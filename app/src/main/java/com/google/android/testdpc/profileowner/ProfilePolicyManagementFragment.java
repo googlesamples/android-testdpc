@@ -16,6 +16,7 @@
 
 package com.google.android.testdpc.profileowner;
 
+import android.app.FragmentManager;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
@@ -26,11 +27,24 @@ import android.widget.Toast;
 
 import com.google.android.testdpc.DeviceAdminReceiver;
 import com.google.android.testdpc.R;
+import com.google.android.testdpc.profileowner.crossprofileintentfilter
+        .AddCrossProfileIntentFilterFragment;
 
 /**
  * This fragment provides several functions that are available in a managed profile.
+ * These includes
+ * 1) {@link DevicePolicyManager#addCrossProfileIntentFilter(android.content.ComponentName,
+ * android.content.IntentFilter, int)}
+ * 2) {@link DevicePolicyManager#clearCrossProfileIntentFilters(android.content.ComponentName)}
  */
-public class ProfilePolicyManagementFragment extends PreferenceFragment {
+public class ProfilePolicyManagementFragment extends PreferenceFragment implements
+        Preference.OnPreferenceClickListener {
+
+    private static final String ADD_CROSS_PROFILE_INTENT_FILTER_PREFERENCE_KEY
+            = "add_cross_profile_intent_filter";
+
+    private static final String CLEAR_CROSS_PROFILE_INTENT_FILTERS_PREFERENCE_KEY
+            = "clear_cross_profile_intent_filters";
 
     private static final String MANAGE_DEVICE_POLICIES_KEY = "manage_device_policies";
 
@@ -39,6 +53,10 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment {
     private ComponentName mAdminComponentName;
 
     private Preference mManageDevicePoliciesPreference;
+
+    private Preference mAddCrossProfileIntentFilterPreference;
+
+    private Preference mClearCrossProfileIntentFiltersPreference;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -70,5 +88,35 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment {
             mManageDevicePoliciesPreference.setSummary(R.string.not_a_device_owner);
         }
 
+        mAddCrossProfileIntentFilterPreference = findPreference(
+                ADD_CROSS_PROFILE_INTENT_FILTER_PREFERENCE_KEY);
+        mAddCrossProfileIntentFilterPreference.setOnPreferenceClickListener(this);
+        mClearCrossProfileIntentFiltersPreference = findPreference(
+                CLEAR_CROSS_PROFILE_INTENT_FILTERS_PREFERENCE_KEY);
+        mClearCrossProfileIntentFiltersPreference.setOnPreferenceClickListener(this);
+    }
+
+    @Override
+    public boolean onPreferenceClick(Preference preference) {
+        String key = preference.getKey();
+        if (ADD_CROSS_PROFILE_INTENT_FILTER_PREFERENCE_KEY.equals(key)) {
+            showAddCrossProfileIntentFilterFragment();
+            return true;
+        } else if (CLEAR_CROSS_PROFILE_INTENT_FILTERS_PREFERENCE_KEY.equals(key)) {
+            mDevicePolicyManager.clearCrossProfileIntentFilters(mAdminComponentName);
+            Toast.makeText(getActivity(), getString(R.string.cross_profile_intent_filters_cleared),
+                    Toast.LENGTH_SHORT).show();
+            return true;
+        }
+        return false;
+    }
+
+    private void showAddCrossProfileIntentFilterFragment() {
+        FragmentManager fragmentManager = getFragmentManager();
+        fragmentManager.beginTransaction()
+                .addToBackStack(ProfilePolicyManagementFragment.class.getName()).replace(
+                R.id.container,
+                new AddCrossProfileIntentFilterFragment())
+                .commit();
     }
 }

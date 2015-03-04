@@ -32,4 +32,21 @@
     <string name="profile_policies_category_title">Profile policies</string>
     <string name="not_a_device_owner">This app is currently not a device owner.</string>
 
+    <!-- Strings for cross-profile intent filters -->
+    <string name="cross_profile_intents">Cross-profile intents</string>
+    <string name="add_cross_profile_intents_title">Add cross-profile intents</string>
+    <string name="clear_cross_profile_intents">Clear all cross-profile intents</string>
+    <string name="actions_title">Actions:</string>
+    <string name="categories_title">Categories:</string>
+    <string name="data_schemes_title">Schemes:</string>
+    <string name="add_cross_profile_intent_success_msg">Cross-profile intent filter has been added.
+    </string>
+    <string name="add_cross_profile_intent_failed_msg">Failed to add cross-profile intent filter
+    </string>
+    <string name="cross_profile_intent_filters_cleared">All cross-profile intent filters have been
+        removed.</string>
+    <string name="cross_profile_intent_filters_flags">Flags:</string>
+    <string name="add">Add</string>
+    <string name="clear">Clear</string>
+
 </resources>
