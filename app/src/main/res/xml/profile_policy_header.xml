@@ -50,6 +50,11 @@
 
     </PreferenceCategory>
 
-    <!-- TODO: Placeholder for profile policies -->
+    <PreferenceCategory
+            android:title="@string/profile_management_title">
+        <Preference
+                android:key="remove_profile"
+                android:title="@string/removing_managed_profile"/>
+    </PreferenceCategory>
 
 </PreferenceScreen>

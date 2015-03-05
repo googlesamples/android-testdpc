@@ -42,6 +42,7 @@ import com.google.android.testdpc.profileowner.crossprofileintentfilter
  * 4) {@link DevicePolicyManager#getCrossProfileCallerIdDisabled(android.content.ComponentName)}
  * 5) {@link DevicePolicyManager#setCameraDisabled(android.content.ComponentName, boolean)}
  * 6) {@link DevicePolicyManager#getCameraDisabled(android.content.ComponentName)}
+ * 7) {@link DevicePolicyManager#wipeData(int)}
  */
 public class ProfilePolicyManagementFragment extends PreferenceFragment implements
         Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
@@ -59,6 +60,8 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
 
     private static final String DISABLE_CAMERA_KEY = "disable_camera";
 
+    private static final String REMOVE_PROFILE_KEY = "remove_profile";
+
     private DevicePolicyManager mDevicePolicyManager;
 
     private ComponentName mAdminComponentName;
@@ -68,6 +71,8 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
     private Preference mAddCrossProfileIntentFilterPreference;
 
     private Preference mClearCrossProfileIntentFiltersPreference;
+
+    private Preference mRemoveManagedProfilePreference;
 
     private SwitchPreference mDisableCrossProfileCallerIdSwitchPreference;
 
@@ -109,6 +114,8 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
         mClearCrossProfileIntentFiltersPreference = findPreference(
                 CLEAR_CROSS_PROFILE_INTENT_FILTERS_PREFERENCE_KEY);
         mClearCrossProfileIntentFiltersPreference.setOnPreferenceClickListener(this);
+        mRemoveManagedProfilePreference = findPreference(REMOVE_PROFILE_KEY);
+        mRemoveManagedProfilePreference.setOnPreferenceClickListener(this);
 
         mDisableCrossProfileCallerIdSwitchPreference = (SwitchPreference) findPreference(
                 DISABLE_CROSS_PROFILE_CALLER_ID_KEY);
@@ -131,6 +138,14 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
             Toast.makeText(getActivity(), getString(R.string.cross_profile_intent_filters_cleared),
                     Toast.LENGTH_SHORT).show();
             return true;
+        } else if (REMOVE_PROFILE_KEY.equals(key)) {
+            mRemoveManagedProfilePreference.setEnabled(false);
+            mDevicePolicyManager.wipeData(0);
+            Toast.makeText(getActivity(), getString(R.string.removing_managed_profile),
+                    Toast.LENGTH_SHORT).show();
+            // Finish the activity because all other functions will not work after the managed
+            // profile is removed.
+            getActivity().finish();
         }
         return false;
     }
