@@ -40,6 +40,8 @@ import com.google.android.testdpc.profileowner.crossprofileintentfilter
  * 3) {@link DevicePolicyManager#setCrossProfileCallerIdDisabled(android.content.ComponentName,
  * boolean)}
  * 4) {@link DevicePolicyManager#getCrossProfileCallerIdDisabled(android.content.ComponentName)}
+ * 5) {@link DevicePolicyManager#setCameraDisabled(android.content.ComponentName, boolean)}
+ * 6) {@link DevicePolicyManager#getCameraDisabled(android.content.ComponentName)}
  */
 public class ProfilePolicyManagementFragment extends PreferenceFragment implements
         Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
@@ -55,6 +57,8 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
     private static final String DISABLE_CROSS_PROFILE_CALLER_ID_KEY
             = "disable_cross_profile_caller_id";
 
+    private static final String DISABLE_CAMERA_KEY = "disable_camera";
+
     private DevicePolicyManager mDevicePolicyManager;
 
     private ComponentName mAdminComponentName;
@@ -66,6 +70,8 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
     private Preference mClearCrossProfileIntentFiltersPreference;
 
     private SwitchPreference mDisableCrossProfileCallerIdSwitchPreference;
+
+    private SwitchPreference mDisableCameraSwitchPreference;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -108,6 +114,10 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
                 DISABLE_CROSS_PROFILE_CALLER_ID_KEY);
         mDisableCrossProfileCallerIdSwitchPreference.setOnPreferenceChangeListener(this);
         reloadCrossProfileCallerIdDisableUi();
+
+        mDisableCameraSwitchPreference = (SwitchPreference) findPreference(DISABLE_CAMERA_KEY);
+        mDisableCameraSwitchPreference.setOnPreferenceChangeListener(this);
+        reloadCameraDisableUi();
     }
 
     @Override
@@ -135,6 +145,12 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
             // Reload UI to verify the state of cross-profiler caller Id is set correctly.
             reloadCrossProfileCallerIdDisableUi();
             return true;
+        } else if (DISABLE_CAMERA_KEY.equals(key)) {
+            boolean disableCamera = (Boolean) newValue;
+            mDevicePolicyManager.setCameraDisabled(mAdminComponentName, disableCamera);
+            // Reload UI to verify the camera is enable / disable correctly.
+            reloadCameraDisableUi();
+            return true;
         }
         return false;
     }
@@ -152,5 +168,10 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
         boolean isCrossProfileCallerIdDisabled = mDevicePolicyManager
                 .getCrossProfileCallerIdDisabled(mAdminComponentName);
         mDisableCrossProfileCallerIdSwitchPreference.setChecked(isCrossProfileCallerIdDisabled);
+    }
+
+    private void reloadCameraDisableUi() {
+        boolean isCameraDisabled = mDevicePolicyManager.getCameraDisabled(mAdminComponentName);
+        mDisableCameraSwitchPreference.setChecked(isCameraDisabled);
     }
 }

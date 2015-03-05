@@ -53,4 +53,8 @@
     <string name="cross_profile_caller_id_title">Cross-profile caller ID</string>
     <string name="disable_cross_profile_caller_id">Disable cross-profile caller ID</string>
 
+    <!-- Strings for camera -->
+    <string name="camera_title">Camera</string>
+    <string name="disable_camera">Disable camera</string>
+
 </resources>

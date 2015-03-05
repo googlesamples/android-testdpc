@@ -18,6 +18,13 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory
+            android:title="@string/camera_title">
+        <SwitchPreference
+                android:key="disable_camera"
+                android:title="@string/disable_camera"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
             android:title="@string/cross_profile_intents">
         <Preference
                 android:title="@string/add_cross_profile_intents_title"
