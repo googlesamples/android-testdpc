@@ -28,6 +28,13 @@
     </PreferenceCategory>
 
     <PreferenceCategory
+            android:title="@string/cross_profile_caller_id_title">
+        <SwitchPreference
+                android:key="disable_cross_profile_caller_id"
+                android:title="@string/disable_cross_profile_caller_id"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
             android:title="@string/device_policies_category_title">
 
         <Preference

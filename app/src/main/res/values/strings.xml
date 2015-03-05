@@ -49,4 +49,8 @@
     <string name="add">Add</string>
     <string name="clear">Clear</string>
 
+    <!-- Strings for cross-profile caller ID -->
+    <string name="cross_profile_caller_id_title">Cross-profile caller ID</string>
+    <string name="disable_cross_profile_caller_id">Disable cross-profile caller ID</string>
+
 </resources>

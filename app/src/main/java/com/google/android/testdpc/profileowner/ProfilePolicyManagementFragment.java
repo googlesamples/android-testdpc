@@ -23,6 +23,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.preference.SwitchPreference;
 import android.widget.Toast;
 
 import com.google.android.testdpc.DeviceAdminReceiver;
@@ -36,9 +37,12 @@ import com.google.android.testdpc.profileowner.crossprofileintentfilter
  * 1) {@link DevicePolicyManager#addCrossProfileIntentFilter(android.content.ComponentName,
  * android.content.IntentFilter, int)}
  * 2) {@link DevicePolicyManager#clearCrossProfileIntentFilters(android.content.ComponentName)}
+ * 3) {@link DevicePolicyManager#setCrossProfileCallerIdDisabled(android.content.ComponentName,
+ * boolean)}
+ * 4) {@link DevicePolicyManager#getCrossProfileCallerIdDisabled(android.content.ComponentName)}
  */
 public class ProfilePolicyManagementFragment extends PreferenceFragment implements
-        Preference.OnPreferenceClickListener {
+        Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
 
     private static final String ADD_CROSS_PROFILE_INTENT_FILTER_PREFERENCE_KEY
             = "add_cross_profile_intent_filter";
@@ -47,6 +51,9 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
             = "clear_cross_profile_intent_filters";
 
     private static final String MANAGE_DEVICE_POLICIES_KEY = "manage_device_policies";
+
+    private static final String DISABLE_CROSS_PROFILE_CALLER_ID_KEY
+            = "disable_cross_profile_caller_id";
 
     private DevicePolicyManager mDevicePolicyManager;
 
@@ -57,6 +64,8 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
     private Preference mAddCrossProfileIntentFilterPreference;
 
     private Preference mClearCrossProfileIntentFiltersPreference;
+
+    private SwitchPreference mDisableCrossProfileCallerIdSwitchPreference;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -94,6 +103,11 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
         mClearCrossProfileIntentFiltersPreference = findPreference(
                 CLEAR_CROSS_PROFILE_INTENT_FILTERS_PREFERENCE_KEY);
         mClearCrossProfileIntentFiltersPreference.setOnPreferenceClickListener(this);
+
+        mDisableCrossProfileCallerIdSwitchPreference = (SwitchPreference) findPreference(
+                DISABLE_CROSS_PROFILE_CALLER_ID_KEY);
+        mDisableCrossProfileCallerIdSwitchPreference.setOnPreferenceChangeListener(this);
+        reloadCrossProfileCallerIdDisableUi();
     }
 
     @Override
@@ -111,6 +125,20 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
         return false;
     }
 
+    @Override
+    public boolean onPreferenceChange(Preference preference, Object newValue) {
+        String key = preference.getKey();
+        if (DISABLE_CROSS_PROFILE_CALLER_ID_KEY.equals(key)) {
+            boolean disableCrossProfileCallerId = (Boolean) newValue;
+            mDevicePolicyManager.setCrossProfileCallerIdDisabled(mAdminComponentName,
+                    disableCrossProfileCallerId);
+            // Reload UI to verify the state of cross-profiler caller Id is set correctly.
+            reloadCrossProfileCallerIdDisableUi();
+            return true;
+        }
+        return false;
+    }
+
     private void showAddCrossProfileIntentFilterFragment() {
         FragmentManager fragmentManager = getFragmentManager();
         fragmentManager.beginTransaction()
@@ -118,5 +146,11 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
                 R.id.container,
                 new AddCrossProfileIntentFilterFragment())
                 .commit();
+    }
+
+    private void reloadCrossProfileCallerIdDisableUi() {
+        boolean isCrossProfileCallerIdDisabled = mDevicePolicyManager
+                .getCrossProfileCallerIdDisabled(mAdminComponentName);
+        mDisableCrossProfileCallerIdSwitchPreference.setChecked(isCrossProfileCallerIdDisabled);
     }
 }
