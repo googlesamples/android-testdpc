@@ -61,4 +61,19 @@
     <string name="profile_management_title">Profile management</string>
     <string name="removing_managed_profile">Removing managed profile</string>
 
+    <!-- Strings for cross-profile widget provider -->
+    <string name="cross_profile_widget_providers_title">Cross-profile widget providers</string>
+    <string name="add_cross_profile_app_widget_providers_title">Enable app widgets</string>
+    <string name="add_cross_profile_app_widget_providers">Enable app widgets in a work profile app
+    </string>
+    <string name="remove_cross_profile_app_widget_providers_title">Disable app widgets</string>
+    <string name="remove_cross_profile_app_widget_providers">Remove app widgets in a work profile
+    </string>
+    <string name="no_cross_profile_widget_providers_to_enable">There is no widget from any of the
+        work profile apps that is in disabled state.</string>
+    <string name="no_cross_profile_widget_providers_to_disable">There is no widget from any of the
+        work profile apps that is in enabled state.</string>
+    <string name="cross_profile_widget_enable">Widgets from "%s" are enabled.</string>
+    <string name="cross_profile_widget_disable">Widgets from "%s" are disabled.</string>
+
 </resources>

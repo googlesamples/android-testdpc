@@ -16,10 +16,14 @@
 
 package com.google.android.testdpc.profileowner;
 
+import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.app.admin.DevicePolicyManager;
+import android.appwidget.AppWidgetManager;
+import android.appwidget.AppWidgetProviderInfo;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
@@ -28,8 +32,13 @@ import android.widget.Toast;
 
 import com.google.android.testdpc.DeviceAdminReceiver;
 import com.google.android.testdpc.R;
+import com.google.android.testdpc.common.AppInfoArrayAdapter;
 import com.google.android.testdpc.profileowner.crossprofileintentfilter
         .AddCrossProfileIntentFilterFragment;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 
 /**
  * This fragment provides several functions that are available in a managed profile.
@@ -43,6 +52,10 @@ import com.google.android.testdpc.profileowner.crossprofileintentfilter
  * 5) {@link DevicePolicyManager#setCameraDisabled(android.content.ComponentName, boolean)}
  * 6) {@link DevicePolicyManager#getCameraDisabled(android.content.ComponentName)}
  * 7) {@link DevicePolicyManager#wipeData(int)}
+ * 8) {@link DevicePolicyManager#addCrossProfileWidgetProvider(android.content.ComponentName,
+ * String)}
+ * 9) {@link DevicePolicyManager#removeCrossProfileWidgetProvider(android.content.ComponentName,
+ * String)}
  */
 public class ProfilePolicyManagementFragment extends PreferenceFragment implements
         Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
@@ -62,6 +75,11 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
 
     private static final String REMOVE_PROFILE_KEY = "remove_profile";
 
+    private static final String ADD_CROSS_PROFILE_APP_WIDGETS_KEY = "add_cross_profile_app_widgets";
+
+    private static final String REMOVE_CROSS_PROFILE_APP_WIDGETS_KEY
+            = "remove_cross_profile_app_widgets";
+
     private DevicePolicyManager mDevicePolicyManager;
 
     private ComponentName mAdminComponentName;
@@ -73,6 +91,10 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
     private Preference mClearCrossProfileIntentFiltersPreference;
 
     private Preference mRemoveManagedProfilePreference;
+
+    private Preference mAddCrossProfileAppWidgetsPreference;
+
+    private Preference mRemoveCrossProfileAppWidgetsPreference;
 
     private SwitchPreference mDisableCrossProfileCallerIdSwitchPreference;
 
@@ -116,6 +138,11 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
         mClearCrossProfileIntentFiltersPreference.setOnPreferenceClickListener(this);
         mRemoveManagedProfilePreference = findPreference(REMOVE_PROFILE_KEY);
         mRemoveManagedProfilePreference.setOnPreferenceClickListener(this);
+        mAddCrossProfileAppWidgetsPreference = findPreference(ADD_CROSS_PROFILE_APP_WIDGETS_KEY);
+        mAddCrossProfileAppWidgetsPreference.setOnPreferenceClickListener(this);
+        mRemoveCrossProfileAppWidgetsPreference = findPreference(
+                REMOVE_CROSS_PROFILE_APP_WIDGETS_KEY);
+        mRemoveCrossProfileAppWidgetsPreference.setOnPreferenceClickListener(this);
 
         mDisableCrossProfileCallerIdSwitchPreference = (SwitchPreference) findPreference(
                 DISABLE_CROSS_PROFILE_CALLER_ID_KEY);
@@ -125,6 +152,12 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
         mDisableCameraSwitchPreference = (SwitchPreference) findPreference(DISABLE_CAMERA_KEY);
         mDisableCameraSwitchPreference.setOnPreferenceChangeListener(this);
         reloadCameraDisableUi();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getActivity().getActionBar().setTitle(R.string.app_name);
     }
 
     @Override
@@ -146,6 +179,12 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
             // Finish the activity because all other functions will not work after the managed
             // profile is removed.
             getActivity().finish();
+        } else if (ADD_CROSS_PROFILE_APP_WIDGETS_KEY.equals(key)) {
+            showDisabledAppWidgetList();
+            return true;
+        } else if (REMOVE_CROSS_PROFILE_APP_WIDGETS_KEY.equals(key)) {
+            showEnabledAppWidgetList();
+            return true;
         }
         return false;
     }
@@ -188,5 +227,100 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
     private void reloadCameraDisableUi() {
         boolean isCameraDisabled = mDevicePolicyManager.getCameraDisabled(mAdminComponentName);
         mDisableCameraSwitchPreference.setChecked(isCameraDisabled);
+    }
+
+    /**
+     * Show a list of work profile apps which have non-enabled widget providers.
+     * Clicking any item on the list will enable ALL the widgets from that app.
+     *
+     * Show toast if there is no work profile app that has non-enabled widget providers.
+     */
+    private void showDisabledAppWidgetList() {
+        if (getActivity() == null || getActivity().isFinishing()) {
+            return;
+        }
+        final List<String> disabledCrossProfileWidgetProvidersList
+                = getDisabledCrossProfileWidgetProvidersList();
+        if (disabledCrossProfileWidgetProvidersList.isEmpty()) {
+            Toast.makeText(getActivity(), getString(
+                    R.string.no_cross_profile_widget_providers_to_enable), Toast.LENGTH_SHORT)
+                    .show();
+        } else {
+            AppInfoArrayAdapter appInfoArrayAdapter = new AppInfoArrayAdapter(getActivity(),
+                    R.layout.app_row, disabledCrossProfileWidgetProvidersList);
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle(getString(R.string.add_cross_profile_app_widget_providers_title));
+            builder.setAdapter(appInfoArrayAdapter, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    String pkgName = disabledCrossProfileWidgetProvidersList.get(which);
+                    mDevicePolicyManager.addCrossProfileWidgetProvider(mAdminComponentName,
+                            pkgName);
+                    Toast.makeText(getActivity(), getString(R.string.cross_profile_widget_enable,
+                            pkgName), Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
+                }
+            });
+            builder.show();
+        }
+    }
+
+    /**
+     * Get a list of work profile apps which has non-enabled cross-profile widget providers.
+     *
+     * @return a list of package name which has non-enabled cross-profile widget providers.
+     */
+    private List<String> getDisabledCrossProfileWidgetProvidersList() {
+        Context context = getActivity().getApplicationContext();
+        List<String> enabledCrossProfileWidgetProvidersList = mDevicePolicyManager
+                .getCrossProfileWidgetProviders(DeviceAdminReceiver.getComponentName(context));
+        HashSet<String> disabledCrossProfileWidgetProvidersSet = new HashSet<String>();
+        List<AppWidgetProviderInfo> appWidgetProviderInfoList
+                = AppWidgetManager.getInstance(context).getInstalledProviders();
+        for (AppWidgetProviderInfo appWidgetProviderInfo : appWidgetProviderInfoList) {
+            if (appWidgetProviderInfo.configure != null &&
+                    !enabledCrossProfileWidgetProvidersList.contains(
+                            appWidgetProviderInfo.configure.getPackageName())) {
+                disabledCrossProfileWidgetProvidersSet.add(
+                        appWidgetProviderInfo.configure.getPackageName());
+            }
+        }
+        return new ArrayList<String>(disabledCrossProfileWidgetProvidersSet);
+    }
+
+    /**
+     * Show a list of work profile apps which have widget providers enabled.
+     * Clicking any item on the list will disable ALL the widgets from that app.
+     *
+     * Show toast if there is no app that have non-enabled widget providers.
+     */
+    private void showEnabledAppWidgetList() {
+        if (getActivity() == null || getActivity().isFinishing()) {
+            return;
+        }
+        final List<String> packageWithEnabledCrossProfileWidgetsList = mDevicePolicyManager
+                .getCrossProfileWidgetProviders(mAdminComponentName);
+        if (packageWithEnabledCrossProfileWidgetsList.isEmpty()) {
+            Toast.makeText(getActivity(), getString(
+                    R.string.no_cross_profile_widget_providers_to_disable), Toast.LENGTH_SHORT)
+                    .show();
+        } else {
+            AppInfoArrayAdapter appInfoArrayAdapter = new AppInfoArrayAdapter(getActivity(),
+                    R.layout.app_row, packageWithEnabledCrossProfileWidgetsList);
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle(getString(R.string.remove_cross_profile_app_widget_providers_title));
+            builder.setAdapter(appInfoArrayAdapter, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    String pkgName = packageWithEnabledCrossProfileWidgetsList.get(which);
+                    mDevicePolicyManager.removeCrossProfileWidgetProvider(mAdminComponentName,
+                            pkgName);
+                    Toast.makeText(getActivity(),getString(R.string.cross_profile_widget_disable,
+                            pkgName), Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
+                }
+            });
+            builder.show();
+        }
     }
 }
