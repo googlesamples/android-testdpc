@@ -53,7 +53,7 @@ public abstract class IntentOrIntentFilterFragment extends Fragment implements
     /**
      * A list of common actions
      */
-    private static final String[] ACTIONS_LIST = new String[]{
+    protected static final String[] ACTIONS_LIST = new String[]{
             Intent.ACTION_MAIN,
             Intent.ACTION_VIEW,
             Intent.ACTION_ATTACH_DATA,
@@ -80,7 +80,7 @@ public abstract class IntentOrIntentFilterFragment extends Fragment implements
     /**
      * A list of common categories
      */
-    private static final String[] CATEGORIES_LIST = new String[]{
+    protected static final String[] CATEGORIES_LIST = new String[]{
             Intent.CATEGORY_DEFAULT,
             Intent.CATEGORY_BROWSABLE,
             Intent.CATEGORY_TAB,
@@ -103,7 +103,7 @@ public abstract class IntentOrIntentFilterFragment extends Fragment implements
     /**
      * A list of common data schemes
      */
-    private static final String[] DATA_SCHEMES_LIST = new String[]{
+    protected static final String[] DATA_SCHEMES_LIST = new String[]{
             "http",
             "https",
             "tel",

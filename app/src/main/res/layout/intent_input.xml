@@ -30,7 +30,7 @@ limitations under the License.
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-        <Spinner
+        <com.google.android.testdpc.common.ReselectionSpinner
                 android:id="@+id/list_of_actions"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -76,6 +76,7 @@ limitations under the License.
             android:text="@string/data_schemes_title"/>
 
     <LinearLayout
+            android:id="@+id/data_schemes_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">

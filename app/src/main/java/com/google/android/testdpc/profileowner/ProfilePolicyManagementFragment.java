@@ -28,11 +28,14 @@ import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.SwitchPreference;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.google.android.testdpc.DeviceAdminReceiver;
 import com.google.android.testdpc.R;
 import com.google.android.testdpc.common.AppInfoArrayAdapter;
+import com.google.android.testdpc.profileowner.addsystemapps.EnableSystemAppsByIntentFragment;
 import com.google.android.testdpc.profileowner.crossprofileintentfilter
         .AddCrossProfileIntentFilterFragment;
 
@@ -56,6 +59,10 @@ import java.util.List;
  * String)}
  * 9) {@link DevicePolicyManager#removeCrossProfileWidgetProvider(android.content.ComponentName,
  * String)}
+ * 10) {@link DevicePolicyManager#enableSystemApp(android.content.ComponentName,
+ * android.content.Intent)}
+ * 11) {@link DevicePolicyManager#enableSystemApp(android.content.ComponentName, String)}
+ *
  */
 public class ProfilePolicyManagementFragment extends PreferenceFragment implements
         Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
@@ -80,6 +87,11 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
     private static final String REMOVE_CROSS_PROFILE_APP_WIDGETS_KEY
             = "remove_cross_profile_app_widgets";
 
+    private static final String ENABLE_SYSTEM_APPS_BY_PACKAGE_NAME_KEY
+            = "enable_system_apps_by_package_name";
+
+    private static final String ENABLE_SYSTEM_APPS_BY_INTENT_KEY = "enable_system_apps_by_intent";
+
     private DevicePolicyManager mDevicePolicyManager;
 
     private ComponentName mAdminComponentName;
@@ -95,6 +107,10 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
     private Preference mAddCrossProfileAppWidgetsPreference;
 
     private Preference mRemoveCrossProfileAppWidgetsPreference;
+
+    private Preference mEnableSystemAppByPackageNamePreference;
+
+    private Preference mEnableSystemAppByIntentPreference;
 
     private SwitchPreference mDisableCrossProfileCallerIdSwitchPreference;
 
@@ -143,6 +159,11 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
         mRemoveCrossProfileAppWidgetsPreference = findPreference(
                 REMOVE_CROSS_PROFILE_APP_WIDGETS_KEY);
         mRemoveCrossProfileAppWidgetsPreference.setOnPreferenceClickListener(this);
+        mEnableSystemAppByPackageNamePreference = findPreference(
+                ENABLE_SYSTEM_APPS_BY_PACKAGE_NAME_KEY);
+        mEnableSystemAppByPackageNamePreference.setOnPreferenceClickListener(this);
+        mEnableSystemAppByIntentPreference = findPreference(ENABLE_SYSTEM_APPS_BY_INTENT_KEY);
+        mEnableSystemAppByIntentPreference.setOnPreferenceClickListener(this);
 
         mDisableCrossProfileCallerIdSwitchPreference = (SwitchPreference) findPreference(
                 DISABLE_CROSS_PROFILE_CALLER_ID_KEY);
@@ -184,6 +205,12 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
             return true;
         } else if (REMOVE_CROSS_PROFILE_APP_WIDGETS_KEY.equals(key)) {
             showEnabledAppWidgetList();
+            return true;
+        } else if (ENABLE_SYSTEM_APPS_BY_PACKAGE_NAME_KEY.equals(key)) {
+            showEnableSystemAppByPackageNamePrompt();
+            return true;
+        } else if (ENABLE_SYSTEM_APPS_BY_INTENT_KEY.equals(key)) {
+            showEnableSystemAppByIntentFragment();
             return true;
         }
         return false;
@@ -298,21 +325,21 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
         if (getActivity() == null || getActivity().isFinishing()) {
             return;
         }
-        final List<String> packageWithEnabledCrossProfileWidgetsList = mDevicePolicyManager
+        final List<String> packagesWithEnabledCrossProfileWidgetsList = mDevicePolicyManager
                 .getCrossProfileWidgetProviders(mAdminComponentName);
-        if (packageWithEnabledCrossProfileWidgetsList.isEmpty()) {
+        if (packagesWithEnabledCrossProfileWidgetsList.isEmpty()) {
             Toast.makeText(getActivity(), getString(
                     R.string.no_cross_profile_widget_providers_to_disable), Toast.LENGTH_SHORT)
                     .show();
         } else {
             AppInfoArrayAdapter appInfoArrayAdapter = new AppInfoArrayAdapter(getActivity(),
-                    R.layout.app_row, packageWithEnabledCrossProfileWidgetsList);
+                    R.layout.app_row, packagesWithEnabledCrossProfileWidgetsList);
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setTitle(getString(R.string.remove_cross_profile_app_widget_providers_title));
             builder.setAdapter(appInfoArrayAdapter, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    String pkgName = packageWithEnabledCrossProfileWidgetsList.get(which);
+                    String pkgName = packagesWithEnabledCrossProfileWidgetsList.get(which);
                     mDevicePolicyManager.removeCrossProfileWidgetProvider(mAdminComponentName,
                             pkgName);
                     Toast.makeText(getActivity(),getString(R.string.cross_profile_widget_disable,
@@ -322,5 +349,54 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
             });
             builder.show();
         }
+    }
+
+    /**
+     * Show a prompt to enable system app.
+     */
+    private void showEnableSystemAppByPackageNamePrompt() {
+        if (getActivity() == null || getActivity().isFinishing()) {
+            return;
+        }
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(getString(R.string.enable_system_apps_title));
+        LinearLayout inputContainer = (LinearLayout) getActivity().getLayoutInflater()
+                .inflate(R.layout.simple_edittext, null);
+        final EditText editText = (EditText) inputContainer.findViewById(R.id.input);
+        editText.setHint(getString(R.string.enable_system_apps_by_package_name_hints));
+        builder.setView(inputContainer);
+        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                try {
+                    final String packageName = editText.getText().toString();
+                    mDevicePolicyManager.enableSystemApp(mAdminComponentName, packageName);
+                    Toast.makeText(getActivity(),getString(
+                            R.string.enable_system_apps_by_package_name_success_msg, packageName),
+                            Toast.LENGTH_SHORT).show();
+                } catch (IllegalArgumentException e) {
+                    Toast.makeText(getActivity(), e.getLocalizedMessage(), Toast.LENGTH_SHORT)
+                            .show();
+                }
+                dialog.dismiss();
+            }
+        });
+        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        builder.show();
+    }
+
+    /**
+     * Show a fragment to construct an intent for enabling system apps.
+     */
+    private void showEnableSystemAppByIntentFragment() {
+        FragmentManager fragmentManager = getFragmentManager();
+        fragmentManager.beginTransaction()
+                .addToBackStack(ProfilePolicyManagementFragment.class.getName()).replace(
+                        R.id.container, new EnableSystemAppsByIntentFragment()).commit();
     }
 }

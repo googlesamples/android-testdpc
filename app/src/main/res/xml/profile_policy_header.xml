@@ -18,6 +18,17 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory
+            android:title="@string/apps_management_title">
+        <Preference
+                android:key="enable_system_apps_by_package_name"
+                android:title="@string/enable_system_apps_by_package_name"/>
+
+        <Preference
+                android:key="enable_system_apps_by_intent"
+                android:title="@string/enable_system_apps_by_intent"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
             android:title="@string/camera_title">
         <SwitchPreference
                 android:key="disable_camera"

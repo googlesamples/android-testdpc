@@ -76,4 +76,20 @@
     <string name="cross_profile_widget_enable">Widgets from "%s" are enabled.</string>
     <string name="cross_profile_widget_disable">Widgets from "%s" are disabled.</string>
 
+    <!-- Strings for managing apps -->
+    <string name="apps_management_title">Apps management</string>
+    <string name="enable_system_apps_title">Enable system apps</string>
+    <string name="enable_system_apps_by_package_name">Enable a system app by package name</string>
+    <string name="enable_system_apps_by_package_name_hints">Enter a system app package name.
+    </string>
+    <string name="enable_system_apps_by_package_name_success_msg">%s is enabled.</string>
+    <string name="enable_system_apps_by_intent">Enable a system app by intent</string>
+    <string name="enable_system_apps_failure_msg">Failed to enable system apps with the given
+        intent.
+    </string>
+    <string name="enable_system_apps_attempt_msg">Enabled system apps with the given intent.
+    </string>
+    <string name="enable">Enable</string>
+    <string name="invalid_system_apps_action">Invalid action.</string>
+
 </resources>
