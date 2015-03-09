@@ -70,9 +70,9 @@
     <string name="remove_cross_profile_app_widget_providers_title">Disable app widgets</string>
     <string name="remove_cross_profile_app_widget_providers">Remove app widgets in a work profile
     </string>
-    <string name="no_cross_profile_widget_providers_to_enable">There is no widget from any of the
+    <string name="all_cross_profile_widget_providers_are_enabled">There is no widget from any of the
         work profile apps that is in disabled state.</string>
-    <string name="no_cross_profile_widget_providers_to_disable">There is no widget from any of the
+    <string name="all_cross_profile_widget_providers_are_disabled">There is no widget from any of the
         work profile apps that is in enabled state.</string>
     <string name="cross_profile_widget_enable">Widgets from "%s" are enabled.</string>
     <string name="cross_profile_widget_disable">Widgets from "%s" are disabled.</string>
@@ -102,5 +102,10 @@
     <string name="check_lock_task_permitted_result_permitted">Lock task is permitted.</string>
     <string name="check_lock_task_permitted_result_not_permitted">Lock task is not permitted.
     </string>
+
+    <!-- Strings for user restriction management -->
+    <string name="user_restriction_management_title">User restriction</string>
+    <string name="disallow_debugging_feature">Disallow debugging feature</string>
+    <string name="disallow_install_unknown_sources">Disallow install unknown sources</string>
 
 </resources>

@@ -24,8 +24,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
+import android.os.UserManager;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.preference.SwitchPreference;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -41,17 +43,25 @@ import java.util.List;
  * These include
  * 1) {@link DevicePolicyManager#setLockTaskPackages(android.content.ComponentName, String[])}
  * 2) {@link DevicePolicyManager#isLockTaskPermitted(String)}
+ * 3) {@link UserManager#DISALLOW_DEBUGGING_FEATURES}
+ * 4) {@link UserManager#DISALLOW_INSTALL_UNKNOWN_SOURCES}
  */
 public class DevicePolicyManagementFragment extends PreferenceFragment implements
-        Preference.OnPreferenceClickListener {
-
+        Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
     private static final String MANAGE_LOCK_TASK_LIST_KEY = "manage_lock_task";
     private static final String CHECK_LOCK_TASK_PERMITTED_KEY = "check_lock_task_permitted";
+    private static final String DISALLOW_INSTALL_DEBUGGING_FEATURE_KEY
+            = "disallow_debugging_feature";
+    private static final String DISALLOW_INSTALL_UNKNOWN_SOURCES_KEY
+            = "disallow_install_unknown_sources";
 
-    private DevicePolicyManager mDevicePolicyManager;
-    private ComponentName mAdminComponentName;
     private Preference mManageLockTaskPreference;
     private Preference mCheckLockTaskPermittedPreference;
+    private SwitchPreference mDisallowDebuggingFeatureSwitchPreference;
+    private SwitchPreference mDisallowInstallUnknownSourcesSwitchPreference;
+    private DevicePolicyManager mDevicePolicyManager;
+    private ComponentName mAdminComponentName;
+    private UserManager mUserManager;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -60,19 +70,21 @@ public class DevicePolicyManagementFragment extends PreferenceFragment implement
         mAdminComponentName = DeviceAdminReceiver.getComponentName(getActivity());
         mDevicePolicyManager = (DevicePolicyManager) getActivity().getSystemService(
                 Context.DEVICE_POLICY_SERVICE);
+        mUserManager = (UserManager) getActivity().getSystemService(Context.USER_SERVICE);
         addPreferencesFromResource(R.xml.device_policy_header);
-
-        boolean isDeviceOwner = mDevicePolicyManager.isDeviceOwnerApp(
-                getActivity().getPackageName());
-        if (!isDeviceOwner) {
-            mCheckLockTaskPermittedPreference.setEnabled(false);
-            mManageLockTaskPreference.setEnabled(false);
-        }
 
         mManageLockTaskPreference = findPreference(MANAGE_LOCK_TASK_LIST_KEY);
         mManageLockTaskPreference.setOnPreferenceClickListener(this);
         mCheckLockTaskPermittedPreference = findPreference(CHECK_LOCK_TASK_PERMITTED_KEY);
         mCheckLockTaskPermittedPreference.setOnPreferenceClickListener(this);
+        mDisallowDebuggingFeatureSwitchPreference = (SwitchPreference) findPreference(
+                DISALLOW_INSTALL_DEBUGGING_FEATURE_KEY);
+        mDisallowDebuggingFeatureSwitchPreference.setOnPreferenceChangeListener(this);
+        mDisallowInstallUnknownSourcesSwitchPreference = (SwitchPreference) findPreference(
+                DISALLOW_INSTALL_UNKNOWN_SOURCES_KEY);
+        mDisallowInstallUnknownSourcesSwitchPreference.setOnPreferenceChangeListener(this);
+        validateUserRestrictionUi(UserManager.DISALLOW_DEBUGGING_FEATURES);
+        validateUserRestrictionUi(UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES);
     }
 
     @Override
@@ -96,6 +108,22 @@ public class DevicePolicyManagementFragment extends PreferenceFragment implement
             return true;
         } else if (mCheckLockTaskPermittedPreference == preference) {
             showCheckLockTaskPermittedPrompt();
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean onPreferenceChange(Preference preference, Object newValue) {
+        String key = preference.getKey();
+        if (DISALLOW_INSTALL_DEBUGGING_FEATURE_KEY.equals(key)) {
+            boolean disallowDebuggingFeature = (Boolean) newValue;
+            setUserRestriction(UserManager.DISALLOW_DEBUGGING_FEATURES, disallowDebuggingFeature);
+            return true;
+        } else if (DISALLOW_INSTALL_UNKNOWN_SOURCES_KEY.equals(key)) {
+            boolean disallowInstallUnknownSources = (Boolean) newValue;
+            setUserRestriction(UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES,
+                    disallowInstallUnknownSources);
             return true;
         }
         return false;
@@ -177,5 +205,30 @@ public class DevicePolicyManagementFragment extends PreferenceFragment implement
                     }
                 })
                 .show();
+    }
+
+    private void setUserRestriction(String restriction, boolean disallow) {
+        if (disallow) {
+            mDevicePolicyManager.addUserRestriction(mAdminComponentName, restriction);
+        } else {
+            mDevicePolicyManager.clearUserRestriction(mAdminComponentName, restriction);
+        }
+        validateUserRestrictionUi(restriction);
+    }
+
+    private void validateUserRestrictionUi(String userRestrictions) {
+        switch (userRestrictions) {
+            case UserManager.DISALLOW_DEBUGGING_FEATURES:
+                boolean disallowDebuggingFeature = mUserManager
+                        .hasUserRestriction(UserManager.DISALLOW_DEBUGGING_FEATURES);
+                mDisallowDebuggingFeatureSwitchPreference.setChecked(disallowDebuggingFeature);
+                break;
+            case UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES:
+                boolean disallowInstallUnknownSources = mUserManager.hasUserRestriction(
+                        UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES);
+                mDisallowInstallUnknownSourcesSwitchPreference.setChecked(
+                        disallowInstallUnknownSources);
+                break;
+        }
     }
 }

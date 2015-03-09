@@ -33,13 +33,27 @@
         <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/setup_profile_message" />
+                android:text="@string/setup_profile_message"/>
 
         <Button
                 android:id="@+id/setup_profile"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/set_up_profile" />
+                android:text="@string/set_up_profile"/>
+
+
+        <TextView
+                android:id="@+id/not_a_device_owner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/not_a_device_owner"/>
+
+        <Button
+                android:id="@+id/device_management"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/manage_device_policies_title"
+                android:enabled="false"/>
 
     </LinearLayout>
 

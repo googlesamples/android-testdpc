@@ -27,4 +27,14 @@ limitations under the License.
                 android:title="@string/check_lock_task_permitted"/>
     </PreferenceCategory>
 
+    <PreferenceCategory
+            android:title="@string/user_restriction_management_title">
+        <SwitchPreference
+                android:key="disallow_debugging_feature"
+                android:title="@string/disallow_debugging_feature"/>
+        <SwitchPreference
+                android:key="disallow_install_unknown_sources"
+                android:title="@string/disallow_install_unknown_sources"/>
+    </PreferenceCategory>
+
 </PreferenceScreen>

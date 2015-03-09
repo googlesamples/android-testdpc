@@ -263,7 +263,7 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
                 = getDisabledCrossProfileWidgetProvidersList();
         if (disabledCrossProfileWidgetProvidersList.isEmpty()) {
             Toast.makeText(getActivity(), getString(
-                    R.string.no_cross_profile_widget_providers_to_enable), Toast.LENGTH_SHORT)
+                    R.string.all_cross_profile_widget_providers_are_enabled), Toast.LENGTH_SHORT)
                     .show();
         } else {
             AppInfoArrayAdapter appInfoArrayAdapter = new AppInfoArrayAdapter(getActivity(),
@@ -323,7 +323,7 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
                 .getCrossProfileWidgetProviders(mAdminComponentName);
         if (packagesWithEnabledCrossProfileWidgetsList.isEmpty()) {
             Toast.makeText(getActivity(), getString(
-                    R.string.no_cross_profile_widget_providers_to_disable), Toast.LENGTH_SHORT)
+                    R.string.all_cross_profile_widget_providers_are_disabled), Toast.LENGTH_SHORT)
                     .show();
         } else {
             AppInfoArrayAdapter appInfoArrayAdapter = new AppInfoArrayAdapter(getActivity(),
