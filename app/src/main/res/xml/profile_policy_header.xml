@@ -26,6 +26,10 @@
         <Preference
                 android:key="enable_system_apps_by_intent"
                 android:title="@string/enable_system_apps_by_intent"/>
+
+        <Preference
+                android:key="manage_app_restrictions"
+                android:title="@string/manage_app_restrictions"/>
     </PreferenceCategory>
 
     <PreferenceCategory

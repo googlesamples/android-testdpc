@@ -45,6 +45,7 @@ import com.google.android.testdpc.R;
 import com.google.android.testdpc.common.AppInfoArrayAdapter;
 import com.google.android.testdpc.deviceowner.DevicePolicyManagementFragment;
 import com.google.android.testdpc.profileowner.addsystemapps.EnableSystemAppsByIntentFragment;
+import com.google.android.testdpc.profileowner.apprestrictions.ManageAppRestrictionsFragment;
 import com.google.android.testdpc.profileowner.crossprofileintentfilter
         .AddCrossProfileIntentFilterFragment;
 
@@ -94,7 +95,6 @@ import java.util.List;
  */
 public class ProfilePolicyManagementFragment extends PreferenceFragment implements
         Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
-
     public static final String TAG = "ProfilePolicyManagementFragment";
     public static final int INSTALL_KEY_CERTIFICATE_REQUEST_CODE = 7689;
     public static final int INSTALL_CA_CERTIFICATE_REQUEST_CODE = 7690;
@@ -118,6 +118,7 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
     private static final String INSTALL_CA_CERTIFICATE_KEY = "install_ca_certificate";
     private static final String GET_CA_CERTIFICATES_KEY = "get_ca_certificates";
     private static final String REMOVE_ALL_CERTIFICATES_KEY = "remove_all_ca_certificates";
+    private static final String MANAGE_APP_RESTRICTIONS_KEY = "manage_app_restrictions";
 
     private DevicePolicyManager mDevicePolicyManager;
     private ComponentName mAdminComponentName;
@@ -133,6 +134,7 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
     private Preference mInstallCaCertificatePreference;
     private Preference mGetCaCertificatePreference;
     private Preference mRemoveAllCaCertificatesPreference;
+    private Preference mManageAppRestrictionsPreference;
     private SwitchPreference mDisableCrossProfileCallerIdSwitchPreference;
     private SwitchPreference mDisableCameraSwitchPreference;
     private ShowCaCertificateListTask mShowCaCertificateListTask = null;
@@ -183,6 +185,8 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
         mGetCaCertificatePreference.setOnPreferenceClickListener(this);
         mRemoveAllCaCertificatesPreference = findPreference(REMOVE_ALL_CERTIFICATES_KEY);
         mRemoveAllCaCertificatesPreference.setOnPreferenceClickListener(this);
+        mManageAppRestrictionsPreference = findPreference(MANAGE_APP_RESTRICTIONS_KEY);
+        mManageAppRestrictionsPreference.setOnPreferenceClickListener(this);
     }
 
     @Override
@@ -257,6 +261,9 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
             mDevicePolicyManager.uninstallAllUserCaCerts(mAdminComponentName);
             Toast.makeText(getActivity(), R.string.all_ca_certificates_removed, Toast.LENGTH_SHORT)
                     .show();
+            return true;
+        } else if (MANAGE_APP_RESTRICTIONS_KEY.equals(key)) {
+            showManageAppRestrictionsFragment();
             return true;
         }
         return false;
@@ -703,5 +710,15 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
             }
             return caSubjectDnList;
         }
+    }
+
+    /**
+     * Show the app restriction management fragment.
+     */
+    private void showManageAppRestrictionsFragment() {
+        FragmentManager fragmentManager = getFragmentManager();
+        fragmentManager.beginTransaction()
+                .addToBackStack(ProfilePolicyManagementFragment.class.getName())
+                .replace(R.id.container, new ManageAppRestrictionsFragment()).commit();
     }
 }

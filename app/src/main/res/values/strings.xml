@@ -127,4 +127,18 @@
     <string name="installed_ca_title">Installed CA certificates</string>
     <string name="remove_all_ca_certificates">Remove all CA certificates</string>
     <string name="all_ca_certificates_removed">All CA certificates have been removed.</string>
+
+    <!-- Strings for app restrictions -->
+    <string name="manage_app_restrictions">Manage app restrictions</string>
+    <string name="app_restrictions_key">Key</string>
+    <string name="app_restrictions_value">Value</string>
+    <string name="add_modify_key">Add / modify key</string>
+    <string name="remove_key">Remove key</string>
+    <string name="load_default">Load default</string>
+    <string name="empty_key_error">Please enter a key.</string>
+    <string name="set_app_restrictions">Set app restrictions</string>
+    <string name="set_str_array_dialog_title">Set values for\n\"%s\"</string>
+    <string name="set_app_restrictions_fail">Fail to set app restrictions due to invalid input.
+    </string>
+    <string name="set_app_restrictions_success">Set app restrictions for %s is successful.</string>
 </resources>
