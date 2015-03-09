@@ -108,4 +108,23 @@
     <string name="disallow_debugging_feature">Disallow debugging feature</string>
     <string name="disallow_install_unknown_sources">Disallow install unknown sources</string>
 
+    <!-- Strings for certificate management  -->
+    <string name="certificate_management_title">Certificate management</string>
+    <string name="install_key_certificate">Install a key certificate</string>
+    <string name="certificate_password_prompt_title">Extract certificate</string>
+    <string name="certificate_password_prompt_enter_password">Type the password to extract the
+        certificates.</string>
+    <string name="certificate_password_prompt_incorrect">Type the correct password.</string>
+    <string name="certificate_alias_prompt_title">Name the certificate</string>
+    <string name="certificate_alias_prompt_certificate_name">Certificate name:</string>
+    <string name="certificate_added">\"%s\" certificate added.</string>
+    <string name="not_a_key_certificate">The selected certificate is not a key certificate.</string>
+    <string name="install_ca_certificate">Install a CA certificate</string>
+    <string name="install_ca_successfully">The selected CA is installed.</string>
+    <string name="install_ca_fail">The selected CA is not installed.</string>
+    <string name="get_ca_certificates">Get a list of CAs</string>
+    <string name="no_ca_certificate">There is no CA certificate installed.</string>
+    <string name="installed_ca_title">Installed CA certificates</string>
+    <string name="remove_all_ca_certificates">Remove all CA certificates</string>
+    <string name="all_ca_certificates_removed">All CA certificates have been removed.</string>
 </resources>

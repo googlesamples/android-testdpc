@@ -36,6 +36,22 @@
     </PreferenceCategory>
 
     <PreferenceCategory
+            android:title="@string/certificate_management_title">
+        <Preference
+                android:key="install_key_certificate"
+                android:title="@string/install_key_certificate"/>
+        <Preference
+                android:key="install_ca_certificate"
+                android:title="@string/install_ca_certificate"/>
+        <Preference
+                android:key="get_ca_certificates"
+                android:title="@string/get_ca_certificates"/>
+        <Preference
+                android:key="remove_all_ca_certificates"
+                android:title="@string/remove_all_ca_certificates"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
             android:title="@string/cross_profile_intents">
         <Preference
                 android:title="@string/add_cross_profile_intents_title"

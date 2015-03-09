@@ -18,6 +18,7 @@ package com.google.android.testdpc;
 
 import android.app.Activity;
 import android.app.admin.DevicePolicyManager;
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.google.android.testdpc.profileowner.ProfilePolicyManagementFragment;
@@ -27,6 +28,8 @@ import com.google.android.testdpc.profileowner.ProfilePolicyManagementFragment;
  * Otherwise, a profile policy management fragment is shown.
  */
 public class DevicePolicyManagementActivity extends Activity {
+
+    private ProfilePolicyManagementFragment mProfilePolicyManagementFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,14 +42,21 @@ public class DevicePolicyManagementActivity extends Activity {
         if (savedInstanceState == null) {
             String packageName = getPackageName();
             if (devicePolicyManager.isProfileOwnerApp(packageName)) {
-                getFragmentManager().beginTransaction()
-                        .add(R.id.container, new ProfilePolicyManagementFragment())
-                        .commit();
+                mProfilePolicyManagementFragment = new ProfilePolicyManagementFragment();
+                getFragmentManager().beginTransaction().add(R.id.container,
+                        mProfilePolicyManagementFragment).commit();
             } else {
-                getFragmentManager().beginTransaction()
-                        .add(R.id.container, new SetupProfileFragment())
-                        .commit();
+                getFragmentManager().beginTransaction().add(R.id.container,
+                        new SetupProfileFragment()).commit();
             }
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (mProfilePolicyManagementFragment != null) {
+            mProfilePolicyManagementFragment.onActivityResult(requestCode, resultCode, data);
         }
     }
 }
