@@ -35,6 +35,7 @@ import android.widget.Toast;
 import com.google.android.testdpc.DeviceAdminReceiver;
 import com.google.android.testdpc.R;
 import com.google.android.testdpc.common.AppInfoArrayAdapter;
+import com.google.android.testdpc.deviceowner.DevicePolicyManagementFragment;
 import com.google.android.testdpc.profileowner.addsystemapps.EnableSystemAppsByIntentFragment;
 import com.google.android.testdpc.profileowner.crossprofileintentfilter
         .AddCrossProfileIntentFilterFragment;
@@ -45,7 +46,7 @@ import java.util.List;
 
 /**
  * This fragment provides several functions that are available in a managed profile.
- * These includes
+ * These include
  * 1) {@link DevicePolicyManager#addCrossProfileIntentFilter(android.content.ComponentName,
  * android.content.IntentFilter, int)}
  * 2) {@link DevicePolicyManager#clearCrossProfileIntentFilters(android.content.ComponentName)}
@@ -93,27 +94,16 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
     private static final String ENABLE_SYSTEM_APPS_BY_INTENT_KEY = "enable_system_apps_by_intent";
 
     private DevicePolicyManager mDevicePolicyManager;
-
     private ComponentName mAdminComponentName;
-
     private Preference mManageDevicePoliciesPreference;
-
     private Preference mAddCrossProfileIntentFilterPreference;
-
     private Preference mClearCrossProfileIntentFiltersPreference;
-
     private Preference mRemoveManagedProfilePreference;
-
     private Preference mAddCrossProfileAppWidgetsPreference;
-
     private Preference mRemoveCrossProfileAppWidgetsPreference;
-
     private Preference mEnableSystemAppByPackageNamePreference;
-
     private Preference mEnableSystemAppByIntentPreference;
-
     private SwitchPreference mDisableCrossProfileCallerIdSwitchPreference;
-
     private SwitchPreference mDisableCameraSwitchPreference;
 
     @Override
@@ -126,26 +116,9 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
 
         addPreferencesFromResource(R.xml.profile_policy_header);
 
-        String packageName = getActivity().getPackageName();
-        boolean isProfileOwner = mDevicePolicyManager.isProfileOwnerApp(packageName);
-        boolean isDeviceOwner = mDevicePolicyManager.isDeviceOwnerApp(packageName);
-
-        if (!isProfileOwner) {
-            // Safe net: should never happen.
-            Toast.makeText(getActivity(), R.string.setup_profile_message, Toast.LENGTH_SHORT)
-                    .show();
-            getActivity().finish();
-            return;
-        }
 
         mManageDevicePoliciesPreference = findPreference(MANAGE_DEVICE_POLICIES_KEY);
-        mManageDevicePoliciesPreference.setEnabled(isDeviceOwner);
-        if (!isDeviceOwner) {
-            // Disable shortcut to the device policy management console if the app is currently not
-            // a device owner.
-            mManageDevicePoliciesPreference.setSummary(R.string.not_a_device_owner);
-        }
-
+        mManageDevicePoliciesPreference.setOnPreferenceClickListener(this);
         mAddCrossProfileIntentFilterPreference = findPreference(
                 ADD_CROSS_PROFILE_INTENT_FILTER_PREFERENCE_KEY);
         mAddCrossProfileIntentFilterPreference.setOnPreferenceClickListener(this);
@@ -164,12 +137,10 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
         mEnableSystemAppByPackageNamePreference.setOnPreferenceClickListener(this);
         mEnableSystemAppByIntentPreference = findPreference(ENABLE_SYSTEM_APPS_BY_INTENT_KEY);
         mEnableSystemAppByIntentPreference.setOnPreferenceClickListener(this);
-
         mDisableCrossProfileCallerIdSwitchPreference = (SwitchPreference) findPreference(
                 DISABLE_CROSS_PROFILE_CALLER_ID_KEY);
         mDisableCrossProfileCallerIdSwitchPreference.setOnPreferenceChangeListener(this);
         reloadCrossProfileCallerIdDisableUi();
-
         mDisableCameraSwitchPreference = (SwitchPreference) findPreference(DISABLE_CAMERA_KEY);
         mDisableCameraSwitchPreference.setOnPreferenceChangeListener(this);
         reloadCameraDisableUi();
@@ -178,7 +149,26 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
     @Override
     public void onResume() {
         super.onResume();
-        getActivity().getActionBar().setTitle(R.string.app_name);
+        getActivity().getActionBar().setTitle(R.string.profile_management_title);
+
+        String packageName = getActivity().getPackageName();
+        boolean isProfileOwner = mDevicePolicyManager.isProfileOwnerApp(packageName);
+        boolean isDeviceOwner = mDevicePolicyManager.isDeviceOwnerApp(packageName);
+
+        if (!isProfileOwner) {
+            // Safe net: should never happen.
+            Toast.makeText(getActivity(), R.string.setup_profile_message, Toast.LENGTH_SHORT)
+                    .show();
+            getActivity().finish();
+        }
+
+        mManageDevicePoliciesPreference.setEnabled(isDeviceOwner);
+        if (!isDeviceOwner) {
+            // Disable shortcut to the device policy management console if the app is currently not
+            // a device owner.
+            mManageDevicePoliciesPreference.setSummary(
+                    getString(R.string.not_a_device_owner, mAdminComponentName.getClassName()));
+        }
     }
 
     @Override
@@ -211,6 +201,9 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
             return true;
         } else if (ENABLE_SYSTEM_APPS_BY_INTENT_KEY.equals(key)) {
             showEnableSystemAppByIntentFragment();
+            return true;
+        } else if (MANAGE_DEVICE_POLICIES_KEY.equals(key)) {
+            showDevicePolicyManagementFragment();
             return true;
         }
         return false;
@@ -293,20 +286,21 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
     }
 
     /**
-     * Get a list of work profile apps which has non-enabled cross-profile widget providers.
+     * Get a list of work profile apps which have non-enabled cross-profile widget providers.
      *
-     * @return a list of package name which has non-enabled cross-profile widget providers.
+     * @return a list of package names which have non-enabled cross-profile widget providers.
      */
     private List<String> getDisabledCrossProfileWidgetProvidersList() {
         Context context = getActivity().getApplicationContext();
-        List<String> enabledCrossProfileWidgetProvidersList = mDevicePolicyManager
-                .getCrossProfileWidgetProviders(DeviceAdminReceiver.getComponentName(context));
+        HashSet<String> enabledCrossProfileWidgetProvidersSet = new HashSet<String>(
+                mDevicePolicyManager.getCrossProfileWidgetProviders(
+                        DeviceAdminReceiver.getComponentName(context)));
         HashSet<String> disabledCrossProfileWidgetProvidersSet = new HashSet<String>();
         List<AppWidgetProviderInfo> appWidgetProviderInfoList
                 = AppWidgetManager.getInstance(context).getInstalledProviders();
         for (AppWidgetProviderInfo appWidgetProviderInfo : appWidgetProviderInfoList) {
             if (appWidgetProviderInfo.configure != null &&
-                    !enabledCrossProfileWidgetProvidersList.contains(
+                    !enabledCrossProfileWidgetProvidersSet.contains(
                             appWidgetProviderInfo.configure.getPackageName())) {
                 disabledCrossProfileWidgetProvidersSet.add(
                         appWidgetProviderInfo.configure.getPackageName());
@@ -398,5 +392,15 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
         fragmentManager.beginTransaction()
                 .addToBackStack(ProfilePolicyManagementFragment.class.getName()).replace(
                         R.id.container, new EnableSystemAppsByIntentFragment()).commit();
+    }
+
+    /**
+     * Show the device policy management fragment.
+     */
+    private void showDevicePolicyManagementFragment() {
+        FragmentManager fragmentManager = getFragmentManager();
+        fragmentManager.beginTransaction()
+                .addToBackStack(ProfilePolicyManagementFragment.class.getName()).replace(
+                        R.id.container,new DevicePolicyManagementFragment()).commit();
     }
 }

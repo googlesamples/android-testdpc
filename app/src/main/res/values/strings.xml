@@ -30,6 +30,7 @@
     <string name="device_policies_category_title">Device policies</string>
     <string name="manage_device_policies_title">Manage device policies</string>
     <string name="profile_policies_category_title">Profile policies</string>
+    <string name="device_management_title">Device management</string>
     <string name="not_a_device_owner">This app is currently not a device owner.</string>
 
     <!-- Strings for cross-profile intent filters -->
@@ -91,5 +92,15 @@
     </string>
     <string name="enable">Enable</string>
     <string name="invalid_system_apps_action">Invalid action.</string>
+
+    <!-- Strings for lock task -->
+    <string name="lock_task_title">Lock task</string>
+    <string name="manage_lock_task">Manage lock task list</string>
+    <string name="no_primary_app_available">No primary app is available</string>
+    <string name="check_lock_task_permitted">Check lock task permitted</string>
+    <string name="check_lock_task_permitted_hints">Enter a package name</string>
+    <string name="check_lock_task_permitted_result_permitted">Lock task is permitted.</string>
+    <string name="check_lock_task_permitted_result_not_permitted">Lock task is not permitted.
+    </string>
 
 </resources>
