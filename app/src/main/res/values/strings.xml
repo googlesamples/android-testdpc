@@ -30,8 +30,23 @@
     <string name="device_policies_category_title">Device policies</string>
     <string name="manage_device_policies_title">Manage device policies</string>
     <string name="profile_policies_category_title">Profile policies</string>
+
+    <!-- String for device owner management -->
     <string name="device_management_title">Device management</string>
     <string name="not_a_device_owner">This app is currently not a device owner.</string>
+    <string name="not_a_device_owner_running_in_managed_profile">This app is currently not a device
+        owner and is running in managed profile. Some of the management options are not available.
+    </string>
+    <string name="a_device_owner">This app is a device owner.</string>
+    <string name="a_device_owner_running_in_managed_profile">This app is a device owner and is
+        running in a managed profile. Some of the management options are not available.</string>
+    <string name="device_owner_management">Device owner management</string>
+    <string name="remove_device_owner">Remove this app from device owner</string>
+    <string name="remove_device_owner_title">Device owner removal</string>
+    <string name="remove_device_owner_confirmation">Are you sure to remove this app from device
+        owner?
+    </string>
+    <string name="device_owner_removed">This app is no longer a device owner.</string>
 
     <!-- Strings for cross-profile intent filters -->
     <string name="cross_profile_intents">Cross-profile intents</string>
@@ -72,8 +87,8 @@
     </string>
     <string name="all_cross_profile_widget_providers_are_enabled">There is no widget from any of the
         work profile apps that is in disabled state.</string>
-    <string name="all_cross_profile_widget_providers_are_disabled">There is no widget from any of the
-        work profile apps that is in enabled state.</string>
+    <string name="all_cross_profile_widget_providers_are_disabled">There is no widget from any of
+        the work profile apps that is in enabled state.</string>
     <string name="cross_profile_widget_enable">Widgets from "%s" are enabled.</string>
     <string name="cross_profile_widget_disable">Widgets from "%s" are disabled.</string>
 
@@ -107,13 +122,23 @@
     <string name="user_restriction_management_title">User restriction</string>
     <string name="disallow_debugging_feature">Disallow debugging feature</string>
     <string name="disallow_install_unknown_sources">Disallow install unknown sources</string>
+    <string name="disallow_remove_user">Disallow remove user</string>
+    <string name="disallow_add_user">Disallow add user</string>
+    <string name="disallow_factory_reset">Disallow factor reset</string>
+    <string name="disallow_config_credentials">Disallow config credentials</string>
+    <string name="disallow_share_location">Disallow share location</string>
+    <string name="disallow_config_tethering">Disallow config tethering</string>
+    <string name="disallow_adjust_volume">Disallow adjust volume</string>
+    <string name="disallow_unmute_microphone">Disallow unmute microphone</string>
+    <string name="disallow_modify_accounts">Disallow modify accounts</string>
 
     <!-- Strings for certificate management  -->
     <string name="certificate_management_title">Certificate management</string>
     <string name="install_key_certificate">Install a key certificate</string>
     <string name="certificate_password_prompt_title">Extract certificate</string>
     <string name="certificate_password_prompt_enter_password">Type the password to extract the
-        certificates.</string>
+        certificates.
+    </string>
     <string name="certificate_password_prompt_incorrect">Type the correct password.</string>
     <string name="certificate_alias_prompt_title">Name the certificate</string>
     <string name="certificate_alias_prompt_certificate_name">Certificate name:</string>
@@ -141,4 +166,50 @@
     <string name="set_app_restrictions_fail">Fail to set app restrictions due to invalid input.
     </string>
     <string name="set_app_restrictions_success">Set app restrictions for %s is successful.</string>
+
+    <!-- Accessibility -->
+    <string name="accessibility_title">Accessibility</string>
+    <string name="set_accessibility_services">Set accessibility services</string>
+    <string name="allow_all">Allow all</string>
+    <string name="set_accessibility_services_successful">The given list of accessibility services is
+        enabled.
+    </string>
+    <string name="set_accessibility_services_fail">Fail to set the given accessibility services
+        list.
+    </string>
+    <string name="all_accessibility_services_enabled">All accessibility services are enabled.
+    </string>
+
+    <!-- Input method -->
+    <string name="input_methods_title">Input methods</string>
+    <string name="set_input_methods">Set input methods</string>
+    <string name="set_input_methods_successful">The given list of input methods is enabled.</string>
+    <string name="set_input_methods_fail">Fail to set the given input methods list.
+    </string>
+    <string name="all_input_methods_enabled">All input methods are enabled.</string>
+
+    <!-- Account management -->
+    <string name="account_management_title">Account management</string>
+    <string name="set_disable_account_management">Set disable account management</string>
+    <string name="get_disable_account_management">Get disable account management</string>
+    <string name="account_type_hint">Enter an account type</string>
+    <string name="disable">Disable</string>
+    <string name="account_management_disabled">Account management for \"%s\" has been disabled.
+    </string>
+    <string name="account_management_enabled">Account management for \"%s\" has been enabled.
+    </string>
+    <string name="fail_to_set_account_management">Fail to set account management.</string>
+    <string name="list_of_disabled_account_types">List of disabled account types</string>
+    <string name="no_disabled_account">There is no account type that is disabled.</string>
+
+    <!-- User management -->
+    <string name="user_management">User management</string>
+    <string name="create_and_initialize_user">Create and initialize user</string>
+    <string name="remove_user">Remove user</string>
+    <string name="user_created">Successfully created user %1$d.</string>
+    <string name="enter_username_hint">Enter a username</string>
+    <string name="failed_to_create_user">Failed to create user.</string>
+    <string name="enter_user_id">Enter a user serial number</string>
+    <string name="user_removed">User removed.</string>
+    <string name="failed_to_remove_user">Failed to remove user.</string>
 </resources>

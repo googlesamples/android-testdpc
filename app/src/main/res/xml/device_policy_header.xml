@@ -17,6 +17,34 @@ limitations under the License.
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <Preference
+            android:key="device_owner_status"
+            android:selectable="false"/>
+
+    <PreferenceCategory
+            android:title="@string/accessibility_title">
+        <Preference
+                android:key="set_accessibility_services"
+                android:title="@string/set_accessibility_services"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+            android:title="@string/account_management_title">
+        <Preference
+                android:key="set_disable_account_management"
+                android:title="@string/set_disable_account_management"/>
+        <Preference
+                android:key="get_disable_account_management"
+                android:title="@string/get_disable_account_management"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+            android:title="@string/input_methods_title">
+        <Preference
+                android:key="set_input_methods"
+                android:title="@string/set_input_methods"/>
+    </PreferenceCategory>
+
     <PreferenceCategory
             android:title="@string/lock_task_title">
         <Preference
@@ -30,11 +58,55 @@ limitations under the License.
     <PreferenceCategory
             android:title="@string/user_restriction_management_title">
         <SwitchPreference
-                android:key="disallow_debugging_feature"
+                android:key="no_debugging_features"
                 android:title="@string/disallow_debugging_feature"/>
         <SwitchPreference
-                android:key="disallow_install_unknown_sources"
+                android:key="no_install_unknown_sources"
                 android:title="@string/disallow_install_unknown_sources"/>
+        <SwitchPreference
+                android:key="no_remove_user"
+                android:title="@string/disallow_remove_user"/>
+        <SwitchPreference
+                android:key="no_add_user"
+                android:title="@string/disallow_add_user"/>
+        <SwitchPreference
+                android:key="no_factory_reset"
+                android:title="@string/disallow_factory_reset"/>
+        <SwitchPreference
+                android:key="no_config_credentials"
+                android:title="@string/disallow_config_credentials"/>
+        <SwitchPreference
+                android:key="no_share_location"
+                android:title="@string/disallow_share_location"/>
+        <SwitchPreference
+                android:key="no_config_tethering"
+                android:title="@string/disallow_config_tethering"/>
+        <SwitchPreference
+                android:key="no_adjust_volume"
+                android:title="@string/disallow_adjust_volume"/>
+        <SwitchPreference
+                android:key="no_unmute_microphone"
+                android:title="@string/disallow_unmute_microphone"/>
+        <SwitchPreference
+                android:key="no_modify_accounts"
+                android:title="@string/disallow_modify_accounts"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+            android:title="@string/user_management">
+        <Preference
+            android:key="create_and_initialize_user"
+            android:title="@string/create_and_initialize_user"/>
+        <Preference
+                android:key="remove_user"
+                android:title="@string/remove_user"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+            android:title="@string/device_owner_management">
+            <Preference
+                    android:key="remove_device_owner"
+                    android:title="@string/remove_device_owner"/>
     </PreferenceCategory>
 
 </PreferenceScreen>

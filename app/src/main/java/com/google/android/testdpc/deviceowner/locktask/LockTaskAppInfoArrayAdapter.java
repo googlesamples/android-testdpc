@@ -16,85 +16,61 @@
 
 package com.google.android.testdpc.deviceowner.locktask;
 
-import android.app.admin.DevicePolicyManager;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ImageView;
-import android.widget.Switch;
-import android.widget.TextView;
+import android.text.TextUtils;
 
-import com.google.android.testdpc.R;
+import com.google.android.testdpc.common.EnableComponentsArrayAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * An array adapter which takes a {@link java.util.ArrayList<android.content.pm.ResolveInfo>} and
- * renders them into a listview. Each entry contains a switch, an app icon and the app name. The
- * switch is used to indicate whether the lock task for that app is permitted or not.
+ * renders them into a listview. Each entry contains a checkbox, an app icon and the app name. The
+ * checkbox is used to indicate whether the lock task for that app is permitted or not.
  */
-public class LockTaskAppInfoArrayAdapter extends ArrayAdapter<ResolveInfo> {
+public class LockTaskAppInfoArrayAdapter extends EnableComponentsArrayAdapter {
 
-    private final PackageManager mPackageManager;
-
-    private final DevicePolicyManager mDevicePolicyManager;
-
-    private final ArrayList<Boolean> mIsLockTaskPermittedList = new ArrayList<Boolean>();
-
-    public LockTaskAppInfoArrayAdapter(Context context, int resource,
-            List<ResolveInfo> objects) {
+    public LockTaskAppInfoArrayAdapter(Context context, int resource, List<ResolveInfo> objects) {
         super(context, resource, objects);
-        mPackageManager = getContext().getPackageManager();
-        mDevicePolicyManager = (DevicePolicyManager) getContext().getSystemService(
-                Context.DEVICE_POLICY_SERVICE);
-        int size = getCount();
-        for (int i = 0; i < size; i++) {
-            mIsLockTaskPermittedList.add(mDevicePolicyManager.isLockTaskPermitted(
-                    getItem(i).activityInfo.packageName));
-        }
     }
 
     @Override
-    public View getView(final int position, View convertView, ViewGroup parent) {
-        ApplicationInfo applicationInfo = getItem(position).activityInfo.applicationInfo;
-        if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.lock_task_app_row,
-                    parent, false);
+    public boolean isComponentEnabled(ResolveInfo resolveInfo) {
+        if (resolveInfo != null && resolveInfo.activityInfo != null &&!TextUtils.isEmpty(
+                resolveInfo.activityInfo.packageName)) {
+            return mDevicePolicyManager.isLockTaskPermitted(resolveInfo.activityInfo.packageName);
         }
-        ImageView iconImageView = (ImageView) convertView.findViewById(R.id.pkg_icon);
-        iconImageView.setImageDrawable(mPackageManager.getApplicationIcon(applicationInfo));
-        TextView pkgNameTextView = (TextView) convertView.findViewById(R.id.pkg_name);
-        pkgNameTextView.setText(mPackageManager.getApplicationLabel(applicationInfo));
-        final Switch lockTaskPermittedSwitch = (Switch) convertView.findViewById(
-                R.id.enable_lock_task_switch);
-        lockTaskPermittedSwitch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mIsLockTaskPermittedList.set(position, lockTaskPermittedSwitch.isChecked());
-            }
-        });
-        lockTaskPermittedSwitch.setChecked(mIsLockTaskPermittedList.get(position));
-        return convertView;
+        return false;
     }
 
     /**
-     * Invoke to save the lock task state for apps.
+     * Invoke to get a list of the permitted lock tasks.
      */
     public String[] getLockTaskList() {
         ArrayList<String> lockTaskEnabledArrayList = new ArrayList<String>();
         int size = getCount();
         for (int i = 0; i < size; i++) {
-            if (mIsLockTaskPermittedList.get(i)) {
+            if (mIsComponentEnabledList.get(i)) {
                 lockTaskEnabledArrayList.add(getItem(i).activityInfo.packageName);
             }
         }
         String[] lockTaskEnabledArray = new String[lockTaskEnabledArrayList.size()];
         return lockTaskEnabledArrayList.toArray(lockTaskEnabledArray);
+    }
+
+    @Override
+    protected ApplicationInfo getApplicationInfo(int position) {
+        return getItem(position).activityInfo.applicationInfo;
+    }
+
+    @Override
+    protected void initIsComponentEnabledList() {
+        int size = getCount();
+        for (int i = 0; i < size; i++) {
+            mIsComponentEnabledList.add(isComponentEnabled(getItem(i)));
+        }
     }
 }

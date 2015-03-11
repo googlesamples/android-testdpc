@@ -204,14 +204,6 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
                     .show();
             getActivity().finish();
         }
-
-        mManageDevicePoliciesPreference.setEnabled(isDeviceOwner);
-        if (!isDeviceOwner) {
-            // Disable shortcut to the device policy management console if the app is currently not
-            // a device owner.
-            mManageDevicePoliciesPreference.setSummary(
-                    getString(R.string.not_a_device_owner, mAdminComponentName.getClassName()));
-        }
     }
 
     @Override
