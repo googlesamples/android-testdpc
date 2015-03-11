@@ -15,17 +15,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:orientation="horizontal"
               android:padding="10dip">
-
-    <Switch
-            android:id="@+id/enable_lock_task_switch"
-            android:layout_width="wrap_content"
-            android:focusable="false"
-            android:layout_height="match_parent"/>
 
     <ImageView
             android:id="@+id/pkg_icon"
@@ -36,7 +30,17 @@ limitations under the License.
             android:id="@+id/pkg_name"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:gravity="center"
-            android:paddingLeft="10dip"/>
+            android:layout_centerVertical="true"
+            android:paddingLeft="10dip"
+            android:layout_toRightOf="@id/pkg_icon"
+            android:layout_toLeftOf="@+id/enable_component_checkbox"/>
 
-</LinearLayout>
+    <CheckBox
+            android:id="@id/enable_component_checkbox"
+            android:layout_width="wrap_content"
+            android:focusable="false"
+            android:layout_centerVertical="true"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"/>
+
+</RelativeLayout>
