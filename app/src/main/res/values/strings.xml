@@ -113,7 +113,7 @@
     <string name="manage_lock_task">Manage lock task list</string>
     <string name="no_primary_app_available">No primary app is available</string>
     <string name="check_lock_task_permitted">Check lock task permitted</string>
-    <string name="check_lock_task_permitted_hints">Enter a package name</string>
+    <string name="input_package_name_hints">Enter a package name</string>
     <string name="check_lock_task_permitted_result_permitted">Lock task is permitted.</string>
     <string name="check_lock_task_permitted_result_not_permitted">Lock task is not permitted.
     </string>
@@ -212,4 +212,19 @@
     <string name="enter_user_id">Enter a user serial number</string>
     <string name="user_removed">User removed.</string>
     <string name="failed_to_remove_user">Failed to remove user.</string>
+
+    <!-- Strings for block uninstall -->
+    <string name="block_uninstallation_title">Block uninstallation</string>
+    <string name="block_uninstallation_by_pkg">Block uninstallation by package name</string>
+    <string name="block_uninstallation_list">Block uninstallation list</string>
+    <string name="uninstallation_blocked">%s uninstallation has been blocked.
+    </string>
+    <string name="uninstallation_allowed">%s uninstallation has been allowed.
+    </string>
+    <string name="block_uninstallation_failed_invalid_pkgname">Could not update block uninstallation
+        policy on an invalid package name.
+    </string>
+    <string name="block">Block</string>
+    <string name="unblock">Unblock</string>
+    <string name="close">Close</string>
 </resources>

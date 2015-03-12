@@ -39,6 +39,16 @@ limitations under the License.
     </PreferenceCategory>
 
     <PreferenceCategory
+            android:title="@string/block_uninstallation_title">
+        <Preference
+                android:key="block_uninstallation_by_pkg"
+                android:title="@string/block_uninstallation_by_pkg"/>
+        <Preference
+                android:key="block_uninstallation_list"
+                android:title="@string/block_uninstallation_list"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
             android:title="@string/input_methods_title">
         <Preference
                 android:key="set_input_methods"

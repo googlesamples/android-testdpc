@@ -36,6 +36,8 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -60,6 +62,7 @@ import android.widget.Toast;
 import com.google.android.testdpc.DeviceAdminReceiver;
 import com.google.android.testdpc.R;
 import com.google.android.testdpc.deviceowner.accessibility.AccessibilityServiceInfoArrayAdapter;
+import com.google.android.testdpc.deviceowner.blockuninstallation.BlockUninstallationInfoArrayAdapter;
 import com.google.android.testdpc.deviceowner.inputmethod.InputMethodInfoArrayAdapter;
 import com.google.android.testdpc.deviceowner.locktask.LockTaskAppInfoArrayAdapter;
 
@@ -67,7 +70,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This fragment provides several device management functions.
+ * Provides several device management functions.
  * These include
  * 1) {@link DevicePolicyManager#setLockTaskPackages(android.content.ComponentName, String[])}
  * 2) {@link DevicePolicyManager#isLockTaskPermitted(String)}
@@ -91,6 +94,9 @@ import java.util.List;
  * 19) {@link DevicePolicyManager#createAndInitializeUser(android.content.ComponentName, String,
  * String, android.content.ComponentName, android.os.Bundle)}
  * 20) {@link DevicePolicyManager#removeUser(android.content.ComponentName, android.os.UserHandle)}
+ * 21) {@link DevicePolicyManager#setUninstallBlocked(android.content.ComponentName, String,
+ * boolean)}
+ * 22) {@link DevicePolicyManager#isUninstallBlocked(android.content.ComponentName, String)}
  */
 public class DevicePolicyManagementFragment extends PreferenceFragment implements
         Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
@@ -110,6 +116,9 @@ public class DevicePolicyManagementFragment extends PreferenceFragment implement
             = "get_disable_account_management";
     private static final String CREATE_AND_INITIALIZE_USER_KEY = "create_and_initialize_user";
     private static final String REMOVE_USER_KEY = "remove_user";
+    private static final String BLOCK_UNINSTALLATION_BY_PKG_KEY = "block_uninstallation_by_pkg";
+    private static final String BLOCK_UNINSTALLATION_LIST_KEY = "block_uninstallation_list";
+
     private static final String[] PRIMARY_USER_ONLY_RESTRICTIONS = {
             DISALLOW_REMOVE_USER, DISALLOW_ADD_USER, DISALLOW_FACTORY_RESET,
             DISALLOW_CONFIG_TETHERING, DISALLOW_ADJUST_VOLUME, DISALLOW_UNMUTE_MICROPHONE
@@ -122,6 +131,7 @@ public class DevicePolicyManagementFragment extends PreferenceFragment implement
     };
 
     private DevicePolicyManager mDevicePolicyManager;
+    private PackageManager mPackageManager;
     private String mPackageName;
     private ComponentName mAdminComponentName;
     private UserManager mUserManager;
@@ -152,6 +162,7 @@ public class DevicePolicyManagementFragment extends PreferenceFragment implement
         mDevicePolicyManager = (DevicePolicyManager) getActivity().getSystemService(
                 Context.DEVICE_POLICY_SERVICE);
         mUserManager = (UserManager) getActivity().getSystemService(Context.USER_SERVICE);
+        mPackageManager = getActivity().getPackageManager();
         mPackageName = getActivity().getPackageName();
 
         addPreferencesFromResource(R.xml.device_policy_header);
@@ -220,6 +231,10 @@ public class DevicePolicyManagementFragment extends PreferenceFragment implement
         mRemoveUserPreference = findPreference(REMOVE_USER_KEY);
         mRemoveUserPreference.setOnPreferenceClickListener(this);
 
+        findPreference(BLOCK_UNINSTALLATION_BY_PKG_KEY).setOnPreferenceClickListener(this);
+
+        findPreference(BLOCK_UNINSTALLATION_LIST_KEY).setOnPreferenceClickListener(this);
+
         updateUserRestrictionUi(ALL_USER_RESTRICTIONS);
         disableIncompatibleManagementOptionsInCurrentProfile();
     }
@@ -249,23 +264,24 @@ public class DevicePolicyManagementFragment extends PreferenceFragment implement
                 return true;
             case REMOVE_DEVICE_OWNER_KEY:
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                builder.setTitle(R.string.remove_device_owner_title);
-                builder.setMessage(R.string.remove_device_owner_confirmation);
-                builder.setPositiveButton(android.R.string.ok,
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                mDevicePolicyManager.clearDeviceOwnerApp(mPackageName);
-                                if (getActivity() != null && !getActivity().isFinishing()) {
-                                    showToast(R.string.device_owner_removed);
-                                    getActivity().getFragmentManager().popBackStack();
-                                }
-                            }
-                        });
-                builder.setNegativeButton(android.R.string.cancel, null);
-                builder.show();
+                builder.setTitle(R.string.remove_device_owner_title)
+                        .setMessage(R.string.remove_device_owner_confirmation)
+                        .setPositiveButton(android.R.string.ok,
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        mDevicePolicyManager.clearDeviceOwnerApp(mPackageName);
+                                        if (getActivity() != null && !getActivity().isFinishing()) {
+                                            showToast(R.string.device_owner_removed);
+                                            getActivity().getFragmentManager().popBackStack();
+                                        }
+                                    }
+                                })
+                        .setNegativeButton(android.R.string.cancel, null)
+                        .show();
                 return true;
             case SET_ACCESSIBILITY_SERVICES_KEY:
+                // Avoid starting the same task twice.
                 if (mGetAccessibilityServicesTask != null && !mGetAccessibilityServicesTask
                         .isCancelled()) {
                     mGetAccessibilityServicesTask.cancel(true);
@@ -274,6 +290,7 @@ public class DevicePolicyManagementFragment extends PreferenceFragment implement
                 mGetAccessibilityServicesTask.execute();
                 return true;
             case SET_INPUT_METHODS_KEY:
+                // Avoid starting the same task twice.
                 if (mGetInputMethodsTask != null && !mGetInputMethodsTask.isCancelled()) {
                     mGetInputMethodsTask.cancel(true);
                 }
@@ -291,6 +308,12 @@ public class DevicePolicyManagementFragment extends PreferenceFragment implement
                 return true;
             case REMOVE_USER_KEY:
                 showRemoveUserPrompt();
+                return true;
+            case BLOCK_UNINSTALLATION_BY_PKG_KEY:
+                showBlockUninstallationByPackageNamePrompt();
+                return true;
+            case BLOCK_UNINSTALLATION_LIST_KEY:
+                showBlockUninstallationPrompt();
                 return true;
         }
         return false;
@@ -338,7 +361,7 @@ public class DevicePolicyManagementFragment extends PreferenceFragment implement
     }
 
     /**
-     * Show a list of primary user apps in a prompt, indicating whether lock task is permitted for
+     * Shows a list of primary user apps in a prompt, indicating whether lock task is permitted for
      * that app.
      */
     private void showManageLockTaskListPrompt() {
@@ -386,9 +409,8 @@ public class DevicePolicyManagementFragment extends PreferenceFragment implement
     }
 
     /**
-     * Show a prompt to collect a package name and check whether the lock task for the
-     * corresponding
-     * app is permitted or not.
+     * Shows a prompt to collect a package name and checks whether the lock task for the
+     * corresponding app is permitted or not.
      */
     private void showCheckLockTaskPermittedPrompt() {
         if (getActivity() == null || getActivity().isFinishing()) {
@@ -396,7 +418,7 @@ public class DevicePolicyManagementFragment extends PreferenceFragment implement
         }
         View view = getActivity().getLayoutInflater().inflate(R.layout.simple_edittext, null);
         final EditText input = (EditText) view.findViewById(R.id.input);
-        input.setHint(getString(R.string.check_lock_task_permitted_hints));
+        input.setHint(getString(R.string.input_package_name_hints));
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(getString(R.string.check_lock_task_permitted))
@@ -438,7 +460,8 @@ public class DevicePolicyManagementFragment extends PreferenceFragment implement
     }
 
     /**
-     * Update the corresponding UI for a given user restriction.
+     * Updates the corresponding UI for a given user restriction.
+     *
      * @param userRestriction the id of a preference that is going to be updated.
      */
     private void updateUserRestrictionUi(String userRestriction) {
@@ -527,35 +550,36 @@ public class DevicePolicyManagementFragment extends PreferenceFragment implement
     }
 
     /**
-     * Show a prompt to ask for the account type that would be enable or disable for account
-     * management.
+     * Shows a prompt that allows entering the account type for which account management should be
+     * disabled or enabled.
      */
     private void showSetDisableAccountManagementPrompt() {
         if (getActivity() == null || getActivity().isFinishing()) {
             return;
         }
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle(R.string.set_disable_account_management);
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.simple_edittext, null);
         final EditText input = (EditText) view.findViewById(R.id.input);
         input.setHint(R.string.account_type_hint);
-        builder.setView(view);
-        builder.setPositiveButton(R.string.disable, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                String accountType = input.getText().toString();
-                setDisableAccountManagement(accountType, true);
-            }
-        });
-        builder.setNeutralButton(R.string.enable, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                String accountType = input.getText().toString();
-                setDisableAccountManagement(accountType, false);
-            }
-        });
-        builder.setNegativeButton(android.R.string.cancel, null /* Nothing to do */);
-        builder.show();
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(R.string.set_disable_account_management)
+                .setView(view)
+                .setPositiveButton(R.string.disable, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        String accountType = input.getText().toString();
+                        setDisableAccountManagement(accountType, true);
+                    }
+                })
+                .setNeutralButton(R.string.enable, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        String accountType = input.getText().toString();
+                        setDisableAccountManagement(accountType, false);
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, null /* Nothing to do */)
+                .show();
     }
 
     private void setDisableAccountManagement(String accountType, boolean disabled) {
@@ -581,53 +605,54 @@ public class DevicePolicyManagementFragment extends PreferenceFragment implement
         String[] disabledAccountTypeList = mDevicePolicyManager
                 .getAccountTypesWithManagementDisabled();
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle(R.string.list_of_disabled_account_types);
-        builder.setAdapter(new ArrayAdapter<String>(getActivity(),
-                android.R.layout.simple_list_item_1, android.R.id.text1, disabledAccountTypeList),
-                null);
-        builder.setPositiveButton(android.R.string.ok, null);
-        builder.show();
+        builder.setTitle(R.string.list_of_disabled_account_types)
+                .setAdapter(new ArrayAdapter<String>(getActivity(),
+                                android.R.layout.simple_list_item_1, android.R.id.text1,
+                                disabledAccountTypeList), null)
+                .setPositiveButton(android.R.string.ok, null)
+                .show();
     }
 
     /**
      * For user creation:
-     * Show a prompt to ask for the username that would be used for creating a new user.
+     * Shows a prompt to ask for the username that would be used for creating a new user.
      */
     private void showCreateUserPrompt() {
         if (getActivity() == null || getActivity().isFinishing()) {
             return;
         }
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle(R.string.create_and_initialize_user);
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.simple_edittext, null);
         final EditText input = (EditText) view.findViewById(R.id.input);
         input.setHint(R.string.enter_username_hint);
-        builder.setView(view);
-        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                String name = input.getText().toString();
-                String ownerName = getString(R.string.app_name);
-                if (!TextUtils.isEmpty(name)) {
-                    UserHandle userHandle = mDevicePolicyManager.createAndInitializeUser(
-                            mAdminComponentName, name, ownerName, mAdminComponentName,
-                            new Bundle());
-                    if (userHandle != null) {
-                        long serialNumber = mUserManager.getSerialNumberForUser(userHandle);
-                        showToast(R.string.user_created, serialNumber);
-                        return;
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(R.string.create_and_initialize_user)
+                .setView(view)
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        String name = input.getText().toString();
+                        String ownerName = getString(R.string.app_name);
+                        if (!TextUtils.isEmpty(name)) {
+                            UserHandle userHandle = mDevicePolicyManager.createAndInitializeUser(
+                                    mAdminComponentName, name, ownerName, mAdminComponentName,
+                                    new Bundle());
+                            if (userHandle != null) {
+                                long serialNumber = mUserManager.getSerialNumberForUser(userHandle);
+                                showToast(R.string.user_created, serialNumber);
+                                return;
+                            }
+                            showToast(R.string.failed_to_create_user);
+                        }
                     }
-                    showToast(R.string.failed_to_create_user);
-                }
-            }
-        });
-        builder.setNegativeButton(android.R.string.cancel, null);
-        builder.show();
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
     }
 
     /**
      * For user removal:
-     * Show a prompt to ask for the user serial number that is going to be removed.
+     * Shows a prompt to ask for the user serial number that is going to be removed.
      */
     private void showRemoveUserPrompt() {
         if (getActivity() == null || getActivity().isFinishing()) {
@@ -657,8 +682,91 @@ public class DevicePolicyManagementFragment extends PreferenceFragment implement
                 showToast(success ? R.string.user_removed : R.string.failed_to_remove_user);
             }
         });
-        builder.setNegativeButton(android.R.string.cancel, null);
-        builder.show();
+    }
+
+    /**
+     * Asks for the package name whose uninstallation should be blocked / unblocked.
+     */
+    private void showBlockUninstallationByPackageNamePrompt() {
+        Activity activity = getActivity();
+        if (activity == null || activity.isFinishing()) {
+            return;
+        }
+        View view = LayoutInflater.from(activity).inflate(R.layout.simple_edittext, null);
+        final EditText input = (EditText) view.findViewById(R.id.input);
+        input.setHint(getString(R.string.input_package_name_hints));
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setTitle(R.string.block_uninstallation_title)
+                .setView(view)
+                .setPositiveButton(R.string.block, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        String pkgName = input.getText().toString();
+                        if (!TextUtils.isEmpty(pkgName)) {
+                            mDevicePolicyManager.setUninstallBlocked(mAdminComponentName, pkgName,
+                                    true);
+                            showToast(R.string.uninstallation_blocked, pkgName);
+                        } else {
+                            showToast(R.string.block_uninstallation_failed_invalid_pkgname);
+                        }
+                    }
+                })
+                .setNeutralButton(R.string.unblock, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        String pkgName = input.getText().toString();
+                        if (!TextUtils.isEmpty(pkgName)) {
+                            mDevicePolicyManager.setUninstallBlocked(mAdminComponentName, pkgName,
+                                    false);
+                            showToast(R.string.uninstallation_allowed, pkgName);
+                        } else {
+                            showToast(R.string.block_uninstallation_failed_invalid_pkgname);
+                        }
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    /**
+     * Displays an alert dialog that allows the user to select applications from all non-system
+     * applications installed on the current profile. When the user selects an app, this app can't
+     * be uninstallation.
+     */
+    private void showBlockUninstallationPrompt() {
+        Activity activity = getActivity();
+        if (activity == null || activity.isFinishing()) {
+            return;
+        }
+
+        List<ApplicationInfo> applicationInfoList
+                = mPackageManager.getInstalledApplications(0 /* No flag */);
+        List<ResolveInfo> resolveInfoList = new ArrayList<ResolveInfo>();
+        for (ApplicationInfo applicationInfo : applicationInfoList) {
+            // Ignore system apps because they can't be uninstalled.
+            if ((applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0) {
+                ResolveInfo resolveInfo = new ResolveInfo();
+                resolveInfo.resolvePackageName = applicationInfo.packageName;
+                resolveInfoList.add(resolveInfo);
+            }
+        }
+
+        final BlockUninstallationInfoArrayAdapter blockUninstallationInfoArrayAdapter
+                = new BlockUninstallationInfoArrayAdapter(getActivity(), R.id.pkg_name,
+                resolveInfoList);
+        ListView listview = new ListView(getActivity());
+        listview.setAdapter(blockUninstallationInfoArrayAdapter);
+        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> arg0, View view, int pos, long id) {
+                blockUninstallationInfoArrayAdapter.onItemClick(view, pos);
+            }
+        });
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(R.string.block_uninstallation_title)
+                .setView(listview)
+                .setPositiveButton(R.string.close, null /* Nothing to do */)
+                .show();
     }
 
     private void showToast(int msgId, Object... args) {
@@ -674,8 +782,8 @@ public class DevicePolicyManagementFragment extends PreferenceFragment implement
     }
 
     /**
-     * A async task for getting all the accessibility services. After all the accessibility services
-     * are retrieved, the result is displayed in a popup.
+     * Gets all the accessibility services. After all the accessibility services are retrieved, the
+     * result is displayed in a popup.
      */
     private class GetAccessibilityServicesTask extends
             AsyncTask<Void, Void, List<AccessibilityServiceInfo>> {
@@ -745,8 +853,8 @@ public class DevicePolicyManagementFragment extends PreferenceFragment implement
     }
 
     /**
-     * A async task for getting all the input methods. After all the input methods are retrieved,
-     * the result is displayed in a popup.
+     * Gets all the input methods. After all the input methods are retrieved, the result is displayed
+     * in a popup.
      */
     private class GetInputMethodsTask extends AsyncTask<Void, Void, List<InputMethodInfo>> {
 
