@@ -67,6 +67,7 @@ import android.widget.Toast;
 
 import com.google.android.testdpc.DeviceAdminReceiver;
 import com.google.android.testdpc.R;
+import com.google.android.testdpc.common.AppInfoArrayAdapter;
 import com.google.android.testdpc.policy.accessibility.AccessibilityServiceInfoArrayAdapter;
 import com.google.android.testdpc.policy.blockuninstallation.BlockUninstallationInfoArrayAdapter;
 import com.google.android.testdpc.policy.inputmethod.InputMethodInfoArrayAdapter;
@@ -91,7 +92,9 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Provides several device management functions.
@@ -161,6 +164,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     private static final String BLOCK_UNINSTALLATION_BY_PKG_KEY = "block_uninstallation_by_pkg";
     private static final String BLOCK_UNINSTALLATION_LIST_KEY = "block_uninstallation_list";
     private static final String DISABLE_CAMERA_KEY = "disable_camera";
+    private static final String ENABLE_SYSTEM_APPS_KEY = "enable_system_apps";
     private static final String ENABLE_SYSTEM_APPS_BY_PACKAGE_NAME_KEY
             = "enable_system_apps_by_package_name";
     private static final String ENABLE_SYSTEM_APPS_BY_INTENT_KEY = "enable_system_apps_by_intent";
@@ -270,6 +274,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         findPreference(GET_DISABLE_ACCOUNT_MANAGEMENT_KEY).setOnPreferenceClickListener(this);
         findPreference(BLOCK_UNINSTALLATION_BY_PKG_KEY).setOnPreferenceClickListener(this);
         findPreference(BLOCK_UNINSTALLATION_LIST_KEY).setOnPreferenceClickListener(this);
+        findPreference(ENABLE_SYSTEM_APPS_KEY).setOnPreferenceClickListener(this);
         findPreference(ENABLE_SYSTEM_APPS_BY_PACKAGE_NAME_KEY).setOnPreferenceClickListener(this);
         findPreference(ENABLE_SYSTEM_APPS_BY_INTENT_KEY).setOnPreferenceClickListener(this);
         findPreference(MANAGE_APP_RESTRICTIONS_KEY).setOnPreferenceClickListener(this);
@@ -359,6 +364,9 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 return true;
             case BLOCK_UNINSTALLATION_LIST_KEY:
                 showBlockUninstallationPrompt();
+                return true;
+            case ENABLE_SYSTEM_APPS_KEY:
+                showEnableSystemAppsPrompt();
                 return true;
             case ENABLE_SYSTEM_APPS_BY_PACKAGE_NAME_KEY:
                 showEnableSystemAppByPackageNamePrompt();
@@ -1066,8 +1074,8 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         if (getActivity() == null || getActivity().isFinishing()) {
             return;
         }
+        // Avoid starting the same task twice.
         if (mShowCaCertificateListTask != null && !mShowCaCertificateListTask.isCancelled()) {
-            // Cancel the previous task
             mShowCaCertificateListTask.cancel(true);
         }
         mShowCaCertificateListTask = new ShowCaCertificateListTask();
@@ -1085,7 +1093,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
 
     /**
      * Displays an alert dialog that allows the user to select applications from all non-system
-     * applications installed on the current profile. When the user selects an app, this app can't
+     * applications installed on the current profile. After the user selects an app, this app can't
      * be uninstallation.
      */
     private void showBlockUninstallationPrompt() {
@@ -1122,6 +1130,51 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 .setView(listview)
                 .setPositiveButton(R.string.close, null /* Nothing to do */)
                 .show();
+    }
+
+    /**
+     * Shows an alert dialog which displays a list of disabled system apps. Clicking an app in the
+     * dialog enables the app.
+     */
+    private void showEnableSystemAppsPrompt() {
+        // Disabled system apps list = {All system apps} - {Enabled system apps}
+        final List<String> disabledSystemApps = new ArrayList<String>();
+        // This list contains both enabled and disabled apps.
+        List<ApplicationInfo> allApps = mPackageManager.getInstalledApplications(
+                PackageManager.GET_UNINSTALLED_PACKAGES);
+        // This list contains all enabled apps.
+        List<ApplicationInfo> enabledApps =
+                mPackageManager.getInstalledApplications(0 /* No flags */);
+        Set<String> enabledAppsPkgNames = new HashSet<String>();
+        for (ApplicationInfo applicationInfo : enabledApps) {
+            enabledAppsPkgNames.add(applicationInfo.packageName);
+        }
+        for (ApplicationInfo applicationInfo : allApps) {
+            // Interested in disabled system apps only.
+            if (!enabledAppsPkgNames.contains(applicationInfo.packageName)
+                    && (applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0) {
+                disabledSystemApps.add(applicationInfo.packageName);
+            }
+        }
+
+        if (disabledSystemApps.isEmpty()) {
+            showToast(R.string.no_disabled_system_apps);
+        } else {
+            AppInfoArrayAdapter appInfoArrayAdapter = new AppInfoArrayAdapter(getActivity(),
+                    R.id.pkg_name, disabledSystemApps, true);
+            new AlertDialog.Builder(getActivity())
+                    .setTitle(getString(R.string.enable_system_apps_title))
+                    .setAdapter(appInfoArrayAdapter, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int position) {
+                            String packageName = disabledSystemApps.get(position);
+                            mDevicePolicyManager.enableSystemApp(mAdminComponentName, packageName);
+                            showToast(R.string.enable_system_apps_by_package_name_success_msg,
+                                    packageName);
+                        }
+                    })
+                    .show();
+        }
     }
 
     private void showToast(int msgId, Object... args) {

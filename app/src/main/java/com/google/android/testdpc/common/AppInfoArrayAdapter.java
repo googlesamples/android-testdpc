@@ -31,16 +31,24 @@ import com.google.android.testdpc.R;
 import java.util.List;
 
 /**
- * A simple adapter which takes a list of package name and shows their app icon and app name in a
+ * A simple adapter which takes a list of package names and shows their app icon and app name in a
  * listview.
  */
 public class AppInfoArrayAdapter extends ArrayAdapter<String> {
-
     private PackageManager mPackageManager;
+    private int mAppInfoFlags = 0;
 
-    public AppInfoArrayAdapter(Context context, int resource, List<String> objects) {
-        super(context, resource, objects);
+    public AppInfoArrayAdapter(Context context, int resource, List<String> pkgNameList,
+            boolean includeDisabledApps) {
+        super(context, resource, pkgNameList);
         mPackageManager = getContext().getPackageManager();
+        if (includeDisabledApps) {
+            mAppInfoFlags = PackageManager.GET_UNINSTALLED_PACKAGES;
+        }
+    }
+
+    public AppInfoArrayAdapter(Context context, int resource, List<String> pkgNameList) {
+        this(context, resource, pkgNameList, false /* Don't include disabled apps */);
     }
 
     @Override
@@ -52,13 +60,15 @@ public class AppInfoArrayAdapter extends ArrayAdapter<String> {
 
         try {
             ApplicationInfo applicationInfo = mPackageManager.getApplicationInfo(getItem(position),
-                    0 /* No flags*/);
+                    mAppInfoFlags);
             ImageView iconImageView = (ImageView) convertView.findViewById(R.id.pkg_icon);
             iconImageView.setImageDrawable(mPackageManager.getApplicationIcon(applicationInfo));
             TextView pkgNameTextView = (TextView) convertView.findViewById(R.id.pkg_name);
             pkgNameTextView.setText(mPackageManager.getApplicationLabel(applicationInfo));
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
+            // Returns an empty view in case the package is not found.
+            return new View(getContext());
         }
         return convertView;
     }

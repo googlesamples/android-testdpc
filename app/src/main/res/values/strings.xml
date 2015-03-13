@@ -102,6 +102,7 @@
     </string>
     <string name="enable_system_apps_attempt_msg">Enabled system apps with the given intent.
     </string>
+    <string name ="no_disabled_system_apps">All system apps have been enabled.</string>
     <string name="enable">Enable</string>
     <string name="invalid_system_apps_action">Invalid action.</string>
 
