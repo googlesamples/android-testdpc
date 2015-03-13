@@ -18,18 +18,15 @@ package com.google.android.testdpc;
 
 import android.app.Activity;
 import android.app.admin.DevicePolicyManager;
-import android.content.Intent;
 import android.os.Bundle;
 
-import com.google.android.testdpc.profileowner.ProfilePolicyManagementFragment;
+import com.google.android.testdpc.policy.PolicyManagementFragment;
 
 /**
- * An entry activity which shows a setup profile fragment if the app is not a profile owner.
- * Otherwise, a profile policy management fragment is shown.
+ * An entry activity that shows a profile setup fragment if the app is not a profile or device
+ * owner. Otherwise, a policy management fragment is shown.
  */
-public class DevicePolicyManagementActivity extends Activity {
-
-    private ProfilePolicyManagementFragment mProfilePolicyManagementFragment;
+public class PolicyManagementActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,22 +38,14 @@ public class DevicePolicyManagementActivity extends Activity {
 
         if (savedInstanceState == null) {
             String packageName = getPackageName();
-            if (devicePolicyManager.isProfileOwnerApp(packageName)) {
-                mProfilePolicyManagementFragment = new ProfilePolicyManagementFragment();
+            if (devicePolicyManager.isProfileOwnerApp(packageName)
+                    || devicePolicyManager.isDeviceOwnerApp(packageName)) {
                 getFragmentManager().beginTransaction().add(R.id.container,
-                        mProfilePolicyManagementFragment).commit();
+                        new PolicyManagementFragment()).commit();
             } else {
                 getFragmentManager().beginTransaction().add(R.id.container,
                         new SetupProfileFragment()).commit();
             }
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (mProfilePolicyManagementFragment != null) {
-            mProfilePolicyManagementFragment.onActivityResult(requestCode, resultCode, data);
         }
     }
 }

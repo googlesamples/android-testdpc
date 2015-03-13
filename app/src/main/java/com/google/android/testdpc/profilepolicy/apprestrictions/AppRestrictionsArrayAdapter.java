@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.testdpc.profileowner.apprestrictions;
+package com.google.android.testdpc.profilepolicy.apprestrictions;
 
 import android.app.AlertDialog;
 import android.app.admin.DevicePolicyManager;
@@ -135,7 +135,7 @@ public class AppRestrictionsArrayAdapter extends ArrayAdapter<RestrictionEntry> 
         }
     };
 
-    // Prompt a dialog for viewing and editing String[].
+    // Shows a prompt for viewing and editing String[].
     private View.OnClickListener mStringArrayButtonOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
@@ -293,9 +293,9 @@ public class AppRestrictionsArrayAdapter extends ArrayAdapter<RestrictionEntry> 
     }
 
     /**
-     * Construct a {@link android.os.Bundle} of app restrictions from the UI and send it to the
+     * Constructs a {@link android.os.Bundle} of app restrictions from the UI and send it to the
      * system by invoking {@link DevicePolicyManager#setApplicationRestrictions(
-     *android.content.ComponentName, String, android.os.Bundle)}.
+     * android.content.ComponentName, String, android.os.Bundle)}.
      */
     public void setAppRestrictions(String pkgName) {
         boolean restrictionsAreValid = true;
@@ -344,7 +344,7 @@ public class AppRestrictionsArrayAdapter extends ArrayAdapter<RestrictionEntry> 
     }
 
     /**
-     * Add a new row for collecting a new app restriction entry. By default, an empty key value
+     * Adds a new row for collecting a new app restriction entry. By default, an empty key value
      * entry with type String is inserted at the end of the ListView.
      */
     public void addNewRow() {

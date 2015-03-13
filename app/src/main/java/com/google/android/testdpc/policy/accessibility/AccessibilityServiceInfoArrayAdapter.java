@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.testdpc.deviceowner.accessibility;
+package com.google.android.testdpc.policy.accessibility;
 
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.content.Context;
@@ -34,7 +34,7 @@ import java.util.HashSet;
 import java.util.List;
 
 /**
- * Display a list of installed accessibility services with a checkbox for enabling the component.
+ * Displays a list of installed accessibility services with a checkbox for enabling the component.
  * All system accessibility services are enabled by default and can't be disabled.
  */
 public class AccessibilityServiceInfoArrayAdapter extends EnableComponentsArrayAdapter {

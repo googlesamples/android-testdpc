@@ -98,7 +98,7 @@ public abstract class EnableComponentsArrayAdapter extends ArrayAdapter<ResolveI
     }
 
     /**
-     * Get the {@link android.content.pm.ApplicationInfo} of a service or an activity.
+     * Gets the {@link android.content.pm.ApplicationInfo} of a service or an activity.
      *
      * @param position the position of the view that requests
      *        {@link android.content.pm.ApplicationInfo}.
@@ -109,12 +109,12 @@ public abstract class EnableComponentsArrayAdapter extends ArrayAdapter<ResolveI
     protected abstract ApplicationInfo getApplicationInfo(int position);
 
     /**
-     * Initialize the {@link EnableComponentsArrayAdapter#mIsComponentEnabledList}.
+     * Initializes the {@link EnableComponentsArrayAdapter#mIsComponentEnabledList}.
      */
     protected abstract void initIsComponentEnabledList();
 
     /**
-     * Check whether an activity or service is enabled.
+     * Checks whether an activity or service is enabled.
      * @param resolveInfo The service or activity resolve info.
      * @return true if the given activity or service is enabled, false otherwise.
      */

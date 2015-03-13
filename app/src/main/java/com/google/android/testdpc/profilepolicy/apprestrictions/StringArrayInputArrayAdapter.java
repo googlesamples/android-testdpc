@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.testdpc.profileowner.apprestrictions;
+package com.google.android.testdpc.profilepolicy.apprestrictions;
 
 import android.content.Context;
 import android.util.Log;

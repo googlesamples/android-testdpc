@@ -27,19 +27,16 @@
     </string>
     <string name="icon">Icon</string>
 
-    <string name="device_policies_category_title">Device policies</string>
-    <string name="manage_device_policies_title">Manage device policies</string>
-    <string name="profile_policies_category_title">Profile policies</string>
+    <string name="managed_profile_specific_policy_category_title">Managed profile policy</string>
+    <string name="managed_profile_specific_policy_title">Manage work profile specific policy
+    </string>
+    <string name="policies_management">Policy management</string>
 
     <!-- String for device owner management -->
-    <string name="device_management_title">Device management</string>
-    <string name="not_a_device_owner">This app is currently not a device owner.</string>
-    <string name="not_a_device_owner_running_in_managed_profile">This app is currently not a device
-        owner and is running in managed profile. Some of the management options are not available.
-    </string>
-    <string name="a_device_owner">This app is a device owner.</string>
-    <string name="a_device_owner_running_in_managed_profile">This app is a device owner and is
-        running in a managed profile. Some of the management options are not available.</string>
+    <string name="this_is_not_a_device_owner">This app is currently not a device owner.</string>
+    <string name="this_is_a_device_owner">This app is a device owner.</string>
+    <string name="this_is_a_managed_profile_owner">This app is a managed profile owner.
+        Some of the management options are not available.</string>
     <string name="device_owner_management">Device owner management</string>
     <string name="remove_device_owner">Remove this app from device owner</string>
     <string name="remove_device_owner_title">Device owner removal</string>
@@ -73,9 +70,9 @@
     <string name="camera_title">Camera</string>
     <string name="disable_camera">Disable camera</string>
 
-    <!-- Stings for profile management -->
-    <string name="profile_management_title">Profile management</string>
-    <string name="removing_managed_profile">Removing managed profile</string>
+    <!-- Stings for work profile management -->
+    <string name="profile_management_title">Work profile management</string>
+    <string name="removing_managed_profile">Removing work profile</string>
 
     <!-- Strings for cross-profile widget provider -->
     <string name="cross_profile_widget_providers_title">Cross-profile widget providers</string>
@@ -163,7 +160,7 @@
     <string name="empty_key_error">Please enter a key.</string>
     <string name="set_app_restrictions">Set app restrictions</string>
     <string name="set_str_array_dialog_title">Set values for\n\"%s\"</string>
-    <string name="set_app_restrictions_fail">Fail to set app restrictions due to invalid input.
+    <string name="set_app_restrictions_fail">Failed to set app restrictions due to invalid input.
     </string>
     <string name="set_app_restrictions_success">Set app restrictions for %s is successful.</string>
 
@@ -174,7 +171,7 @@
     <string name="set_accessibility_services_successful">The given list of accessibility services is
         enabled.
     </string>
-    <string name="set_accessibility_services_fail">Fail to set the given accessibility services
+    <string name="set_accessibility_services_fail">Failed to set the given accessibility services
         list.
     </string>
     <string name="all_accessibility_services_enabled">All accessibility services are enabled.
@@ -184,7 +181,7 @@
     <string name="input_methods_title">Input methods</string>
     <string name="set_input_methods">Set input methods</string>
     <string name="set_input_methods_successful">The given list of input methods is enabled.</string>
-    <string name="set_input_methods_fail">Fail to set the given input methods list.
+    <string name="set_input_methods_fail">Failed to set the given input methods list.
     </string>
     <string name="all_input_methods_enabled">All input methods are enabled.</string>
 
@@ -198,7 +195,7 @@
     </string>
     <string name="account_management_enabled">Account management for \"%s\" has been enabled.
     </string>
-    <string name="fail_to_set_account_management">Fail to set account management.</string>
+    <string name="fail_to_set_account_management">Failed to set account management.</string>
     <string name="list_of_disabled_account_types">List of disabled account types</string>
     <string name="no_disabled_account">There is no account type that is disabled.</string>
 

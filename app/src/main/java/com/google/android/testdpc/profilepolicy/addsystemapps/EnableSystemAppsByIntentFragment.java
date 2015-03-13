@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.testdpc.profileowner.addsystemapps;
+package com.google.android.testdpc.profilepolicy.addsystemapps;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -109,7 +109,7 @@ public class EnableSystemAppsByIntentFragment extends IntentOrIntentFilterFragme
     }
 
     /**
-     * Construct an intent from user input. This intent is used for enabling system apps.
+     * Constructs an intent from user input. This intent is used for enabling system apps.
      *
      * @return a user constructed intent.
      */

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.testdpc.deviceowner.inputmethod;
+package com.google.android.testdpc.policy.inputmethod;
 
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
@@ -33,7 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Display a list of installed input methods with a checkbox for enabling the component. All system
+ * Displays a list of installed input methods with a checkbox for enabling the component. All system
  * input methods are enabled by default and can't be disabled.
  */
 public class InputMethodInfoArrayAdapter extends EnableComponentsArrayAdapter {

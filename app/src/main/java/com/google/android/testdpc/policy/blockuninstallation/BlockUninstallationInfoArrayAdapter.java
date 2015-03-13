@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.testdpc.deviceowner.blockuninstallation;
+package com.google.android.testdpc.policy.blockuninstallation;
 
 import android.content.Context;
 import android.content.pm.ApplicationInfo;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.testdpc.deviceowner;
+package com.google.android.testdpc.policy;
 
 import static android.os.UserManager.DISALLOW_ADD_USER;
 import static android.os.UserManager.DISALLOW_ADJUST_VOLUME;
@@ -31,7 +31,9 @@ import static android.os.UserManager.DISALLOW_UNMUTE_MICROPHONE;
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.FragmentManager;
 import android.app.admin.DevicePolicyManager;
+import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -39,6 +41,7 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.UserHandle;
@@ -46,8 +49,10 @@ import android.os.UserManager;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.SwitchPreference;
+import android.security.KeyChain;
 import android.text.InputType;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.accessibility.AccessibilityManager;
@@ -56,17 +61,36 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.android.testdpc.DeviceAdminReceiver;
 import com.google.android.testdpc.R;
-import com.google.android.testdpc.deviceowner.accessibility.AccessibilityServiceInfoArrayAdapter;
-import com.google.android.testdpc.deviceowner.blockuninstallation.BlockUninstallationInfoArrayAdapter;
-import com.google.android.testdpc.deviceowner.inputmethod.InputMethodInfoArrayAdapter;
-import com.google.android.testdpc.deviceowner.locktask.LockTaskAppInfoArrayAdapter;
+import com.google.android.testdpc.policy.accessibility.AccessibilityServiceInfoArrayAdapter;
+import com.google.android.testdpc.policy.blockuninstallation.BlockUninstallationInfoArrayAdapter;
+import com.google.android.testdpc.policy.inputmethod.InputMethodInfoArrayAdapter;
+import com.google.android.testdpc.policy.locktask.LockTaskAppInfoArrayAdapter;
+import com.google.android.testdpc.profilepolicy.ProfilePolicyManagementFragment;
+import com.google.android.testdpc.profilepolicy.addsystemapps.EnableSystemAppsByIntentFragment;
+import com.google.android.testdpc.profilepolicy.apprestrictions.ManageAppRestrictionsFragment;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 
 /**
@@ -97,9 +121,27 @@ import java.util.List;
  * 21) {@link DevicePolicyManager#setUninstallBlocked(android.content.ComponentName, String,
  * boolean)}
  * 22) {@link DevicePolicyManager#isUninstallBlocked(android.content.ComponentName, String)}
+ * 23) {@link DevicePolicyManager#setCameraDisabled(android.content.ComponentName, boolean)}
+ * 24) {@link DevicePolicyManager#getCameraDisabled(android.content.ComponentName)}
+ * 25) {@link DevicePolicyManager#enableSystemApp(android.content.ComponentName,
+ * android.content.Intent)}
+ * 26) {@link DevicePolicyManager#enableSystemApp(android.content.ComponentName, String)}
+ * 27 {@link DevicePolicyManager#setApplicationRestrictions(android.content.ComponentName, String,
+ * android.os.Bundle)}
+ * 28) {@link DevicePolicyManager#installKeyPair(android.content.ComponentName,
+ * java.security.PrivateKey, java.security.cert.Certificate, String)}
+ * 29) {@link DevicePolicyManager#installCaCert(android.content.ComponentName, byte[])}
+ * 30) {@link DevicePolicyManager#uninstallAllUserCaCerts(android.content.ComponentName)}
+ * 31) {@link DevicePolicyManager#getInstalledCaCerts(android.content.ComponentName)}
  */
-public class DevicePolicyManagementFragment extends PreferenceFragment implements
+public class PolicyManagementFragment extends PreferenceFragment implements
         Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
+    public static final int INSTALL_KEY_CERTIFICATE_REQUEST_CODE = 7689;
+    public static final int INSTALL_CA_CERTIFICATE_REQUEST_CODE = 7690;
+    public static final int DEFAULT_BUFFER_SIZE = 4096;
+    public static final String X509_CERT_TYPE = "X.509";
+
+    private static final String TAG = "PolicyManagementFragment";
     private static final String DEVICE_OWNER_STATUS_KEY = "device_owner_status";
     private static final String MANAGE_LOCK_TASK_LIST_KEY = "manage_lock_task";
     private static final String CHECK_LOCK_TASK_PERMITTED_KEY = "check_lock_task_permitted";
@@ -118,7 +160,16 @@ public class DevicePolicyManagementFragment extends PreferenceFragment implement
     private static final String REMOVE_USER_KEY = "remove_user";
     private static final String BLOCK_UNINSTALLATION_BY_PKG_KEY = "block_uninstallation_by_pkg";
     private static final String BLOCK_UNINSTALLATION_LIST_KEY = "block_uninstallation_list";
-
+    private static final String DISABLE_CAMERA_KEY = "disable_camera";
+    private static final String ENABLE_SYSTEM_APPS_BY_PACKAGE_NAME_KEY
+            = "enable_system_apps_by_package_name";
+    private static final String ENABLE_SYSTEM_APPS_BY_INTENT_KEY = "enable_system_apps_by_intent";
+    private static final String MANAGE_APP_RESTRICTIONS_KEY = "manage_app_restrictions";
+    private static final String INSTALL_KEY_CERTIFICATE_KEY = "install_key_certificate";
+    private static final String INSTALL_CA_CERTIFICATE_KEY = "install_ca_certificate";
+    private static final String GET_CA_CERTIFICATES_KEY = "get_ca_certificates";
+    private static final String REMOVE_ALL_CERTIFICATES_KEY = "remove_all_ca_certificates";
+    private static final String MANAGED_PROFILE_SPECIFIC_POLICIES_KEY = "managed_profile_policies";
     private static final String[] PRIMARY_USER_ONLY_RESTRICTIONS = {
             DISALLOW_REMOVE_USER, DISALLOW_ADD_USER, DISALLOW_FACTORY_RESET,
             DISALLOW_CONFIG_TETHERING, DISALLOW_ADJUST_VOLUME, DISALLOW_UNMUTE_MICROPHONE
@@ -129,13 +180,15 @@ public class DevicePolicyManagementFragment extends PreferenceFragment implement
             DISALLOW_SHARE_LOCATION, DISALLOW_CONFIG_TETHERING, DISALLOW_ADJUST_VOLUME,
             DISALLOW_UNMUTE_MICROPHONE, DISALLOW_MODIFY_ACCOUNTS
     };
+    private static final String[] MANAGED_PROFILE_SPECIFIC_OPTIONS = {
+            MANAGED_PROFILE_SPECIFIC_POLICIES_KEY
+    };
 
     private DevicePolicyManager mDevicePolicyManager;
     private PackageManager mPackageManager;
     private String mPackageName;
     private ComponentName mAdminComponentName;
     private UserManager mUserManager;
-
     private Preference mManageLockTaskPreference;
     private Preference mCheckLockTaskPermittedPreference;
     private Preference mCreateAndInitializeUserPreference;
@@ -151,8 +204,10 @@ public class DevicePolicyManagementFragment extends PreferenceFragment implement
     private SwitchPreference mDisallowAdjustVolumePreference;
     private SwitchPreference mDisallowUnmuteMicrophonePreference;
     private SwitchPreference mDisallowModifyAccountsPreference;
+    private SwitchPreference mDisableCameraSwitchPreference;
     private GetAccessibilityServicesTask mGetAccessibilityServicesTask = null;
     private GetInputMethodsTask mGetInputMethodsTask = null;
+    private ShowCaCertificateListTask mShowCaCertificateListTask = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -169,71 +224,61 @@ public class DevicePolicyManagementFragment extends PreferenceFragment implement
 
         mManageLockTaskPreference = findPreference(MANAGE_LOCK_TASK_LIST_KEY);
         mManageLockTaskPreference.setOnPreferenceClickListener(this);
-
         mCheckLockTaskPermittedPreference = findPreference(CHECK_LOCK_TASK_PERMITTED_KEY);
         mCheckLockTaskPermittedPreference.setOnPreferenceClickListener(this);
-
         mDisallowDebuggingFeatureSwitchPreference = (SwitchPreference) findPreference(
                 DISALLOW_DEBUGGING_FEATURES);
         mDisallowDebuggingFeatureSwitchPreference.setOnPreferenceChangeListener(this);
-
         mDisallowInstallUnknownSourcesSwitchPreference = (SwitchPreference) findPreference(
                 DISALLOW_INSTALL_UNKNOWN_SOURCES);
         mDisallowInstallUnknownSourcesSwitchPreference.setOnPreferenceChangeListener(this);
-
         mDisallowRemoveUserSwitchPreference = (SwitchPreference) findPreference(
                 DISALLOW_REMOVE_USER);
         mDisallowRemoveUserSwitchPreference.setOnPreferenceChangeListener(this);
-
         mDisallowAddUserSwitchPreference = (SwitchPreference) findPreference(DISALLOW_ADD_USER);
         mDisallowAddUserSwitchPreference.setOnPreferenceChangeListener(this);
-
         mDisallowFactoryResetSwitchPreference = (SwitchPreference) findPreference(
                 DISALLOW_FACTORY_RESET);
         mDisallowFactoryResetSwitchPreference.setOnPreferenceChangeListener(this);
-
         mDisallowConfigCredentialsSwitchPreference = (SwitchPreference) findPreference(
                 DISALLOW_CONFIG_CREDENTIALS);
         mDisallowConfigCredentialsSwitchPreference.setOnPreferenceChangeListener(this);
-
         mDisallowShareLocationSwitchPreference = (SwitchPreference) findPreference(
                 DISALLOW_SHARE_LOCATION);
         mDisallowShareLocationSwitchPreference.setOnPreferenceChangeListener(this);
-
         mDisallowConfigTetheringSwitchPreference = (SwitchPreference) findPreference(
                 DISALLOW_CONFIG_TETHERING);
         mDisallowConfigTetheringSwitchPreference.setOnPreferenceChangeListener(this);
-
         mDisallowAdjustVolumePreference = (SwitchPreference) findPreference(DISALLOW_ADJUST_VOLUME);
         mDisallowAdjustVolumePreference.setOnPreferenceChangeListener(this);
-
         mDisallowUnmuteMicrophonePreference = (SwitchPreference) findPreference(
                 DISALLOW_UNMUTE_MICROPHONE);
         mDisallowUnmuteMicrophonePreference.setOnPreferenceChangeListener(this);
-
         mDisallowModifyAccountsPreference = (SwitchPreference) findPreference(
                 DISALLOW_MODIFY_ACCOUNTS);
         mDisallowModifyAccountsPreference.setOnPreferenceChangeListener(this);
-
-        findPreference(REMOVE_DEVICE_OWNER_KEY).setOnPreferenceClickListener(this);
-
-        findPreference(SET_ACCESSIBILITY_SERVICES_KEY).setOnPreferenceClickListener(this);
-
-        findPreference(SET_INPUT_METHODS_KEY).setOnPreferenceClickListener(this);
-
-        findPreference(SET_DISABLE_ACCOUNT_MANAGEMENT_KEY).setOnPreferenceClickListener(this);
-
-        findPreference(GET_DISABLE_ACCOUNT_MANAGEMENT_KEY).setOnPreferenceClickListener(this);
-
         mCreateAndInitializeUserPreference = findPreference(CREATE_AND_INITIALIZE_USER_KEY);
         mCreateAndInitializeUserPreference.setOnPreferenceClickListener(this);
-
         mRemoveUserPreference = findPreference(REMOVE_USER_KEY);
         mRemoveUserPreference.setOnPreferenceClickListener(this);
-
+        mDisableCameraSwitchPreference = (SwitchPreference) findPreference(DISABLE_CAMERA_KEY);
+        mDisableCameraSwitchPreference.setOnPreferenceChangeListener(this);
+        findPreference(REMOVE_DEVICE_OWNER_KEY).setOnPreferenceClickListener(this);
+        findPreference(SET_ACCESSIBILITY_SERVICES_KEY).setOnPreferenceClickListener(this);
+        findPreference(SET_INPUT_METHODS_KEY).setOnPreferenceClickListener(this);
+        findPreference(SET_DISABLE_ACCOUNT_MANAGEMENT_KEY).setOnPreferenceClickListener(this);
+        findPreference(GET_DISABLE_ACCOUNT_MANAGEMENT_KEY).setOnPreferenceClickListener(this);
         findPreference(BLOCK_UNINSTALLATION_BY_PKG_KEY).setOnPreferenceClickListener(this);
-
         findPreference(BLOCK_UNINSTALLATION_LIST_KEY).setOnPreferenceClickListener(this);
+        findPreference(ENABLE_SYSTEM_APPS_BY_PACKAGE_NAME_KEY).setOnPreferenceClickListener(this);
+        findPreference(ENABLE_SYSTEM_APPS_BY_INTENT_KEY).setOnPreferenceClickListener(this);
+        findPreference(MANAGE_APP_RESTRICTIONS_KEY).setOnPreferenceClickListener(this);
+        findPreference(INSTALL_KEY_CERTIFICATE_KEY).setOnPreferenceClickListener(this);
+        findPreference(INSTALL_CA_CERTIFICATE_KEY).setOnPreferenceClickListener(this);
+        findPreference(GET_CA_CERTIFICATES_KEY).setOnPreferenceClickListener(this);
+        findPreference(REMOVE_ALL_CERTIFICATES_KEY).setOnPreferenceClickListener(this);
+        findPreference(MANAGED_PROFILE_SPECIFIC_POLICIES_KEY).setOnPreferenceClickListener(this);
+        reloadCameraDisableUi();
 
         updateUserRestrictionUi(ALL_USER_RESTRICTIONS);
         disableIncompatibleManagementOptionsInCurrentProfile();
@@ -242,12 +287,12 @@ public class DevicePolicyManagementFragment extends PreferenceFragment implement
     @Override
     public void onResume() {
         super.onResume();
-        getActivity().getActionBar().setTitle(R.string.device_management_title);
+        getActivity().getActionBar().setTitle(R.string.policies_management);
 
         boolean isDeviceOwner = mDevicePolicyManager.isDeviceOwnerApp(mPackageName);
         boolean isProfileOwner = mDevicePolicyManager.isProfileOwnerApp(mPackageName);
         if (!isDeviceOwner && !isProfileOwner) {
-            showToast(R.string.not_a_device_owner);
+            showToast(R.string.this_is_not_a_device_owner);
             getActivity().finish();
         }
     }
@@ -263,8 +308,8 @@ public class DevicePolicyManagementFragment extends PreferenceFragment implement
                 showCheckLockTaskPermittedPrompt();
                 return true;
             case REMOVE_DEVICE_OWNER_KEY:
-                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                builder.setTitle(R.string.remove_device_owner_title)
+                new AlertDialog.Builder(getActivity())
+                        .setTitle(R.string.remove_device_owner_title)
                         .setMessage(R.string.remove_device_owner_confirmation)
                         .setPositiveButton(android.R.string.ok,
                                 new DialogInterface.OnClickListener() {
@@ -273,7 +318,7 @@ public class DevicePolicyManagementFragment extends PreferenceFragment implement
                                         mDevicePolicyManager.clearDeviceOwnerApp(mPackageName);
                                         if (getActivity() != null && !getActivity().isFinishing()) {
                                             showToast(R.string.device_owner_removed);
-                                            getActivity().getFragmentManager().popBackStack();
+                                            getActivity().finish();
                                         }
                                     }
                                 })
@@ -314,6 +359,31 @@ public class DevicePolicyManagementFragment extends PreferenceFragment implement
                 return true;
             case BLOCK_UNINSTALLATION_LIST_KEY:
                 showBlockUninstallationPrompt();
+                return true;
+            case ENABLE_SYSTEM_APPS_BY_PACKAGE_NAME_KEY:
+                showEnableSystemAppByPackageNamePrompt();
+                return true;
+            case ENABLE_SYSTEM_APPS_BY_INTENT_KEY:
+                showEnableSystemAppByIntentFragment();
+                return true;
+            case MANAGE_APP_RESTRICTIONS_KEY:
+                showManageAppRestrictionsFragment();
+                return true;
+            case INSTALL_KEY_CERTIFICATE_KEY:
+                showFileViewerForImportingCertificate(INSTALL_KEY_CERTIFICATE_REQUEST_CODE);
+                return true;
+            case INSTALL_CA_CERTIFICATE_KEY:
+                showFileViewerForImportingCertificate(INSTALL_CA_CERTIFICATE_REQUEST_CODE);
+                return true;
+            case GET_CA_CERTIFICATES_KEY:
+                showCaCertificateList();
+                return true;
+            case REMOVE_ALL_CERTIFICATES_KEY:
+                mDevicePolicyManager.uninstallAllUserCaCerts(mAdminComponentName);
+                showToast(R.string.all_ca_certificates_removed);
+                return true;
+            case MANAGED_PROFILE_SPECIFIC_POLICIES_KEY:
+                showManagedProfileSpecificPolicyFragment();
                 return true;
         }
         return false;
@@ -356,6 +426,11 @@ public class DevicePolicyManagementFragment extends PreferenceFragment implement
             case DISALLOW_MODIFY_ACCOUNTS:
                 setUserRestriction(key, (Boolean) newValue);
                 return true;
+            case DISABLE_CAMERA_KEY:
+                mDevicePolicyManager.setCameraDisabled(mAdminComponentName, (Boolean) newValue);
+                // Reload UI to verify the camera is enable / disable correctly.
+                reloadCameraDisableUi();
+                return true;
         }
         return false;
     }
@@ -385,8 +460,9 @@ public class DevicePolicyManagementFragment extends PreferenceFragment implement
                     appInfoArrayAdapter.onItemClick(view, position);
                 }
             });
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setTitle(getString(R.string.manage_lock_task))
+
+            new AlertDialog.Builder(getActivity())
+                    .setTitle(getString(R.string.manage_lock_task))
                     .setView(listView)
                     .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                         @Override
@@ -420,8 +496,8 @@ public class DevicePolicyManagementFragment extends PreferenceFragment implement
         final EditText input = (EditText) view.findViewById(R.id.input);
         input.setHint(getString(R.string.input_package_name_hints));
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle(getString(R.string.check_lock_task_permitted))
+        new AlertDialog.Builder(getActivity())
+                .setTitle(getString(R.string.check_lock_task_permitted))
                 .setView(view)
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
@@ -521,7 +597,7 @@ public class DevicePolicyManagementFragment extends PreferenceFragment implement
     private void disableIncompatibleManagementOptionsInCurrentProfile() {
         boolean isProfileOwner = mDevicePolicyManager.isProfileOwnerApp(mPackageName);
         boolean isDeviceOwner = mDevicePolicyManager.isDeviceOwnerApp(mPackageName);
-        int deviceOwnerStatusStringId = R.string.not_a_device_owner;
+        int deviceOwnerStatusStringId = R.string.this_is_not_a_device_owner;
         if (isProfileOwner) {
             // Some of the management options can only be applied in a primary profile.
             for (String primaryUserRestriction : PRIMARY_USER_ONLY_RESTRICTIONS) {
@@ -532,19 +608,15 @@ public class DevicePolicyManagementFragment extends PreferenceFragment implement
             // Only the device owner in the primary profile can create or remove user.
             mCreateAndInitializeUserPreference.setEnabled(false);
             mRemoveUserPreference.setEnabled(false);
-            // A device owner running in a managed profile.
-            if (isDeviceOwner) {
-                deviceOwnerStatusStringId = R.string.a_device_owner_running_in_managed_profile;
-            }
-            // Not a device owner running in a managed profile.
-            else {
-                mManageLockTaskPreference.setEnabled(false);
-                mCheckLockTaskPermittedPreference.setEnabled(false);
-                deviceOwnerStatusStringId = R.string.not_a_device_owner_running_in_managed_profile;
-            }
+            mManageLockTaskPreference.setEnabled(false);
+            mCheckLockTaskPermittedPreference.setEnabled(false);
+            deviceOwnerStatusStringId = R.string.this_is_a_managed_profile_owner;
         } else if (isDeviceOwner) {
             // If it's a device owner and running in the primary profile.
-            deviceOwnerStatusStringId = R.string.a_device_owner;
+            deviceOwnerStatusStringId = R.string.this_is_a_device_owner;
+            for (String managedProfileSpecificOption : MANAGED_PROFILE_SPECIFIC_OPTIONS) {
+                findPreference(managedProfileSpecificOption).setEnabled(false);
+            }
         }
         findPreference(DEVICE_OWNER_STATUS_KEY).setSummary(deviceOwnerStatusStringId);
     }
@@ -561,8 +633,8 @@ public class DevicePolicyManagementFragment extends PreferenceFragment implement
         final EditText input = (EditText) view.findViewById(R.id.input);
         input.setHint(R.string.account_type_hint);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle(R.string.set_disable_account_management)
+        new AlertDialog.Builder(getActivity())
+                .setTitle(R.string.set_disable_account_management)
                 .setView(view)
                 .setPositiveButton(R.string.disable, new DialogInterface.OnClickListener() {
                     @Override
@@ -596,7 +668,7 @@ public class DevicePolicyManagementFragment extends PreferenceFragment implement
     }
 
     /**
-     * Show a list of account types that is disabled for account management.
+     * Shows a list of account types that is disabled for account management.
      */
     private void showDisableAccountTypeList() {
         if (getActivity() == null || getActivity().isFinishing()) {
@@ -604,11 +676,11 @@ public class DevicePolicyManagementFragment extends PreferenceFragment implement
         }
         String[] disabledAccountTypeList = mDevicePolicyManager
                 .getAccountTypesWithManagementDisabled();
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle(R.string.list_of_disabled_account_types)
+        new AlertDialog.Builder(getActivity())
+                .setTitle(R.string.list_of_disabled_account_types)
                 .setAdapter(new ArrayAdapter<String>(getActivity(),
-                                android.R.layout.simple_list_item_1, android.R.id.text1,
-                                disabledAccountTypeList), null)
+                        android.R.layout.simple_list_item_1, android.R.id.text1,
+                        disabledAccountTypeList), null)
                 .setPositiveButton(android.R.string.ok, null)
                 .show();
     }
@@ -625,8 +697,8 @@ public class DevicePolicyManagementFragment extends PreferenceFragment implement
         final EditText input = (EditText) view.findViewById(R.id.input);
         input.setHint(R.string.enter_username_hint);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle(R.string.create_and_initialize_user)
+        new AlertDialog.Builder(getActivity())
+                .setTitle(R.string.create_and_initialize_user)
                 .setView(view)
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
@@ -658,30 +730,34 @@ public class DevicePolicyManagementFragment extends PreferenceFragment implement
         if (getActivity() == null || getActivity().isFinishing()) {
             return;
         }
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle(R.string.remove_user);
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.simple_edittext, null);
         final EditText input = (EditText) view.findViewById(R.id.input);
         input.setHint(R.string.enter_user_id);
         input.setRawInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED);
-        builder.setView(view);
-        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                boolean success = false;
-                long serialNumber = -1;
-                try {
-                    serialNumber = Long.parseLong(input.getText().toString());
-                    UserHandle userHandle = mUserManager.getUserForSerialNumber(serialNumber);
-                    if (userHandle != null) {
-                        success = mDevicePolicyManager.removeUser(mAdminComponentName, userHandle);
+
+        new AlertDialog.Builder(getActivity())
+                .setTitle(R.string.remove_user)
+                .setView(view)
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        boolean success = false;
+                        long serialNumber = -1;
+                        try {
+                            serialNumber = Long.parseLong(input.getText().toString());
+                            UserHandle userHandle = mUserManager
+                                    .getUserForSerialNumber(serialNumber);
+                            if (userHandle != null) {
+                                success = mDevicePolicyManager
+                                        .removeUser(mAdminComponentName, userHandle);
+                            }
+                        } catch (NumberFormatException e) {
+                            // Error message is printed in the next line.
+                        }
+                        showToast(success ? R.string.user_removed : R.string.failed_to_remove_user);
                     }
-                } catch (NumberFormatException e) {
-                    // Error message is printed in the next few lines.
-                }
-                showToast(success ? R.string.user_removed : R.string.failed_to_remove_user);
-            }
-        });
+                })
+                .show();
     }
 
     /**
@@ -728,6 +804,285 @@ public class DevicePolicyManagementFragment extends PreferenceFragment implement
                 .show();
     }
 
+    private void reloadCameraDisableUi() {
+        boolean isCameraDisabled = mDevicePolicyManager.getCameraDisabled(mAdminComponentName);
+        mDisableCameraSwitchPreference.setChecked(isCameraDisabled);
+    }
+
+    /**
+     * Shows a prompt to enable a system app from the user input.
+     */
+    private void showEnableSystemAppByPackageNamePrompt() {
+        if (getActivity() == null || getActivity().isFinishing()) {
+            return;
+        }
+        LinearLayout inputContainer = (LinearLayout) getActivity().getLayoutInflater()
+                .inflate(R.layout.simple_edittext, null);
+        final EditText editText = (EditText) inputContainer.findViewById(R.id.input);
+        editText.setHint(getString(R.string.enable_system_apps_by_package_name_hints));
+
+        new AlertDialog.Builder(getActivity())
+                .setTitle(getString(R.string.enable_system_apps_title))
+                .setView(inputContainer)
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        final String packageName = editText.getText().toString();
+                        mDevicePolicyManager.enableSystemApp(mAdminComponentName, packageName);
+                        showToast(R.string.enable_system_apps_by_package_name_success_msg,
+                                packageName);
+                        dialog.dismiss();
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .show();
+    }
+
+    /**
+     * Shows a fragment to pick an intent. The system apps receiving it will be enabled.
+     */
+    private void showEnableSystemAppByIntentFragment() {
+        FragmentManager fragmentManager = getFragmentManager();
+        fragmentManager.beginTransaction().addToBackStack(PolicyManagementFragment.class.getName())
+                .replace(R.id.container, new EnableSystemAppsByIntentFragment()).commit();
+    }
+
+    /**
+     * Shows the app restriction management fragment.
+     */
+    private void showManageAppRestrictionsFragment() {
+        FragmentManager fragmentManager = getFragmentManager();
+        fragmentManager.beginTransaction().addToBackStack(PolicyManagementFragment.class.getName())
+                .replace(R.id.container, new ManageAppRestrictionsFragment()).commit();
+    }
+
+    /**
+     * Shows the file viewer for importing a certificate.
+     */
+    private void showFileViewerForImportingCertificate(int requestCode) {
+        Intent certIntent = new Intent(Intent.ACTION_GET_CONTENT);
+        certIntent.setTypeAndNormalize("*/*");
+        try {
+            startActivityForResult(certIntent, requestCode);
+        } catch (ActivityNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Imports a certificate to the managed profile. If the provided password failed to decrypt the
+     * given certificate, shows a try again prompt. Otherwise, shows a prompt for the certificate
+     * alias.
+     *
+     * @param intent Intent that contains the certificate data uri.
+     * @param password The password to decrypt the certificate.
+     */
+    private void importKeyCertificateFromIntent(Intent intent, String password) {
+        importKeyCertificateFromIntent(intent, password, 0 /* first try */);
+    }
+
+    /**
+     * Imports a certificate to the managed profile. If the provided decryption password is
+     * incorrect, shows a try again prompt. Otherwise, shows a prompt for the certificate alias.
+     *
+     * @param intent Intent that contains the certificate data uri.
+     * @param password The password to decrypt the certificate.
+     * @param attempts The number of times user entered incorrect password.
+     */
+    private void importKeyCertificateFromIntent(Intent intent, String password, int attempts) {
+        if (getActivity() == null || getActivity().isFinishing()) {
+            return;
+        }
+        Uri data = null;
+        if (intent != null && (data = intent.getData()) != null) {
+            // If the password is null, try to decrypt the certificate with an empty password.
+            if (password == null) {
+                password = "";
+            }
+            InputStream certificateInputStream;
+            try {
+                certificateInputStream = getActivity().getContentResolver().openInputStream(data);
+                KeyStore keyStore = KeyStore.getInstance(KeyChain.EXTRA_PKCS12);
+                keyStore.load(certificateInputStream, password.toCharArray());
+                Enumeration<String> aliases = keyStore.aliases();
+                while (aliases.hasMoreElements()) {
+                    String alias = aliases.nextElement();
+                    if (!TextUtils.isEmpty(alias)) {
+                        Certificate certificate = keyStore.getCertificate(alias);
+                        PrivateKey privateKey = (PrivateKey) keyStore
+                                .getKey(alias, "".toCharArray());
+                        showPromptForKeyCertificateAlias(privateKey, certificate, alias);
+                    }
+                }
+            } catch (KeyStoreException | FileNotFoundException | CertificateException
+                    | UnrecoverableKeyException | NoSuchAlgorithmException e) {
+                Log.e(TAG, "Unable to load key", e);
+            } catch (IOException e) {
+                showPromptForCertificatePassword(intent, ++attempts);
+            } catch (ClassCastException e) {
+                showToast(R.string.not_a_key_certificate);
+            }
+        }
+    }
+
+    /**
+     * Shows a prompt to ask for the certificate password. If the certificate password is correct,
+     * import the private key and certificate.
+     *
+     * @param intent Intent that contains the certificate data uri.
+     * @param attempts The number of times user entered incorrect password.
+     */
+    private void showPromptForCertificatePassword(final Intent intent, final int attempts) {
+        if (getActivity() == null || getActivity().isFinishing()) {
+            return;
+        }
+        View passwordInputView = getActivity().getLayoutInflater()
+                .inflate(R.layout.certificate_password_prompt, null);
+        final EditText input = (EditText) passwordInputView.findViewById(R.id.password_input);
+        if (attempts > 1) {
+            passwordInputView.findViewById(R.id.incorrect_password).setVisibility(View.VISIBLE);
+        }
+        new AlertDialog.Builder(getActivity())
+                .setTitle(getString(R.string.certificate_password_prompt_title))
+                .setView(passwordInputView)
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String userPassword = input.getText().toString();
+                        importKeyCertificateFromIntent(intent, userPassword, attempts);
+                        dialog.dismiss();
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                })
+                .show();
+    }
+
+    /**
+     * Shows a prompt to ask for the certificate alias. This alias will be imported together with
+     * the private key and certificate.
+     *
+     * @param key The private key of a certificate.
+     * @param certificate The certificate will be imported.
+     * @param alias A name that represents the certificate in the profile.
+     */
+    private void showPromptForKeyCertificateAlias(final PrivateKey key,
+            final Certificate certificate, String alias) {
+        if (getActivity() == null || getActivity().isFinishing() || key == null
+                || certificate == null) {
+            return;
+        }
+        View passwordInputView = getActivity().getLayoutInflater().inflate(
+                R.layout.certificate_alias_prompt, null);
+        final EditText input = (EditText) passwordInputView.findViewById(R.id.alias_input);
+        if (!TextUtils.isEmpty(alias)) {
+            input.setText(alias);
+            input.selectAll();
+        }
+
+        new AlertDialog.Builder(getActivity())
+                .setTitle(getString(R.string.certificate_alias_prompt_title))
+                .setView(passwordInputView)
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String alias = input.getText().toString();
+                        mDevicePolicyManager.installKeyPair(mAdminComponentName, key, certificate,
+                                alias);
+                        showToast(R.string.certificate_added, alias);
+                        dialog.dismiss();
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                })
+                .show();
+    }
+
+    /**
+     * Imports a CA certificate from the given data URI.
+     *
+     * @param intent Intent that contains the CA data URI.
+     */
+    private void importCaCertificateFromIntent(Intent intent) {
+        if (getActivity() == null || getActivity().isFinishing()) {
+            return;
+        }
+        Uri data = null;
+        if (intent != null && (data = intent.getData()) != null) {
+            boolean isCaInstalled = false;
+            try {
+                InputStream certificateInputStream = getActivity().getContentResolver()
+                        .openInputStream(data);
+                if (certificateInputStream != null) {
+                    ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
+                    byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
+                    int len = 0;
+                    while ((len = certificateInputStream.read(buffer)) > 0) {
+                        byteBuffer.write(buffer, 0, len);
+                    }
+                    isCaInstalled = mDevicePolicyManager.installCaCert(mAdminComponentName,
+                            byteBuffer.toByteArray());
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            showToast(isCaInstalled ? R.string.install_ca_successfully : R.string.install_ca_fail);
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == PolicyManagementFragment.INSTALL_KEY_CERTIFICATE_REQUEST_CODE) {
+                importKeyCertificateFromIntent(data, "");
+            } else if (requestCode ==
+                    PolicyManagementFragment.INSTALL_CA_CERTIFICATE_REQUEST_CODE) {
+                importCaCertificateFromIntent(data);
+            }
+        }
+    }
+
+    /**
+     * Shows a list of installed CA certificates.
+     */
+    private void showCaCertificateList() {
+        if (getActivity() == null || getActivity().isFinishing()) {
+            return;
+        }
+        if (mShowCaCertificateListTask != null && !mShowCaCertificateListTask.isCancelled()) {
+            // Cancel the previous task
+            mShowCaCertificateListTask.cancel(true);
+        }
+        mShowCaCertificateListTask = new ShowCaCertificateListTask();
+        mShowCaCertificateListTask.execute();
+    }
+
+    /**
+     * Shows the managed profile policy management fragment.
+     */
+    private void showManagedProfileSpecificPolicyFragment() {
+        FragmentManager fragmentManager = getFragmentManager();
+        fragmentManager.beginTransaction().addToBackStack(PolicyManagementFragment.class.getName())
+                .replace(R.id.container, new ProfilePolicyManagementFragment()).commit();
+    }
+
     /**
      * Displays an alert dialog that allows the user to select applications from all non-system
      * applications installed on the current profile. When the user selects an app, this app can't
@@ -762,8 +1117,8 @@ public class DevicePolicyManagementFragment extends PreferenceFragment implement
             }
         });
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle(R.string.block_uninstallation_title)
+        new AlertDialog.Builder(getActivity())
+                .setTitle(R.string.block_uninstallation_title)
                 .setView(listview)
                 .setPositiveButton(R.string.close, null /* Nothing to do */)
                 .show();
@@ -779,6 +1134,14 @@ public class DevicePolicyManagementFragment extends PreferenceFragment implement
         } else {
             Toast.makeText(activity, msgId, Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void showToast(String msg) {
+        Activity activity = getActivity();
+        if (activity == null || activity.isFinishing()) {
+            return;
+        }
+        Toast.makeText(activity, msg, Toast.LENGTH_SHORT).show();
     }
 
     /**
@@ -806,8 +1169,6 @@ public class DevicePolicyManagementFragment extends PreferenceFragment implement
             if (activity == null || activity.isFinishing()) {
                 return;
             }
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setTitle(R.string.set_accessibility_services);
             List<ResolveInfo> accessibilityServicesResolveInfoList
                     = AccessibilityServiceInfoArrayAdapter
                     .getResolveInfoListFromAccessibilityServiceInfoList(
@@ -822,39 +1183,41 @@ public class DevicePolicyManagementFragment extends PreferenceFragment implement
                     accessibilityServiceInfoArrayAdapter.onItemClick(view, pos);
                 }
             });
-            builder.setView(listview);
-            builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    ArrayList<String> permittedAccessibilityServicesArrayList
-                            = accessibilityServiceInfoArrayAdapter
-                            .getPermittedAccessibilityServices();
-                    boolean result = mDevicePolicyManager.setPermittedAccessibilityServices(
-                            DeviceAdminReceiver.getComponentName(getActivity()),
-                            permittedAccessibilityServicesArrayList);
-                    showToast(result
-                            ? R.string.set_accessibility_services_successful
-                            : R.string.set_accessibility_services_fail);
-                }
-            });
-            builder.setNeutralButton(R.string.allow_all, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    boolean result = mDevicePolicyManager.setPermittedAccessibilityServices(
-                            mAdminComponentName, null);
-                    showToast(result
-                            ? R.string.all_accessibility_services_enabled
-                            : R.string.set_accessibility_services_fail);
-                }
-            });
-            builder.setNegativeButton(android.R.string.cancel, null);
-            builder.show();
+
+            new AlertDialog.Builder(getActivity())
+                    .setTitle(R.string.set_accessibility_services)
+                    .setView(listview)
+                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            ArrayList<String> permittedAccessibilityServicesArrayList
+                                    = accessibilityServiceInfoArrayAdapter
+                                    .getPermittedAccessibilityServices();
+                            boolean result = mDevicePolicyManager.setPermittedAccessibilityServices(
+                                    DeviceAdminReceiver.getComponentName(getActivity()),
+                                    permittedAccessibilityServicesArrayList);
+                            showToast(result
+                                    ? R.string.set_accessibility_services_successful
+                                    : R.string.set_accessibility_services_fail);
+                        }
+                    })
+                    .setNeutralButton(R.string.allow_all, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            boolean result = mDevicePolicyManager.setPermittedAccessibilityServices(
+                                    mAdminComponentName, null);
+                            showToast(result
+                                    ? R.string.all_accessibility_services_enabled
+                                    : R.string.set_accessibility_services_fail);
+                        }
+                    })
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .show();
         }
     }
 
     /**
-     * Gets all the input methods. After all the input methods are retrieved, the result is displayed
-     * in a popup.
+     * Gets all the input methods and displays them in a prompt.
      */
     private class GetInputMethodsTask extends AsyncTask<Void, Void, List<InputMethodInfo>> {
 
@@ -876,11 +1239,9 @@ public class DevicePolicyManagementFragment extends PreferenceFragment implement
             if (activity == null || activity.isFinishing()) {
                 return;
             }
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setTitle(R.string.set_input_methods);
             List<ResolveInfo> inputMethodsResolveInfoList
                     = InputMethodInfoArrayAdapter.getResolveInfoListFromInputMethodsInfoList(
-                            inputMethodsInfoList);
+                    inputMethodsInfoList);
             final InputMethodInfoArrayAdapter inputMethodInfoArrayAdapter
                     = new InputMethodInfoArrayAdapter(getActivity(), R.id.pkg_name,
                             inputMethodsResolveInfoList);
@@ -891,32 +1252,83 @@ public class DevicePolicyManagementFragment extends PreferenceFragment implement
                     inputMethodInfoArrayAdapter.onItemClick(view, pos);
                 }
             });
-            builder.setView(listview);
-            builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    ArrayList<String> permittedAccessibilityServicesArrayList
-                            = inputMethodInfoArrayAdapter.getPermittedAccessibilityServices();
-                    boolean result = mDevicePolicyManager.setPermittedInputMethods(
-                            DeviceAdminReceiver.getComponentName(getActivity()),
-                            permittedAccessibilityServicesArrayList);
-                    showToast(result
-                            ? R.string.set_input_methods_successful
-                            : R.string.set_input_methods_fail);
+
+            new AlertDialog.Builder(getActivity())
+                    .setTitle(R.string.set_input_methods)
+                    .setView(listview)
+                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            ArrayList<String> permittedAccessibilityServicesArrayList
+                                    = inputMethodInfoArrayAdapter
+                                    .getPermittedAccessibilityServices();
+                            boolean result = mDevicePolicyManager.setPermittedInputMethods(
+                                    DeviceAdminReceiver.getComponentName(getActivity()),
+                                    permittedAccessibilityServicesArrayList);
+                            showToast(result
+                                    ? R.string.set_input_methods_successful
+                                    : R.string.set_input_methods_fail);
+                        }
+                    })
+                    .setNeutralButton(R.string.allow_all, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            boolean result = mDevicePolicyManager.setPermittedInputMethods(
+                                    mAdminComponentName, null);
+                            showToast(result
+                                    ? R.string.all_input_methods_enabled
+                                    : R.string.set_input_methods_fail);
+                        }
+                    })
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .show();
+        }
+    }
+
+    /**
+     * Gets all CA certificates and displays them in a prompt.
+     */
+    private class ShowCaCertificateListTask extends AsyncTask<Void, Void, String[]> {
+
+        @Override
+        protected String[] doInBackground(Void... params) {
+            return getCaCertificateSubjectDnList();
+        }
+
+        @Override
+        protected void onPostExecute(String[] installedCaCertificateDnList) {
+            if (getActivity() == null || getActivity().isFinishing()) {
+                return;
+            }
+            if (installedCaCertificateDnList == null) {
+                showToast(R.string.no_ca_certificate);
+            } else {
+                new AlertDialog.Builder(getActivity())
+                        .setTitle(getString(R.string.installed_ca_title))
+                        .setItems(installedCaCertificateDnList, null)
+                        .show();
+            }
+        }
+
+        private String[] getCaCertificateSubjectDnList() {
+            List<byte[]> installedCaCerts = mDevicePolicyManager.getInstalledCaCerts(
+                    mAdminComponentName);
+            String[] caSubjectDnList = null;
+            if (installedCaCerts.size() > 0) {
+                caSubjectDnList = new String[installedCaCerts.size()];
+                int i = 0;
+                for (byte[] installedCaCert : installedCaCerts) {
+                    try {
+                        X509Certificate certificate = (X509Certificate) CertificateFactory
+                                .getInstance(X509_CERT_TYPE).generateCertificate(
+                                        new ByteArrayInputStream(installedCaCert));
+                        caSubjectDnList[i++] = certificate.getSubjectDN().getName();
+                    } catch (CertificateException e) {
+                        e.printStackTrace();
+                    }
                 }
-            });
-            builder.setNeutralButton(R.string.allow_all, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    boolean result = mDevicePolicyManager.setPermittedInputMethods(
-                            mAdminComponentName, null);
-                    showToast(result
-                            ? R.string.all_input_methods_enabled
-                            : R.string.set_input_methods_fail);
-                }
-            });
-            builder.setNegativeButton(android.R.string.cancel, null);
-            builder.show();
+            }
+            return caSubjectDnList;
         }
     }
 }

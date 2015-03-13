@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.testdpc.deviceowner.locktask;
+package com.google.android.testdpc.policy.locktask;
 
 import android.content.Context;
 import android.content.pm.ApplicationInfo;

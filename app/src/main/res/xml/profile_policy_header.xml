@@ -18,44 +18,6 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory
-            android:title="@string/apps_management_title">
-        <Preference
-                android:key="enable_system_apps_by_package_name"
-                android:title="@string/enable_system_apps_by_package_name"/>
-
-        <Preference
-                android:key="enable_system_apps_by_intent"
-                android:title="@string/enable_system_apps_by_intent"/>
-
-        <Preference
-                android:key="manage_app_restrictions"
-                android:title="@string/manage_app_restrictions"/>
-    </PreferenceCategory>
-
-    <PreferenceCategory
-            android:title="@string/camera_title">
-        <SwitchPreference
-                android:key="disable_camera"
-                android:title="@string/disable_camera"/>
-    </PreferenceCategory>
-
-    <PreferenceCategory
-            android:title="@string/certificate_management_title">
-        <Preference
-                android:key="install_key_certificate"
-                android:title="@string/install_key_certificate"/>
-        <Preference
-                android:key="install_ca_certificate"
-                android:title="@string/install_ca_certificate"/>
-        <Preference
-                android:key="get_ca_certificates"
-                android:title="@string/get_ca_certificates"/>
-        <Preference
-                android:key="remove_all_ca_certificates"
-                android:title="@string/remove_all_ca_certificates"/>
-    </PreferenceCategory>
-
-    <PreferenceCategory
             android:title="@string/cross_profile_intents">
         <Preference
                 android:title="@string/add_cross_profile_intents_title"
@@ -80,15 +42,6 @@
         <Preference
                 android:key="remove_cross_profile_app_widgets"
                 android:title="@string/remove_cross_profile_app_widget_providers"/>
-    </PreferenceCategory>
-
-    <PreferenceCategory
-            android:title="@string/device_policies_category_title">
-
-        <Preference
-                android:key="manage_device_policies"
-                android:title="@string/manage_device_policies_title"/>
-
     </PreferenceCategory>
 
     <PreferenceCategory

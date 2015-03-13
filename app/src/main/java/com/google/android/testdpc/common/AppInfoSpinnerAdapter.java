@@ -32,7 +32,7 @@ import com.google.android.testdpc.R;
 import java.util.List;
 
 /**
- * An array adapter to show an application name and its icon in a spinner view.
+ * An array adapter which shows an application name and its icon in a spinner view.
  */
 public class AppInfoSpinnerAdapter extends ArrayAdapter<ApplicationInfo> implements SpinnerAdapter {
 

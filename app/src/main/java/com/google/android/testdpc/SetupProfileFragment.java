@@ -21,18 +21,12 @@ import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_DEVICE_AD
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.admin.DevicePolicyManager;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.Toast;
-
-import com.google.android.testdpc.deviceowner.DevicePolicyManagementFragment;
 
 /**
  * This {@link Fragment} handles initiation of managed profile provisioning.
@@ -50,15 +44,6 @@ public class SetupProfileFragment extends Fragment implements View.OnClickListen
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         view.findViewById(R.id.setup_profile).setOnClickListener(this);
-
-        DevicePolicyManager devicePolicyManager = (DevicePolicyManager) getActivity()
-                .getSystemService(Context.DEVICE_POLICY_SERVICE);
-        if (devicePolicyManager.isDeviceOwnerApp(getActivity().getPackageName())) {
-            Button deviceManagementButton = (Button) view.findViewById(R.id.device_management);
-            deviceManagementButton.setOnClickListener(this);
-            deviceManagementButton.setEnabled(true);
-            view.findViewById(R.id.not_a_device_owner).setVisibility(View.GONE);
-        }
     }
 
     @Override
@@ -66,10 +51,6 @@ public class SetupProfileFragment extends Fragment implements View.OnClickListen
         switch (view.getId()) {
             case R.id.setup_profile: {
                 provisionManagedProfile();
-                break;
-            }
-            case R.id.device_management: {
-                showDevicePolicyManagementFragment();
                 break;
             }
         }
@@ -108,14 +89,5 @@ public class SetupProfileFragment extends Fragment implements View.OnClickListen
             return;
         }
         super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    /**
-     * Show the device policy management fragment.
-     */
-    private void showDevicePolicyManagementFragment() {
-        FragmentManager fragmentManager = getFragmentManager();
-        fragmentManager.beginTransaction().addToBackStack(SetupProfileFragment.class.getName())
-                .replace(R.id.container, new DevicePolicyManagementFragment()).commit();
     }
 }

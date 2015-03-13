@@ -21,8 +21,8 @@ import android.util.AttributeSet;
 import android.widget.Spinner;
 
 /**
- * A wrapper class of spinner to pass the onItemSelected event even when the same item is selected
- * again.
+ * A wrapper class of spinner which passes the onItemSelected event even when the same item is
+ * selected again.
  */
 public class ReselectionSpinner extends Spinner {
 

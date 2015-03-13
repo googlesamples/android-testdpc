@@ -72,7 +72,7 @@ public class EnableProfileActivity extends Activity implements View.OnClickListe
         switch (view.getId()) {
             case R.id.app_icon: {
                 // Opens up the main screen
-                startActivity(new Intent(this, DevicePolicyManagementActivity.class));
+                startActivity(new Intent(this, PolicyManagementActivity.class));
                 finish();
                 break;
             }

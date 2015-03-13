@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.google.android.testdpc.profileowner.crossprofileintentfilter;
+package com.google.android.testdpc.profilepolicy.crossprofileintentfilter;
 
 import android.app.admin.DevicePolicyManager;
 import android.content.IntentFilter;
@@ -148,7 +148,7 @@ public class AddCrossProfileIntentFilterFragment extends IntentOrIntentFilterFra
     }
 
     /**
-     * Construct an intent filter from user input. This intent-filter is used for cross-profile
+     * Constructs an intent filter from user input. This intent-filter is used for cross-profile
      * intent.
      *
      * @return a user constructed intent filter.

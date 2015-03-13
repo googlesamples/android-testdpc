@@ -228,7 +228,7 @@ public abstract class IntentOrIntentFilterFragment extends Fragment implements
     protected abstract void updateStatusTextView();
 
     /**
-     * Clean up the intent or the intent filter lists
+     * Cleans up the intent or the intent filter lists
      */
     protected void clearIntentOrIntentFilter() {
         mActions.clear();

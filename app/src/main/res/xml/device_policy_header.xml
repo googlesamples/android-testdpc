@@ -39,6 +39,21 @@ limitations under the License.
     </PreferenceCategory>
 
     <PreferenceCategory
+            android:title="@string/apps_management_title">
+        <Preference
+                android:key="enable_system_apps_by_package_name"
+                android:title="@string/enable_system_apps_by_package_name"/>
+
+        <Preference
+                android:key="enable_system_apps_by_intent"
+                android:title="@string/enable_system_apps_by_intent"/>
+
+        <Preference
+                android:key="manage_app_restrictions"
+                android:title="@string/manage_app_restrictions"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
             android:title="@string/block_uninstallation_title">
         <Preference
                 android:key="block_uninstallation_by_pkg"
@@ -46,6 +61,29 @@ limitations under the License.
         <Preference
                 android:key="block_uninstallation_list"
                 android:title="@string/block_uninstallation_list"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+            android:title="@string/camera_title">
+        <SwitchPreference
+                android:key="disable_camera"
+                android:title="@string/disable_camera"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+            android:title="@string/certificate_management_title">
+        <Preference
+                android:key="install_key_certificate"
+                android:title="@string/install_key_certificate"/>
+        <Preference
+                android:key="install_ca_certificate"
+                android:title="@string/install_ca_certificate"/>
+        <Preference
+                android:key="get_ca_certificates"
+                android:title="@string/get_ca_certificates"/>
+        <Preference
+                android:key="remove_all_ca_certificates"
+                android:title="@string/remove_all_ca_certificates"/>
     </PreferenceCategory>
 
     <PreferenceCategory
@@ -63,6 +101,13 @@ limitations under the License.
         <Preference
                 android:key="check_lock_task_permitted"
                 android:title="@string/check_lock_task_permitted"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+            android:title="@string/managed_profile_specific_policy_category_title">
+        <Preference
+                android:key="managed_profile_policies"
+                android:title="@string/managed_profile_specific_policy_title"/>
     </PreferenceCategory>
 
     <PreferenceCategory
