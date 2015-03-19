@@ -25,6 +25,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.ImageView;
@@ -36,17 +37,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A simple array adapter which contains a checkbox, an app icon and the app name. This is mainly
- * used to display the enable state of activities and services.
+ * A simple array adapter which shows a checkbox, an app icon and the app name for each item in a
+ * list of {@link android.content.pm.ResolveInfo}.
  */
-public abstract class EnableComponentsArrayAdapter extends ArrayAdapter<ResolveInfo> {
-    public static final String TAG = EnableComponentsArrayAdapter.class.getSimpleName();
+public abstract class ToggleComponentsArrayAdapter extends ArrayAdapter<ResolveInfo> implements
+        AdapterView.OnItemClickListener {
+    public static final String TAG = ToggleComponentsArrayAdapter.class.getSimpleName();
 
     protected PackageManager mPackageManager;
     protected DevicePolicyManager mDevicePolicyManager;
-    protected ArrayList<Boolean> mIsComponentEnabledList = new ArrayList<Boolean>();
+    protected ArrayList<Boolean> mIsComponentCheckedList = new ArrayList<Boolean>();
 
-    public EnableComponentsArrayAdapter(Context context, int resource, List<ResolveInfo> objects) {
+    public ToggleComponentsArrayAdapter(Context context, int resource, List<ResolveInfo> objects) {
         super(context, resource, objects);
         mPackageManager = context.getPackageManager();
         mDevicePolicyManager = (DevicePolicyManager) context.getSystemService(
@@ -75,23 +77,30 @@ public abstract class EnableComponentsArrayAdapter extends ArrayAdapter<ResolveI
         enableComponentCheckbox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mIsComponentEnabledList.set(position, ((CheckBox) v).isChecked());
+                // Only handles the onClick event if the component can be enabled or disabled.
+                if (canModifyComponent(position)) {
+                    mIsComponentCheckedList.set(position, ((CheckBox) v).isChecked());
+                } else {
+                    ((CheckBox) v).setChecked(mIsComponentCheckedList.get(position));
+                }
             }
         });
-        enableComponentCheckbox.setChecked(mIsComponentEnabledList.get(position));
+        enableComponentCheckbox.setChecked(mIsComponentCheckedList.get(position));
+        enableComponentCheckbox.setEnabled(canModifyComponent(position));
         return convertView;
     }
 
     /**
-     * Called when an entry of item is clicked. This is UX an improvement to enable / disable a
-     * component when a row is clicked.
+     * Called when an entry of item is clicked.
      *
-     * @param view The view that the click event originated. It must contain the enable component
-     *             checkbox.
+     * @param parent The AdapterView where the click happened.
+     * @param view The view that was clicked on. It must contain the enable component checkbox.
      * @param position The position of a component in this adapter which should handle the click
      *                 event.
+     * @param id The row id of the item that was clicked.
      */
-    public void onItemClick(View view, int position) {
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         CheckBox enableComponentCheckbox = (CheckBox) view.findViewById(
                 R.id.enable_component_checkbox);
         enableComponentCheckbox.performClick();
@@ -100,25 +109,34 @@ public abstract class EnableComponentsArrayAdapter extends ArrayAdapter<ResolveI
     /**
      * Gets the {@link android.content.pm.ApplicationInfo} of a service or an activity.
      *
-     * @param position the position of the view that requests
+     * @param position The position of the view that requests
      *        {@link android.content.pm.ApplicationInfo}.
      * @return The {@link android.content.pm.ApplicationInfo} of a service or an activity at the
-     *         give position. The {@link android.content.pm.ApplicationInfo} should come from either
-     *         a direct or indirect query of {@link android.content.pm.PackageManager}.
+     *         given position. The {@link android.content.pm.ApplicationInfo} should come from
+     *         either a direct or indirect query of {@link android.content.pm.PackageManager}.
      */
     protected abstract ApplicationInfo getApplicationInfo(int position);
 
     /**
-     * Initializes the {@link EnableComponentsArrayAdapter#mIsComponentEnabledList}.
+     * Initializes the {@link ToggleComponentsArrayAdapter#mIsComponentCheckedList}.
      */
     protected abstract void initIsComponentEnabledList();
 
     /**
      * Checks whether an activity or service is enabled.
+     *
      * @param resolveInfo The service or activity resolve info.
      * @return true if the given activity or service is enabled, false otherwise.
      */
     protected abstract boolean isComponentEnabled(ResolveInfo resolveInfo);
+
+    /**
+     * Checks if the component in a given position can be enabled or disabled.
+     *
+     * @param position The position of the component in this adapter
+     * @return true if the component can be enabled or disabled. Otherwise, false.
+     */
+    protected abstract boolean canModifyComponent(int position);
 
     protected boolean isSystemApp(ApplicationInfo applicationInfo) {
         return applicationInfo != null

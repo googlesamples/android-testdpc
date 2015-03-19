@@ -42,8 +42,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * This fragment is responsible to view and edit an application's application restrictions. It also
- * supports the loading of the default app restrictions.
+ * This fragment shows all installed apps and allows viewing and editing application restrictions
+ * for those apps. It also allows loading the default app restrictions for each of those apps.
  */
 public class ManageAppRestrictionsFragment extends Fragment implements View.OnClickListener {
 
@@ -103,7 +103,7 @@ public class ManageAppRestrictionsFragment extends Fragment implements View.OnCl
 
     private List<ApplicationInfo> getInstalledLaunchableApps() {
         List<ApplicationInfo> managedAppList = mPackageManager.getInstalledApplications(
-                0 /* no flags */);
+                0 /* Default flags */);
         List<ApplicationInfo> launchableAppList = new ArrayList<ApplicationInfo>();
         for (ApplicationInfo applicationInfo : managedAppList) {
             if ((mPackageManager.getLaunchIntentForPackage(applicationInfo.packageName)) != null) {

@@ -20,14 +20,10 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.ResolveInfo;
 import android.text.TextUtils;
-import android.view.View;
-import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodInfo;
-import android.widget.CheckBox;
 
 import com.google.android.testdpc.DeviceAdminReceiver;
-import com.google.android.testdpc.R;
-import com.google.android.testdpc.common.EnableComponentsArrayAdapter;
+import com.google.android.testdpc.common.ToggleComponentsArrayAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +32,7 @@ import java.util.List;
  * Displays a list of installed input methods with a checkbox for enabling the component. All system
  * input methods are enabled by default and can't be disabled.
  */
-public class InputMethodInfoArrayAdapter extends EnableComponentsArrayAdapter {
+public class InputMethodInfoArrayAdapter extends ToggleComponentsArrayAdapter {
 
     private List<String> mPermittedInputType = null;
 
@@ -54,17 +50,6 @@ public class InputMethodInfoArrayAdapter extends EnableComponentsArrayAdapter {
             inputMethodsResolveInfoList.add(resolveInfo);
         }
         return inputMethodsResolveInfoList;
-    }
-
-    @Override
-    public View getView(final int position, View convertView, ViewGroup parent) {
-        View view = super.getView(position, convertView, parent);
-        if (isSystemApp(getItem(position).serviceInfo.applicationInfo)) {
-            CheckBox enableComponentCheckbox = (CheckBox) view.findViewById(
-                    R.id.enable_component_checkbox);
-            enableComponentCheckbox.setEnabled(false);
-        }
-        return view;
     }
 
     /**
@@ -87,11 +72,17 @@ public class InputMethodInfoArrayAdapter extends EnableComponentsArrayAdapter {
         return false;
     }
 
+    @Override
+    protected boolean canModifyComponent(int position) {
+        // System input methods are always enabled.
+        return !isSystemApp(getApplicationInfo(position));
+    }
+
     public ArrayList<String> getPermittedAccessibilityServices() {
         ArrayList<String> permittedAccessibilityServicesArrayList = new ArrayList<String>();
         int size = getCount();
         for (int i = 0; i < size; i++) {
-            if (mIsComponentEnabledList.get(i)) {
+            if (mIsComponentCheckedList.get(i)) {
                 permittedAccessibilityServicesArrayList.add(getItem(i).serviceInfo.packageName);
             }
         }
@@ -109,7 +100,7 @@ public class InputMethodInfoArrayAdapter extends EnableComponentsArrayAdapter {
                 DeviceAdminReceiver.getComponentName(getContext()));
         int size = getCount();
         for (int i = 0; i < size; i++) {
-            mIsComponentEnabledList.add(isComponentEnabled(getItem(i)));
+            mIsComponentCheckedList.add(isComponentEnabled(getItem(i)));
         }
     }
 }

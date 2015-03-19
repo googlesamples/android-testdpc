@@ -29,7 +29,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 /**
- * This {@link Fragment} handles initiation of managed profile provisioning.
+ * This {@link Fragment} shows the UI that allows the user to start the setup of a managed profile.
  */
 public class SetupProfileFragment extends Fragment implements View.OnClickListener {
 
@@ -71,23 +71,9 @@ public class SetupProfileFragment extends Fragment implements View.OnClickListen
         if (intent.resolveActivity(activity.getPackageManager()) != null) {
             startActivityForResult(intent, REQUEST_PROVISION_MANAGED_PROFILE);
         } else {
-            Toast.makeText(activity, "Device provisioning is not enabled. Stopping.",
-                    Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity, R.string.provisioning_not_supported, Toast.LENGTH_SHORT)
+                    .show();
             getActivity().finish();
         }
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_PROVISION_MANAGED_PROFILE) {
-            if (resultCode == Activity.RESULT_OK) {
-                Toast.makeText(getActivity(), "Provisioning done.", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(getActivity(), "Provisioning failed.", Toast.LENGTH_SHORT).show();
-            }
-            getActivity().finish();
-            return;
-        }
-        super.onActivityResult(requestCode, resultCode, data);
     }
 }

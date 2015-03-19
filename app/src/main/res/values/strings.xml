@@ -19,28 +19,30 @@
 
     <string name="app_name">DevicePolicyManagementSample</string>
     <string name="set_up_profile">Set up profile</string>
-    <string name="setup_profile_message">This app is currently not a profile owner.</string>
+    <string name="setup_profile_message">This app is currently not the owner of this profile. Please
+        click the button below to set up a new profile managed by this app.</string>
     <string name="profile_name">Sample Managed Profile</string>
-    <string name="all_done">Setup all done</string>
-    <string name="all_done_explanation">To manage the configuration in your managed profile, visit
-        the badged version of this application.
+    <string name="all_done">Setup finished successfully</string>
+    <string name="all_done_explanation">To manage the new managed profile, visit the badged version
+        of this application.
     </string>
     <string name="icon">Icon</string>
+    <string name="provisioning_not_supported">Device provisioning is not enabled. Stopping.</string>
 
     <string name="managed_profile_specific_policy_category_title">Managed profile policy</string>
     <string name="managed_profile_specific_policy_title">Manage work profile specific policy
     </string>
     <string name="policies_management">Policy management</string>
 
-    <!-- String for device owner management -->
-    <string name="this_is_not_a_device_owner">This app is currently not a device owner.</string>
-    <string name="this_is_a_device_owner">This app is a device owner.</string>
+    <!-- Strings for device owner management -->
+    <string name="this_is_not_a_device_owner">This app is currently not the device owner.</string>
+    <string name="this_is_a_device_owner">This app is the device owner.</string>
     <string name="this_is_a_managed_profile_owner">This app is a managed profile owner.
         Some of the management options are not available.</string>
     <string name="device_owner_management">Device owner management</string>
-    <string name="remove_device_owner">Remove this app from device owner</string>
+    <string name="remove_device_owner">Remove this device owner</string>
     <string name="remove_device_owner_title">Device owner removal</string>
-    <string name="remove_device_owner_confirmation">Are you sure to remove this app from device
+    <string name="remove_device_owner_confirmation">Are you sure you want to remove this device
         owner?
     </string>
     <string name="device_owner_removed">This app is no longer a device owner.</string>
@@ -81,6 +83,7 @@
     </string>
     <string name="remove_cross_profile_app_widget_providers_title">Disable app widgets</string>
     <string name="remove_cross_profile_app_widget_providers">Remove app widgets in a work profile
+        app
     </string>
     <string name="all_cross_profile_widget_providers_are_enabled">There is no widget from any of the
         work profile apps that is in disabled state.</string>
@@ -97,10 +100,10 @@
     </string>
     <string name="enable_system_apps_by_package_name_success_msg">%s is enabled.</string>
     <string name="enable_system_apps_by_intent">Enable a system app by intent</string>
-    <string name="enable_system_apps_failure_msg">Failed to enable system apps with the given
-        intent.
+    <string name="enable_system_apps_failure_msg">Failed to enable system apps that receive the
+        given intent.
     </string>
-    <string name="enable_system_apps_attempt_msg">Enabled system apps with the given intent.
+    <string name="enable_system_apps_attempt_msg">Enabled system apps that receive the given intent.
     </string>
     <string name ="no_disabled_system_apps">All system apps have been enabled.</string>
     <string name="enable">Enable</string>
@@ -132,7 +135,7 @@
 
     <!-- Strings for certificate management  -->
     <string name="certificate_management_title">Certificate management</string>
-    <string name="install_key_certificate">Install a key certificate</string>
+    <string name="install_key_certificate">Install a private key certificate</string>
     <string name="certificate_password_prompt_title">Extract certificate</string>
     <string name="certificate_password_prompt_enter_password">Type the password to extract the
         certificates.
@@ -141,11 +144,12 @@
     <string name="certificate_alias_prompt_title">Name the certificate</string>
     <string name="certificate_alias_prompt_certificate_name">Certificate name:</string>
     <string name="certificate_added">\"%s\" certificate added.</string>
-    <string name="not_a_key_certificate">The selected certificate is not a key certificate.</string>
+    <string name="not_a_key_certificate">The selected certificate is not a private key certificate.
+    </string>
     <string name="install_ca_certificate">Install a CA certificate</string>
-    <string name="install_ca_successfully">The selected CA is installed.</string>
-    <string name="install_ca_fail">The selected CA is not installed.</string>
-    <string name="get_ca_certificates">Get a list of CAs</string>
+    <string name="install_ca_successfully">The selected CA certificate is installed.</string>
+    <string name="install_ca_fail">The selected CA certificate is not installed.</string>
+    <string name="get_ca_certificates">Get a list of CA certificates</string>
     <string name="no_ca_certificate">There is no CA certificate installed.</string>
     <string name="installed_ca_title">Installed CA certificates</string>
     <string name="remove_all_ca_certificates">Remove all CA certificates</string>
@@ -163,7 +167,7 @@
     <string name="set_str_array_dialog_title">Set values for\n\"%s\"</string>
     <string name="set_app_restrictions_fail">Failed to set app restrictions due to invalid input.
     </string>
-    <string name="set_app_restrictions_success">Set app restrictions for %s is successful.</string>
+    <string name="set_app_restrictions_success">Successfully set app restrictions for %s.</string>
 
     <!-- Accessibility -->
     <string name="accessibility_title">Accessibility</string>
@@ -188,15 +192,15 @@
 
     <!-- Account management -->
     <string name="account_management_title">Account management</string>
-    <string name="set_disable_account_management">Set disable account management</string>
-    <string name="get_disable_account_management">Get disable account management</string>
+    <string name="set_disable_account_management">Toggle account management</string>
+    <string name="get_disable_account_management">Get account types with management disabled</string>
     <string name="account_type_hint">Enter an account type</string>
     <string name="disable">Disable</string>
     <string name="account_management_disabled">Account management for \"%s\" has been disabled.
     </string>
     <string name="account_management_enabled">Account management for \"%s\" has been enabled.
     </string>
-    <string name="fail_to_set_account_management">Failed to set account management.</string>
+    <string name="fail_to_set_account_management">Failed to toggle account management.</string>
     <string name="list_of_disabled_account_types">List of disabled account types</string>
     <string name="no_disabled_account">There is no account type that is disabled.</string>
 
@@ -204,7 +208,7 @@
     <string name="user_management">User management</string>
     <string name="create_and_initialize_user">Create and initialize user</string>
     <string name="remove_user">Remove user</string>
-    <string name="user_created">Successfully created user %1$d.</string>
+    <string name="user_created">Successfully created user with serial number %1$d.</string>
     <string name="enter_username_hint">Enter a username</string>
     <string name="failed_to_create_user">Failed to create user.</string>
     <string name="enter_user_id">Enter a user serial number</string>

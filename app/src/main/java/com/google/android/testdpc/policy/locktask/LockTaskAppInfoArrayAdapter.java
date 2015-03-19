@@ -21,17 +21,17 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.ResolveInfo;
 import android.text.TextUtils;
 
-import com.google.android.testdpc.common.EnableComponentsArrayAdapter;
+import com.google.android.testdpc.common.ToggleComponentsArrayAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * An array adapter which takes a {@link java.util.ArrayList<android.content.pm.ResolveInfo>} and
- * renders them into a listview. Each entry contains a checkbox, an app icon and the app name. The
- * checkbox is used to indicate whether the lock task for that app is permitted or not.
+ * renders its items into a listview. Each entry contains a checkbox, an app icon and the app name.
+ * The checkbox is used to indicate whether the lock task for that app is permitted or not.
  */
-public class LockTaskAppInfoArrayAdapter extends EnableComponentsArrayAdapter {
+public class LockTaskAppInfoArrayAdapter extends ToggleComponentsArrayAdapter {
 
     public LockTaskAppInfoArrayAdapter(Context context, int resource, List<ResolveInfo> objects) {
         super(context, resource, objects);
@@ -53,7 +53,7 @@ public class LockTaskAppInfoArrayAdapter extends EnableComponentsArrayAdapter {
         ArrayList<String> lockTaskEnabledArrayList = new ArrayList<String>();
         int size = getCount();
         for (int i = 0; i < size; i++) {
-            if (mIsComponentEnabledList.get(i)) {
+            if (mIsComponentCheckedList.get(i)) {
                 lockTaskEnabledArrayList.add(getItem(i).activityInfo.packageName);
             }
         }
@@ -70,7 +70,13 @@ public class LockTaskAppInfoArrayAdapter extends EnableComponentsArrayAdapter {
     protected void initIsComponentEnabledList() {
         int size = getCount();
         for (int i = 0; i < size; i++) {
-            mIsComponentEnabledList.add(isComponentEnabled(getItem(i)));
+            mIsComponentCheckedList.add(isComponentEnabled(getItem(i)));
         }
+    }
+
+    @Override
+    protected boolean canModifyComponent(int position) {
+        // Any app can be set as a lock task.
+        return true;
     }
 }

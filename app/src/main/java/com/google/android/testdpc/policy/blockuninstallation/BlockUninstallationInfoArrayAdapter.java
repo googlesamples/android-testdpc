@@ -26,14 +26,14 @@ import android.widget.CheckBox;
 
 import com.google.android.testdpc.DeviceAdminReceiver;
 import com.google.android.testdpc.R;
-import com.google.android.testdpc.common.EnableComponentsArrayAdapter;
+import com.google.android.testdpc.common.ToggleComponentsArrayAdapter;
 
 import java.util.List;
 
 /**
  * Displays a list of installed apps with a checkbox for disabling the uninstallation.
  */
-public class BlockUninstallationInfoArrayAdapter extends EnableComponentsArrayAdapter {
+public class BlockUninstallationInfoArrayAdapter extends ToggleComponentsArrayAdapter {
 
     public BlockUninstallationInfoArrayAdapter(Context context, int resource,
             List<ResolveInfo> resolveInfoList) {
@@ -55,7 +55,7 @@ public class BlockUninstallationInfoArrayAdapter extends EnableComponentsArrayAd
                     @Override
                     public void onClick(View v) {
                         boolean isBlocked = ((CheckBox) v).isChecked();
-                        mIsComponentEnabledList.set(position, isBlocked);
+                        mIsComponentCheckedList.set(position, isBlocked);
                         mDevicePolicyManager.setUninstallBlocked(
                                 DeviceAdminReceiver.getComponentName(getContext()),
                                 getItem(position).resolvePackageName, isBlocked);
@@ -69,7 +69,7 @@ public class BlockUninstallationInfoArrayAdapter extends EnableComponentsArrayAd
     protected ApplicationInfo getApplicationInfo(int position) {
         try {
             return mPackageManager.getApplicationInfo(getItem(position).resolvePackageName,
-                    0 /* No flag */);
+                    0 /* Default flags */);
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
@@ -80,12 +80,18 @@ public class BlockUninstallationInfoArrayAdapter extends EnableComponentsArrayAd
     protected void initIsComponentEnabledList() {
         int size = getCount();
         for (int i = 0; i < size; i++) {
-            mIsComponentEnabledList.add(isComponentEnabled(getItem(i)));
+            mIsComponentCheckedList.add(isComponentEnabled(getItem(i)));
         }
     }
 
+    @Override
+    protected boolean canModifyComponent(int position) {
+        // Uninstallation of all apps can be blocked.
+        return true;
+    }
+
     /**
-     * Stores if installation is blocked for a package.
+     * Stores whether installation is blocked for a package.
      */
     public class BlockUninstallationAppInfo {
         public boolean isUninstallationBlocked;

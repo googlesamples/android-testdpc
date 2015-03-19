@@ -34,9 +34,9 @@ import com.google.android.testdpc.R;
 import com.google.android.testdpc.common.IntentOrIntentFilterFragment;
 
 /**
- * An UI class that helps constructing intents for enabling system apps.
+ * UI class that helps constructing intents for enabling system apps.
  *
- * Contains sample codes for testing
+ * Contains sample code for testing
  * {@link android.app.admin.DevicePolicyManager#enableSystemApp(android.content.ComponentName,
  * android.content.Intent)}
  */
@@ -54,6 +54,7 @@ public class EnableSystemAppsByIntentFragment extends IntentOrIntentFilterFragme
         View view = super.onCreateView(layoutInflater, container, savedInstanceState);
         Button addButton = (Button) view.findViewById(R.id.btn_add);
         // Hide data schemes UI because this is not useful for building an intent.
+        view.findViewById(R.id.data_schemes_title).setVisibility(View.GONE);
         view.findViewById(R.id.data_schemes_container).setVisibility(View.GONE);
         // There is only one action for an intent. Probably don't need an add button.
         mAddActionButton.setVisibility(View.GONE);

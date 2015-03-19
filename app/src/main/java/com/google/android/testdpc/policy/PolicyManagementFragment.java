@@ -141,10 +141,11 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
     public static final int INSTALL_KEY_CERTIFICATE_REQUEST_CODE = 7689;
     public static final int INSTALL_CA_CERTIFICATE_REQUEST_CODE = 7690;
+
     public static final int DEFAULT_BUFFER_SIZE = 4096;
     public static final String X509_CERT_TYPE = "X.509";
+    public static final String TAG = "PolicyManagementFragment";
 
-    private static final String TAG = "PolicyManagementFragment";
     private static final String DEVICE_OWNER_STATUS_KEY = "device_owner_status";
     private static final String MANAGE_LOCK_TASK_LIST_KEY = "manage_lock_task";
     private static final String CHECK_LOCK_TASK_PERMITTED_KEY = "check_lock_task_permitted";
@@ -174,16 +175,19 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     private static final String GET_CA_CERTIFICATES_KEY = "get_ca_certificates";
     private static final String REMOVE_ALL_CERTIFICATES_KEY = "remove_all_ca_certificates";
     private static final String MANAGED_PROFILE_SPECIFIC_POLICIES_KEY = "managed_profile_policies";
+
     private static final String[] PRIMARY_USER_ONLY_RESTRICTIONS = {
             DISALLOW_REMOVE_USER, DISALLOW_ADD_USER, DISALLOW_FACTORY_RESET,
             DISALLOW_CONFIG_TETHERING, DISALLOW_ADJUST_VOLUME, DISALLOW_UNMUTE_MICROPHONE
     };
+
     private static final String[] ALL_USER_RESTRICTIONS = {
             DISALLOW_DEBUGGING_FEATURES, DISALLOW_INSTALL_UNKNOWN_SOURCES, DISALLOW_REMOVE_USER,
             DISALLOW_ADD_USER, DISALLOW_FACTORY_RESET, DISALLOW_CONFIG_CREDENTIALS,
             DISALLOW_SHARE_LOCATION, DISALLOW_CONFIG_TETHERING, DISALLOW_ADJUST_VOLUME,
             DISALLOW_UNMUTE_MICROPHONE, DISALLOW_MODIFY_ACCOUNTS
     };
+
     private static final String[] MANAGED_PROFILE_SPECIFIC_OPTIONS = {
             MANAGED_PROFILE_SPECIFIC_POLICIES_KEY
     };
@@ -193,6 +197,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     private String mPackageName;
     private ComponentName mAdminComponentName;
     private UserManager mUserManager;
+
     private Preference mManageLockTaskPreference;
     private Preference mCheckLockTaskPermittedPreference;
     private Preference mCreateAndInitializeUserPreference;
@@ -209,6 +214,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     private SwitchPreference mDisallowUnmuteMicrophonePreference;
     private SwitchPreference mDisallowModifyAccountsPreference;
     private SwitchPreference mDisableCameraSwitchPreference;
+
     private GetAccessibilityServicesTask mGetAccessibilityServicesTask = null;
     private GetInputMethodsTask mGetInputMethodsTask = null;
     private ShowCaCertificateListTask mShowCaCertificateListTask = null;
@@ -313,22 +319,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 showCheckLockTaskPermittedPrompt();
                 return true;
             case REMOVE_DEVICE_OWNER_KEY:
-                new AlertDialog.Builder(getActivity())
-                        .setTitle(R.string.remove_device_owner_title)
-                        .setMessage(R.string.remove_device_owner_confirmation)
-                        .setPositiveButton(android.R.string.ok,
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        mDevicePolicyManager.clearDeviceOwnerApp(mPackageName);
-                                        if (getActivity() != null && !getActivity().isFinishing()) {
-                                            showToast(R.string.device_owner_removed);
-                                            getActivity().finish();
-                                        }
-                                    }
-                                })
-                        .setNegativeButton(android.R.string.cancel, null)
-                        .show();
+                showRemoveDeviceOwnerPrompt();
                 return true;
             case SET_ACCESSIBILITY_SERVICES_KEY:
                 // Avoid starting the same task twice.
@@ -444,8 +435,8 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     }
 
     /**
-     * Shows a list of primary user apps in a prompt, indicating whether lock task is permitted for
-     * that app.
+     * Shows a list of primary user apps in a prompt, the user can set whether lock task is
+     * permitted for each app.
      */
     private void showManageLockTaskListPrompt() {
         if (getActivity() == null || getActivity().isFinishing()) {
@@ -457,6 +448,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 .queryIntentActivities(launcherIntent, 0);
         if (primaryUserAppList.isEmpty()) {
             showToast(R.string.no_primary_app_available);
+            return;
         } else {
             final LockTaskAppInfoArrayAdapter appInfoArrayAdapter = new LockTaskAppInfoArrayAdapter(
                     getActivity(), R.id.pkg_name, primaryUserAppList);
@@ -465,7 +457,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    appInfoArrayAdapter.onItemClick(view, position);
+                    appInfoArrayAdapter.onItemClick(parent, view, position, id);
                 }
             });
 
@@ -525,6 +517,28 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                         dialog.dismiss();
                     }
                 })
+                .show();
+    }
+
+    /**
+     * Shows a prompt to ask for confirmation on removing device owner.
+     */
+    private void showRemoveDeviceOwnerPrompt() {
+        new AlertDialog.Builder(getActivity())
+                .setTitle(R.string.remove_device_owner_title)
+                .setMessage(R.string.remove_device_owner_confirmation)
+                .setPositiveButton(android.R.string.ok,
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                mDevicePolicyManager.clearDeviceOwnerApp(mPackageName);
+                                if (getActivity() != null && !getActivity().isFinishing()) {
+                                    showToast(R.string.device_owner_removed);
+                                    getActivity().finish();
+                                }
+                            }
+                        })
+                .setNegativeButton(android.R.string.cancel, null)
                 .show();
     }
 
@@ -599,8 +613,8 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     }
 
     /**
-     * Some testing UIs in this class can only be run if this app is a device owner and is running
-     * in the primary profile. Disable those UIs to avoid confusion.
+     * Some functionality only works if this app is device owner. Disable their UIs to avoid
+     * confusion.
      */
     private void disableIncompatibleManagementOptionsInCurrentProfile() {
         boolean isProfileOwner = mDevicePolicyManager.isProfileOwnerApp(mPackageName);
@@ -684,13 +698,17 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         }
         String[] disabledAccountTypeList = mDevicePolicyManager
                 .getAccountTypesWithManagementDisabled();
-        new AlertDialog.Builder(getActivity())
-                .setTitle(R.string.list_of_disabled_account_types)
-                .setAdapter(new ArrayAdapter<String>(getActivity(),
-                        android.R.layout.simple_list_item_1, android.R.id.text1,
-                        disabledAccountTypeList), null)
-                .setPositiveButton(android.R.string.ok, null)
-                .show();
+        if (disabledAccountTypeList == null || disabledAccountTypeList.length == 0) {
+            showToast(R.string.no_disabled_account);
+        } else {
+            new AlertDialog.Builder(getActivity())
+                    .setTitle(R.string.list_of_disabled_account_types)
+                    .setAdapter(new ArrayAdapter<String>(getActivity(),
+                            android.R.layout.simple_list_item_1, android.R.id.text1,
+                            disabledAccountTypeList), null)
+                    .setPositiveButton(android.R.string.ok, null)
+                    .show();
+        }
     }
 
     /**
@@ -732,7 +750,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
 
     /**
      * For user removal:
-     * Shows a prompt to ask for the user serial number that is going to be removed.
+     * Shows a prompt for a user serial number. The associated user will be removed.
      */
     private void showRemoveUserPrompt() {
         if (getActivity() == null || getActivity().isFinishing()) {
@@ -818,7 +836,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     }
 
     /**
-     * Shows a prompt to enable a system app from the user input.
+     * Shows a prompt to ask for package name which is used to enable a system app.
      */
     private void showEnableSystemAppByPackageNamePrompt() {
         if (getActivity() == null || getActivity().isFinishing()) {
@@ -1120,8 +1138,8 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         ListView listview = new ListView(getActivity());
         listview.setAdapter(blockUninstallationInfoArrayAdapter);
         listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> arg0, View view, int pos, long id) {
-                blockUninstallationInfoArrayAdapter.onItemClick(view, pos);
+            public void onItemClick(AdapterView<?> parent, View view, int pos, long id) {
+                blockUninstallationInfoArrayAdapter.onItemClick(parent, view, pos, id);
             }
         });
 
@@ -1144,7 +1162,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 PackageManager.GET_UNINSTALLED_PACKAGES);
         // This list contains all enabled apps.
         List<ApplicationInfo> enabledApps =
-                mPackageManager.getInstalledApplications(0 /* No flags */);
+                mPackageManager.getInstalledApplications(0 /* Default flags */);
         Set<String> enabledAppsPkgNames = new HashSet<String>();
         for (ApplicationInfo applicationInfo : enabledApps) {
             enabledAppsPkgNames.add(applicationInfo.packageName);
@@ -1232,8 +1250,8 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             ListView listview = new ListView(getActivity());
             listview.setAdapter(accessibilityServiceInfoArrayAdapter);
             listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                public void onItemClick(AdapterView<?> arg0, View view, int pos, long id) {
-                    accessibilityServiceInfoArrayAdapter.onItemClick(view, pos);
+                public void onItemClick(AdapterView<?> parent, View view, int pos, long id) {
+                    accessibilityServiceInfoArrayAdapter.onItemClick(parent, view, pos, id);
                 }
             });
 
@@ -1245,7 +1263,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                         public void onClick(DialogInterface dialogInterface, int i) {
                             ArrayList<String> permittedAccessibilityServicesArrayList
                                     = accessibilityServiceInfoArrayAdapter
-                                    .getPermittedAccessibilityServices();
+                                    .getSelectedAccessibilityServices();
                             boolean result = mDevicePolicyManager.setPermittedAccessibilityServices(
                                     DeviceAdminReceiver.getComponentName(getActivity()),
                                     permittedAccessibilityServicesArrayList);
@@ -1301,8 +1319,8 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             ListView listview = new ListView(getActivity());
             listview.setAdapter(inputMethodInfoArrayAdapter);
             listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                public void onItemClick(AdapterView<?> arg0, View view, int pos, long id) {
-                    inputMethodInfoArrayAdapter.onItemClick(view, pos);
+                public void onItemClick(AdapterView<?> parent, View view, int pos, long id) {
+                    inputMethodInfoArrayAdapter.onItemClick(parent, view, pos, id);
                 }
             });
 

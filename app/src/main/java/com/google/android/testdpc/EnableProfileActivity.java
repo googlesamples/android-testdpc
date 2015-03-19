@@ -28,9 +28,9 @@ import android.view.View;
 import android.widget.ImageView;
 
 /**
- * This activity is started after the provisioning is complete in {@link DeviceAdminReceiver}.
- * It is responsible to enable the managed profile and provide a shortcut to the policy management
- * screen.
+ * This activity is started after provisioning is complete in {@link DeviceAdminReceiver}.
+ * It is responsible for enabling the managed profile and providing a shortcut to the policy
+ * management screen.
  */
 public class EnableProfileActivity extends Activity implements View.OnClickListener {
 
@@ -44,12 +44,12 @@ public class EnableProfileActivity extends Activity implements View.OnClickListe
             enableProfile();
         }
 
-        // This is just a friendly shortcut to the policy management screen of this app.
+        // This is just a user friendly shortcut to the policy management screen of this app.
         setContentView(R.layout.activity_setup);
         ImageView appIcon = (ImageView) findViewById(R.id.app_icon);
         try {
             ApplicationInfo applicationInfo = getPackageManager()
-                    .getApplicationInfo(getPackageName(), 0);
+                    .getApplicationInfo(getPackageName(), 0 /* Default flags */);
             appIcon.setImageDrawable(getPackageManager().getApplicationIcon(applicationInfo));
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();

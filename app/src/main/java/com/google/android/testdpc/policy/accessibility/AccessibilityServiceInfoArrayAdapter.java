@@ -21,13 +21,9 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.ResolveInfo;
 import android.text.TextUtils;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.CheckBox;
 
 import com.google.android.testdpc.DeviceAdminReceiver;
-import com.google.android.testdpc.R;
-import com.google.android.testdpc.common.EnableComponentsArrayAdapter;
+import com.google.android.testdpc.common.ToggleComponentsArrayAdapter;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -37,7 +33,7 @@ import java.util.List;
  * Displays a list of installed accessibility services with a checkbox for enabling the component.
  * All system accessibility services are enabled by default and can't be disabled.
  */
-public class AccessibilityServiceInfoArrayAdapter extends EnableComponentsArrayAdapter {
+public class AccessibilityServiceInfoArrayAdapter extends ToggleComponentsArrayAdapter {
 
     private List<String> mPermittedAccessibilityServices = null;
 
@@ -48,22 +44,15 @@ public class AccessibilityServiceInfoArrayAdapter extends EnableComponentsArrayA
         super(context, resource, objects);
     }
 
-    @Override
-    public View getView(final int position, View convertView, ViewGroup parent) {
-        View view = super.getView(position, convertView, parent);
-        if (isSystemApp(getItem(position).serviceInfo.applicationInfo)) {
-            CheckBox enableComponentCheckbox = (CheckBox) view.findViewById(
-                    R.id.enable_component_checkbox);
-            enableComponentCheckbox.setEnabled(false);
-        }
-        return view;
-    }
-
-    public ArrayList<String> getPermittedAccessibilityServices() {
+    /**
+     * @return The package names of accessibility services which are selected in the array adapter
+     * UI.
+     */
+    public ArrayList<String> getSelectedAccessibilityServices() {
         ArrayList<String> permittedAccessibilityServicesArrayList = new ArrayList<String>();
         int size = getCount();
         for (int i = 0; i < size; i++) {
-            if (mIsComponentEnabledList.get(i)) {
+            if (mIsComponentCheckedList.get(i)) {
                 permittedAccessibilityServicesArrayList.add(getItem(i).serviceInfo.packageName);
             }
         }
@@ -76,8 +65,8 @@ public class AccessibilityServiceInfoArrayAdapter extends EnableComponentsArrayA
         List<ResolveInfo> resolveInfoList = new ArrayList<ResolveInfo>();
         for (AccessibilityServiceInfo accessibilityServiceInfo: accessibilityServiceInfoList) {
             ResolveInfo resolveInfo = accessibilityServiceInfo.getResolveInfo();
-            // Some apps may contain multiple accessibility services. Ignore those services which
-            // package name exists in the return list.
+            // Some apps may contain multiple accessibility services. Make sure that the package
+            // name is unique in the return list.
             if (!packageSet.contains(resolveInfo.serviceInfo.packageName)) {
                 resolveInfoList.add(resolveInfo);
                 packageSet.add(resolveInfo.serviceInfo.packageName);
@@ -97,7 +86,7 @@ public class AccessibilityServiceInfoArrayAdapter extends EnableComponentsArrayA
                 DeviceAdminReceiver.getComponentName(getContext()));
         int size = getCount();
         for (int i = 0; i < size; i++) {
-            mIsComponentEnabledList.add(isComponentEnabled(getItem(i)));
+            mIsComponentCheckedList.add(isComponentEnabled(getItem(i)));
         }
     }
 
@@ -106,21 +95,27 @@ public class AccessibilityServiceInfoArrayAdapter extends EnableComponentsArrayA
      * 1) There are no restrictions for the permitted accessibility services.
      * 2) A given accessibility service's package name exists in the permitted accessibility
      * service list.
-     * 3) A given accessibility service is part of a system app.
+     * 3) A given accessibility service is a system app.
      */
     @Override
     protected boolean isComponentEnabled(ResolveInfo resolveInfo) {
         if (resolveInfo != null && resolveInfo.serviceInfo != null && !TextUtils
                 .isEmpty(resolveInfo.serviceInfo.packageName)) {
-            // null means there are no restrictions. All accessibility services are enabled.
-            if (mPermittedAccessibilityServices == null || isSystemApp(
+           if (mPermittedAccessibilityServices == null || isSystemApp(
                     resolveInfo.serviceInfo.applicationInfo)) {
-                return true;
+               // null means there are no restrictions. All accessibility services are enabled.
+               return true;
             } else {
                 return mPermittedAccessibilityServices.contains(
                         resolveInfo.serviceInfo.packageName);
             }
         }
         return false;
+    }
+
+    @Override
+    protected boolean canModifyComponent(int position) {
+        // System accessibility services are always enabled.
+        return !isSystemApp(getApplicationInfo(position));
     }
 }

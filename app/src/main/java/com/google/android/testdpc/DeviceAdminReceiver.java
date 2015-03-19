@@ -21,23 +21,21 @@ import android.content.Context;
 import android.content.Intent;
 
 /**
- * Handles events related to managed profile.
+ * Handles events related to the managed profile.
  */
 public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
 
     @Override
     public void onProfileProvisioningComplete(Context context, Intent intent) {
-        // EnableProfileActivity is launched with the newly set up profile.
+        // Enable the profile after provisioning is complete.
         Intent launch = new Intent(context, EnableProfileActivity.class);
         launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(launch);
     }
 
     /**
-     * Generates a {@link android.content.ComponentName} that is used throughout the app.
-     *
      * @param context The context of the application.
-     * @return a {@link android.content.ComponentName}.
+     * @return The component name of this component in the given context.
      */
     public static ComponentName getComponentName(Context context) {
         return new ComponentName(context.getApplicationContext(), DeviceAdminReceiver.class);

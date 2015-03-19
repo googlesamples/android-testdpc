@@ -49,7 +49,9 @@ public abstract class IntentOrIntentFilterFragment extends Fragment implements
         AdapterView.OnItemSelectedListener {
 
     private static final String CUSTOM = "Custom";
-
+    private static final int CUSTOM_INPUT_TYPE_ACTIONS = 0;
+    private static final int CUSTOM_INPUT_TYPE_CATEGORIES = 1;
+    private static final int CUSTOM_INPUT_TYPE_SCHEMES = 2;
     /**
      * A list of common actions
      */
@@ -135,12 +137,6 @@ public abstract class IntentOrIntentFilterFragment extends Fragment implements
     protected Button mAddButton;
 
     protected TextView mStatusTextView;
-
-    private enum CustomInputType {
-        NONE, ACTION, CATEGORY, DATA_SCHEME
-    }
-
-    private CustomInputType mCustomInputType = CustomInputType.NONE;
 
     @Override
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup container,
@@ -242,20 +238,20 @@ public abstract class IntentOrIntentFilterFragment extends Fragment implements
         switch (parent.getId()) {
             case R.id.list_of_actions:
                 if (position == ACTIONS_LIST.length - 1) {
-                    mCustomInputType = CustomInputType.ACTION;
-                    showCustomInputDialog(getString(R.string.actions_title));
+                    showCustomInputDialog(getString(R.string.actions_title),
+                            CUSTOM_INPUT_TYPE_ACTIONS);
                 }
                 break;
             case R.id.list_of_categories:
                 if (position == CATEGORIES_LIST.length - 1) {
-                    mCustomInputType = CustomInputType.CATEGORY;
-                    showCustomInputDialog(getString(R.string.categories_title));
+                    showCustomInputDialog(getString(R.string.categories_title),
+                            CUSTOM_INPUT_TYPE_CATEGORIES);
                 }
                 break;
             case R.id.list_of_data_schemes:
                 if (position == DATA_SCHEMES_LIST.length - 1) {
-                    mCustomInputType = CustomInputType.DATA_SCHEME;
-                    showCustomInputDialog(getString(R.string.data_schemes_title));
+                    showCustomInputDialog(getString(R.string.data_schemes_title),
+                            CUSTOM_INPUT_TYPE_SCHEMES);
                 }
                 break;
             default:
@@ -268,7 +264,7 @@ public abstract class IntentOrIntentFilterFragment extends Fragment implements
         // Nothing to do.
     }
 
-    private void showCustomInputDialog(String title) {
+    private void showCustomInputDialog(String title, final int customInputType) {
         LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
         View customInputView = layoutInflater.inflate(
                 R.layout.simple_edittext, null);
@@ -279,11 +275,12 @@ public abstract class IntentOrIntentFilterFragment extends Fragment implements
         if (!TextUtils.isEmpty(title)) {
             customInputViewAlertBuilder.setTitle(title);
         }
+
         customInputViewAlertBuilder.setOnCancelListener(new DialogInterface.OnCancelListener() {
 
             @Override
             public void onCancel(DialogInterface dialog) {
-                resetSpinners();
+                resetSpinners(customInputType);
                 dialog.dismiss();
             }
         });
@@ -291,20 +288,20 @@ public abstract class IntentOrIntentFilterFragment extends Fragment implements
                 .setPositiveButton(R.string.add, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        switch (mCustomInputType) {
-                            case ACTION:
+                        switch (customInputType) {
+                            case CUSTOM_INPUT_TYPE_ACTIONS:
                                 mActions.add(customInputEditText.getText().toString());
                                 break;
-                            case CATEGORY:
+                            case CUSTOM_INPUT_TYPE_CATEGORIES:
                                 mCategories.add(customInputEditText.getText().toString());
                                 break;
-                            case DATA_SCHEME:
+                            case CUSTOM_INPUT_TYPE_SCHEMES:
                                 mDataSchemes.add(customInputEditText.getText().toString());
                                 break;
                             default:
                                 break;
                         }
-                        resetSpinners();
+                        resetSpinners(customInputType);
                         dialog.dismiss();
                         updateStatusTextView();
                     }
@@ -313,27 +310,26 @@ public abstract class IntentOrIntentFilterFragment extends Fragment implements
                 .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        resetSpinners();
+                        resetSpinners(customInputType);
                         dialog.dismiss();
                     }
                 });
         customInputViewAlertBuilder.show();
     }
 
-    private void resetSpinners() {
-        switch (mCustomInputType) {
-            case ACTION:
+    private void resetSpinners(int customInputType) {
+        switch (customInputType) {
+            case CUSTOM_INPUT_TYPE_ACTIONS:
                 mActionsSpinner.setSelection(0);
                 break;
-            case CATEGORY:
+            case CUSTOM_INPUT_TYPE_CATEGORIES:
                 mCategoriesSpinner.setSelection(0);
                 break;
-            case DATA_SCHEME:
+            case CUSTOM_INPUT_TYPE_SCHEMES:
                 mDataSchemesSpinner.setSelection(0);
                 break;
             default:
                 break;
         }
-        mCustomInputType = CustomInputType.NONE;
     }
 }
