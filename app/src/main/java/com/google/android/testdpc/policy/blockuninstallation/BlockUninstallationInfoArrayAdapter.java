@@ -97,4 +97,9 @@ public class BlockUninstallationInfoArrayAdapter extends ToggleComponentsArrayAd
         public boolean isUninstallationBlocked;
         public String pkgName;
     }
+
+    @Override
+    public CharSequence getDisplayName(int position) {
+        return mPackageManager.getApplicationLabel(getApplicationInfo(position));
+    }
 }

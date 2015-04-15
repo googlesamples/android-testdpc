@@ -38,6 +38,7 @@ import com.google.android.testdpc.R;
 import com.google.android.testdpc.common.AppInfoSpinnerAdapter;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -76,6 +77,8 @@ public class ManageAppRestrictionsFragment extends Fragment implements View.OnCl
         Intent intent = new Intent(Intent.ACTION_MAIN);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
         List<ApplicationInfo> managedAppList = getInstalledLaunchableApps();
+        Collections.sort(managedAppList,
+                new ApplicationInfo.DisplayNameComparator(mPackageManager));
         AppInfoSpinnerAdapter appInfoSpinnerAdapter = new AppInfoSpinnerAdapter(getActivity(),
                 R.layout.app_row, R.id.pkg_name, managedAppList);
         mManagedAppsSpinner.setAdapter(appInfoSpinnerAdapter);

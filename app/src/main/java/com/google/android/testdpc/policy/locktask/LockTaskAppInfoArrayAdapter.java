@@ -79,4 +79,9 @@ public class LockTaskAppInfoArrayAdapter extends ToggleComponentsArrayAdapter {
         // Any app can be set as a lock task.
         return true;
     }
+
+    @Override
+    public CharSequence getDisplayName(int position) {
+        return getItem(position).loadLabel(mPackageManager);
+    }
 }

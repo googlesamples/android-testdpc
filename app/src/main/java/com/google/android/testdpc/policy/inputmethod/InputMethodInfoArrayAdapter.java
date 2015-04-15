@@ -103,4 +103,9 @@ public class InputMethodInfoArrayAdapter extends ToggleComponentsArrayAdapter {
             mIsComponentCheckedList.add(isComponentEnabled(getItem(i)));
         }
     }
+
+    @Override
+    public CharSequence getDisplayName(int position) {
+        return getItem(position).loadLabel(mPackageManager);
+    }
 }

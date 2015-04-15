@@ -38,6 +38,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -95,6 +96,8 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
@@ -469,6 +472,8 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             showToast(R.string.no_primary_app_available);
             return;
         } else {
+            Collections.sort(primaryUserAppList,
+                    new ResolveInfo.DisplayNameComparator(getActivity().getPackageManager()));
             final LockTaskAppInfoArrayAdapter appInfoArrayAdapter = new LockTaskAppInfoArrayAdapter(
                     getActivity(), R.id.pkg_name, primaryUserAppList);
             ListView listView = new ListView(getActivity());
@@ -728,6 +733,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         }
         String[] disabledAccountTypeList = mDevicePolicyManager
                 .getAccountTypesWithManagementDisabled();
+        Arrays.sort(disabledAccountTypeList, String.CASE_INSENSITIVE_ORDER);
         if (disabledAccountTypeList == null || disabledAccountTypeList.length == 0) {
             showToast(R.string.no_disabled_account);
         } else {
@@ -1153,6 +1159,8 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         List<ApplicationInfo> applicationInfoList
                 = mPackageManager.getInstalledApplications(0 /* No flag */);
         List<ResolveInfo> resolveInfoList = new ArrayList<ResolveInfo>();
+        Collections.sort(applicationInfoList,
+                new ApplicationInfo.DisplayNameComparator(mPackageManager));
         for (ApplicationInfo applicationInfo : applicationInfoList) {
             // Ignore system apps because they can't be uninstalled.
             if ((applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0) {
@@ -1190,6 +1198,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         // This list contains both enabled and disabled apps.
         List<ApplicationInfo> allApps = mPackageManager.getInstalledApplications(
                 PackageManager.GET_UNINSTALLED_PACKAGES);
+        Collections.sort(allApps, new ApplicationInfo.DisplayNameComparator(mPackageManager));
         // This list contains all enabled apps.
         List<ApplicationInfo> enabledApps =
                 mPackageManager.getInstalledApplications(0 /* Default flags */);
@@ -1274,6 +1283,8 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                     = AccessibilityServiceInfoArrayAdapter
                     .getResolveInfoListFromAccessibilityServiceInfoList(
                             accessibilityServicesInfoList);
+            Collections.sort(accessibilityServicesResolveInfoList,
+                    new ResolveInfo.DisplayNameComparator(mPackageManager));
             final AccessibilityServiceInfoArrayAdapter accessibilityServiceInfoArrayAdapter
                     = new AccessibilityServiceInfoArrayAdapter(getActivity(), R.id.pkg_name,
                             accessibilityServicesResolveInfoList);
@@ -1343,6 +1354,9 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             List<ResolveInfo> inputMethodsResolveInfoList
                     = InputMethodInfoArrayAdapter.getResolveInfoListFromInputMethodsInfoList(
                     inputMethodsInfoList);
+            Collections.sort(inputMethodsResolveInfoList,
+                    new ResolveInfo.DisplayNameComparator(mPackageManager));
+
             final InputMethodInfoArrayAdapter inputMethodInfoArrayAdapter
                     = new InputMethodInfoArrayAdapter(getActivity(), R.id.pkg_name,
                             inputMethodsResolveInfoList);

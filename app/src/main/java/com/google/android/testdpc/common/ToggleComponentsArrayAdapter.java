@@ -56,6 +56,14 @@ public abstract class ToggleComponentsArrayAdapter extends ArrayAdapter<ResolveI
         initIsComponentEnabledList();
     }
 
+    /**
+     * Get the display name of the item.
+     *
+     * @param position The position of a component in this adapter which should handle the click
+     *                 event.
+     */
+    public abstract CharSequence getDisplayName(int position);
+
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         ApplicationInfo applicationInfo = getApplicationInfo(position);
@@ -71,7 +79,7 @@ public abstract class ToggleComponentsArrayAdapter extends ArrayAdapter<ResolveI
         ImageView iconImageView = (ImageView) convertView.findViewById(R.id.pkg_icon);
         iconImageView.setImageDrawable(mPackageManager.getApplicationIcon(applicationInfo));
         TextView pkgNameTextView = (TextView) convertView.findViewById(R.id.pkg_name);
-        pkgNameTextView.setText(mPackageManager.getApplicationLabel(applicationInfo));
+        pkgNameTextView.setText(getDisplayName(position));
         CheckBox enableComponentCheckbox = (CheckBox) convertView.findViewById(
                 R.id.enable_component_checkbox);
         enableComponentCheckbox.setOnClickListener(new View.OnClickListener() {

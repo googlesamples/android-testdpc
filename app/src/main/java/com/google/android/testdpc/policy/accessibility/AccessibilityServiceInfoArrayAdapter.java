@@ -118,4 +118,9 @@ public class AccessibilityServiceInfoArrayAdapter extends ToggleComponentsArrayA
         // System accessibility services are always enabled.
         return !isSystemApp(getApplicationInfo(position));
     }
+
+    @Override
+    public CharSequence getDisplayName(int position) {
+        return getItem(position).loadLabel(mPackageManager);
+    }
 }
