@@ -125,7 +125,7 @@
     <string name="disallow_install_unknown_sources">Disallow install unknown sources</string>
     <string name="disallow_remove_user">Disallow remove user</string>
     <string name="disallow_add_user">Disallow add user</string>
-    <string name="disallow_factory_reset">Disallow factor reset</string>
+    <string name="disallow_factory_reset">Disallow factory reset</string>
     <string name="disallow_config_credentials">Disallow config credentials</string>
     <string name="disallow_share_location">Disallow share location</string>
     <string name="disallow_config_tethering">Disallow config tethering</string>
