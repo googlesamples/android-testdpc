@@ -229,4 +229,16 @@
     <string name="block">Block</string>
     <string name="unblock">Unblock</string>
     <string name="close">Close</string>
+
+    <!--  Strings for system update policy -->
+    <string name="system_update_management">System update</string>
+    <string name="system_update_policy">Manage system update policy</string>
+    <string name="system_update_policy_automatic">Automatic immediate install</string>
+    <string name="system_update_policy_Windowed">Install within a maintenance window</string>
+    <string name="system_update_policy_postpone">Postpone</string>
+    <string name="system_update_policy_none">None</string>
+    <string name="current_system_update_policy">Current system update policy:</string>
+    <string name="system_update_policy_window_start_label">Maintenance window start:</string>
+    <string name="system_update_policy_window_end_label">Maintenance window end:</string>
+    <string name="system_update_policy_set_policy">Set new policy</string>
 </resources>

@@ -19,6 +19,7 @@ package com.google.android.testdpc;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.widget.Toast;
 
 /**
  * Handles events related to the managed profile.
@@ -31,6 +32,12 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
         Intent launch = new Intent(context, EnableProfileActivity.class);
         launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(launch);
+    }
+
+    // TODO: Missing @Override, wait until API goes into SDK.
+    public void onSystemUpdatePending(Context context, Intent intent, long receivedTime) {
+        Toast.makeText(context, "System update received at: " + receivedTime,
+                Toast.LENGTH_LONG).show();
     }
 
     /**

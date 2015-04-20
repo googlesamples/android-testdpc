@@ -112,6 +112,13 @@ limitations under the License.
     </PreferenceCategory>
 
     <PreferenceCategory
+            android:title="@string/system_update_management">
+            <Preference
+                    android:key="system_update_policy"
+                    android:title="@string/system_update_policy"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
             android:title="@string/user_restriction_management_title">
         <SwitchPreference
                 android:key="no_debugging_features"

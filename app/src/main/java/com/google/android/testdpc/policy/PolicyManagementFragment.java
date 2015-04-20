@@ -43,6 +43,8 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.UserHandle;
 import android.os.UserManager;
@@ -72,6 +74,7 @@ import com.google.android.testdpc.policy.accessibility.AccessibilityServiceInfoA
 import com.google.android.testdpc.policy.blockuninstallation.BlockUninstallationInfoArrayAdapter;
 import com.google.android.testdpc.policy.inputmethod.InputMethodInfoArrayAdapter;
 import com.google.android.testdpc.policy.locktask.LockTaskAppInfoArrayAdapter;
+import com.google.android.testdpc.policy.systemupdatepolicy.SystemUpdatePolicyFragment;
 import com.google.android.testdpc.profilepolicy.ProfilePolicyManagementFragment;
 import com.google.android.testdpc.profilepolicy.addsystemapps.EnableSystemAppsByIntentFragment;
 import com.google.android.testdpc.profilepolicy.apprestrictions.ManageAppRestrictionsFragment;
@@ -175,6 +178,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     private static final String GET_CA_CERTIFICATES_KEY = "get_ca_certificates";
     private static final String REMOVE_ALL_CERTIFICATES_KEY = "remove_all_ca_certificates";
     private static final String MANAGED_PROFILE_SPECIFIC_POLICIES_KEY = "managed_profile_policies";
+    private static final String SYSTEM_UPDATE_POLICY_KEY = "system_update_policy";
 
     private static final String[] PRIMARY_USER_ONLY_RESTRICTIONS = {
             DISALLOW_REMOVE_USER, DISALLOW_ADD_USER, DISALLOW_FACTORY_RESET,
@@ -202,6 +206,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     private Preference mCheckLockTaskPermittedPreference;
     private Preference mCreateAndInitializeUserPreference;
     private Preference mRemoveUserPreference;
+    private Preference mSystemUpdatePolicyPreference;
     private SwitchPreference mDisallowDebuggingFeatureSwitchPreference;
     private SwitchPreference mDisallowInstallUnknownSourcesSwitchPreference;
     private SwitchPreference mDisallowRemoveUserSwitchPreference;
@@ -273,6 +278,8 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         mRemoveUserPreference.setOnPreferenceClickListener(this);
         mDisableCameraSwitchPreference = (SwitchPreference) findPreference(DISABLE_CAMERA_KEY);
         mDisableCameraSwitchPreference.setOnPreferenceChangeListener(this);
+        mSystemUpdatePolicyPreference = findPreference(SYSTEM_UPDATE_POLICY_KEY);
+        mSystemUpdatePolicyPreference.setOnPreferenceClickListener(this);
         findPreference(REMOVE_DEVICE_OWNER_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_ACCESSIBILITY_SERVICES_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_INPUT_METHODS_KEY).setOnPreferenceClickListener(this);
@@ -293,6 +300,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
 
         updateUserRestrictionUi(ALL_USER_RESTRICTIONS);
         disableIncompatibleManagementOptionsInCurrentProfile();
+        disableIncompatibleManagementOptionsByApiLevel();
     }
 
     @Override
@@ -383,6 +391,9 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 return true;
             case MANAGED_PROFILE_SPECIFIC_POLICIES_KEY:
                 showManagedProfileSpecificPolicyFragment();
+                return true;
+            case SYSTEM_UPDATE_POLICY_KEY:
+                showSystemUpdatePolicyFragment();
                 return true;
         }
         return false;
@@ -632,6 +643,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             mRemoveUserPreference.setEnabled(false);
             mManageLockTaskPreference.setEnabled(false);
             mCheckLockTaskPermittedPreference.setEnabled(false);
+            mSystemUpdatePolicyPreference.setEnabled(false);
             deviceOwnerStatusStringId = R.string.this_is_a_managed_profile_owner;
         } else if (isDeviceOwner) {
             // If it's a device owner and running in the primary profile.
@@ -641,6 +653,15 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             }
         }
         findPreference(DEVICE_OWNER_STATUS_KEY).setSummary(deviceOwnerStatusStringId);
+    }
+
+    private void disableIncompatibleManagementOptionsByApiLevel() {
+        if (Build.VERSION.SDK_INT <= VERSION_CODES.LOLLIPOP_MR1
+                /*TODO: remove once SDK_INT on device is bumped */
+                && (!"MNC".equals(Build.VERSION.CODENAME))) {
+            // The following options depend on MNC APIs.
+            mSystemUpdatePolicyPreference.setEnabled(false);
+        }
     }
 
     /**
@@ -1402,4 +1423,11 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             return caSubjectDnList;
         }
     }
+
+    private void showSystemUpdatePolicyFragment() {
+        FragmentManager fragmentManager = getFragmentManager();
+        fragmentManager.beginTransaction().addToBackStack(PolicyManagementFragment.class.getName())
+                .replace(R.id.container, new SystemUpdatePolicyFragment()).commit();
+    }
+
 }
