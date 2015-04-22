@@ -85,6 +85,9 @@ limitations under the License.
         <Preference
                 android:key="remove_all_ca_certificates"
                 android:title="@string/remove_all_ca_certificates"/>
+        <Preference
+                android:key="manage_cert_installer"
+                android:title="@string/manage_cert_installer"/>
     </PreferenceCategory>
 
     <PreferenceCategory

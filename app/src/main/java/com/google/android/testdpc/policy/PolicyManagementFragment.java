@@ -72,6 +72,7 @@ import com.google.android.testdpc.R;
 import com.google.android.testdpc.common.AppInfoArrayAdapter;
 import com.google.android.testdpc.policy.accessibility.AccessibilityServiceInfoArrayAdapter;
 import com.google.android.testdpc.policy.blockuninstallation.BlockUninstallationInfoArrayAdapter;
+import com.google.android.testdpc.policy.certificate.DelegatedCertInstallerFragment;
 import com.google.android.testdpc.policy.inputmethod.InputMethodInfoArrayAdapter;
 import com.google.android.testdpc.policy.locktask.LockTaskAppInfoArrayAdapter;
 import com.google.android.testdpc.policy.systemupdatepolicy.SystemUpdatePolicyFragment;
@@ -179,6 +180,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     private static final String REMOVE_ALL_CERTIFICATES_KEY = "remove_all_ca_certificates";
     private static final String MANAGED_PROFILE_SPECIFIC_POLICIES_KEY = "managed_profile_policies";
     private static final String SYSTEM_UPDATE_POLICY_KEY = "system_update_policy";
+    private static final String DELEGATED_CERT_INSTALLER_KEY = "manage_cert_installer";
 
     private static final String[] PRIMARY_USER_ONLY_RESTRICTIONS = {
             DISALLOW_REMOVE_USER, DISALLOW_ADD_USER, DISALLOW_FACTORY_RESET,
@@ -207,6 +209,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     private Preference mCreateAndInitializeUserPreference;
     private Preference mRemoveUserPreference;
     private Preference mSystemUpdatePolicyPreference;
+    private Preference mDelegatedCertInstallerPreference;
     private SwitchPreference mDisallowDebuggingFeatureSwitchPreference;
     private SwitchPreference mDisallowInstallUnknownSourcesSwitchPreference;
     private SwitchPreference mDisallowRemoveUserSwitchPreference;
@@ -280,6 +283,8 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         mDisableCameraSwitchPreference.setOnPreferenceChangeListener(this);
         mSystemUpdatePolicyPreference = findPreference(SYSTEM_UPDATE_POLICY_KEY);
         mSystemUpdatePolicyPreference.setOnPreferenceClickListener(this);
+        mDelegatedCertInstallerPreference = findPreference(DELEGATED_CERT_INSTALLER_KEY);
+        mDelegatedCertInstallerPreference.setOnPreferenceClickListener(this);
         findPreference(REMOVE_DEVICE_OWNER_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_ACCESSIBILITY_SERVICES_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_INPUT_METHODS_KEY).setOnPreferenceClickListener(this);
@@ -394,6 +399,9 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 return true;
             case SYSTEM_UPDATE_POLICY_KEY:
                 showSystemUpdatePolicyFragment();
+                return true;
+            case DELEGATED_CERT_INSTALLER_KEY:
+                showDelegatedCertInstallerFragment();
                 return true;
         }
         return false;
@@ -661,6 +669,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 && (!"MNC".equals(Build.VERSION.CODENAME))) {
             // The following options depend on MNC APIs.
             mSystemUpdatePolicyPreference.setEnabled(false);
+            mDelegatedCertInstallerPreference.setEnabled(false);
         }
     }
 
@@ -1430,4 +1439,9 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 .replace(R.id.container, new SystemUpdatePolicyFragment()).commit();
     }
 
+    private void showDelegatedCertInstallerFragment() {
+        FragmentManager fragmentManager = getFragmentManager();
+        fragmentManager.beginTransaction().addToBackStack(PolicyManagementFragment.class.getName())
+                .replace(R.id.container, new DelegatedCertInstallerFragment()).commit();
+    }
 }

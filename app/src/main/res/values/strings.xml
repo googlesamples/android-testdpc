@@ -241,4 +241,14 @@
     <string name="system_update_policy_window_start_label">Maintenance window start:</string>
     <string name="system_update_policy_window_end_label">Maintenance window end:</string>
     <string name="system_update_policy_set_policy">Set new policy</string>
+
+    <!--  Strings for delegated certificate installer -->
+    <string name="manage_cert_installer">Manage delegated certificate installer</string>
+    <string name="current_delegated_cert_installer">Current delegated cert installer:</string>
+    <string name="delegated_cert_installer_new_label">New delegated cert installer package name
+    </string>
+    <string name="delegated_cert_installer_set">Set</string>
+    <string name="delegated_cert_installer_clear">Clear</string>
+    <string name="delegated_cert_installer_instructions">Select an app as the new cert installer, 
+        or manually enter its package name below:</string>
 </resources>
