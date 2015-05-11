@@ -21,7 +21,6 @@ import android.app.TimePickerDialog;
 import android.app.TimePickerDialog.OnTimeSetListener;
 import android.app.admin.DevicePolicyManager;
 import android.app.admin.SystemUpdatePolicy;
-import android.app.admin.SystemUpdatePolicy.InvalidWindowException;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -135,25 +134,19 @@ public class SystemUpdatePolicyFragment extends Fragment implements View.OnClick
     }
 
     private void setSystemUpdatePolicy() {
-        SystemUpdatePolicy newPolicy = new SystemUpdatePolicy();
+        SystemUpdatePolicy newPolicy;
         switch (mSystemUpdatePolicySelection.getCheckedRadioButtonId()) {
             case R.id.system_update_policy_automatic:
-                newPolicy.setAutomaticInstallPolicy();
+                newPolicy = SystemUpdatePolicy.createAutomaticInstallPolicy();
                 break;
             case R.id.system_update_policy_Windowed:
-                try {
-                    newPolicy.setWindowedInstallPolicy(mMaintenanceStart, mMaintenanceEnd);
-                } catch (InvalidWindowException e) {
-                    Toast.makeText(getActivity(), "Invalid maintenance window.", Toast.LENGTH_SHORT)
-                            .show();
-                }
+                newPolicy = SystemUpdatePolicy.createWindowedInstallPolicy(
+                        mMaintenanceStart, mMaintenanceEnd);
                 break;
             case R.id.system_update_policy_postpone:
-                newPolicy.setPostponeInstallPolicy();
+                newPolicy = SystemUpdatePolicy.createPostponeInstallPolicy();
                 break;
             case R.id.system_update_policy_none:
-                newPolicy = null;
-                break;
             default:
                 newPolicy = null;
         }
