@@ -25,6 +25,7 @@ import static android.os.UserManager.DISALLOW_FACTORY_RESET;
 import static android.os.UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES;
 import static android.os.UserManager.DISALLOW_MODIFY_ACCOUNTS;
 import static android.os.UserManager.DISALLOW_REMOVE_USER;
+import static android.os.UserManager.DISALLOW_SAFE_BOOT;
 import static android.os.UserManager.DISALLOW_SHARE_LOCATION;
 import static android.os.UserManager.DISALLOW_UNMUTE_MICROPHONE;
 
@@ -38,7 +39,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -143,6 +143,9 @@ import java.util.Set;
  * 29) {@link DevicePolicyManager#installCaCert(android.content.ComponentName, byte[])}
  * 30) {@link DevicePolicyManager#uninstallAllUserCaCerts(android.content.ComponentName)}
  * 31) {@link DevicePolicyManager#getInstalledCaCerts(android.content.ComponentName)}
+ * 32) {@link UserManager#DISALLOW_SAFE_BOOT}
+ * 33) {@link DevicePolicyManager#setStatusBarDisabled(ComponentName, boolean)}
+ * 33) {@link DevicePolicyManager#setKeyguardDisabled(ComponentName, boolean)}
  */
 public class PolicyManagementFragment extends PreferenceFragment implements
         Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
@@ -156,6 +159,8 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     private static final String DEVICE_OWNER_STATUS_KEY = "device_owner_status";
     private static final String MANAGE_LOCK_TASK_LIST_KEY = "manage_lock_task";
     private static final String CHECK_LOCK_TASK_PERMITTED_KEY = "check_lock_task_permitted";
+    private static final String START_LOCK_TASK = "start_lock_task";
+    private static final String STOP_LOCK_TASK = "stop_lock_task";
     private static final String DISALLOW_INSTALL_DEBUGGING_FEATURE_KEY
             = "disallow_debugging_feature";
     private static final String DISALLOW_INSTALL_UNKNOWN_SOURCES_KEY
@@ -184,17 +189,22 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     private static final String MANAGED_PROFILE_SPECIFIC_POLICIES_KEY = "managed_profile_policies";
     private static final String SYSTEM_UPDATE_POLICY_KEY = "system_update_policy";
     private static final String DELEGATED_CERT_INSTALLER_KEY = "manage_cert_installer";
+    private static final String DISABLE_STATUS_BAR = "disable_status_bar";
+    private static final String REENABLE_STATUS_BAR = "reenable_status_bar";
+    private static final String DISABLE_KEYGUARD = "disable_keyguard";
+    private static final String REENABLE_KEYGUARD = "reenable_keyguard";
 
     private static final String[] PRIMARY_USER_ONLY_RESTRICTIONS = {
             DISALLOW_REMOVE_USER, DISALLOW_ADD_USER, DISALLOW_FACTORY_RESET,
-            DISALLOW_CONFIG_TETHERING, DISALLOW_ADJUST_VOLUME, DISALLOW_UNMUTE_MICROPHONE
+            DISALLOW_CONFIG_TETHERING, DISALLOW_ADJUST_VOLUME, DISALLOW_UNMUTE_MICROPHONE,
+            DISALLOW_SAFE_BOOT
     };
 
     private static final String[] ALL_USER_RESTRICTIONS = {
             DISALLOW_DEBUGGING_FEATURES, DISALLOW_INSTALL_UNKNOWN_SOURCES, DISALLOW_REMOVE_USER,
             DISALLOW_ADD_USER, DISALLOW_FACTORY_RESET, DISALLOW_CONFIG_CREDENTIALS,
             DISALLOW_SHARE_LOCATION, DISALLOW_CONFIG_TETHERING, DISALLOW_ADJUST_VOLUME,
-            DISALLOW_UNMUTE_MICROPHONE, DISALLOW_MODIFY_ACCOUNTS
+            DISALLOW_UNMUTE_MICROPHONE, DISALLOW_MODIFY_ACCOUNTS, DISALLOW_SAFE_BOOT
     };
 
     private static final String[] MANAGED_PROFILE_SPECIFIC_OPTIONS = {
@@ -209,10 +219,16 @@ public class PolicyManagementFragment extends PreferenceFragment implements
 
     private Preference mManageLockTaskPreference;
     private Preference mCheckLockTaskPermittedPreference;
+    private Preference mStartLockTaskPreference;
+    private Preference mStopLockTaskPreference;
     private Preference mCreateAndInitializeUserPreference;
     private Preference mRemoveUserPreference;
     private Preference mSystemUpdatePolicyPreference;
     private Preference mDelegatedCertInstallerPreference;
+    private Preference mDisableStatusBarPreference;
+    private Preference mReenableStatusBarPreference;
+    private Preference mDisableKeyguardPreference;
+    private Preference mReenableKeyguardPreference;
     private SwitchPreference mDisallowDebuggingFeatureSwitchPreference;
     private SwitchPreference mDisallowInstallUnknownSourcesSwitchPreference;
     private SwitchPreference mDisallowRemoveUserSwitchPreference;
@@ -225,6 +241,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     private SwitchPreference mDisallowUnmuteMicrophonePreference;
     private SwitchPreference mDisallowModifyAccountsPreference;
     private SwitchPreference mDisableCameraSwitchPreference;
+    private SwitchPreference mDisallowSafeBootPreference;
 
     private GetAccessibilityServicesTask mGetAccessibilityServicesTask = null;
     private GetInputMethodsTask mGetInputMethodsTask = null;
@@ -247,6 +264,10 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         mManageLockTaskPreference.setOnPreferenceClickListener(this);
         mCheckLockTaskPermittedPreference = findPreference(CHECK_LOCK_TASK_PERMITTED_KEY);
         mCheckLockTaskPermittedPreference.setOnPreferenceClickListener(this);
+        mStartLockTaskPreference = findPreference(START_LOCK_TASK);
+        mStartLockTaskPreference.setOnPreferenceClickListener(this);
+        mStopLockTaskPreference = findPreference(STOP_LOCK_TASK);
+        mStopLockTaskPreference.setOnPreferenceClickListener(this);
         mDisallowDebuggingFeatureSwitchPreference = (SwitchPreference) findPreference(
                 DISALLOW_DEBUGGING_FEATURES);
         mDisallowDebuggingFeatureSwitchPreference.setOnPreferenceChangeListener(this);
@@ -284,10 +305,20 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         mRemoveUserPreference.setOnPreferenceClickListener(this);
         mDisableCameraSwitchPreference = (SwitchPreference) findPreference(DISABLE_CAMERA_KEY);
         mDisableCameraSwitchPreference.setOnPreferenceChangeListener(this);
+        mDisallowSafeBootPreference = (SwitchPreference) findPreference(DISALLOW_SAFE_BOOT);
+        mDisallowSafeBootPreference.setOnPreferenceChangeListener(this);
         mSystemUpdatePolicyPreference = findPreference(SYSTEM_UPDATE_POLICY_KEY);
         mSystemUpdatePolicyPreference.setOnPreferenceClickListener(this);
         mDelegatedCertInstallerPreference = findPreference(DELEGATED_CERT_INSTALLER_KEY);
         mDelegatedCertInstallerPreference.setOnPreferenceClickListener(this);
+        mDisableStatusBarPreference = findPreference(DISABLE_STATUS_BAR);
+        mDisableStatusBarPreference.setOnPreferenceClickListener(this);
+        mReenableStatusBarPreference = findPreference(REENABLE_STATUS_BAR);
+        mReenableStatusBarPreference.setOnPreferenceClickListener(this);
+        mDisableKeyguardPreference = findPreference(DISABLE_KEYGUARD);
+        mDisableKeyguardPreference.setOnPreferenceClickListener(this);
+        mReenableKeyguardPreference = findPreference(REENABLE_KEYGUARD);
+        mReenableKeyguardPreference.setOnPreferenceClickListener(this);
         findPreference(REMOVE_DEVICE_OWNER_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_ACCESSIBILITY_SERVICES_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_INPUT_METHODS_KEY).setOnPreferenceClickListener(this);
@@ -333,6 +364,16 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 return true;
             case CHECK_LOCK_TASK_PERMITTED_KEY:
                 showCheckLockTaskPermittedPrompt();
+                return true;
+            case START_LOCK_TASK:
+                getActivity().startLockTask();
+                return true;
+            case STOP_LOCK_TASK:
+                try {
+                    getActivity().stopLockTask();
+                } catch (IllegalStateException e) {
+                    // no lock task present, ignore
+                }
                 return true;
             case REMOVE_DEVICE_OWNER_KEY:
                 showRemoveDeviceOwnerPrompt();
@@ -406,6 +447,23 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             case DELEGATED_CERT_INSTALLER_KEY:
                 showDelegatedCertInstallerFragment();
                 return true;
+            case DISABLE_STATUS_BAR:
+                if (!mDevicePolicyManager.setStatusBarDisabled(mAdminComponentName, true)) {
+                    showToast("Unable to disable status bar when lock password is set.");
+                }
+                return true;
+            case REENABLE_STATUS_BAR:
+                mDevicePolicyManager.setStatusBarDisabled(mAdminComponentName, false);
+                return true;
+            case DISABLE_KEYGUARD:
+                if (!mDevicePolicyManager.setKeyguardDisabled(mAdminComponentName, true)) {
+                    // this should not happen
+                    showToast("Unable to disable keyguard");
+                }
+                return true;
+            case REENABLE_KEYGUARD:
+                mDevicePolicyManager.setKeyguardDisabled(mAdminComponentName, false);
+                return true;
         }
         return false;
     }
@@ -451,6 +509,9 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 mDevicePolicyManager.setCameraDisabled(mAdminComponentName, (Boolean) newValue);
                 // Reload UI to verify the camera is enable / disable correctly.
                 reloadCameraDisableUi();
+                return true;
+            case DISALLOW_SAFE_BOOT:
+                setUserRestriction(key, (Boolean) newValue);
                 return true;
         }
         return false;
@@ -633,6 +694,10 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 disallowed = mUserManager.hasUserRestriction(DISALLOW_MODIFY_ACCOUNTS);
                 mDisallowModifyAccountsPreference.setChecked(disallowed);
                 break;
+            case DISALLOW_SAFE_BOOT:
+                disallowed = mUserManager.hasUserRestriction(DISALLOW_SAFE_BOOT);
+                mDisallowSafeBootPreference.setChecked(disallowed);
+                break;
         }
     }
 
@@ -656,6 +721,12 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             mRemoveUserPreference.setEnabled(false);
             mManageLockTaskPreference.setEnabled(false);
             mCheckLockTaskPermittedPreference.setEnabled(false);
+            mStartLockTaskPreference.setEnabled(false);
+            mStopLockTaskPreference.setEnabled(false);
+            mDisableStatusBarPreference.setEnabled(false);
+            mReenableStatusBarPreference.setEnabled(false);
+            mDisableKeyguardPreference.setEnabled(false);
+            mReenableKeyguardPreference.setEnabled(false);
             mSystemUpdatePolicyPreference.setEnabled(false);
             deviceOwnerStatusStringId = R.string.this_is_a_managed_profile_owner;
         } else if (isDeviceOwner) {
@@ -673,8 +744,15 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 /*TODO: remove once SDK_INT on device is bumped */
                 && (!"MNC".equals(Build.VERSION.CODENAME))) {
             // The following options depend on MNC APIs.
+            mStartLockTaskPreference.setEnabled(false);
+            mStopLockTaskPreference.setEnabled(false);
             mSystemUpdatePolicyPreference.setEnabled(false);
             mDelegatedCertInstallerPreference.setEnabled(false);
+            mDisableStatusBarPreference.setEnabled(false);
+            mReenableStatusBarPreference.setEnabled(false);
+            mDisableKeyguardPreference.setEnabled(false);
+            mReenableKeyguardPreference.setEnabled(false);
+            findPreference(DISALLOW_SAFE_BOOT).setEnabled(false);
         }
     }
 

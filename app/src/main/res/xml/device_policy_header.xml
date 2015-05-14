@@ -105,6 +105,12 @@ limitations under the License.
         <Preference
                 android:key="check_lock_task_permitted"
                 android:title="@string/check_lock_task_permitted"/>
+        <Preference
+                android:key="start_lock_task"
+                android:title="@string/start_lock_task"/>
+        <Preference
+            android:key="stop_lock_task"
+            android:title="@string/stop_lock_task"/>
     </PreferenceCategory>
 
     <PreferenceCategory
@@ -112,6 +118,22 @@ limitations under the License.
         <Preference
                 android:key="managed_profile_policies"
                 android:title="@string/managed_profile_specific_policy_title"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/single_use_devices">
+        <Preference
+            android:key="disable_status_bar"
+            android:title="@string/disable_status_bar"/>
+        <Preference
+            android:key="reenable_status_bar"
+            android:title="@string/reenable_status_bar"/>
+        <Preference
+            android:key="disable_keyguard"
+            android:title="@string/disable_keyguard"/>
+        <Preference
+            android:key="reenable_keyguard"
+            android:title="@string/reenable_keyguard"/>
     </PreferenceCategory>
 
     <PreferenceCategory
@@ -156,6 +178,9 @@ limitations under the License.
         <SwitchPreference
                 android:key="no_modify_accounts"
                 android:title="@string/disallow_modify_accounts"/>
+        <SwitchPreference
+                android:key="no_safe_boot"
+                android:title="Disallow safe boot"/>
     </PreferenceCategory>
 
     <PreferenceCategory
