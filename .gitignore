@@ -1,0 +1,20 @@
+*~
+*.bak
+*.class
+bin/
+*.properties
+*.project
+*.cproject
+*.settings
+*.pyc
+
+# idea project files
+.idea/
+.idea/.name
+*.iml
+*.ipr
+*.iws
+
+#Gradle-based build
+.gradle
+build/
