@@ -69,11 +69,9 @@ public class ManageCrossProfileWidgetProviderUtil {
         List<AppWidgetProviderInfo> appWidgetProviderInfoList = mAppWidgetManager
                 .getInstalledProviders();
         for (AppWidgetProviderInfo appWidgetProviderInfo : appWidgetProviderInfoList) {
-            if (appWidgetProviderInfo.configure != null &&
-                    !enabledCrossProfileWidgetProvidersList.contains(
-                            appWidgetProviderInfo.configure.getPackageName())) {
-                disabledCrossProfileWidgetProvidersPackageNameSet.add(
-                        appWidgetProviderInfo.configure.getPackageName());
+            String appWidgetProviderPackage = appWidgetProviderInfo.provider.getPackageName();
+            if (!enabledCrossProfileWidgetProvidersList.contains(appWidgetProviderPackage)) {
+                disabledCrossProfileWidgetProvidersPackageNameSet.add(appWidgetProviderPackage);
             }
         }
         return new ArrayList<String>(disabledCrossProfileWidgetProvidersPackageNameSet);
