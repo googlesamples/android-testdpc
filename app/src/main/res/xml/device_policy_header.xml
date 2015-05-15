@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ Copyright 2015 Google Inc. All Rights Reserved.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <Preference
+            android:key="device_owner_status"
+            android:selectable="false"/>
+
+    <PreferenceCategory
+            android:title="@string/accessibility_title">
+        <Preference
+                android:key="set_accessibility_services"
+                android:title="@string/set_accessibility_services"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+            android:title="@string/account_management_title">
+        <Preference
+                android:key="set_disable_account_management"
+                android:title="@string/set_disable_account_management"/>
+        <Preference
+                android:key="get_disable_account_management"
+                android:title="@string/get_disable_account_management"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+            android:title="@string/apps_management_title">
+        <Preference
+                android:key="enable_system_apps"
+                android:title="@string/enable_system_apps_title"/>
+        <Preference
+                android:key="enable_system_apps_by_package_name"
+                android:title="@string/enable_system_apps_by_package_name"/>
+        <Preference
+                android:key="enable_system_apps_by_intent"
+                android:title="@string/enable_system_apps_by_intent"/>
+        <Preference
+                android:key="manage_app_restrictions"
+                android:title="@string/manage_app_restrictions"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+            android:title="@string/block_uninstallation_title">
+        <Preference
+                android:key="block_uninstallation_by_pkg"
+                android:title="@string/block_uninstallation_by_pkg"/>
+        <Preference
+                android:key="block_uninstallation_list"
+                android:title="@string/block_uninstallation_list"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+            android:title="@string/camera_title">
+        <SwitchPreference
+                android:key="disable_camera"
+                android:title="@string/disable_camera"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+            android:title="@string/certificate_management_title">
+        <Preference
+                android:key="install_key_certificate"
+                android:title="@string/install_key_certificate"/>
+        <Preference
+                android:key="install_ca_certificate"
+                android:title="@string/install_ca_certificate"/>
+        <Preference
+                android:key="get_ca_certificates"
+                android:title="@string/get_ca_certificates"/>
+        <Preference
+                android:key="remove_all_ca_certificates"
+                android:title="@string/remove_all_ca_certificates"/>
+        <Preference
+                android:key="manage_cert_installer"
+                android:title="@string/manage_cert_installer"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+            android:title="@string/input_methods_title">
+        <Preference
+                android:key="set_input_methods"
+                android:title="@string/set_input_methods"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+            android:title="@string/lock_task_title">
+        <Preference
+                android:key="manage_lock_task"
+                android:title="@string/manage_lock_task"/>
+        <Preference
+                android:key="check_lock_task_permitted"
+                android:title="@string/check_lock_task_permitted"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+            android:title="@string/managed_profile_specific_policy_category_title">
+        <Preference
+                android:key="managed_profile_policies"
+                android:title="@string/managed_profile_specific_policy_title"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+            android:title="@string/system_update_management">
+            <Preference
+                    android:key="system_update_policy"
+                    android:title="@string/system_update_policy"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+            android:title="@string/user_restriction_management_title">
+        <SwitchPreference
+                android:key="no_debugging_features"
+                android:title="@string/disallow_debugging_feature"/>
+        <SwitchPreference
+                android:key="no_install_unknown_sources"
+                android:title="@string/disallow_install_unknown_sources"/>
+        <SwitchPreference
+                android:key="no_remove_user"
+                android:title="@string/disallow_remove_user"/>
+        <SwitchPreference
+                android:key="no_add_user"
+                android:title="@string/disallow_add_user"/>
+        <SwitchPreference
+                android:key="no_factory_reset"
+                android:title="@string/disallow_factory_reset"/>
+        <SwitchPreference
+                android:key="no_config_credentials"
+                android:title="@string/disallow_config_credentials"/>
+        <SwitchPreference
+                android:key="no_share_location"
+                android:title="@string/disallow_share_location"/>
+        <SwitchPreference
+                android:key="no_config_tethering"
+                android:title="@string/disallow_config_tethering"/>
+        <SwitchPreference
+                android:key="no_adjust_volume"
+                android:title="@string/disallow_adjust_volume"/>
+        <SwitchPreference
+                android:key="no_unmute_microphone"
+                android:title="@string/disallow_unmute_microphone"/>
+        <SwitchPreference
+                android:key="no_modify_accounts"
+                android:title="@string/disallow_modify_accounts"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+            android:title="@string/user_management">
+        <Preference
+            android:key="create_and_initialize_user"
+            android:title="@string/create_and_initialize_user"/>
+        <Preference
+                android:key="remove_user"
+                android:title="@string/remove_user"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+            android:title="@string/device_owner_management">
+            <Preference
+                    android:key="remove_device_owner"
+                    android:title="@string/remove_device_owner"/>
+    </PreferenceCategory>
+
+</PreferenceScreen>
