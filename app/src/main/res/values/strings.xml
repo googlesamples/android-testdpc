@@ -127,6 +127,10 @@
     <string name="reenable_status_bar">Reenable status bar</string>
     <string name="disable_keyguard">Disable keyguard</string>
     <string name="reenable_keyguard">Reenable keyguard</string>
+    <string name="kiosk_mode">Kiosk mode</string>
+    <string name="kiosk_select_title">Select kiosk apps</string>
+    <string name="start_kiosk_mode">Start kiosk mode</string>
+    <string name="stop_kiosk_mode">Stop kiosk mode</string>
 
     <!-- Strings for user restriction management -->
     <string name="user_restriction_management_title">User restriction</string>

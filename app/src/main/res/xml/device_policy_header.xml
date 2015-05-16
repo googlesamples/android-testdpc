@@ -134,6 +134,9 @@ limitations under the License.
         <Preference
             android:key="reenable_keyguard"
             android:title="@string/reenable_keyguard"/>
+        <Preference
+            android:key="start_kiosk_mode"
+            android:title="@string/start_kiosk_mode"/>
     </PreferenceCategory>
 
     <PreferenceCategory

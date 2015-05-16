@@ -75,6 +75,7 @@ import com.google.android.testdpc.policy.accessibility.AccessibilityServiceInfoA
 import com.google.android.testdpc.policy.blockuninstallation.BlockUninstallationInfoArrayAdapter;
 import com.google.android.testdpc.policy.certificate.DelegatedCertInstallerFragment;
 import com.google.android.testdpc.policy.inputmethod.InputMethodInfoArrayAdapter;
+import com.google.android.testdpc.policy.locktask.KioskModeActivity;
 import com.google.android.testdpc.policy.locktask.LockTaskAppInfoArrayAdapter;
 import com.google.android.testdpc.policy.systemupdatepolicy.SystemUpdatePolicyFragment;
 import com.google.android.testdpc.profilepolicy.ProfilePolicyManagementFragment;
@@ -193,6 +194,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     private static final String REENABLE_STATUS_BAR = "reenable_status_bar";
     private static final String DISABLE_KEYGUARD = "disable_keyguard";
     private static final String REENABLE_KEYGUARD = "reenable_keyguard";
+    private static final String START_KIOSK_MODE = "start_kiosk_mode";
 
     private static final String[] PRIMARY_USER_ONLY_RESTRICTIONS = {
             DISALLOW_REMOVE_USER, DISALLOW_ADD_USER, DISALLOW_FACTORY_RESET,
@@ -229,6 +231,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     private Preference mReenableStatusBarPreference;
     private Preference mDisableKeyguardPreference;
     private Preference mReenableKeyguardPreference;
+    private Preference mStartKioskModePreference;
     private SwitchPreference mDisallowDebuggingFeatureSwitchPreference;
     private SwitchPreference mDisallowInstallUnknownSourcesSwitchPreference;
     private SwitchPreference mDisallowRemoveUserSwitchPreference;
@@ -319,6 +322,8 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         mDisableKeyguardPreference.setOnPreferenceClickListener(this);
         mReenableKeyguardPreference = findPreference(REENABLE_KEYGUARD);
         mReenableKeyguardPreference.setOnPreferenceClickListener(this);
+        mStartKioskModePreference = findPreference(START_KIOSK_MODE);
+        mStartKioskModePreference.setOnPreferenceClickListener(this);
         findPreference(REMOVE_DEVICE_OWNER_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_ACCESSIBILITY_SERVICES_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_INPUT_METHODS_KEY).setOnPreferenceClickListener(this);
@@ -360,7 +365,16 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         String key = preference.getKey();
         switch (key) {
             case MANAGE_LOCK_TASK_LIST_KEY:
-                showManageLockTaskListPrompt();
+                showManageLockTaskListPrompt(R.string.lock_task_title,
+                        new ManageLockTaskListCallback() {
+                            @Override
+                            public void onPositiveButtonClicked(String[] lockTaskArray) {
+                                mDevicePolicyManager.setLockTaskPackages(
+                                        DeviceAdminReceiver.getComponentName(getActivity()),
+                                        lockTaskArray);
+                            }
+                        }
+                );
                 return true;
             case CHECK_LOCK_TASK_PERMITTED_KEY:
                 showCheckLockTaskPermittedPrompt();
@@ -464,6 +478,16 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             case REENABLE_KEYGUARD:
                 mDevicePolicyManager.setKeyguardDisabled(mAdminComponentName, false);
                 return true;
+            case START_KIOSK_MODE:
+                showManageLockTaskListPrompt(R.string.kiosk_select_title,
+                        new ManageLockTaskListCallback() {
+                            @Override
+                            public void onPositiveButtonClicked(String[] lockTaskArray) {
+                                startKioskMode(lockTaskArray);
+                            }
+                        }
+                );
+                return true;
         }
         return false;
     }
@@ -518,10 +542,14 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     }
 
     /**
-     * Shows a list of primary user apps in a prompt, the user can set whether lock task is
-     * permitted for each app.
+     * Shows a list of primary user apps in a dialog.
+     *
+     * @param dialogTitle the title to show for the dialog
+     * @param callback will be called with the list apps that the user has selected when he closes
+     *        the dialog. The callback is not fired if the user cancels.
      */
-    private void showManageLockTaskListPrompt() {
+    private void showManageLockTaskListPrompt(int dialogTitle,
+            final ManageLockTaskListCallback callback) {
         if (getActivity() == null || getActivity().isFinishing()) {
             return;
         }
@@ -547,15 +575,13 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             });
 
             new AlertDialog.Builder(getActivity())
-                    .setTitle(getString(R.string.manage_lock_task))
+                    .setTitle(getString(dialogTitle))
                     .setView(listView)
                     .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             String[] lockTaskEnabledArray = appInfoArrayAdapter.getLockTaskList();
-                            mDevicePolicyManager.setLockTaskPackages(
-                                    DeviceAdminReceiver.getComponentName(getActivity()),
-                                    lockTaskEnabledArray);
+                            callback.onPositiveButtonClicked(lockTaskEnabledArray);
                         }
                     })
                     .setNegativeButton(android.R.string.cancel,
@@ -727,6 +753,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             mReenableStatusBarPreference.setEnabled(false);
             mDisableKeyguardPreference.setEnabled(false);
             mReenableKeyguardPreference.setEnabled(false);
+            mStartKioskModePreference.setEnabled(false);
             mSystemUpdatePolicyPreference.setEnabled(false);
             deviceOwnerStatusStringId = R.string.this_is_a_managed_profile_owner;
         } else if (isDeviceOwner) {
@@ -752,6 +779,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             mReenableStatusBarPreference.setEnabled(false);
             mDisableKeyguardPreference.setEnabled(false);
             mReenableKeyguardPreference.setEnabled(false);
+            mStartKioskModePreference.setEnabled(false);
             findPreference(DISALLOW_SAFE_BOOT).setEnabled(false);
         }
     }
@@ -1535,5 +1563,18 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         FragmentManager fragmentManager = getFragmentManager();
         fragmentManager.beginTransaction().addToBackStack(PolicyManagementFragment.class.getName())
                 .replace(R.id.container, new DelegatedCertInstallerFragment()).commit();
+    }
+
+    private void startKioskMode(String[] lockTaskArray) {
+        // start locked activity
+        Intent launchIntent = new Intent(getActivity(), KioskModeActivity.class);
+        launchIntent.putExtra(KioskModeActivity.LOCKED_APP_PACKAGE_LIST, lockTaskArray);
+        launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(launchIntent);
+        getActivity().finish();
+    }
+
+    abstract class ManageLockTaskListCallback {
+        public abstract void onPositiveButtonClicked(String[] lockTaskArray);
     }
 }
