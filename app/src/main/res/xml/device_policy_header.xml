@@ -122,6 +122,13 @@ limitations under the License.
     </PreferenceCategory>
 
     <PreferenceCategory
+            android:title="@string/data_usage">
+            <Preference
+                    android:key="network_stats"
+                    android:title="@string/network_stats"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
             android:title="@string/user_restriction_management_title">
         <SwitchPreference
                 android:key="no_debugging_features"

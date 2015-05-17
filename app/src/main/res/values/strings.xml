@@ -242,6 +242,16 @@
     <string name="system_update_policy_window_end_label">Maintenance window end:</string>
     <string name="system_update_policy_set_policy">Set new policy</string>
 
+    <!--  Strings for data usage -->
+    <string name="data_usage">Data usage</string>
+    <string name="network_stats">Network Data Usage Stats</string>
+    <string name="network_usage_summary_device_button">Query summary for device</string>
+    <string name="network_usage_summary_user_button">Query summary for user</string>
+    <string name="network_usage_summary_apps_button">Query summary of apps</string>
+    <string name="network_usage_history_apps_button">Query histories of apps</string>
+    <string name="network_usage_history_uid_button">Query history of uid</string>
+    <string name="network_usage_clear_button">Clear text</string>
+
     <!--  Strings for delegated certificate installer -->
     <string name="manage_cert_installer">Manage delegated certificate installer</string>
     <string name="current_delegated_cert_installer">Current delegated cert installer:</string>

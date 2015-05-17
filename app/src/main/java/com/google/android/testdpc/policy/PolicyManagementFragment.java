@@ -77,6 +77,7 @@ import com.google.android.testdpc.policy.certificate.DelegatedCertInstallerFragm
 import com.google.android.testdpc.policy.inputmethod.InputMethodInfoArrayAdapter;
 import com.google.android.testdpc.policy.locktask.LockTaskAppInfoArrayAdapter;
 import com.google.android.testdpc.policy.systemupdatepolicy.SystemUpdatePolicyFragment;
+import com.google.android.testdpc.policy.datausage.NetworkUsageStatsFragment;
 import com.google.android.testdpc.profilepolicy.ProfilePolicyManagementFragment;
 import com.google.android.testdpc.profilepolicy.addsystemapps.EnableSystemAppsByIntentFragment;
 import com.google.android.testdpc.profilepolicy.apprestrictions.ManageAppRestrictionsFragment;
@@ -183,6 +184,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     private static final String REMOVE_ALL_CERTIFICATES_KEY = "remove_all_ca_certificates";
     private static final String MANAGED_PROFILE_SPECIFIC_POLICIES_KEY = "managed_profile_policies";
     private static final String SYSTEM_UPDATE_POLICY_KEY = "system_update_policy";
+    private static final String NETWORK_STATS_KEY = "network_stats";
     private static final String DELEGATED_CERT_INSTALLER_KEY = "manage_cert_installer";
 
     private static final String[] PRIMARY_USER_ONLY_RESTRICTIONS = {
@@ -212,6 +214,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     private Preference mCreateAndInitializeUserPreference;
     private Preference mRemoveUserPreference;
     private Preference mSystemUpdatePolicyPreference;
+    private Preference mNetworkStatsPreference;
     private Preference mDelegatedCertInstallerPreference;
     private SwitchPreference mDisallowDebuggingFeatureSwitchPreference;
     private SwitchPreference mDisallowInstallUnknownSourcesSwitchPreference;
@@ -286,6 +289,8 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         mDisableCameraSwitchPreference.setOnPreferenceChangeListener(this);
         mSystemUpdatePolicyPreference = findPreference(SYSTEM_UPDATE_POLICY_KEY);
         mSystemUpdatePolicyPreference.setOnPreferenceClickListener(this);
+        mNetworkStatsPreference = findPreference(NETWORK_STATS_KEY);
+        mNetworkStatsPreference.setOnPreferenceClickListener(this);
         mDelegatedCertInstallerPreference = findPreference(DELEGATED_CERT_INSTALLER_KEY);
         mDelegatedCertInstallerPreference.setOnPreferenceClickListener(this);
         findPreference(REMOVE_DEVICE_OWNER_KEY).setOnPreferenceClickListener(this);
@@ -402,6 +407,9 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 return true;
             case SYSTEM_UPDATE_POLICY_KEY:
                 showSystemUpdatePolicyFragment();
+                return true;
+            case NETWORK_STATS_KEY:
+                showNetworkUsageStatsFragment();
                 return true;
             case DELEGATED_CERT_INSTALLER_KEY:
                 showDelegatedCertInstallerFragment();
@@ -674,6 +682,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 && (!"MNC".equals(Build.VERSION.CODENAME))) {
             // The following options depend on MNC APIs.
             mSystemUpdatePolicyPreference.setEnabled(false);
+            mNetworkStatsPreference.setEnabled(false);
             mDelegatedCertInstallerPreference.setEnabled(false);
         }
     }
@@ -1451,6 +1460,12 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         FragmentManager fragmentManager = getFragmentManager();
         fragmentManager.beginTransaction().addToBackStack(PolicyManagementFragment.class.getName())
                 .replace(R.id.container, new SystemUpdatePolicyFragment()).commit();
+    }
+
+    private void showNetworkUsageStatsFragment() {
+        FragmentManager fragmentManager = getFragmentManager();
+        fragmentManager.beginTransaction().addToBackStack(PolicyManagementFragment.class.getName())
+                .replace(R.id.container, new NetworkUsageStatsFragment()).commit();
     }
 
     private void showDelegatedCertInstallerFragment() {
