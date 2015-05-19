@@ -40,6 +40,16 @@ limitations under the License.
                 android:name=".EnableProfileActivity"
                 android:label="@string/app_name"/>
 
+        <activity
+                android:name=".policy.locktask.KioskModeActivity"
+                android:label="@string/kiosk_mode"
+                android:launchMode="singleInstance">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.HOME"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
         <receiver
                 android:name=".DeviceAdminReceiver"
                 android:description="@string/app_name"
