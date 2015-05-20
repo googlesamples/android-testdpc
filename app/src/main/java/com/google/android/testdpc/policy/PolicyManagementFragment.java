@@ -49,6 +49,7 @@ import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.UserHandle;
 import android.os.UserManager;
+import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.SwitchPreference;
@@ -158,6 +159,8 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     public static final String X509_CERT_TYPE = "X.509";
     public static final String TAG = "PolicyManagementFragment";
 
+    public static final String OVERRIDE_KEY_SELECTION_KEY = "override_key_selection";
+
     private static final String DEVICE_OWNER_STATUS_KEY = "device_owner_status";
     private static final String MANAGE_LOCK_TASK_LIST_KEY = "manage_lock_task";
     private static final String CHECK_LOCK_TASK_PERMITTED_KEY = "check_lock_task_permitted";
@@ -221,6 +224,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     private ComponentName mAdminComponentName;
     private UserManager mUserManager;
 
+    private EditTextPreference mOverrideKeySelectionPreference;
     private Preference mManageLockTaskPreference;
     private Preference mCheckLockTaskPermittedPreference;
     private Preference mStartLockTaskPreference;
@@ -266,6 +270,10 @@ public class PolicyManagementFragment extends PreferenceFragment implements
 
         addPreferencesFromResource(R.xml.device_policy_header);
 
+        mOverrideKeySelectionPreference = (EditTextPreference) findPreference(
+                OVERRIDE_KEY_SELECTION_KEY);
+        mOverrideKeySelectionPreference.setOnPreferenceChangeListener(this);
+        mOverrideKeySelectionPreference.setSummary(mOverrideKeySelectionPreference.getText());
         mManageLockTaskPreference = findPreference(MANAGE_LOCK_TASK_LIST_KEY);
         mManageLockTaskPreference.setOnPreferenceClickListener(this);
         mCheckLockTaskPermittedPreference = findPreference(CHECK_LOCK_TASK_PERMITTED_KEY);
@@ -504,6 +512,9 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         String key = preference.getKey();
         switch (key) {
+            case OVERRIDE_KEY_SELECTION_KEY:
+                preference.setSummary((String) newValue);
+                return true;
             case DISALLOW_DEBUGGING_FEATURES:
                 setUserRestriction(key, (Boolean) newValue);
                 return true;
@@ -779,6 +790,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 /*TODO: remove once SDK_INT on device is bumped */
                 && (!"MNC".equals(Build.VERSION.CODENAME))) {
             // The following options depend on MNC APIs.
+            mOverrideKeySelectionPreference.setEnabled(false);
             mStartLockTaskPreference.setEnabled(false);
             mStopLockTaskPreference.setEnabled(false);
             mSystemUpdatePolicyPreference.setEnabled(false);
@@ -1173,9 +1185,12 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String alias = input.getText().toString();
-                        mDevicePolicyManager.installKeyPair(mAdminComponentName, key, certificate,
-                                alias);
-                        showToast(R.string.certificate_added, alias);
+                        if (mDevicePolicyManager.installKeyPair(mAdminComponentName, key,
+                                certificate, alias) == true) {
+                            showToast(R.string.certificate_added, alias);
+                        } else {
+                            showToast(R.string.certificate_add_failed, alias);
+                        }
                         dialog.dismiss();
                     }
                 })

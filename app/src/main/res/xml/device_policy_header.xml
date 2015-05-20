@@ -76,6 +76,9 @@ limitations under the License.
         <Preference
                 android:key="install_key_certificate"
                 android:title="@string/install_key_certificate"/>
+        <EditTextPreference
+                android:key="override_key_selection"
+                android:title="@string/key_override_alias"/>
         <Preference
                 android:key="install_ca_certificate"
                 android:title="@string/install_ca_certificate"/>

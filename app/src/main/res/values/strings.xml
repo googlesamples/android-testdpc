@@ -149,6 +149,7 @@
     <!-- Strings for certificate management  -->
     <string name="certificate_management_title">Certificate management</string>
     <string name="install_key_certificate">Install a private key certificate</string>
+    <string name="key_override_alias">Override client certificates with alias</string>
     <string name="certificate_password_prompt_title">Extract certificate</string>
     <string name="certificate_password_prompt_enter_password">Type the password to extract the
         certificates.
@@ -157,6 +158,7 @@
     <string name="certificate_alias_prompt_title">Name the certificate</string>
     <string name="certificate_alias_prompt_certificate_name">Certificate name:</string>
     <string name="certificate_added">\"%s\" certificate added.</string>
+    <string name="certificate_add_failed">\"%s\" certificate could not be installed.</string>
     <string name="not_a_key_certificate">The selected certificate is not a private key certificate.
     </string>
     <string name="install_ca_certificate">Install a CA certificate</string>
