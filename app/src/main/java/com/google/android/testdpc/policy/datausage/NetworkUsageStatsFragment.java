@@ -18,7 +18,7 @@ package com.google.android.testdpc.policy.datausage;
 
 import android.app.Fragment;
 import android.app.usage.NetworkStatsManager;
-import android.app.usage.NetworkStats;
+import android.app.usage.NetworkUsageStats;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
@@ -75,8 +75,8 @@ public class NetworkUsageStatsFragment extends Fragment implements View.OnClickL
 
     @Override
     public void onClick(View v) {
-        NetworkStats result = null;
-        NetworkStats.Bucket bucket = null;
+        NetworkUsageStats result = null;
+        NetworkUsageStats.Bucket bucket = null;
         try {
             switch (v.getId()) {
                 case R.id.button_network_usage_summary_device: {
@@ -120,12 +120,12 @@ public class NetworkUsageStatsFragment extends Fragment implements View.OnClickL
         }
     }
 
-    private void showResult(NetworkStats result) {
+    private void showResult(NetworkUsageStats result) {
         if (result == null) {
             show("result == null");
             return;
         }
-        NetworkStats.Bucket bucket = new NetworkStats.Bucket();
+        NetworkUsageStats.Bucket bucket = new NetworkUsageStats.Bucket();
         while (result.getNextBucket(bucket)) {
             show(bucket2String(bucket));
         }
@@ -145,7 +145,7 @@ public class NetworkUsageStatsFragment extends Fragment implements View.OnClickL
         }
     }
 
-    private String bucket2String(NetworkStats.Bucket bucket) {
+    private String bucket2String(NetworkUsageStats.Bucket bucket) {
         if (bucket == null) {
             return "bucket == null";
         }
