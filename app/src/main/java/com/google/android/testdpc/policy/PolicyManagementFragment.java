@@ -1600,6 +1600,10 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         Intent launchIntent = new Intent(getActivity(), KioskModeActivity.class);
         launchIntent.putExtra(KioskModeActivity.LOCKED_APP_PACKAGE_LIST, lockTaskArray);
         launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        getActivity().getPackageManager().setComponentEnabledSetting(
+                new ComponentName(mPackageName, KioskModeActivity.class.getName()),
+                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                PackageManager.DONT_KILL_APP);
         startActivity(launchIntent);
         getActivity().finish();
     }
