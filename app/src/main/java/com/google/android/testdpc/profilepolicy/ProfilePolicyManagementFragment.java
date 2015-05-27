@@ -195,7 +195,7 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
                 = ManageCrossProfileWidgetProviderUtil.getInstance(getActivity())
                 .getDisabledCrossProfileWidgetProvidersList();
         if (disabledCrossProfileWidgetProvidersList.isEmpty()) {
-            showToast(R.string.all_accessibility_services_enabled);
+            showToast(R.string.all_cross_profile_widget_providers_are_enabled);
         } else {
             AppInfoArrayAdapter appInfoArrayAdapter = new AppInfoArrayAdapter(getActivity(),
                     R.layout.app_row, disabledCrossProfileWidgetProvidersList);
