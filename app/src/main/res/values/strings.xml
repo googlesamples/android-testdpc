@@ -17,7 +17,7 @@
 
 <resources>
 
-    <string name="app_name">DevicePolicyManagementSample</string>
+    <string name="app_name">TestDPC</string>
     <string name="set_up_profile">Set up profile</string>
     <string name="setup_profile_message">This app is currently not the owner of this profile. Please
         click the button below to set up a new profile managed by this app.</string>
