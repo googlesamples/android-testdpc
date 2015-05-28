@@ -93,8 +93,11 @@ public class KioskModeActivity extends Activity {
             for (String pkg : packageArray) {
                 mKioskPackages.add(pkg);
             }
+            mKioskPackages.remove(getPackageName());
+            mKioskPackages.add(getPackageName());
             setDefaultKioskPolicies(true);
         } else {
+            // after a reboot there is no need to set the policies again
             SharedPreferences sharedPreferences = getSharedPreferences(KIOSK_PREFERENCE_FILE,
                     MODE_PRIVATE);
             mKioskPackages = new ArrayList<>(sharedPreferences.getStringSet(KIOSK_APPS_KEY,
@@ -135,6 +138,10 @@ public class KioskModeActivity extends Activity {
     public void onBackdoorClicked() {
         stopLockTask();
         setDefaultKioskPolicies(false);
+        mPackageManager.setComponentEnabledSetting(
+                new ComponentName(getPackageName(), getClass().getName()),
+                PackageManager.COMPONENT_ENABLED_STATE_DEFAULT,
+                PackageManager.DONT_KILL_APP);
         finish();
     }
 

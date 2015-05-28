@@ -56,6 +56,7 @@ public class NetworkUsageStatsFragment extends Fragment implements View.OnClickL
                 Context.NETWORK_STATS_SERVICE);
         mText = (TextView) view.findViewById(R.id.textout);
         mText.setMovementMethod(new ScrollingMovementMethod());
+        mUidText = (TextView) view.findViewById(R.id.uid);
 
         for (int id : new int[] {
                 R.id.button_network_usage_summary_device,
