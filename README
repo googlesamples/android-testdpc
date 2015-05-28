@@ -24,11 +24,16 @@ To build this app,
    Debug Build: $ ./gradlew assembleDebug
    Release Build: $ ./gradlew assembleRelease
 
-APKs can be found under app/build/outputs/apk/
-
 IDE integration - Android Studio
 1. To import this project into Android Studio, click "Open an existing Android Studio project" from
    the "Quick Start" wizard.
 2. Select the "setting.gradle" file, which is located in the same directory of this README, in the
    "Open Project" wizard.
 3. Select "Use default gradle wrapper (recommended)" and click OK.
+
+Known Issues:
+1. This app will only work with devices running Android M. We will be adding support for L very shortly.
+2. Disable Camera policy does not work.
+3. No support for mime type in cross-profile intent filter creation.
+4. No support for PackageInstaller APIs.
+
