@@ -17,10 +17,10 @@ This sample uses the Gradle build system. To build this project, use the
 Screenshots
 -----------
 
-![Setup](doc/setup.png “Setup screen“)
-![Policy Management](doc/policy_management.png “Home screen once the profile is setup“)
-![Manage App Restrictions](doc/manage_app_restrictions.png “Manage restrictions for apps in the Work Profile“)
-![Work Profile Management](doc/work_profile_management.png “Manage policies specific to the Work Profile“)
+![Setup](doc/setup.png "Setup screen")
+![Policy Management](doc/policy_management.png "Home screen once the profile is setup")
+![Manage App Restrictions](doc/manage_app_restrictions.png "Manage restrictions for apps in the Work Profile")
+![Work Profile Management](doc/work_profile_management.png "Manage policies specific to the Work Profile")
 
 Known Issues
 ------------
@@ -48,4 +48,3 @@ How to make contributions?
 --------------------------
 
 Please read and follow the steps in the CONTRIB file.
-
