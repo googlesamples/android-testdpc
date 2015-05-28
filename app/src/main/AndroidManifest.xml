@@ -43,7 +43,8 @@ limitations under the License.
         <activity
                 android:name=".policy.locktask.KioskModeActivity"
                 android:label="@string/kiosk_mode"
-                android:launchMode="singleInstance">
+                android:launchMode="singleInstance"
+                android:enabled="false">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.HOME"/>
