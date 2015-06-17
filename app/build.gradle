@@ -6,8 +6,8 @@ android {
 
     defaultConfig {
         applicationId "com.google.android.testdpc"
-        minSdkVersion 'MNC'
-        targetSdkVersion 'MNC'
+        minSdkVersion 21
+        targetSdkVersion 21
         versionCode 1
         versionName "1.0"
     }
@@ -20,6 +20,23 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
         targetCompatibility JavaVersion.VERSION_1_7
+    }
+
+    /* TODO: remove once release version of M sdk is released */
+    def minVersion = defaultConfig.getMinSdkVersion().getApiString()
+    def targetVersion = defaultConfig.getTargetSdkVersion().getApiString()
+    applicationVariants.all { variant ->
+        variant.outputs.each { output ->
+            output.processManifest.doLast {
+                def manifestOutFile = output.processManifest.manifestOutputFile
+                def newFileContents = manifestOutFile.getText('UTF-8').
+                        replace('android:minSdkVersion="MNC"',
+                                'android:minSdkVersion="' + minVersion + '"')
+                newFileContents = newFileContents.replace('android:targetSdkVersion="MNC"',
+                        'android:targetSdkVersion="' + targetVersion + '"')
+                manifestOutFile.write(newFileContents, 'UTF-8')
+            }
+        }
     }
 }
 
