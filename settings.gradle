@@ -1,0 +1,4 @@
+include ':TestDPC'
+project(':TestDPC').projectDir = new File(rootDir, "app")
+include ':CosuApp'
+project(':CosuApp').projectDir = new File(rootDir, "cosuapp")

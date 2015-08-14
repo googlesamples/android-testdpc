@@ -1,0 +1,46 @@
+apply plugin: 'com.android.application'
+
+ext {
+    /* Version code for *next* release, bump *after* a release is created. */
+    // 1 or more digits
+    versionMajor = 1
+    // exactly 1 digit
+    versionMinor = 1
+    // exactly 2 digits
+    versionBuild = 0
+}
+
+android {
+    compileSdkVersion 'android-23'
+    buildToolsVersion '23.0.0 rc4'
+
+    defaultConfig {
+        applicationId "com.sample.android.testdpc"
+        minSdkVersion 21
+        targetSdkVersion 23
+        versionCode versionMajor * 1000 + versionMinor * 100 + versionBuild
+        versionName "${versionMajor}.${versionMinor}.${versionBuild}"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+
+    repositories {
+        flatDir {
+            dirs 'libs'
+        }
+    }
+}
+
+dependencies {
+    compile "com.android.support:support-v4:22.0.0"
+    compile(name:'setup-wizard-lib', ext:'aar')
+}
