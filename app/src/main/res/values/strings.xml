@@ -1,0 +1,440 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ Copyright (C) 2015 The Android Open Source Project
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+    <string name="app_name">Test DPC</string>
+    <string name="cancel">Cancel</string>
+    <string name="set_up_managed_profile">Set up managed profile</string>
+    <string name="set_up_device_owner">Set up device owner</string>
+    <string name="set_up_management_header">Setup Management</string>
+    <string name="setup_management_message">This app is currently not the owner of this device or
+        profile. Please select an option below and click NEXT to set up appropriate management by this app.</string>
+    <string name="managed_account_message">Added account that requires management:</string>
+    <string name="managed_account_complete_message">Added account that is now managed:</string>
+    <string name="account_migration_failed_message">Account failed to migrate:</string>
+    <string name="add_account_later_message">Please add the account later.</string>
+    <string name="setup_label">Set up</string>
+    <string name="profile_name">Sample Managed Profile</string>
+    <string name="finish_setup">Finish setup</string>
+    <string name="setup_finished">Setup finished</string>
+    <string name="click_finish_to_complete">Click Finish to complete setup.</string>
+    <string name="finish_button">Finish</string>
+    <string name="all_done">Setup finished successfully</string>
+    <string name="all_done_explanation_profile_owner">To manage the new managed profile, visit the
+        badged version of this application.
+    </string>
+    <string name="all_done_explanation_device_owner">To manage the device open this application.
+    </string>
+    <string name="add_account_title">Provisioning finished successfully</string>
+    <string name="add_account_explanation">To add an account, select the corresponding option below. Select skip if you want to add it later:
+    </string>
+    <string name="add_account">Add account</string>
+    <string name="add_account_with_name">Add account with name</string>
+    <string name="add_account_skip">Skip</string>
+    <string name="add_account_dialog_title">Account name:</string>
+    <string name="icon">Icon</string>
+    <string name="manage_apps">Manage applications</string>
+    <string name="reset">Reset</string>
+    <string name="save">Save</string>
+    <string name="migration_not_supported">Unable to migrate account into profile, please add manually.</string>
+    <string name="provisioning_not_supported">Device provisioning is not enabled. Stopping.</string>
+    <string name="provisioning_failed_or_cancelled">Provisioning failed or cancelled.</string>
+
+    <string name="managed_profile_specific_policy_category_title">Managed profile policy</string>
+    <string name="managed_profile_specific_policy_title">Manage work profile specific policy
+    </string>
+    <string name="policies_management">Policy management</string>
+    <string name="other_owner_already_setup_error">There is already a device/profile owner, cannot
+        start TestDPC</string>
+    <string name="invalid_launch_intent_no_account">No account found on incoming intent.</string>
+    <string name="device_admin_receiver_failure">Failed to become device/profile owner.</string>
+
+    <!-- Strings for device owner management -->
+    <string name="this_is_not_a_device_owner">This app is currently not the device owner.</string>
+    <string name="this_is_a_device_owner">This app is the device owner.</string>
+    <string name="this_is_a_managed_profile_owner">This app is a managed profile owner.
+        Some of the management options are not available.</string>
+    <string name="device_owner_management">Device owner management</string>
+    <string name="wipe_data">Wipe data</string>
+    <string name="wipe_data_title">Wipe data?</string>
+    <string name="wipe_data_confirmation">Are you sure you want to wipe the data?</string>
+    <string name="wipe_data_include">Also wipe:</string>
+    <string name="external_storage">External storage</string>
+    <string name="reset_protection_data">Factory reset protection</string>
+    <string name="remove_device_owner">Remove this device owner</string>
+    <string name="remove_device_owner_title">Device owner removal</string>
+    <string name="remove_device_owner_confirmation">Are you sure you want to remove this device
+        owner?
+    </string>
+    <string name="device_owner_removed">This app is no longer a device owner.</string>
+
+    <!-- Strings for cross-profile intent filters -->
+    <string name="cross_profile_intents">Cross-profile intents</string>
+    <string name="add_cross_profile_intents_title">Add cross-profile intents</string>
+    <string name="clear_cross_profile_intents">Clear all cross-profile intents</string>
+    <string name="actions_title">Actions:</string>
+    <string name="categories_title">Categories:</string>
+    <string name="data_schemes_title">Schemes:</string>
+    <string name="data_types_title">Data types:</string>
+    <string name="add_cross_profile_intent_success_msg">Cross-profile intent filter has been added.
+    </string>
+    <string name="add_cross_profile_intent_failed_msg">Failed to add cross-profile intent filter.
+        Add at least one action, category, or scheme.
+    </string>
+    <string name="cross_profile_intent_filters_cleared">All cross-profile intent filters have been
+        removed.</string>
+    <string name="cross_profile_intent_filters_flags">Flags:</string>
+    <string name="add">Add</string>
+    <string name="clear">Clear</string>
+
+    <!-- Strings for camera and screen capture -->
+    <string name="camera_title">Camera and Screen capture</string>
+    <string name="display_media">Display Media</string>
+    <string name="disable_camera">Disable camera</string>
+    <string name="capture_image">Capture image</string>
+    <string name="capture_video">Capture video</string>
+    <string name="activity_not_found">No activity is found to handle this.</string>
+    <string name="play_button_label">Play</string>
+    <string name="stop_button_label">Stop</string>
+    <string name="delete_button_label">Delete</string>
+    <string name="disable_screen_capture">Disable screen capture</string>
+
+    <!-- Stings for work profile management -->
+    <string name="profile_management_title">Work profile management</string>
+    <string name="removing_managed_profile">Removing work profile</string>
+
+    <!-- Strings for cross-profile widget provider -->
+    <string name="cross_profile_widget_providers_title">Cross-profile widget providers</string>
+    <string name="add_cross_profile_app_widget_providers_title">Enable app widgets</string>
+    <string name="add_cross_profile_app_widget_providers">Enable app widgets in a work profile app
+    </string>
+    <string name="remove_cross_profile_app_widget_providers_title">Disable app widgets</string>
+    <string name="remove_cross_profile_app_widget_providers">Remove app widgets in a work profile
+        app
+    </string>
+    <string name="all_cross_profile_widget_providers_are_enabled">There is no widget from any of the
+        work profile apps that is in disabled state.</string>
+    <string name="all_cross_profile_widget_providers_are_disabled">There is no widget from any of
+        the work profile apps that is in enabled state.</string>
+    <string name="cross_profile_widget_enable">Widgets from "%s" are enabled.</string>
+    <string name="cross_profile_widget_disable">Widgets from "%s" are disabled.</string>
+
+    <!-- Strings for policies -->
+    <string name="policies_title">Policies</string>
+    <string name="disable_bluetooth_contact_sharing">Disable bluetooth contact sharing</string>
+    <string name="disable_cross_profile_caller_id">Disable cross-profile caller ID</string>
+    <string name="disallow_cross_profile_copy_paste">Disallow cross-profile copy/paste</string>
+
+    <!-- Strings for wifi management -->
+    <string name="wifi_management_title">Wifi management</string>
+    <string name="create_wifi_configuration">Create wifi configuration</string>
+    <string name="add_network">Add network</string>
+    <string name="wifi_ssid">Network name</string>
+    <string name="wifi_ssid_hint">Enter the SSID</string>
+    <string name="wifi_security">Security</string>
+    <string-array name="wifi_security_choices">
+        <item>None</item>
+        <!-- Do not translate. -->
+        <item>WEP</item>
+        <!-- Do not translate. -->
+        <item>WPA/WPA2</item>
+    </string-array>
+    <string name="wifi_password">Password</string>
+    <string name="wifi_show_password">Show password</string>
+    <string name="minimum_limit">At least 8 characters</string>
+    <!-- Hint for unchanged fields -->
+    <string name="wifi_unchanged">(unchanged)</string>
+    <string name="wifi_save">Save</string>
+    <string name="wifi_cancel">Cancel</string>
+    <string name="wifi_config_success">Wifi configuration saved.</string>
+    <string name="wifi_config_fail">Failed to save the wifi configuration.</string>
+    <string name="enable_wifi_config_lockdown">DO created WiFi configs are modifiable only by DO.</string>
+    <string name="modify_wifi_configuration">Modify wifi configuration</string>
+    <string name="wifi_configs_header">Saved WiFi configurations</string>
+    <string name="wifi_update_config_button">Update selected</string>
+    <string name="wifi_remove_config_button">Remove selected</string>
+    <string name="wifi_modification_error_title">Error modifying config</string>
+    <string name="wifi_remove_config_error">Unable to remove SSID \'<xliff:g id="wifi_ssid">%1$s</xliff:g>\': netId = <xliff:g id="wifi_network_id">%2$d</xliff:g></string>
+
+    <!-- Strings for managing apps -->
+    <string name="apps_management_title">Apps management</string>
+    <string name="enable_system_apps_title">Enable system apps</string>
+    <string name="enable_system_apps_by_package_name">Enable a system app by package name</string>
+    <string name="enable_system_apps_by_package_name_hints">Enter a system app package name.
+    </string>
+    <string name="enable_system_apps_by_package_name_success_msg">%s is enabled.</string>
+    <string name="enable_system_apps_by_package_name_error">Package not found.</string>
+    <string name="enable_system_apps_by_intent">Enable a system app by intent</string>
+    <string name="enable_system_apps_failure_msg">Failed to enable system apps that receive the
+        given intent.
+    </string>
+    <string name="enable_system_apps_attempt_msg">Enabled system apps that receive the given intent.
+    </string>
+    <string name ="no_disabled_system_apps">All system apps have been enabled.</string>
+    <string name="enable">Enable</string>
+    <string name="invalid_system_apps_action">Invalid action.</string>
+    <string name="hide_apps_title">Hide apps</string>
+    <string name="hide_apps_empty">All apps are hidden.</string>
+    <string name="hide_apps_success">%s is now hidden.</string>
+    <string name="hide_apps_failure">%s cannot be hidden, because it is an active admin or
+        required by the system.</string>
+    <string name="unhide_apps_title">Unhide apps</string>
+    <string name="unhide_apps_empty">No apps are currently hidden.</string>
+    <string name="unhide_apps_success">%s is no longer hidden.</string>
+    <string name="unhide_apps_failure">%s cannot be unhidden.</string>
+
+    <!-- Strings for lock task -->
+    <string name="lock_task_title">Lock task</string>
+    <string name="manage_lock_task">Manage lock task list</string>
+    <string name="no_primary_app_available">No primary app is available</string>
+    <string name="check_lock_task_permitted">Check lock task permitted</string>
+    <string name="input_package_name_hints">Enter a package name</string>
+    <string name="check_lock_task_permitted_result_permitted">Lock task is permitted.</string>
+    <string name="check_lock_task_permitted_result_not_permitted">Lock task is not permitted.
+    </string>
+    <string name="start_lock_task">Start lock task mode</string>
+    <string name="stop_lock_task">Stop lock task mode</string>
+
+    <!-- Strings for single-use devices -->
+    <string name="single_use_devices">Single-use devices</string>
+    <string name="disable_status_bar">Disable status bar</string>
+    <string name="reenable_status_bar">Reenable status bar</string>
+    <string name="disable_keyguard">Disable keyguard</string>
+    <string name="reenable_keyguard">Reenable keyguard</string>
+    <string name="kiosk_mode">Kiosk mode</string>
+    <string name="kiosk_select_title">Select kiosk apps</string>
+    <string name="start_kiosk_mode">Start kiosk mode</string>
+    <string name="stop_kiosk_mode">Stop kiosk mode</string>
+
+    <!-- Strings for user restriction management -->
+    <string name="user_restriction_management_title">User restriction</string>
+    <string name="disallow_debugging_feature">Disallow debugging feature</string>
+    <string name="disallow_install_unknown_sources">Disallow install unknown sources</string>
+    <string name="check_setting_disallow_install_unknown_sources">Ensure that
+        \"Allow installs from unknown sources\" under Settings management is correctly checked.
+    </string>
+    <string name="check_setting_ok">Ok</string>
+    <string name="disallow_remove_user">Disallow remove user</string>
+    <string name="disallow_add_user">Disallow add user</string>
+    <string name="disallow_factory_reset">Disallow factory reset</string>
+    <string name="disallow_config_credentials">Disallow config credentials</string>
+    <string name="disallow_share_location">Disallow share location</string>
+    <string name="disallow_config_tethering">Disallow config tethering</string>
+    <string name="disallow_adjust_volume">Disallow adjust volume</string>
+    <string name="disallow_unmute_microphone">Disallow unmute microphone</string>
+    <string name="disallow_modify_accounts">Disallow modify accounts</string>
+    <string name="disallow_safe_boot">Disallow safe boot</string>
+    <string name="disallow_outgoing_beam">Disallow outgoing NFC beam</string>
+    <string name="disallow_create_windows">Disallow create windows</string>
+    <string name="allow_parent_profile_app_linking">Allow web links to apps of the parent</string>
+
+    <!-- Strings for certificate management  -->
+    <string name="certificate_management_title">Certificate management</string>
+    <string name="install_key_certificate">Install a private key certificate</string>
+    <string name="key_override_alias">Override client certificates with alias</string>
+    <string name="certificate_password_prompt_title">Extract certificate</string>
+    <string name="certificate_password_prompt_enter_password">Type the password to extract the
+        certificates.
+    </string>
+    <string name="certificate_password_prompt_incorrect">Type the correct password.</string>
+    <string name="certificate_alias_prompt_title">Name the certificate</string>
+    <string name="certificate_alias_prompt_certificate_name">Certificate name:</string>
+    <string name="certificate_added">\"%s\" certificate added.</string>
+    <string name="certificate_add_failed">\"%s\" certificate could not be installed.</string>
+    <string name="not_a_key_certificate">The selected certificate is not a private key certificate.
+    </string>
+    <string name="install_ca_certificate">Install a CA certificate</string>
+    <string name="install_ca_successfully">The selected CA certificate is installed.</string>
+    <string name="install_ca_fail">The selected CA certificate is not installed.</string>
+    <string name="get_ca_certificates">Get a list of CA certificates</string>
+    <string name="no_ca_certificate">There is no CA certificate installed.</string>
+    <string name="installed_ca_title">Installed CA certificates</string>
+    <string name="remove_all_ca_certificates">Remove all CA certificates</string>
+    <string name="all_ca_certificates_removed">All CA certificates have been removed.</string>
+
+    <!-- Strings for app restrictions -->
+    <string name="manage_app_restrictions">Manage app restrictions</string>
+    <string name="define_bundle">Define bundle</string>
+    <string name="define_bundle_array">Define bundle array</string>
+    <string name="load_manifest_restrictions">Load manifest restrictions</string>
+    <string name="set_app_restrictions_success">Successfully set app restrictions for %s.</string>
+    <string name="app_restrictions_info">%1$s - %2$s</string>
+    <string name="plus">+</string>
+
+
+    <!-- strings used in the alert dialog for editing application restrictions. -->
+    <string name="select_type">Select type:</string>
+    <string name="app_restrictions_key">Key:</string>
+    <string name="key_hint">Restriction key</string>
+    <string name="app_restrictions_value">Value:</string>
+    <string name="edit_bundle_instruction">Add values on the Edit screen</string>
+    <string name="key_empty_error">Restriction key should not be empty</string>
+    <string name="value_not_valid">Restriction value is not valid</string>
+    <string name="restriction_save_label">Save</string>
+    <string name="restriction_cancel_label">Cancel</string>
+
+    <!-- Accessibility -->
+    <string name="accessibility_title">Accessibility</string>
+    <string name="set_accessibility_services">Set accessibility services</string>
+    <string name="allow_all">Allow all</string>
+    <string name="set_accessibility_services_successful">The given list of accessibility services is
+        enabled.
+    </string>
+    <string name="set_accessibility_services_fail">Failed to set the given accessibility services
+        list.
+    </string>
+    <string name="all_accessibility_services_enabled">All accessibility services are enabled.
+    </string>
+
+    <!-- Input method -->
+    <string name="input_methods_title">Input methods</string>
+    <string name="set_input_methods">Set input methods</string>
+    <string name="set_input_methods_successful">The given list of input methods is enabled.</string>
+    <string name="set_input_methods_fail">Failed to set the given input methods list.
+    </string>
+    <string name="all_input_methods_enabled">All input methods are enabled.</string>
+
+    <!-- Account management -->
+    <string name="account_management_title">Account management</string>
+    <string name="set_disable_account_management">Toggle account management</string>
+    <string name="get_disable_account_management">Get account types with management disabled</string>
+    <string name="account_type_hint">Enter an account type</string>
+    <string name="disable">Disable</string>
+    <string name="account_management_disabled">Account management for \"%s\" has been disabled.
+    </string>
+    <string name="account_management_enabled">Account management for \"%s\" has been enabled.
+    </string>
+    <string name="fail_to_set_account_management">Failed to toggle account management.</string>
+    <string name="list_of_disabled_account_types">List of disabled account types</string>
+    <string name="no_disabled_account">There is no account type that is disabled.</string>
+
+    <!-- User management -->
+    <string name="user_management">User management</string>
+    <string name="create_and_initialize_user">Create and initialize user</string>
+    <string name="remove_user">Remove user</string>
+    <string name="user_created">Successfully created user with serial number %1$d.</string>
+    <string name="enter_username_hint">Enter a username</string>
+    <string name="failed_to_create_user">Failed to create user.</string>
+    <string name="enter_user_id">Enter a user serial number</string>
+    <string name="user_removed">User removed.</string>
+    <string name="failed_to_remove_user">Failed to remove user.</string>
+
+    <!-- Strings for block uninstall -->
+    <string name="block_uninstallation_title">Block uninstallation</string>
+    <string name="block_uninstallation_by_pkg">Block uninstallation by package name</string>
+    <string name="block_uninstallation_list">Block uninstallation list</string>
+    <string name="uninstallation_blocked">%s uninstallation has been blocked.
+    </string>
+    <string name="uninstallation_allowed">%s uninstallation has been allowed.
+    </string>
+    <string name="block_uninstallation_failed_invalid_pkgname">Could not update block uninstallation
+        policy on an invalid package name.
+    </string>
+    <string name="block">Block</string>
+    <string name="unblock">Unblock</string>
+    <string name="close">Close</string>
+
+    <!--  Strings for system update policy -->
+    <string name="system_update_management">System update</string>
+    <string name="system_update_policy">Manage system update policy</string>
+    <string name="system_update_policy_automatic">Automatic immediate install</string>
+    <string name="system_update_policy_Windowed">Install within a maintenance window</string>
+    <string name="system_update_policy_postpone">Postpone</string>
+    <string name="system_update_policy_none">None</string>
+    <string name="current_system_update_policy">Current system update policy:</string>
+    <string name="system_update_policy_window_start_label">Maintenance window start:</string>
+    <string name="system_update_policy_window_end_label">Maintenance window end:</string>
+    <string name="system_update_policy_set_policy">Set new policy</string>
+
+    <!--  Strings for data usage -->
+    <string name="data_usage">Data usage</string>
+    <string name="network_stats">Network Data Usage Stats</string>
+    <string-array name="network_stats_queries_array">
+        <item>Select query type</item>
+        <item>Query summary for device</item>
+        <item>Query summary for user</item>
+        <item>Query summary of apps</item>
+        <item>Query histories of apps</item>
+    </string-array>
+    <string name="network_stats_choose_query_label">Choose query type: </string>
+    <string name="network_stats_start_date_label">Start date inclusive: </string>
+    <string name="network_stats_end_date_label">End date exclusive: </string>
+    <string name="network_stats_device_summary_explanation">
+        Below you can see the network data usage in the specified time interval for the whole device.
+        (i.e. usage aggregated over all users).\nNote: you need Settings &gt; Security &gt; Apps with usage access
+        be set for TestDPC to not receive a security exception. 
+    </string>
+    <string name="network_stats_device_summary">Device has received %1$d bytes in %2$d packets and transmitted %3$d bytes in %4$d packets.</string>
+    <string name="network_stats_profile_summary_explanation">
+        Below you can see the summarized network data usage in the specified time interval for the managed profile.\n
+    </string>
+    <string name="network_stats_profile_summary">Profile has received %1$d bytes in %2$d packets and transmitted %3$d bytes in %4$d packets.</string>
+    <string name="network_stats_error_title">Error while querying Network Stats</string>
+    <string name="network_stats_result">Query result</string>
+    <string name="network_stats_uid_removed">Removed apps</string>
+    <string name="network_stats_uid_tethering">Tethering</string>
+    <string name="network_stats_uid_system">Android System</string>
+    <string name="network_stats_bucket_usage">Received %1$d bytes in %2$d packets and transmitted %3$d bytes in %4$d packets.</string>
+    <string name="network_stats_back_to_apps_button_label">Back to apps list</string>
+    <string name="network_stats_foreground_state">State: foreground</string>
+    <string name="network_stats_default_state">State: default (background)</string>
+    <string name="network_stats_combined_state">State: combined foreground and background</string>
+    <string name="network_stats_uid">UID = %1$d</string>
+    <string name="network_stats_items">%1$d items</string>
+
+    <!--  Strings for delegated certificate installer -->
+    <string name="manage_cert_installer">Manage delegated certificate installer</string>
+    <string name="current_delegated_cert_installer">Current delegated cert installer:</string>
+    <string name="delegated_cert_installer_new_label">New delegated cert installer package name
+    </string>
+    <string name="delegated_cert_installer_set">Set</string>
+    <string name="delegated_cert_installer_clear">Clear</string>
+    <string name="delegated_cert_installer_instructions">Select an app as the new cert installer, 
+        or manually enter its package name below:</string>
+
+    <!-- Strings for permission policies -->
+    <string name="permission_management">Permission management</string>
+    <string name="set_default_permission_policy">Get/Set default permission policy</string>
+    <string name="permission_policy_prompt">Prompt</string>
+    <string name="permission_policy_auto_accept">Auto accept</string>
+    <string name="permission_policy_auto_deny">Auto deny</string>
+    <string name="permission_allow">Allow</string>
+    <string name="permission_default">Let user decide</string>
+    <string name="permission_deny">Deny</string>
+    <string name="manage_app_permissions">Manage app permissions</string>
+
+    <!-- Keyguard features -->
+    <string name="keyguard_features">Keyguard features</string>
+    <string name="keyguard_disable_widgets">Disable widgets</string>
+    <string name="keyguard_disable_secure_camera">Disable secure camera</string>
+    <string name="keyguard_disable_secure_notifications">Disable secure notifications</string>
+    <string name="keyguard_disable_unredacted_notifications">Disable unredacted notifications</string>
+    <string name="keyguard_disable_trust_agents">Disable trust agents</string>
+    <string name="keyguard_disable_fingerprint">Disable fingerprint</string>
+
+    <!-- Strings for screen lock policies -->
+    <string name="lock_category">Lock screen</string>
+    <string name="maximum_lock_time">Max time to screen lock (seconds)</string>
+    <string name="maximum_password_fails">Max password failures for local wipe</string>
+
+    <!-- Strings for managing Settings -->
+    <string name="settings_management_title">Settings management</string>
+    <string name="stay_on_while_plugged_in">Keep the device on while plugged in</string>
+    <string name="install_non_market_apps">Allow installs from unknown sources</string>
+
+</resources>
