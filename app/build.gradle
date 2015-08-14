@@ -1,3 +1,4 @@
+apply from: '../repositories.gradle'
 apply plugin: 'com.android.application'
 
 ext {
@@ -12,7 +13,7 @@ ext {
 
 android {
     compileSdkVersion 'android-23'
-    buildToolsVersion '23.0.0 rc4'
+    buildToolsVersion '23'
 
     defaultConfig {
         applicationId "com.sample.android.testdpc"
