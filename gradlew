@@ -161,4 +161,11 @@ function splitJvmOpts() {
 eval splitJvmOpts $DEFAULT_JVM_OPTS $JAVA_OPTS $GRADLE_OPTS
 JVM_OPTS[${#JVM_OPTS[*]}]="-Dorg.gradle.appname=$APP_BASE_NAME"
 
+# For reproducible builds, always use the SDKs stored in source control
+if $darwin; then
+    ANDROID_HOME="$APP_HOME/../../../../prebuilts/fullsdk/darwin"
+else
+    ANDROID_HOME="$APP_HOME/../../../../prebuilts/fullsdk/linux"
+fi
+export ANDROID_HOME
 exec "$JAVACMD" "${JVM_OPTS[@]}" -classpath "$CLASSPATH" org.gradle.wrapper.GradleWrapperMain "$@"
