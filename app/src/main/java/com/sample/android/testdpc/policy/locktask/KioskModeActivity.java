@@ -32,6 +32,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -130,8 +131,15 @@ public class KioskModeActivity extends Activity {
 
         // start lock task mode if it's not already active
         ActivityManager am = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        if (am.getLockTaskModeState() == ActivityManager.LOCK_TASK_MODE_NONE) {
-            startLockTask();
+        // ActivityManager.getLockTaskModeState api is not available in pre-M.
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            if (!am.isInLockTaskMode()) {
+                startLockTask();
+            }
+        } else {
+            if (am.getLockTaskModeState() == ActivityManager.LOCK_TASK_MODE_NONE) {
+                startLockTask();
+            }
         }
     }
 
