@@ -220,6 +220,12 @@
     <string name="kiosk_select_title">Select kiosk apps</string>
     <string name="start_kiosk_mode">Start kiosk mode</string>
     <string name="stop_kiosk_mode">Stop kiosk mode</string>
+    <string name="setup_cosu">Setting up your COSU device\u2026</string>
+    <string name="setup_cosu_success">COSU device successfully set up</string>
+    <string name="setup_cosu_failure">Error during COSU set up</string>
+    <string name="setup_cosu_status_download">Downloading the config file\u2026</string>
+    <string name="setup_cosu_status_parse">Parsing the config file\u2026</string>
+    <string name="setup_cosu_status_apps">Downloading and installing additional apps\u2026</string>
 
     <!-- Strings for user restriction management -->
     <string name="user_restriction_management_title">User restriction</string>
@@ -241,6 +247,7 @@
     <string name="disallow_safe_boot">Disallow safe boot</string>
     <string name="disallow_outgoing_beam">Disallow outgoing NFC beam</string>
     <string name="disallow_create_windows">Disallow create windows</string>
+    <string name="disallow_config_wifi">Disallow WiFi configuration</string>
     <string name="allow_parent_profile_app_linking">Allow web links to apps of the parent</string>
 
     <!-- Strings for certificate management  -->

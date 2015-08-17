@@ -32,6 +32,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.sample.android.testdpc.common.LaunchIntentUtil;
+import com.sample.android.testdpc.cosu.EnableCosuActivity;
 import com.sample.android.testdpc.syncauth.FinishSyncAuthDeviceOwnerActivity;
 import com.sample.android.testdpc.syncauth.FinishSyncAuthProfileOwnerActivity;
 
@@ -55,8 +56,10 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
 
         // Enable the profile after provisioning is complete.
         Intent launch = null;
+
         String packageName = context.getPackageName();
         boolean synchronousAuthLaunch = LaunchIntentUtil.isSynchronousAuthLaunch(extras);
+        boolean cosuLaunch = LaunchIntentUtil.isCosuLaunch(extras);
         boolean isProfileOwner = devicePolicyManager.isProfileOwnerApp(packageName);
         boolean isDeviceOwner = devicePolicyManager.isDeviceOwnerApp(packageName);
 
@@ -84,14 +87,20 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
             if (isProfileOwner) {
                 launch = new Intent(context, EnableProfileActivity.class);
             } else {
-                launch = new Intent(context, EnableDeviceOwnerActivity.class);
+                if (cosuLaunch) {
+                    launch = new Intent(context, EnableCosuActivity.class);
+                    launch.putExtra(EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE, extras);
+                } else {
+                    launch = new Intent(context, EnableDeviceOwnerActivity.class);
+                }
             }
         }
 
         // For synchronous auth cases, we can assume accounts are already setup (or will be shortly,
-        // as account migration for Profile Owner is asynchronous). In other cases, offer to add an
-        // account to the newly configured device/profile.
-        if (!synchronousAuthLaunch) {
+        // as account migration for Profile Owner is asynchronous). For COSU we don't want to show
+        // the account option to the user, as no accounts should be added for now.
+        // In other cases, offer to add an account to the newly configured device/profile.
+        if (!synchronousAuthLaunch && !cosuLaunch) {
             AccountManager accountManager = AccountManager.get(context);
             Account[] accounts = accountManager.getAccounts();
             if (accounts != null && accounts.length == 0) {
