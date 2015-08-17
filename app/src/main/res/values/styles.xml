@@ -21,7 +21,9 @@
         <item name="suwLayoutTheme">@style/SetupIllustrationTheme</item>
     </style>
 
-    <style name="AppTheme" parent="android:Theme.Material.Light">
+    <style name="AppTheme" parent="SetupTheme">
+        <item name="android:windowActionBar">true</item>
+        <item name="android:windowNoTitle">false</item>
         <item name="android:colorPrimaryDark">@android:color/black</item>
     </style>
 
