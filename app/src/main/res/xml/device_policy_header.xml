@@ -287,6 +287,9 @@
         <SwitchPreference
                 android:key="no_create_windows"
                 android:title="@string/disallow_create_windows"/>
+        <SwitchPreference
+                android:key="no_config_wifi"
+                android:title="@string/disallow_config_wifi"/>
     </PreferenceCategory>
 
     <PreferenceCategory

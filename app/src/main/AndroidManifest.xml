@@ -23,6 +23,7 @@
     <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
             android:allowBackup="true"
@@ -59,6 +60,11 @@
                 android:theme="@style/SetupTheme"/>
 
         <activity
+                android:name=".cosu.EnableCosuActivity"
+                android:label="@string/app_name"
+                android:theme="@style/SetupTheme"/>
+
+        <activity
                 android:name=".syncauth.SetupSyncAuthManagement"
                 android:label="@string/app_name"
                 android:theme="@style/SetupTheme"/>
@@ -77,6 +83,7 @@
                 android:name=".policy.locktask.KioskModeActivity"
                 android:label="@string/kiosk_mode"
                 android:launchMode="singleInstance"
+                android:lockTaskMode="if_whitelisted"
                 android:enabled="false">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
