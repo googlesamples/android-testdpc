@@ -120,6 +120,7 @@ import static android.os.UserManager.DISALLOW_SAFE_BOOT;
 import static android.os.UserManager.DISALLOW_SHARE_LOCATION;
 import static android.os.UserManager.DISALLOW_UNMUTE_MICROPHONE;
 import static android.os.UserManager.DISALLOW_CREATE_WINDOWS;
+import static android.os.UserManager.DISALLOW_CONFIG_WIFI;
 
 /**
  * Provides several device management functions.
@@ -176,6 +177,7 @@ import static android.os.UserManager.DISALLOW_CREATE_WINDOWS;
  * 43) {@link DevicePolicyManager#setMaximumTimeToLock(ComponentName, long)}
  * 44) {@link DevicePolicyManager#setMaximumFailedPasswordsForWipe(ComponentName, int)}
  * 45) {@link DevicePolicyManager#setApplicationHidden(ComponentName, String, boolean)}
+ * 46) {@link UserManager#DISALLOW_CONFIG_WIFI}
  */
 public class PolicyManagementFragment extends PreferenceFragment implements
         Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
@@ -265,12 +267,13 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     private static final String[] PRIMARY_USER_ONLY_PREFERENCES = {
             DISALLOW_REMOVE_USER, DISALLOW_ADD_USER, DISALLOW_FACTORY_RESET,
             DISALLOW_CONFIG_TETHERING, DISALLOW_ADJUST_VOLUME, DISALLOW_UNMUTE_MICROPHONE,
-            DISALLOW_SAFE_BOOT, DISALLOW_CREATE_WINDOWS, WIPE_DATA_KEY, REMOVE_DEVICE_OWNER_KEY,
-            CREATE_AND_INITIALIZE_USER_KEY, REMOVE_USER_KEY, MANAGE_LOCK_TASK_LIST_KEY,
-            CHECK_LOCK_TASK_PERMITTED_KEY, START_LOCK_TASK, STOP_LOCK_TASK, DISABLE_STATUS_BAR,
-            REENABLE_STATUS_BAR, DISABLE_KEYGUARD, REENABLE_KEYGUARD, START_KIOSK_MODE,
-            SYSTEM_UPDATE_POLICY_KEY, KEYGUARD_DISABLE_WIDGETS, KEYGUARD_DISABLE_SECURE_CAMERA,
-            KEYGUARD_DISABLE_SECURE_NOTIFICATIONS, STAY_ON_WHILE_PLUGGED_IN
+            DISALLOW_SAFE_BOOT, DISALLOW_CREATE_WINDOWS, DISALLOW_CONFIG_WIFI, WIPE_DATA_KEY,
+            REMOVE_DEVICE_OWNER_KEY, CREATE_AND_INITIALIZE_USER_KEY, REMOVE_USER_KEY,
+            MANAGE_LOCK_TASK_LIST_KEY, CHECK_LOCK_TASK_PERMITTED_KEY, START_LOCK_TASK,
+            STOP_LOCK_TASK, DISABLE_STATUS_BAR, REENABLE_STATUS_BAR, DISABLE_KEYGUARD,
+            REENABLE_KEYGUARD, START_KIOSK_MODE, SYSTEM_UPDATE_POLICY_KEY, KEYGUARD_DISABLE_WIDGETS,
+            KEYGUARD_DISABLE_SECURE_CAMERA, KEYGUARD_DISABLE_SECURE_NOTIFICATIONS,
+            STAY_ON_WHILE_PLUGGED_IN
     };
 
     private static String[] MNC_PLUS_PREFERENCES = {
@@ -294,7 +297,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             DISALLOW_ADD_USER, DISALLOW_FACTORY_RESET, DISALLOW_CONFIG_CREDENTIALS,
             DISALLOW_SHARE_LOCATION, DISALLOW_CONFIG_TETHERING, DISALLOW_ADJUST_VOLUME,
             DISALLOW_UNMUTE_MICROPHONE, DISALLOW_MODIFY_ACCOUNTS, DISALLOW_SAFE_BOOT,
-            DISALLOW_OUTGOING_BEAM, DISALLOW_CREATE_WINDOWS
+            DISALLOW_OUTGOING_BEAM, DISALLOW_CREATE_WINDOWS, DISALLOW_CONFIG_WIFI
     };
 
     private static final String[] MANAGED_PROFILE_SPECIFIC_OPTIONS = {
