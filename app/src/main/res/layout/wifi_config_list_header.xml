@@ -21,6 +21,6 @@
         android:textAlignment="viewStart"
         android:paddingTop="8dp"
         android:paddingBottom="4dp"
-        android:textColor="?android:attr/textColorLink"
+        android:textColor="?android:attr/colorAccent"
         android:text="@string/wifi_configs_header"
         style="?android:attr/listSeparatorTextViewStyle" />
