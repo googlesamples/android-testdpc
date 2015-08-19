@@ -98,7 +98,7 @@
         android:textAlignment="viewStart"
         android:paddingTop="8dp"
         android:paddingBottom="4dp"
-        android:textColor="?android:attr/textColorLink"
+        android:textColor="?android:attr/colorAccent"
         style="?android:attr/listSeparatorTextViewStyle"
         android:text="@string/network_stats_result" />
 
