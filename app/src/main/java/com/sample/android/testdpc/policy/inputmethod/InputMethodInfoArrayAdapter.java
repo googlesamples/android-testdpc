@@ -19,6 +19,8 @@ package com.sample.android.testdpc.policy.inputmethod;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.ResolveInfo;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.text.TextUtils;
 import android.view.inputmethod.InputMethodInfo;
 
@@ -78,20 +80,32 @@ public class InputMethodInfoArrayAdapter extends ToggleComponentsArrayAdapter {
         return !isSystemApp(getApplicationInfo(position));
     }
 
-    public ArrayList<String> getPermittedAccessibilityServices() {
-        ArrayList<String> permittedAccessibilityServicesArrayList = new ArrayList<String>();
+    public ArrayList<String> getSelectedInputMethods() {
+        ArrayList<String> selectedInputMethodsArrayList = new ArrayList<String>();
         int size = getCount();
         for (int i = 0; i < size; i++) {
             if (mIsComponentCheckedList.get(i)) {
-                permittedAccessibilityServicesArrayList.add(getItem(i).serviceInfo.packageName);
+                selectedInputMethodsArrayList.add(getItem(i).serviceInfo.packageName);
             }
         }
-        return permittedAccessibilityServicesArrayList;
+        return selectedInputMethodsArrayList;
     }
 
     @Override
     protected ApplicationInfo getApplicationInfo(int position) {
         return getItem(position).serviceInfo.applicationInfo;
+    }
+
+    @Override
+    protected Drawable getApplicationIcon(ApplicationInfo applicationInfo) {
+        // Input methods refer to the packages in primary profile. so, we
+        // need to show them unbadged.
+        // ApplicationInfo.loadUnbadgedIcon api is added in L-MR1, so can't get unbadged icon.
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP) {
+            return mPackageManager.getApplicationIcon(applicationInfo);
+        } else {
+            return applicationInfo.loadUnbadgedIcon(mPackageManager);
+        }
     }
 
     @Override
