@@ -18,7 +18,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="vertical"
               android:layout_width="match_parent"
-              android:layout_height="match_parent">
+              android:layout_height="wrap_content">
 
     <TextView
             android:layout_width="wrap_content"
@@ -122,23 +122,5 @@
                 android:text="+"/>
 
     </LinearLayout>
-
-    <View
-            android:layout_width="match_parent"
-            android:layout_height="1dip"
-            android:background="#333333"
-            android:padding="10dip"/>
-
-    <TextView
-            android:id="@+id/tv_intent_filter"
-            android:layout_width="match_parent"
-            android:layout_height="150dip"
-            android:scrollbars="vertical"/>
-
-    <View
-            android:layout_width="match_parent"
-            android:layout_height="1dip"
-            android:background="#333333"
-            android:padding="10dip"/>
 
 </LinearLayout>

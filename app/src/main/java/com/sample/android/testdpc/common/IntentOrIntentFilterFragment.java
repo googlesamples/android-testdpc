@@ -25,7 +25,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -212,7 +211,6 @@ public abstract class IntentOrIntentFilterFragment extends Fragment implements
 
         mStatusTextView = (TextView) intentOrIntentFilterView.findViewById(
                 R.id.tv_intent_filter);
-        mStatusTextView.setMovementMethod(new ScrollingMovementMethod());
 
         // Prepare custom view for collecting custom action, category or data type
         mAddButton = (Button) intentOrIntentFilterView.findViewById(R.id.btn_add);
