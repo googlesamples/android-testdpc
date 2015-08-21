@@ -20,6 +20,8 @@ import android.accessibilityservice.AccessibilityServiceInfo;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.ResolveInfo;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.text.TextUtils;
 
 import com.sample.android.testdpc.DeviceAdminReceiver;
@@ -78,6 +80,18 @@ public class AccessibilityServiceInfoArrayAdapter extends ToggleComponentsArrayA
     @Override
     protected ApplicationInfo getApplicationInfo(int position) {
         return getItem(position).serviceInfo.applicationInfo;
+    }
+
+    @Override
+    protected Drawable getApplicationIcon(ApplicationInfo applicationInfo) {
+        // Accessibility services refer to the packages in primary profile. so, we
+        // need to show them unbadged.
+        // ApplicationInfo.loadUnbadgedIcon api is added in L-MR1, so can't get unbadged icon.
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP) {
+            return mPackageManager.getApplicationIcon(applicationInfo);
+        } else {
+            return applicationInfo.loadUnbadgedIcon(mPackageManager);
+        }
     }
 
     @Override

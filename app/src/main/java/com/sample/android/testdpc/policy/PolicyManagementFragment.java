@@ -1818,8 +1818,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                             ArrayList<String> permittedAccessibilityServicesArrayList
-                                    = inputMethodInfoArrayAdapter
-                                    .getPermittedAccessibilityServices();
+                                    = inputMethodInfoArrayAdapter.getSelectedInputMethods();
                             boolean result = mDevicePolicyManager.setPermittedInputMethods(
                                     DeviceAdminReceiver.getComponentName(getActivity()),
                                     permittedAccessibilityServicesArrayList);
