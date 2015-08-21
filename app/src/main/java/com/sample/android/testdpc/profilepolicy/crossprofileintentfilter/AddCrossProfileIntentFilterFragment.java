@@ -33,6 +33,7 @@ import com.sample.android.testdpc.R;
 import com.sample.android.testdpc.common.IntentOrIntentFilterFragment;
 
 import java.util.Arrays;
+import java.util.Set;
 
 /**
  * Contains sample codes for testing
@@ -52,6 +53,8 @@ public class AddCrossProfileIntentFilterFragment extends IntentOrIntentFilterFra
             "FLAG_MANAGED_CAN_ACCESS_PARENT",
             "FLAG_PARENT_CAN_ACCESS_MANAGED"
     };
+
+    private static final String NEW_LINE = System.getProperty("line.separator");
 
     private Spinner mCrossProfileDirectionSpinner;
 
@@ -81,7 +84,6 @@ public class AddCrossProfileIntentFilterFragment extends IntentOrIntentFilterFra
     @Override
     public void onClick(View v) {
         boolean isClickHandled = false;
-        int position = 0;
         switch (v.getId()) {
             case R.id.btn_add:
                 IntentFilter intentFilter = getIntentFilter();
@@ -115,42 +117,37 @@ public class AddCrossProfileIntentFilterFragment extends IntentOrIntentFilterFra
     @Override
     protected void updateStatusTextView() {
         StringBuilder stringBuilder = new StringBuilder();
+
         if (!mActions.isEmpty()) {
-            stringBuilder.append(getString(R.string.actions_title));
-            stringBuilder.append("\n");
+            stringBuilder.append(getString(R.string.actions_title)).append(NEW_LINE);
+            dumpSet(stringBuilder, mActions);
+            stringBuilder.append(NEW_LINE);
         }
-        for (String action : mActions) {
-            stringBuilder.append(action);
-            stringBuilder.append("\n");
-        }
+
         if (!mCategories.isEmpty()) {
-            stringBuilder.append("\n");
-            stringBuilder.append(getString(R.string.categories_title));
-            stringBuilder.append("\n");
+            stringBuilder.append(getString(R.string.categories_title)).append(NEW_LINE);
+            dumpSet(stringBuilder, mCategories);
+            stringBuilder.append(NEW_LINE);
         }
-        for (String category : mCategories) {
-            stringBuilder.append(category);
-            stringBuilder.append("\n");
-        }
+
         if (!mDataSchemes.isEmpty()) {
-            stringBuilder.append("\n");
-            stringBuilder.append(getString(R.string.data_schemes_title));
-            stringBuilder.append("\n");
+            stringBuilder.append(getString(R.string.data_schemes_title)).append(NEW_LINE);
+            dumpSet(stringBuilder, mDataSchemes);
+            stringBuilder.append(NEW_LINE);
         }
-        for (String dataScheme : mDataSchemes) {
-            stringBuilder.append(dataScheme);
-            stringBuilder.append("\n");
-        }
+
         if (!mDataTypes.isEmpty()) {
-            stringBuilder.append("\n");
-            stringBuilder.append(getString(R.string.data_types_title));
-            stringBuilder.append("\n");
+            stringBuilder.append(getString(R.string.data_types_title)).append(NEW_LINE);
+            dumpSet(stringBuilder, mDataTypes);
         }
-        for (String dataType : mDataTypes) {
-            stringBuilder.append(dataType);
-            stringBuilder.append("\n");
-        }
+
         mStatusTextView.setText(stringBuilder.toString());
+    }
+
+    private void dumpSet(StringBuilder builder, Set<?> set) {
+        for (Object obj : set) {
+            builder.append(obj.toString()).append(NEW_LINE);
+        }
     }
 
     private int getAddCrossProfileIntentFilterFlag() {
