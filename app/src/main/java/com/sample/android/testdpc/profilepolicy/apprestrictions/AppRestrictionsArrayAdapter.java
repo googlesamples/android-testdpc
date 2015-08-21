@@ -22,7 +22,6 @@ import android.content.DialogInterface;
 import android.content.RestrictionEntry;
 import android.os.Build;
 import android.text.InputType;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -276,11 +275,11 @@ public class AppRestrictionsArrayAdapter extends ArrayAdapter<RestrictionEntry>
                 return true;
             case RestrictionEntry.TYPE_INTEGER:
                 EditText intValueText = (EditText) dialogView.findViewById(R.id.value_int_str);
-                if (TextUtils.isDigitsOnly(intValueText.getText().toString())) {
+                try {
                     restrictionEntry.setIntValue(
                             Integer.parseInt(intValueText.getText().toString()));
                     return true;
-                } else {
+                } catch (NumberFormatException e) {
                     return false;
                 }
             case RestrictionEntry.TYPE_STRING:

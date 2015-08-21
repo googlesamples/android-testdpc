@@ -659,12 +659,20 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 reloadScreenCaptureDisableUi();
                 return true;
             case KEY_MAX_TIME_SCREEN_LOCK:
-                mDevicePolicyManager.setMaximumTimeToLock(mAdminComponentName,
-                        Integer.parseInt((String) newValue) * MS_PER_SECOND);
+                try {
+                    mDevicePolicyManager.setMaximumTimeToLock(mAdminComponentName,
+                            Long.parseLong((String) newValue) * MS_PER_SECOND);
+                } catch (NumberFormatException e) {
+                    showToast(R.string.not_valid_input);
+                }
                 return true;
             case KEY_MAX_FAILS_BEFORE_WIPE:
-                mDevicePolicyManager.setMaximumFailedPasswordsForWipe(mAdminComponentName,
-                        Integer.parseInt((String) newValue));
+                try {
+                    mDevicePolicyManager.setMaximumFailedPasswordsForWipe(mAdminComponentName,
+                            Integer.parseInt((String) newValue));
+                } catch (NumberFormatException e) {
+                    showToast(R.string.not_valid_input);
+                }
                 return true;
             case STAY_ON_WHILE_PLUGGED_IN:
                 mDevicePolicyManager.setGlobalSetting(mAdminComponentName,
