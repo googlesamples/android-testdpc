@@ -21,6 +21,7 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -77,7 +78,7 @@ public abstract class ToggleComponentsArrayAdapter extends ArrayAdapter<ResolveI
                     parent, false);
         }
         ImageView iconImageView = (ImageView) convertView.findViewById(R.id.pkg_icon);
-        iconImageView.setImageDrawable(mPackageManager.getApplicationIcon(applicationInfo));
+        iconImageView.setImageDrawable(getApplicationIcon(applicationInfo));
         TextView pkgNameTextView = (TextView) convertView.findViewById(R.id.pkg_name);
         pkgNameTextView.setText(getDisplayName(position));
         CheckBox enableComponentCheckbox = (CheckBox) convertView.findViewById(
@@ -149,5 +150,9 @@ public abstract class ToggleComponentsArrayAdapter extends ArrayAdapter<ResolveI
     protected boolean isSystemApp(ApplicationInfo applicationInfo) {
         return applicationInfo != null
                 && (applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0;
+    }
+
+    protected Drawable getApplicationIcon(ApplicationInfo applicationInfo) {
+        return mPackageManager.getApplicationIcon(applicationInfo);
     }
 }
