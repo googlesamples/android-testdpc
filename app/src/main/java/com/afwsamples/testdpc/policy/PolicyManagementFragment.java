@@ -68,11 +68,9 @@ import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.AppInfoArrayAdapter;
 import com.afwsamples.testdpc.common.MediaDisplayFragment;
-import com.afwsamples.testdpc.policy.accessibility.AccessibilityServiceInfoArrayAdapter;
 import com.afwsamples.testdpc.policy.blockuninstallation.BlockUninstallationInfoArrayAdapter;
 import com.afwsamples.testdpc.policy.certificate.DelegatedCertInstallerFragment;
 import com.afwsamples.testdpc.policy.datausage.NetworkUsageStatsFragment;
-import com.afwsamples.testdpc.policy.inputmethod.InputMethodInfoArrayAdapter;
 import com.afwsamples.testdpc.policy.locktask.KioskModeActivity;
 import com.afwsamples.testdpc.policy.locktask.LockTaskAppInfoArrayAdapter;
 import com.afwsamples.testdpc.policy.systemupdatepolicy.SystemUpdatePolicyFragment;
@@ -1645,12 +1643,12 @@ public class PolicyManagementFragment extends PreferenceFragment implements
      * Gets all the accessibility services. After all the accessibility services are retrieved, the
      * result is displayed in a popup.
      */
-    private class GetAccessibilityServicesTask extends
-            AsyncTask<Void, Void, List<AccessibilityServiceInfo>> {
-
+    private class GetAccessibilityServicesTask
+            extends GetAvailableComponentsTask<AccessibilityServiceInfo> {
         private AccessibilityManager mAccessibilityManager;
 
         public GetAccessibilityServicesTask() {
+            super(getActivity(), R.string.set_accessibility_services);
             mAccessibilityManager = (AccessibilityManager) getActivity().getSystemService(
                     Context.ACCESSIBILITY_SERVICE);
         }
@@ -1661,68 +1659,46 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         }
 
         @Override
-        protected void onPostExecute(List<AccessibilityServiceInfo> accessibilityServicesInfoList) {
-            Activity activity = getActivity();
-            if (activity == null || activity.isFinishing()) {
-                return;
-            }
-            List<ResolveInfo> accessibilityServicesResolveInfoList
-                    = AccessibilityServiceInfoArrayAdapter
-                    .getResolveInfoListFromAccessibilityServiceInfoList(
-                            accessibilityServicesInfoList);
-            Collections.sort(accessibilityServicesResolveInfoList,
-                    new ResolveInfo.DisplayNameComparator(mPackageManager));
-            final AccessibilityServiceInfoArrayAdapter accessibilityServiceInfoArrayAdapter
-                    = new AccessibilityServiceInfoArrayAdapter(getActivity(), R.id.pkg_name,
-                            accessibilityServicesResolveInfoList);
-            ListView listview = new ListView(getActivity());
-            listview.setAdapter(accessibilityServiceInfoArrayAdapter);
-            listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                public void onItemClick(AdapterView<?> parent, View view, int pos, long id) {
-                    accessibilityServiceInfoArrayAdapter.onItemClick(parent, view, pos, id);
+        protected List<ResolveInfo> getResolveInfoListFromAvailableComponents(
+                List<AccessibilityServiceInfo> accessibilityServiceInfoList) {
+            HashSet<String> packageSet = new HashSet<>();
+            List<ResolveInfo> resolveInfoList = new ArrayList<>();
+            for (AccessibilityServiceInfo accessibilityServiceInfo: accessibilityServiceInfoList) {
+                ResolveInfo resolveInfo = accessibilityServiceInfo.getResolveInfo();
+                // Some apps may contain multiple accessibility services. Make sure that the package
+                // name is unique in the return list.
+                if (!packageSet.contains(resolveInfo.serviceInfo.packageName)) {
+                    resolveInfoList.add(resolveInfo);
+                    packageSet.add(resolveInfo.serviceInfo.packageName);
                 }
-            });
+            }
+            return resolveInfoList;
+        }
 
-            new AlertDialog.Builder(getActivity())
-                    .setTitle(R.string.set_accessibility_services)
-                    .setView(listview)
-                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            ArrayList<String> permittedAccessibilityServicesArrayList
-                                    = accessibilityServiceInfoArrayAdapter
-                                    .getSelectedAccessibilityServices();
-                            boolean result = mDevicePolicyManager.setPermittedAccessibilityServices(
-                                    DeviceAdminReceiver.getComponentName(getActivity()),
-                                    permittedAccessibilityServicesArrayList);
-                            showToast(result
-                                    ? R.string.set_accessibility_services_successful
-                                    : R.string.set_accessibility_services_fail);
-                        }
-                    })
-                    .setNeutralButton(R.string.allow_all, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            boolean result = mDevicePolicyManager.setPermittedAccessibilityServices(
-                                    mAdminComponentName, null);
-                            showToast(result
-                                    ? R.string.all_accessibility_services_enabled
-                                    : R.string.set_accessibility_services_fail);
-                        }
-                    })
-                    .setNegativeButton(android.R.string.cancel, null)
-                    .show();
+        @Override
+        protected List<String> getPermittedComponentsList() {
+            return mDevicePolicyManager.getPermittedAccessibilityServices(mAdminComponentName);
+        }
+
+        @Override
+        protected void setPermittedComponentsList(List<String> permittedAccessibilityServices) {
+            boolean result = mDevicePolicyManager.setPermittedAccessibilityServices(
+                    mAdminComponentName, permittedAccessibilityServices);
+            int successMsgId = (permittedAccessibilityServices == null)
+                    ? R.string.all_accessibility_services_enabled
+                    : R.string.set_accessibility_services_successful;
+            showToast(result ? successMsgId : R.string.set_accessibility_services_fail);
         }
     }
 
     /**
      * Gets all the input methods and displays them in a prompt.
      */
-    private class GetInputMethodsTask extends AsyncTask<Void, Void, List<InputMethodInfo>> {
-
+    private class GetInputMethodsTask extends GetAvailableComponentsTask<InputMethodInfo> {
         private InputMethodManager mInputMethodManager;
 
         public GetInputMethodsTask() {
+            super(getActivity(), R.string.set_input_methods);
             mInputMethodManager = (InputMethodManager) getActivity().getSystemService(
                     Context.INPUT_METHOD_SERVICE);
         }
@@ -1733,56 +1709,31 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         }
 
         @Override
-        protected void onPostExecute(List<InputMethodInfo> inputMethodsInfoList) {
-            Activity activity = getActivity();
-            if (activity == null || activity.isFinishing()) {
-                return;
+        protected List<ResolveInfo> getResolveInfoListFromAvailableComponents(
+                List<InputMethodInfo> inputMethodsInfoList) {
+            List<ResolveInfo> inputMethodsResolveInfoList = new ArrayList<>();
+            for (InputMethodInfo inputMethodInfo: inputMethodsInfoList) {
+                ResolveInfo resolveInfo = new ResolveInfo();
+                resolveInfo.serviceInfo = inputMethodInfo.getServiceInfo();
+                resolveInfo.resolvePackageName = inputMethodInfo.getPackageName();
+                inputMethodsResolveInfoList.add(resolveInfo);
             }
-            List<ResolveInfo> inputMethodsResolveInfoList
-                    = InputMethodInfoArrayAdapter.getResolveInfoListFromInputMethodsInfoList(
-                    inputMethodsInfoList);
-            Collections.sort(inputMethodsResolveInfoList,
-                    new ResolveInfo.DisplayNameComparator(mPackageManager));
+            return inputMethodsResolveInfoList;
+        }
 
-            final InputMethodInfoArrayAdapter inputMethodInfoArrayAdapter
-                    = new InputMethodInfoArrayAdapter(getActivity(), R.id.pkg_name,
-                            inputMethodsResolveInfoList);
-            ListView listview = new ListView(getActivity());
-            listview.setAdapter(inputMethodInfoArrayAdapter);
-            listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                public void onItemClick(AdapterView<?> parent, View view, int pos, long id) {
-                    inputMethodInfoArrayAdapter.onItemClick(parent, view, pos, id);
-                }
-            });
+        @Override
+        protected List<String> getPermittedComponentsList() {
+            return mDevicePolicyManager.getPermittedInputMethods(mAdminComponentName);
+        }
 
-            new AlertDialog.Builder(getActivity())
-                    .setTitle(R.string.set_input_methods)
-                    .setView(listview)
-                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            ArrayList<String> permittedAccessibilityServicesArrayList
-                                    = inputMethodInfoArrayAdapter.getSelectedInputMethods();
-                            boolean result = mDevicePolicyManager.setPermittedInputMethods(
-                                    DeviceAdminReceiver.getComponentName(getActivity()),
-                                    permittedAccessibilityServicesArrayList);
-                            showToast(result
-                                    ? R.string.set_input_methods_successful
-                                    : R.string.set_input_methods_fail);
-                        }
-                    })
-                    .setNeutralButton(R.string.allow_all, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            boolean result = mDevicePolicyManager.setPermittedInputMethods(
-                                    mAdminComponentName, null);
-                            showToast(result
-                                    ? R.string.all_input_methods_enabled
-                                    : R.string.set_input_methods_fail);
-                        }
-                    })
-                    .setNegativeButton(android.R.string.cancel, null)
-                    .show();
+        @Override
+        protected void setPermittedComponentsList(List<String> permittedInputMethods) {
+            boolean result = mDevicePolicyManager.setPermittedInputMethods(mAdminComponentName,
+                    permittedInputMethods);
+            int successMsgId = (permittedInputMethods == null)
+                    ? R.string.all_input_methods_enabled
+                    : R.string.set_input_methods_successful;
+            showToast(result ? successMsgId : R.string.set_input_methods_fail);
         }
     }
 
