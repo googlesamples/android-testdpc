@@ -1,6 +1,6 @@
 apply from: '../repositories.gradle'
 apply plugin: 'com.android.application'
-apply from: '../dist.gradle'
+apply plugin: 'dist'
 
 ext {
     /* Version code for *next* release, bump *after* a release is created. */
