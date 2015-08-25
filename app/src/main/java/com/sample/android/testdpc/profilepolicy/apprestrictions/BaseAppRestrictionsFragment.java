@@ -85,7 +85,6 @@ public abstract class BaseAppRestrictionsFragment extends ManageAppFragment
         if (restrictionEntries != null) {
             mRestrictionEntries =
                     new ArrayList<RestrictionEntry>(Arrays.asList(restrictionEntries));
-            String appName;
             mAppRestrictionsArrayAdapter = new AppRestrictionsArrayAdapter(getActivity(),
                     mRestrictionEntries, this, getCurrentAppName());
             mAppListView.setAdapter(mAppRestrictionsArrayAdapter);
