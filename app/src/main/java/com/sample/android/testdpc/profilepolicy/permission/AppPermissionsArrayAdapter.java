@@ -38,13 +38,11 @@ public class AppPermissionsArrayAdapter
         extends ArrayAdapter<AppPermissionsArrayAdapter.AppPermission> {
 
     private final DevicePolicyManager mDpm;
-    private final PackageManager mPm;
 
     public AppPermissionsArrayAdapter(Context context, int resource,
                                       List<AppPermission> objects) {
         super(context, resource, objects);
         mDpm = (DevicePolicyManager) getContext().getSystemService(Context.DEVICE_POLICY_SERVICE);
-        mPm = context.getPackageManager();
     }
 
     @Override
