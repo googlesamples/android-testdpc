@@ -41,7 +41,9 @@ android {
         }
     }
 }
-
+println 'project.ext.distDir: ' + project.ext.distDir
+println 'System.env.DIST_DIR: ' + System.env.DIST_DIR
+println 'System.env.OUT_DIR: ' + System.env.OUT_DIR
 dependencies {
     compile "com.android.support:support-v4:22.0.0"
     compile(name:'setup-wizard-lib', ext:'aar')
