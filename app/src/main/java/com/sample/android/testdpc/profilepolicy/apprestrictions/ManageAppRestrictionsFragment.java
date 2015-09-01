@@ -75,11 +75,24 @@ public class ManageAppRestrictionsFragment extends BaseAppRestrictionsFragment {
             List<RestrictionEntry> manifestRestrictions = null;
             try {
                 manifestRestrictions = mRestrictionsManager.getManifestRestrictions(pkgName);
+                convertTypeChoiceAndNullToString(manifestRestrictions);
             } catch (NullPointerException e) {
                 // This means no default restrictions.
             }
             if (manifestRestrictions != null) {
                 loadAppRestrictionsList(manifestRestrictions.toArray(new RestrictionEntry[0]));
+            }
+        }
+    }
+
+    /**
+     * TODO (b/23378519): Remove this method and add support for type choice and null.
+     */
+    private void convertTypeChoiceAndNullToString(List<RestrictionEntry> restrictionEntries) {
+        for (RestrictionEntry entry : restrictionEntries) {
+            if (entry.getType() == RestrictionEntry.TYPE_CHOICE ||
+                    entry.getType() == RestrictionEntry.TYPE_NULL) {
+                entry.setType(RestrictionEntry.TYPE_STRING);
             }
         }
     }
