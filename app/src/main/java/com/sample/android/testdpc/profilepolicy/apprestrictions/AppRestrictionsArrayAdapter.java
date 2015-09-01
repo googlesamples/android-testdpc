@@ -257,9 +257,12 @@ public class AppRestrictionsArrayAdapter extends ArrayAdapter<RestrictionEntry>
                 listView.setAdapter(arrayAdapter);
                 arrayAdapter.clear();
                 String[] strArray = restrictionEntry.getAllSelectedStrings();
-                if (strArray != null) {
-                    arrayAdapter.addAll(restrictionEntry.getAllSelectedStrings());
+                if (strArray != null && strArray.length != 0) {
+                    arrayAdapter.addAll(strArray);
                 } else {
+                    // TODO (b/23718355): We display add and delete buttons with the edit boxes. If
+                    // the strArray is null or empty, then no edit boxes will be displayed and user
+                    // has no way of adding new strings. So, we add an empty string to the list.
                     arrayAdapter.add("");
                 }
                 break;
