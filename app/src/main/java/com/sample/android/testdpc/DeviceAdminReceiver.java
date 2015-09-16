@@ -23,6 +23,8 @@ import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.PersistableBundle;
@@ -37,12 +39,14 @@ import com.sample.android.testdpc.syncauth.FinishSyncAuthDeviceOwnerActivity;
 import com.sample.android.testdpc.syncauth.FinishSyncAuthProfileOwnerActivity;
 
 import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE;
+import static android.app.admin.DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED;
 import static com.sample.android.testdpc.policy.PolicyManagementFragment.OVERRIDE_KEY_SELECTION_KEY;
 
 /**
  * Handles events related to the managed profile.
  */
 public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
+    private static final String TAG = "DeviceAdminReceiver";
 
     @Override
     public void onProfileProvisioningComplete(Context context, Intent intent) {
@@ -71,6 +75,8 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
                     .show();
             return;
         }
+
+        autoGrantRequestedPermissionsToSelf(context);
 
         if (synchronousAuthLaunch) {
             // Synchronous auth cases.
@@ -115,6 +121,33 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
 
         launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(launch);
+    }
+
+    private void autoGrantRequestedPermissionsToSelf(Context context) {
+        DevicePolicyManager devicePolicyManager = (DevicePolicyManager) context.getSystemService(
+                Context.DEVICE_POLICY_SERVICE);
+        PackageManager packageManager = context.getPackageManager();
+        String packageName = context.getPackageName();
+        ComponentName adminComponentName = getComponentName(context);
+
+        PackageInfo packageInfo;
+        try {
+            packageInfo = packageManager.getPackageInfo(packageName,
+                    PackageManager.GET_PERMISSIONS);
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.e(TAG, "Could not retrieve info about the package: " + packageName, e);
+            return;
+        }
+
+        if (packageInfo != null && packageInfo.requestedPermissions != null) {
+            for (String permission : packageInfo.requestedPermissions) {
+                boolean success = devicePolicyManager.setPermissionGrantState(adminComponentName,
+                        packageName, permission, PERMISSION_GRANT_STATE_GRANTED);
+                if (!success) {
+                    Log.e(TAG, "Failed to auto grant permission to self: " + permission);
+                }
+            }
+        }
     }
 
     @TargetApi(Build.VERSION_CODES.M)
