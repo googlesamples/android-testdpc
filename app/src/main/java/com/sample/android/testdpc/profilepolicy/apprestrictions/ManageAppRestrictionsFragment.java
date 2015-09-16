@@ -19,6 +19,7 @@ package com.sample.android.testdpc.profilepolicy.apprestrictions;
 import android.content.RestrictionEntry;
 import android.content.RestrictionsManager;
 import android.content.pm.ApplicationInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -103,10 +104,9 @@ public class ManageAppRestrictionsFragment extends BaseAppRestrictionsFragment {
             case R.id.save_app:
                 String pkgName =
                         ((ApplicationInfo) mManagedAppsSpinner.getSelectedItem()).packageName;
-
                 mDevicePolicyManager.setApplicationRestrictions(
                         DeviceAdminReceiver.getComponentName(getActivity()), pkgName,
-                        RestrictionsManager.convertRestrictionsToBundle(mRestrictionEntries));
+                        convertRestrictionsToBundle(mRestrictionEntries));
                 showToast(getString(R.string.set_app_restrictions_success, pkgName));
                 break;
             case R.id.load_default_button:
@@ -116,5 +116,39 @@ public class ManageAppRestrictionsFragment extends BaseAppRestrictionsFragment {
             default:
                 super.onClick(v);
         }
+    }
+
+    /**
+     * Wrapper for RestrictionsManager.convertRestrictionsToBundle, with a fallback implementation
+     * for versions before M where this was introduced.
+     * The fallback recognises only the restriction types available on L.
+     */
+    private Bundle convertRestrictionsToBundle(List<RestrictionEntry> restrictionEntries) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return RestrictionsManager.convertRestrictionsToBundle(restrictionEntries);
+        }
+        Bundle bundle = new Bundle();
+        for (RestrictionEntry entry : restrictionEntries) {
+            switch (entry.getType()) {
+                case RestrictionEntry.TYPE_BOOLEAN:
+                    bundle.putBoolean(entry.getKey(), entry.getSelectedState());
+                    break;
+                case RestrictionEntry.TYPE_INTEGER:
+                    bundle.putInt(entry.getKey(), entry.getIntValue());
+                    break;
+                case RestrictionEntry.TYPE_STRING:
+                case RestrictionEntry.TYPE_NULL:
+                    bundle.putString(entry.getKey(), entry.getSelectedString());
+                    break;
+                case RestrictionEntry.TYPE_CHOICE:
+                case RestrictionEntry.TYPE_MULTI_SELECT:
+                    bundle.putStringArray(entry.getKey(), entry.getAllSelectedStrings());
+                    break;
+                default:
+                    throw new IllegalArgumentException(
+                            "Unsupported restrictionEntry type: " + entry.getType());
+            }
+        }
+        return bundle;
     }
 }
