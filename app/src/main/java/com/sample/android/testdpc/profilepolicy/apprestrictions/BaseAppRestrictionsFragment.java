@@ -156,6 +156,6 @@ public abstract class BaseAppRestrictionsFragment extends ManageAppFragment
     protected abstract String getCurrentAppName();
 
     protected void showToast(String msg) {
-        Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), msg, Toast.LENGTH_SHORT).show();
     }
 }
