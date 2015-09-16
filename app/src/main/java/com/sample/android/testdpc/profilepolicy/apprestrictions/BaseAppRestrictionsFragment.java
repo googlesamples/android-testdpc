@@ -44,8 +44,8 @@ public abstract class BaseAppRestrictionsFragment extends ManageAppFragment
     protected List<RestrictionEntry> mRestrictionEntries;
     protected DevicePolicyManager mDevicePolicyManager;
     protected RestrictionsManager mRestrictionsManager;
+    protected AppRestrictionsArrayAdapter mAppRestrictionsArrayAdapter;
 
-    private AppRestrictionsArrayAdapter mAppRestrictionsArrayAdapter;
     private int mActionBarTitleResId;
 
     @Override
