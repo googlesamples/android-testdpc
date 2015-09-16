@@ -400,6 +400,10 @@ public class AppRestrictionsArrayAdapter extends ArrayAdapter<RestrictionEntry>
         super.notifyDataSetChanged();
     }
 
+    public void setSavedRestrictions(List<RestrictionEntry> entries) {
+        mLastSavedRestrictions = new ArrayList<>(entries);
+    }
+
     public void resetAppRestrictions() {
         clear();
         addAll(mLastSavedRestrictions);

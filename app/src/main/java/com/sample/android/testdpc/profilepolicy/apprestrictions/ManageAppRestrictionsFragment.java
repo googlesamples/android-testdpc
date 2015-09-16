@@ -107,6 +107,7 @@ public class ManageAppRestrictionsFragment extends BaseAppRestrictionsFragment {
                 mDevicePolicyManager.setApplicationRestrictions(
                         DeviceAdminReceiver.getComponentName(getActivity()), pkgName,
                         convertRestrictionsToBundle(mRestrictionEntries));
+                mAppRestrictionsArrayAdapter.setSavedRestrictions(mRestrictionEntries);
                 showToast(getString(R.string.set_app_restrictions_success, pkgName));
                 break;
             case R.id.load_default_button:
