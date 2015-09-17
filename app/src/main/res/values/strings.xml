@@ -138,7 +138,6 @@
     <string name="policies_title">Policies</string>
     <string name="disable_bluetooth_contact_sharing">Disable bluetooth contact sharing</string>
     <string name="disable_cross_profile_caller_id">Disable cross-profile caller ID</string>
-    <string name="disallow_cross_profile_copy_paste">Disallow cross-profile copy/paste</string>
 
     <!-- Strings for wifi management -->
     <string name="wifi_management_title">Wifi management</string>
@@ -228,27 +227,53 @@
     <string name="setup_cosu_status_apps">Downloading and installing additional apps\u2026</string>
 
     <!-- Strings for user restriction management -->
-    <string name="user_restriction_management_title">User restriction</string>
-    <string name="disallow_debugging_feature">Disallow debugging feature</string>
-    <string name="disallow_install_unknown_sources">Disallow install unknown sources</string>
+    <string name="user_restrictions_preference_title">Set user restrictions</string>
+    <string name="user_restrictions_management_title">User restrictions</string>
+    <string name="allow_parent_profile_app_linking">Allow web links to apps of the parent</string>
+    <string name="disallow_cross_profile_copy_paste">Disallow cross-profile copy/paste</string>
     <string name="check_setting_disallow_install_unknown_sources">Ensure that
         \"Allow installs from unknown sources\" under Settings management is correctly checked.
     </string>
     <string name="check_setting_ok">Ok</string>
-    <string name="disallow_remove_user">Disallow remove user</string>
-    <string name="disallow_add_user">Disallow add user</string>
-    <string name="disallow_factory_reset">Disallow factory reset</string>
-    <string name="disallow_config_credentials">Disallow config credentials</string>
-    <string name="disallow_share_location">Disallow share location</string>
-    <string name="disallow_config_tethering">Disallow config tethering</string>
-    <string name="disallow_adjust_volume">Disallow adjust volume</string>
-    <string name="disallow_unmute_microphone">Disallow unmute microphone</string>
-    <string name="disallow_modify_accounts">Disallow modify accounts</string>
-    <string name="disallow_safe_boot">Disallow safe boot</string>
-    <string name="disallow_outgoing_beam">Disallow outgoing NFC beam</string>
-    <string name="disallow_create_windows">Disallow create windows</string>
-    <string name="disallow_config_wifi">Disallow WiFi configuration</string>
-    <string name="allow_parent_profile_app_linking">Allow web links to apps of the parent</string>
+    <string name="user_restriction_error_msg">Operation not allowed</string>
+    <string-array name="user_restriction_keys">
+        <item>allow_parent_profile_app_linking</item>
+        <item>no_add_user</item>
+        <item>no_adjust_volume</item>
+        <item>no_config_credentials</item>
+        <item>no_config_tethering</item>
+        <item>no_config_wifi</item>
+        <item>no_create_windows</item>
+        <item>no_cross_profile_copy_paste</item>
+        <item>no_debugging_features</item>
+        <item>no_factory_reset</item>
+        <item>no_install_unknown_sources</item>
+        <item>no_modify_accounts</item>
+        <item>no_outgoing_beam</item>
+        <item>no_remove_user</item>
+        <item>no_safe_boot</item>
+        <item>no_share_location</item>
+        <item>no_unmute_microphone</item>
+    </string-array>
+    <string-array name="user_restriction_titles">
+        <item>@string/allow_parent_profile_app_linking</item>
+        <item>Disallow add user</item>
+        <item>Disallow adjust volume</item>
+        <item>Disallow config credentials</item>
+        <item>Disallow config tethering</item>
+        <item>Disallow config Wi-Fi</item>
+        <item>Disallow create windows</item>
+        <item>@string/disallow_cross_profile_copy_paste</item>
+        <item>Disallow debugging features</item>
+        <item>Disallow factory reset</item>
+        <item>Disallow install unknown sources</item>
+        <item>Disallow modify accounts</item>
+        <item>Disallow outgoing beam</item>
+        <item>Disallow remove user</item>
+        <item>Disallow safe boot</item>
+        <item>Disallow share location</item>
+        <item>Disallow unmute microphone</item>
+    </string-array>
 
     <!-- Strings for certificate management  -->
     <string name="certificate_management_title">Certificate management</string>

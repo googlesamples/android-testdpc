@@ -106,21 +106,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static android.os.UserManager.DISALLOW_ADD_USER;
-import static android.os.UserManager.DISALLOW_ADJUST_VOLUME;
-import static android.os.UserManager.DISALLOW_CONFIG_CREDENTIALS;
-import static android.os.UserManager.DISALLOW_CONFIG_TETHERING;
-import static android.os.UserManager.DISALLOW_DEBUGGING_FEATURES;
-import static android.os.UserManager.DISALLOW_FACTORY_RESET;
 import static android.os.UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES;
-import static android.os.UserManager.DISALLOW_MODIFY_ACCOUNTS;
-import static android.os.UserManager.DISALLOW_OUTGOING_BEAM;
-import static android.os.UserManager.DISALLOW_REMOVE_USER;
-import static android.os.UserManager.DISALLOW_SAFE_BOOT;
-import static android.os.UserManager.DISALLOW_SHARE_LOCATION;
-import static android.os.UserManager.DISALLOW_UNMUTE_MICROPHONE;
-import static android.os.UserManager.DISALLOW_CREATE_WINDOWS;
-import static android.os.UserManager.DISALLOW_CONFIG_WIFI;
 
 /**
  * Provides several device management functions.
@@ -242,6 +228,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             = "set_disable_account_management";
     private static final String SET_INPUT_METHODS_KEY = "set_input_methods";
     private static final String SET_PERMISSION_POLICY_KEY = "set_permission_policy";
+    private static final String SET_USER_RESTRICTIONS_KEY = "set_user_restrictions";
     private static final String START_KIOSK_MODE = "start_kiosk_mode";
     private static final String START_LOCK_TASK = "start_lock_task";
     private static final String STAY_ON_WHILE_PLUGGED_IN = "stay_on_while_plugged_in";
@@ -265,10 +252,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     private static final String DONT_STAY_ON = "0";
 
     private static final String[] PRIMARY_USER_ONLY_PREFERENCES = {
-            DISALLOW_REMOVE_USER, DISALLOW_ADD_USER, DISALLOW_FACTORY_RESET,
-            DISALLOW_CONFIG_TETHERING, DISALLOW_ADJUST_VOLUME, DISALLOW_UNMUTE_MICROPHONE,
-            DISALLOW_SAFE_BOOT, DISALLOW_CREATE_WINDOWS, DISALLOW_CONFIG_WIFI, WIPE_DATA_KEY,
-            REMOVE_DEVICE_OWNER_KEY, CREATE_AND_INITIALIZE_USER_KEY, REMOVE_USER_KEY,
+            WIPE_DATA_KEY, REMOVE_DEVICE_OWNER_KEY, CREATE_AND_INITIALIZE_USER_KEY, REMOVE_USER_KEY,
             MANAGE_LOCK_TASK_LIST_KEY, CHECK_LOCK_TASK_PERMITTED_KEY, START_LOCK_TASK,
             STOP_LOCK_TASK, DISABLE_STATUS_BAR, REENABLE_STATUS_BAR, DISABLE_KEYGUARD,
             REENABLE_KEYGUARD, START_KIOSK_MODE, SYSTEM_UPDATE_POLICY_KEY, KEYGUARD_DISABLE_WIDGETS,
@@ -280,8 +264,8 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             OVERRIDE_KEY_SELECTION_KEY, START_LOCK_TASK, STOP_LOCK_TASK, SYSTEM_UPDATE_POLICY_KEY,
             NETWORK_STATS_KEY, DELEGATED_CERT_INSTALLER_KEY, DISABLE_STATUS_BAR,
             REENABLE_STATUS_BAR, DISABLE_KEYGUARD, REENABLE_KEYGUARD, START_KIOSK_MODE,
-            DISALLOW_SAFE_BOOT, SET_PERMISSION_POLICY_KEY, MANAGE_APP_PERMISSIONS_KEY,
-            STAY_ON_WHILE_PLUGGED_IN, WIFI_CONFIG_LOCKDOWN_ENABLE_KEY
+            SET_PERMISSION_POLICY_KEY, MANAGE_APP_PERMISSIONS_KEY,STAY_ON_WHILE_PLUGGED_IN,
+            WIFI_CONFIG_LOCKDOWN_ENABLE_KEY
     };
 
     /**
@@ -290,14 +274,6 @@ public class PolicyManagementFragment extends PreferenceFragment implements
      */
     private static String[] MANAGED_PROFILE_MNC_PLUS_PREFERENCES = {
             KEYGUARD_PREFERENCES
-    };
-
-    private static final String[] ALL_USER_RESTRICTIONS = {
-            DISALLOW_DEBUGGING_FEATURES, DISALLOW_INSTALL_UNKNOWN_SOURCES, DISALLOW_REMOVE_USER,
-            DISALLOW_ADD_USER, DISALLOW_FACTORY_RESET, DISALLOW_CONFIG_CREDENTIALS,
-            DISALLOW_SHARE_LOCATION, DISALLOW_CONFIG_TETHERING, DISALLOW_ADJUST_VOLUME,
-            DISALLOW_UNMUTE_MICROPHONE, DISALLOW_MODIFY_ACCOUNTS, DISALLOW_SAFE_BOOT,
-            DISALLOW_OUTGOING_BEAM, DISALLOW_CREATE_WINDOWS, DISALLOW_CONFIG_WIFI
     };
 
     private static final String[] MANAGED_PROFILE_SPECIFIC_OPTIONS = {
@@ -424,13 +400,11 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         mInstallNonMarketAppsPreference = (SwitchPreference) findPreference(
                 INSTALL_NONMARKET_APPS_KEY);
         mInstallNonMarketAppsPreference.setOnPreferenceChangeListener(this);
+        findPreference(SET_USER_RESTRICTIONS_KEY).setOnPreferenceClickListener(this);
 
         reloadCameraDisableUi();
         reloadScreenCaptureDisableUi();
 
-        setOnPreferenceChangeListenerForRestrictionUi(KEYGUARD_DISABLE_PREFERENCES);
-        setOnPreferenceChangeListenerForRestrictionUi(ALL_USER_RESTRICTIONS);
-        updateUserRestrictionUi(ALL_USER_RESTRICTIONS);
         updateKeyguardFeaturesUi();
         disableIncompatibleManagementOptionsInCurrentProfile();
         disableIncompatibleManagementOptionsByApiLevel();
@@ -614,6 +588,9 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             case MODIFY_WIFI_CONFIGURATION_KEY:
                 showFragment(new WifiModificationFragment());
                 return true;
+            case SET_USER_RESTRICTIONS_KEY:
+                showFragment(new UserRestrictionsDisplayFragment());
+                return true;
         }
         return false;
     }
@@ -622,21 +599,6 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         String key = preference.getKey();
 
-        if (Arrays.asList(ALL_USER_RESTRICTIONS).contains(key)) {
-            setUserRestriction(key, (Boolean) newValue);
-            if (DISALLOW_INSTALL_UNKNOWN_SOURCES.equals(key)) {
-                if (newValue.equals(false)) {
-                    new AlertDialog.Builder(getActivity())
-                            .setMessage(R.string.check_setting_disallow_install_unknown_sources)
-                            .setPositiveButton(R.string.check_setting_ok, null)
-                            .show();
-                }
-                // When this user restriction is set, we disable the
-                // DISALLOW_INSTALL_NONMARKET_APPS_KEY setting switch.
-                updateInstallNonMarketAppsPreference();
-            }
-            return true;
-        }
         if (Arrays.asList(KEYGUARD_DISABLE_PREFERENCES).contains(key)) {
             ((SwitchPreference) preference).setChecked((Boolean) newValue);
             updateKeyguardDisabledFeatures();
@@ -864,39 +826,6 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 .show();
     }
 
-    private void setUserRestriction(String restriction, boolean disallow) {
-        if (disallow) {
-            mDevicePolicyManager.addUserRestriction(mAdminComponentName, restriction);
-        } else {
-            mDevicePolicyManager.clearUserRestriction(mAdminComponentName, restriction);
-        }
-        updateUserRestrictionUi(restriction);
-    }
-
-    private void setOnPreferenceChangeListenerForRestrictionUi(String[] userRestrictions) {
-        for (String userRestriction : userRestrictions) {
-            SwitchPreference preference = (SwitchPreference) findPreference(userRestriction);
-            preference.setOnPreferenceChangeListener(this);
-        }
-    }
-
-    private void updateUserRestrictionUi(String[] userRestrictions) {
-        for (String userRestriction : userRestrictions) {
-            updateUserRestrictionUi(userRestriction);
-        }
-    }
-
-    /**
-     * Updates the corresponding UI for a given user restriction.
-     *
-     * @param userRestriction the id of a preference that is going to be updated.
-     */
-    private void updateUserRestrictionUi(String userRestriction) {
-        SwitchPreference preference = (SwitchPreference) findPreference(userRestriction);
-        boolean disallowed = mUserManager.hasUserRestriction(userRestriction);
-        preference.setChecked(disallowed);
-    }
-
     /**
      * Updates all preferences in keyguard features section.
      */
@@ -952,11 +881,11 @@ public class PolicyManagementFragment extends PreferenceFragment implements
      * we disable this preference.
      * </p>
      */
-    private void updateInstallNonMarketAppsPreference() {
+    public void updateInstallNonMarketAppsPreference() {
         mInstallNonMarketAppsPreference.setEnabled(
                 mUserManager.hasUserRestriction(DISALLOW_INSTALL_UNKNOWN_SOURCES) ? false : true);
-        int isInstallNonMarketAppsAllowed = Settings.Secure.getInt(getActivity().getContentResolver(),
-                Settings.Secure.INSTALL_NON_MARKET_APPS, 0);
+        int isInstallNonMarketAppsAllowed = Settings.Secure.getInt(
+                getActivity().getContentResolver(), Settings.Secure.INSTALL_NON_MARKET_APPS, 0);
         mInstallNonMarketAppsPreference.setChecked(
                 isInstallNonMarketAppsAllowed == 0 ? false : true);
     }
