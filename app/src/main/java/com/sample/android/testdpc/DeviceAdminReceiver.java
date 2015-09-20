@@ -76,7 +76,11 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
             return;
         }
 
-        autoGrantRequestedPermissionsToSelf(context);
+        // From M onwards, permissions are not auto-granted, so we need to manually grant
+        // permissions for TestDPC.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            autoGrantRequestedPermissionsToSelf(context);
+        }
 
         if (synchronousAuthLaunch) {
             // Synchronous auth cases.
@@ -123,6 +127,7 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
         context.startActivity(launch);
     }
 
+    @TargetApi(Build.VERSION_CODES.M)
     private void autoGrantRequestedPermissionsToSelf(Context context) {
         DevicePolicyManager devicePolicyManager = (DevicePolicyManager) context.getSystemService(
                 Context.DEVICE_POLICY_SERVICE);
