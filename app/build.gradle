@@ -14,7 +14,7 @@ ext {
 
 android {
     compileSdkVersion 'android-23'
-    buildToolsVersion '23'
+    buildToolsVersion '23.0.1'
 
     defaultConfig {
         applicationId "com.sample.android.testdpc"
