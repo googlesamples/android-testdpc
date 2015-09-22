@@ -20,14 +20,24 @@ import com.sample.android.testdpc.R;
 import static android.os.UserManager.ALLOW_PARENT_PROFILE_APP_LINKING;
 import static android.os.UserManager.DISALLOW_ADD_USER;
 import static android.os.UserManager.DISALLOW_ADJUST_VOLUME;
+import static android.os.UserManager.DISALLOW_CONFIG_BLUETOOTH;
+import static android.os.UserManager.DISALLOW_CONFIG_CELL_BROADCASTS;
+import static android.os.UserManager.DISALLOW_CONFIG_MOBILE_NETWORKS;
 import static android.os.UserManager.DISALLOW_CONFIG_TETHERING;
 import static android.os.UserManager.DISALLOW_CONFIG_WIFI;
+import static android.os.UserManager.DISALLOW_CREATE_WINDOWS;
 import static android.os.UserManager.DISALLOW_CROSS_PROFILE_COPY_PASTE;
 import static android.os.UserManager.DISALLOW_FACTORY_RESET;
+import static android.os.UserManager.DISALLOW_FUN;
 import static android.os.UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES;
+import static android.os.UserManager.DISALLOW_MOUNT_PHYSICAL_MEDIA;
+import static android.os.UserManager.DISALLOW_NETWORK_RESET;
+import static android.os.UserManager.DISALLOW_OUTGOING_CALLS;
 import static android.os.UserManager.DISALLOW_REMOVE_USER;
 import static android.os.UserManager.DISALLOW_SAFE_BOOT;
+import static android.os.UserManager.DISALLOW_SMS;
 import static android.os.UserManager.DISALLOW_UNMUTE_MICROPHONE;
+import static android.os.UserManager.DISALLOW_USB_FILE_TRANSFER;
 
 public class UserRestrictionsDisplayFragment extends PreferenceFragment
         implements Preference.OnPreferenceChangeListener {
@@ -44,12 +54,22 @@ public class UserRestrictionsDisplayFragment extends PreferenceFragment
     private static final String[] PRIMARY_USER_ONLY_RESTRICTIONS = {
             DISALLOW_ADD_USER,
             DISALLOW_ADJUST_VOLUME,
+            DISALLOW_CONFIG_BLUETOOTH,
+            DISALLOW_CONFIG_CELL_BROADCASTS,
+            DISALLOW_CONFIG_MOBILE_NETWORKS,
             DISALLOW_CONFIG_TETHERING,
             DISALLOW_CONFIG_WIFI,
+            DISALLOW_CREATE_WINDOWS,
             DISALLOW_FACTORY_RESET,
+            DISALLOW_FUN,
+            DISALLOW_MOUNT_PHYSICAL_MEDIA,
+            DISALLOW_NETWORK_RESET,
+            DISALLOW_OUTGOING_CALLS,
             DISALLOW_REMOVE_USER,
             DISALLOW_SAFE_BOOT,
-            DISALLOW_UNMUTE_MICROPHONE
+            DISALLOW_SMS,
+            DISALLOW_UNMUTE_MICROPHONE,
+            DISALLOW_USB_FILE_TRANSFER
     };
 
     /**
