@@ -50,11 +50,11 @@
                 android:key="enable_system_apps_by_intent"
                 android:title="@string/enable_system_apps_by_intent"/>
         <Preference
-            android:key="hide_apps"
-            android:title="@string/hide_apps_title"/>
+                android:key="hide_apps"
+                android:title="@string/hide_apps_title"/>
         <Preference
-            android:key="unhide_apps"
-            android:title="@string/unhide_apps_title"/>
+                android:key="unhide_apps"
+                android:title="@string/unhide_apps_title"/>
         <Preference
                 android:key="manage_app_restrictions"
                 android:title="@string/manage_app_restrictions"/>
@@ -82,8 +82,8 @@
                 android:key="capture_video"
                 android:title="@string/capture_video"/>
         <SwitchPreference
-            android:key="disable_screen_capture"
-            android:title="@string/disable_screen_capture"/>
+                android:key="disable_screen_capture"
+                android:title="@string/disable_screen_capture"/>
     </PreferenceCategory>
 
     <PreferenceCategory
@@ -109,10 +109,10 @@
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:title="@string/data_usage">
+            android:title="@string/data_usage">
         <Preference
-            android:key="network_stats"
-            android:title="@string/network_stats"/>
+                android:key="network_stats"
+                android:title="@string/network_stats"/>
     </PreferenceCategory>
 
     <PreferenceCategory
@@ -136,42 +136,42 @@
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:key="keyguard_preferences"
-        android:title="@string/keyguard_features">
+            android:key="keyguard_preferences"
+            android:title="@string/keyguard_features">
         <SwitchPreference
-            android:key="keyguard_disable_widgets"
-            android:title="@string/keyguard_disable_widgets"/>
+                android:key="keyguard_disable_widgets"
+                android:title="@string/keyguard_disable_widgets"/>
         <SwitchPreference
-            android:key="keyguard_disable_secure_camera"
-            android:title="@string/keyguard_disable_secure_camera"/>
+                android:key="keyguard_disable_secure_camera"
+                android:title="@string/keyguard_disable_secure_camera"/>
         <SwitchPreference
-            android:key="keyguard_disable_secure_notifications"
-            android:title="@string/keyguard_disable_secure_notifications"/>
+                android:key="keyguard_disable_secure_notifications"
+                android:title="@string/keyguard_disable_secure_notifications"/>
         <SwitchPreference
-            android:key="keyguard_disable_unredacted_notifications"
-            android:title="@string/keyguard_disable_unredacted_notifications"/>
+                android:key="keyguard_disable_unredacted_notifications"
+                android:title="@string/keyguard_disable_unredacted_notifications"/>
         <SwitchPreference
-            android:key="keyguard_disable_trust_agents"
-            android:title="@string/keyguard_disable_trust_agents"/>
+                android:key="keyguard_disable_trust_agents"
+                android:title="@string/keyguard_disable_trust_agents"/>
         <SwitchPreference
-            android:key="keyguard_disable_fingerprint"
-            android:title="@string/keyguard_disable_fingerprint"/>
+                android:key="keyguard_disable_fingerprint"
+                android:title="@string/keyguard_disable_fingerprint"/>
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:title="@string/lock_category" >
+            android:title="@string/lock_category" >
         <EditTextPreference
-            android:key="key_max_time_screen_lock"
-            android:title="@string/maximum_lock_time"
-            android:dialogTitle="@string/maximum_lock_time"
-            android:inputType="number"
-            android:defaultValue="0" />
+                android:key="key_max_time_screen_lock"
+                android:title="@string/maximum_lock_time"
+                android:dialogTitle="@string/maximum_lock_time"
+                android:inputType="number"
+                android:defaultValue="0" />
         <EditTextPreference
-            android:key="key_max_fails_before_wipe"
-            android:title="@string/maximum_password_fails"
-            android:dialogTitle="@string/maximum_password_fails"
-            android:inputType="number"
-            android:defaultValue="0" />
+                android:key="key_max_fails_before_wipe"
+                android:title="@string/maximum_password_fails"
+                android:dialogTitle="@string/maximum_password_fails"
+                android:inputType="number"
+                android:defaultValue="0" />
     </PreferenceCategory>
 
     <PreferenceCategory
@@ -186,8 +186,8 @@
                 android:key="start_lock_task"
                 android:title="@string/start_lock_task"/>
         <Preference
-            android:key="stop_lock_task"
-            android:title="@string/stop_lock_task"/>
+                android:key="stop_lock_task"
+                android:title="@string/stop_lock_task"/>
     </PreferenceCategory>
 
     <PreferenceCategory
@@ -198,98 +198,56 @@
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:title="@string/permission_management">
+            android:title="@string/permission_management">
         <Preference
-            android:key="set_permission_policy"
-            android:title="@string/set_default_permission_policy"/>
+                android:key="set_permission_policy"
+                android:title="@string/set_default_permission_policy"/>
         <Preference
-            android:key="manage_app_permissions"
-            android:title="@string/manage_app_permissions"/>
+                android:key="manage_app_permissions"
+                android:title="@string/manage_app_permissions"/>
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:title="@string/single_use_devices">
+            android:title="@string/single_use_devices">
         <Preference
-            android:key="disable_status_bar"
-            android:title="@string/disable_status_bar"/>
+                android:key="disable_status_bar"
+                android:title="@string/disable_status_bar"/>
         <Preference
-            android:key="reenable_status_bar"
-            android:title="@string/reenable_status_bar"/>
+                android:key="reenable_status_bar"
+                android:title="@string/reenable_status_bar"/>
         <Preference
-            android:key="disable_keyguard"
-            android:title="@string/disable_keyguard"/>
+                android:key="disable_keyguard"
+                android:title="@string/disable_keyguard"/>
         <Preference
-            android:key="reenable_keyguard"
-            android:title="@string/reenable_keyguard"/>
+                android:key="reenable_keyguard"
+                android:title="@string/reenable_keyguard"/>
         <Preference
-            android:key="start_kiosk_mode"
-            android:title="@string/start_kiosk_mode"/>
+                android:key="start_kiosk_mode"
+                android:title="@string/start_kiosk_mode"/>
     </PreferenceCategory>
 
     <PreferenceCategory
             android:title="@string/system_update_management">
-            <Preference
-                    android:key="system_update_policy"
-                    android:title="@string/system_update_policy"/>
+        <Preference
+                android:key="system_update_policy"
+                android:title="@string/system_update_policy"/>
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:title="@string/user_management">
+            android:title="@string/user_management">
         <Preference
-            android:key="create_and_initialize_user"
-            android:title="@string/create_and_initialize_user"/>
+                android:key="create_and_initialize_user"
+                android:title="@string/create_and_initialize_user"/>
         <Preference
-            android:key="remove_user"
-            android:title="@string/remove_user"/>
+                android:key="remove_user"
+                android:title="@string/remove_user"/>
     </PreferenceCategory>
 
     <PreferenceCategory
-            android:title="@string/user_restriction_management_title">
-        <SwitchPreference
-                android:key="no_debugging_features"
-                android:title="@string/disallow_debugging_feature"/>
-        <SwitchPreference
-                android:key="no_install_unknown_sources"
-                android:title="@string/disallow_install_unknown_sources"/>
-        <SwitchPreference
-                android:key="no_remove_user"
-                android:title="@string/disallow_remove_user"/>
-        <SwitchPreference
-                android:key="no_add_user"
-                android:title="@string/disallow_add_user"/>
-        <SwitchPreference
-                android:key="no_factory_reset"
-                android:title="@string/disallow_factory_reset"/>
-        <SwitchPreference
-                android:key="no_config_credentials"
-                android:title="@string/disallow_config_credentials"/>
-        <SwitchPreference
-                android:key="no_share_location"
-                android:title="@string/disallow_share_location"/>
-        <SwitchPreference
-                android:key="no_config_tethering"
-                android:title="@string/disallow_config_tethering"/>
-        <SwitchPreference
-                android:key="no_adjust_volume"
-                android:title="@string/disallow_adjust_volume"/>
-        <SwitchPreference
-                android:key="no_unmute_microphone"
-                android:title="@string/disallow_unmute_microphone"/>
-        <SwitchPreference
-                android:key="no_modify_accounts"
-                android:title="@string/disallow_modify_accounts"/>
-        <SwitchPreference
-                android:key="no_safe_boot"
-                android:title="@string/disallow_safe_boot"/>
-        <SwitchPreference
-                android:key="no_outgoing_beam"
-                android:title="@string/disallow_outgoing_beam"/>
-        <SwitchPreference
-                android:key="no_create_windows"
-                android:title="@string/disallow_create_windows"/>
-        <SwitchPreference
-                android:key="no_config_wifi"
-                android:title="@string/disallow_config_wifi"/>
+            android:title="@string/user_restrictions_management_title">
+        <Preference
+                android:key="set_user_restrictions"
+                android:title="@string/user_restrictions_preference_title" />
     </PreferenceCategory>
 
     <PreferenceCategory
