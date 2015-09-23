@@ -222,10 +222,10 @@ public class NetworkUsageStatsFragment extends ListFragment implements View.OnCl
                     mDataUsageList.setVisibility(View.VISIBLE);
                 } break;
             }
-        } catch (RemoteException | SecurityException | NumberFormatException e) {
-            new AlertDialog.Builder(getActivity()).setTitle(R.string.network_stats_error_title)
-                    .setIconAttribute(android.R.attr.alertDialogIcon)
-                    .setMessage(e.toString()).setPositiveButton(android.R.string.ok, null).show();
+        } catch (SecurityException e) {
+            showErrorDialog(getString(R.string.network_stats_security_error_msg));
+        } catch (RemoteException | NumberFormatException e) {
+            showErrorDialog(e.toString());
         } finally {
             if (result != null) {
                 result.close();
@@ -269,6 +269,15 @@ public class NetworkUsageStatsFragment extends ListFragment implements View.OnCl
                     };
             mAppHistoryList.setAdapter(adapter);
         }
+    }
+
+    private void showErrorDialog(CharSequence message) {
+        new AlertDialog.Builder(getActivity())
+                .setTitle(R.string.network_stats_error_title)
+                .setIconAttribute(android.R.attr.alertDialogIcon)
+                .setMessage(message)
+                .setPositiveButton(android.R.string.ok, null)
+                .show();
     }
 
     private void pickDate(final Date target) {
