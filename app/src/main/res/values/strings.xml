@@ -398,9 +398,7 @@
     <string name="network_stats_start_date_label">Start date inclusive: </string>
     <string name="network_stats_end_date_label">End date exclusive: </string>
     <string name="network_stats_device_summary_explanation">
-        Below you can see the network data usage in the specified time interval for the whole device.
-        (i.e. usage aggregated over all users).\nNote: you need Settings &gt; Security &gt; Apps with usage access
-        be set for TestDPC to not receive a security exception.
+        Below, you can see the network data usage in the specified time interval for all users on the device.
     </string>
     <string name="network_stats_device_summary">Device has received %1$s in %2$d packets and transmitted %3$s in %4$d packets.</string>
     <string name="network_stats_profile_summary_explanation">
@@ -419,6 +417,9 @@
     <string name="network_stats_combined_state">State: combined foreground and background</string>
     <string name="network_stats_uid">UID = %1$d</string>
     <string name="network_stats_items">%1$d items</string>
+    <string name="network_stats_security_error_msg">
+        To see this data, Test DPC needs to be enabled under Settings &gt; Security &gt; Apps with usage access.
+    </string>
 
     <!--  Strings for delegated certificate installer -->
     <string name="manage_cert_installer">Manage delegated certificate installer</string>
@@ -427,7 +428,7 @@
     </string>
     <string name="delegated_cert_installer_set">Set</string>
     <string name="delegated_cert_installer_clear">Clear</string>
-    <string name="delegated_cert_installer_instructions">Select an app as the new cert installer, 
+    <string name="delegated_cert_installer_instructions">Select an app as the new cert installer,
         or manually enter its package name below:</string>
 
     <!-- Strings for permission policies -->
