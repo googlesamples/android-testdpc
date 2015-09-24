@@ -25,6 +25,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.PermissionInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.PersistableBundle;
@@ -37,6 +38,9 @@ import com.sample.android.testdpc.common.LaunchIntentUtil;
 import com.sample.android.testdpc.cosu.EnableCosuActivity;
 import com.sample.android.testdpc.syncauth.FinishSyncAuthDeviceOwnerActivity;
 import com.sample.android.testdpc.syncauth.FinishSyncAuthProfileOwnerActivity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE;
 import static android.app.admin.DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED;
@@ -131,28 +135,53 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
     private void autoGrantRequestedPermissionsToSelf(Context context) {
         DevicePolicyManager devicePolicyManager = (DevicePolicyManager) context.getSystemService(
                 Context.DEVICE_POLICY_SERVICE);
-        PackageManager packageManager = context.getPackageManager();
         String packageName = context.getPackageName();
         ComponentName adminComponentName = getComponentName(context);
 
+        List<String> permissions = getRuntimePermissions(context.getPackageManager(), packageName);
+        for (String permission : permissions) {
+            boolean success = devicePolicyManager.setPermissionGrantState(adminComponentName,
+                    packageName, permission, PERMISSION_GRANT_STATE_GRANTED);
+            if (!success) {
+                Log.e(TAG, "Failed to auto grant permission to self: " + permission);
+            }
+        }
+    }
+
+    private List<String> getRuntimePermissions(PackageManager packageManager, String packageName) {
+        List<String> permissions = new ArrayList<>();
         PackageInfo packageInfo;
         try {
-            packageInfo = packageManager.getPackageInfo(packageName,
-                    PackageManager.GET_PERMISSIONS);
+            packageInfo =
+                    packageManager.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS);
         } catch (PackageManager.NameNotFoundException e) {
             Log.e(TAG, "Could not retrieve info about the package: " + packageName, e);
-            return;
+            return permissions;
         }
 
         if (packageInfo != null && packageInfo.requestedPermissions != null) {
-            for (String permission : packageInfo.requestedPermissions) {
-                boolean success = devicePolicyManager.setPermissionGrantState(adminComponentName,
-                        packageName, permission, PERMISSION_GRANT_STATE_GRANTED);
-                if (!success) {
-                    Log.e(TAG, "Failed to auto grant permission to self: " + permission);
+            for (String requestedPerm : packageInfo.requestedPermissions) {
+                if (isRuntimePermission(packageManager, requestedPerm)) {
+                    permissions.add(requestedPerm);
                 }
             }
         }
+        return permissions;
+    }
+
+    private boolean isRuntimePermission(PackageManager packageManager, String permission) {
+        try {
+            PermissionInfo pInfo = packageManager.getPermissionInfo(permission, 0);
+            if (pInfo != null) {
+                if ((pInfo.protectionLevel & PermissionInfo.PROTECTION_MASK_BASE)
+                        == PermissionInfo.PROTECTION_DANGEROUS) {
+                    return true;
+                }
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.i(TAG, "Could not retrieve info about the permission: " + permission);
+        }
+        return false;
     }
 
     @TargetApi(Build.VERSION_CODES.M)
