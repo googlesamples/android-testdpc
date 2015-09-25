@@ -405,6 +405,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         reloadCameraDisableUi();
         reloadScreenCaptureDisableUi();
 
+        setPreferenceChangeListeners(KEYGUARD_DISABLE_PREFERENCES);
         updateKeyguardFeaturesUi();
         disableIncompatibleManagementOptionsInCurrentProfile();
         disableIncompatibleManagementOptionsByApiLevel();
@@ -824,6 +825,12 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                         })
                 .setNegativeButton(android.R.string.cancel, null)
                 .show();
+    }
+
+    private void setPreferenceChangeListeners(String[] preferenceKeys) {
+        for (String key : preferenceKeys) {
+            findPreference(key).setOnPreferenceChangeListener(this);
+        }
     }
 
     /**
