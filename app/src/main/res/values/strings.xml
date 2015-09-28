@@ -230,78 +230,41 @@
     <string name="user_restrictions_preference_title">Set user restrictions</string>
     <string name="user_restrictions_management_title">User restrictions</string>
     <string name="allow_parent_profile_app_linking">Allow web links to apps of the parent</string>
+    <string name="disallow_add_user">Disallow add user</string>
+    <string name="disallow_adjust_volume">Disallow adjust volume</string>
+    <string name="disallow_apps_control">Disallow apps control</string>
+    <string name="disallow_config_bluetooth">Disallow config bluetooth</string>
+    <string name="disallow_config_cell_broadcasts">Disallow config cell broadcasts</string>
+    <string name="disallow_config_credentials">Disallow config credentials</string>
+    <string name="disallow_config_mobile_networks">Disallow config mobile networks</string>
+    <string name="disallow_config_tethering">Disallow config tethering</string>
+    <string name="disallow_config_vpn">Disallow config vpn</string>
+    <string name="disallow_config_wifi">Disallow config Wi-Fi</string>
+    <string name="disallow_create_windows">Disallow create windows</string>
     <string name="disallow_cross_profile_copy_paste">Disallow cross-profile copy/paste</string>
+    <string name="disallow_debugging_features">Disallow debugging features</string>
+    <string name="disallow_factory_reset">Disallow factory reset</string>
+    <string name="disallow_fun">Disallow fun</string>
+    <string name="disallow_install_apps">Disallow install apps</string>
+    <string name="disallow_install_unknown_sources">Disallow install unknown sources</string>
     <string name="check_setting_disallow_install_unknown_sources">Ensure that
         \"Allow installs from unknown sources\" under Settings management is correctly checked.
     </string>
     <string name="check_setting_ok">Ok</string>
+    <string name="disallow_modify_accounts">Disallow modify accounts</string>
+    <string name="disallow_mount_physical_media">Disallow mount physical media</string>
+    <string name="disallow_network_reset">Disallow network reset</string>
+    <string name="disallow_outgoing_beam">Disallow outgoing beam</string>
+    <string name="disallow_outgoing_calls">Disallow outgoing calls</string>
+    <string name="disallow_remove_user">Disallow remove user</string>
+    <string name="disallow_safe_boot">Disallow safe boot</string>
+    <string name="disallow_share_location">Disallow share location</string>
+    <string name="disallow_sms">Disallow sms</string>
+    <string name="disallow_uninstall_apps">Disallow uninstall apps</string>
+    <string name="disallow_unmute_microphone">Disallow unmute microphone</string>
+    <string name="disallow_usb_file_transfer">Disallow usb file transfer</string>
+    <string name="ensure_verify_apps">Ensure verify apps</string>
     <string name="user_restriction_error_msg">Operation not allowed</string>
-    <string-array name="user_restriction_keys">
-        <item>allow_parent_profile_app_linking</item>
-        <item>no_add_user</item>
-        <item>no_adjust_volume</item>
-        <item>no_control_apps</item>
-        <item>no_config_bluetooth</item>
-        <item>no_config_cell_broadcasts</item>
-        <item>no_config_credentials</item>
-        <item>no_config_mobile_networks</item>
-        <item>no_config_tethering</item>
-        <item>no_config_vpn</item>
-        <item>no_config_wifi</item>
-        <item>no_create_windows</item>
-        <item>no_cross_profile_copy_paste</item>
-        <item>no_debugging_features</item>
-        <item>no_factory_reset</item>
-        <item>no_fun</item>
-        <item>no_install_apps</item>
-        <item>no_install_unknown_sources</item>
-        <item>no_modify_accounts</item>
-        <item>no_physical_media</item>
-        <item>no_network_reset</item>
-        <item>no_outgoing_beam</item>
-        <item>no_outgoing_calls</item>
-        <item>no_remove_user</item>
-        <item>no_safe_boot</item>
-        <item>no_share_location</item>
-        <item>no_sms</item>
-        <item>no_uninstall_apps</item>
-        <item>no_unmute_microphone</item>
-        <item>no_usb_file_transfer</item>
-        <item>ensure_verify_apps</item>
-    </string-array>
-    <string-array name="user_restriction_titles">
-        <item>@string/allow_parent_profile_app_linking</item>
-        <item>Disallow add user</item>
-        <item>Disallow adjust volume</item>
-        <item>Disallow apps control</item>
-        <item>Disallow config bluetooth</item>
-        <item>Disallow cell broadcasts</item>
-        <item>Disallow config credentials</item>
-        <item>Disallow config mobile networks</item>
-        <item>Disallow config tethering</item>
-        <item>Disallow config vpn</item>
-        <item>Disallow config Wi-Fi</item>
-        <item>Disallow create windows</item>
-        <item>@string/disallow_cross_profile_copy_paste</item>
-        <item>Disallow debugging features</item>
-        <item>Disallow factory reset</item>
-        <item>Disallow fun</item>
-        <item>Disallow install apps</item>
-        <item>Disallow install unknown sources</item>
-        <item>Disallow modify accounts</item>
-        <item>Disallow mount physical media</item>
-        <item>Disallow network reset</item>
-        <item>Disallow outgoing beam</item>
-        <item>Disallow outgoing calls</item>
-        <item>Disallow remove user</item>
-        <item>Disallow safe boot</item>
-        <item>Disallow share location</item>
-        <item>Disallow sms</item>
-        <item>Disallow uninstall apps</item>
-        <item>Disallow unmute microphone</item>
-        <item>Disallow usb file transfer</item>
-        <item>Ensure verify apps</item>
-    </string-array>
 
     <!-- Strings for certificate management  -->
     <string name="certificate_management_title">Certificate management</string>

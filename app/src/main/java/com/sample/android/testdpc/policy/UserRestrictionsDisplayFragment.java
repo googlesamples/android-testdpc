@@ -20,33 +20,82 @@ import com.sample.android.testdpc.R;
 import static android.os.UserManager.ALLOW_PARENT_PROFILE_APP_LINKING;
 import static android.os.UserManager.DISALLOW_ADD_USER;
 import static android.os.UserManager.DISALLOW_ADJUST_VOLUME;
+import static android.os.UserManager.DISALLOW_APPS_CONTROL;
 import static android.os.UserManager.DISALLOW_CONFIG_BLUETOOTH;
 import static android.os.UserManager.DISALLOW_CONFIG_CELL_BROADCASTS;
+import static android.os.UserManager.DISALLOW_CONFIG_CREDENTIALS;
 import static android.os.UserManager.DISALLOW_CONFIG_MOBILE_NETWORKS;
 import static android.os.UserManager.DISALLOW_CONFIG_TETHERING;
+import static android.os.UserManager.DISALLOW_CONFIG_VPN;
 import static android.os.UserManager.DISALLOW_CONFIG_WIFI;
 import static android.os.UserManager.DISALLOW_CREATE_WINDOWS;
 import static android.os.UserManager.DISALLOW_CROSS_PROFILE_COPY_PASTE;
+import static android.os.UserManager.DISALLOW_DEBUGGING_FEATURES;
 import static android.os.UserManager.DISALLOW_FACTORY_RESET;
 import static android.os.UserManager.DISALLOW_FUN;
+import static android.os.UserManager.DISALLOW_INSTALL_APPS;
 import static android.os.UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES;
+import static android.os.UserManager.DISALLOW_MODIFY_ACCOUNTS;
 import static android.os.UserManager.DISALLOW_MOUNT_PHYSICAL_MEDIA;
 import static android.os.UserManager.DISALLOW_NETWORK_RESET;
+import static android.os.UserManager.DISALLOW_OUTGOING_BEAM;
 import static android.os.UserManager.DISALLOW_OUTGOING_CALLS;
 import static android.os.UserManager.DISALLOW_REMOVE_USER;
 import static android.os.UserManager.DISALLOW_SAFE_BOOT;
+import static android.os.UserManager.DISALLOW_SHARE_LOCATION;
 import static android.os.UserManager.DISALLOW_SMS;
+import static android.os.UserManager.DISALLOW_UNINSTALL_APPS;
 import static android.os.UserManager.DISALLOW_UNMUTE_MICROPHONE;
 import static android.os.UserManager.DISALLOW_USB_FILE_TRANSFER;
+import static android.os.UserManager.ENSURE_VERIFY_APPS;
 
 public class UserRestrictionsDisplayFragment extends PreferenceFragment
         implements Preference.OnPreferenceChangeListener {
     private static final String TAG = "UserRestrictions";
 
-    private String[] mUserRestrictionKeys;
     private DevicePolicyManager mDevicePolicyManager;
     private UserManager mUserManager;
     private ComponentName mAdminComponentName;
+
+    private static final UserRestriction[] ALL_USER_RESTRICTIONS = {
+            new UserRestriction(ALLOW_PARENT_PROFILE_APP_LINKING,
+                    R.string.allow_parent_profile_app_linking),
+            new UserRestriction(DISALLOW_ADD_USER, R.string.disallow_add_user),
+            new UserRestriction(DISALLOW_ADJUST_VOLUME, R.string.disallow_adjust_volume),
+            new UserRestriction(DISALLOW_APPS_CONTROL, R.string.disallow_apps_control),
+            new UserRestriction(DISALLOW_CONFIG_BLUETOOTH, R.string.disallow_config_bluetooth),
+            new UserRestriction(DISALLOW_CONFIG_CELL_BROADCASTS,
+                    R.string.disallow_config_cell_broadcasts),
+            new UserRestriction(DISALLOW_CONFIG_CREDENTIALS, R.string.disallow_config_credentials),
+            new UserRestriction(DISALLOW_CONFIG_MOBILE_NETWORKS,
+                    R.string.disallow_config_mobile_networks),
+            new UserRestriction(DISALLOW_CONFIG_TETHERING, R.string.disallow_config_tethering),
+            new UserRestriction(DISALLOW_CONFIG_VPN, R.string.disallow_config_vpn),
+            new UserRestriction(DISALLOW_CONFIG_WIFI, R.string.disallow_config_wifi),
+            new UserRestriction(DISALLOW_CREATE_WINDOWS, R.string.disallow_create_windows),
+            new UserRestriction(DISALLOW_CROSS_PROFILE_COPY_PASTE,
+                    R.string.disallow_cross_profile_copy_paste),
+            new UserRestriction(DISALLOW_DEBUGGING_FEATURES, R.string.disallow_debugging_features),
+            new UserRestriction(DISALLOW_FACTORY_RESET, R.string.disallow_factory_reset),
+            new UserRestriction(DISALLOW_FUN, R.string.disallow_fun),
+            new UserRestriction(DISALLOW_INSTALL_APPS, R.string.disallow_install_apps),
+            new UserRestriction(DISALLOW_INSTALL_UNKNOWN_SOURCES,
+                    R.string.disallow_install_unknown_sources),
+            new UserRestriction(DISALLOW_MODIFY_ACCOUNTS, R.string.disallow_modify_accounts),
+            new UserRestriction(DISALLOW_MOUNT_PHYSICAL_MEDIA,
+                    R.string.disallow_mount_physical_media),
+            new UserRestriction(DISALLOW_NETWORK_RESET, R.string.disallow_network_reset),
+            new UserRestriction(DISALLOW_OUTGOING_BEAM, R.string.disallow_outgoing_beam),
+            new UserRestriction(DISALLOW_OUTGOING_CALLS, R.string.disallow_outgoing_calls),
+            new UserRestriction(DISALLOW_REMOVE_USER, R.string.disallow_remove_user),
+            new UserRestriction(DISALLOW_SAFE_BOOT, R.string.disallow_safe_boot),
+            new UserRestriction(DISALLOW_SHARE_LOCATION, R.string.disallow_share_location),
+            new UserRestriction(DISALLOW_SMS, R.string.disallow_sms),
+            new UserRestriction(DISALLOW_UNINSTALL_APPS, R.string.disallow_uninstall_apps),
+            new UserRestriction(DISALLOW_UNMUTE_MICROPHONE, R.string.disallow_unmute_microphone),
+            new UserRestriction(DISALLOW_USB_FILE_TRANSFER, R.string.disallow_usb_file_transfer),
+            new UserRestriction(ENSURE_VERIFY_APPS, R.string.ensure_verify_apps),
+    };
 
     /**
      * Setting these user restrictions only have effect on primary users.
@@ -104,15 +153,10 @@ public class UserRestrictionsDisplayFragment extends PreferenceFragment
                 getActivity());
         setPreferenceScreen(preferenceScreen);
 
-        mUserRestrictionKeys = getActivity().getResources().getStringArray(
-                R.array.user_restriction_keys);
-        String[] userRestrictionTitles = getActivity().getResources().getStringArray(
-                R.array.user_restriction_titles);
-        final int N = mUserRestrictionKeys.length;
-        for (int i = 0; i < N; ++i) {
+        for (UserRestriction restriction : ALL_USER_RESTRICTIONS) {
             SwitchPreference preference = new SwitchPreference(getActivity());
-            preference.setTitle(userRestrictionTitles[i]);
-            preference.setKey(mUserRestrictionKeys[i]);
+            preference.setTitle(restriction.titleResId);
+            preference.setKey(restriction.key);
             preference.setOnPreferenceChangeListener(this);
             preferenceScreen.addPreference(preference);
         }
@@ -155,8 +199,8 @@ public class UserRestrictionsDisplayFragment extends PreferenceFragment
     }
 
     private void updateAllUserRestrictions() {
-        for (String restriction : mUserRestrictionKeys) {
-            updateUserRestriction(restriction);
+        for (UserRestriction restriction : ALL_USER_RESTRICTIONS) {
+            updateUserRestriction(restriction.key);
         }
     }
 
@@ -186,6 +230,15 @@ public class UserRestrictionsDisplayFragment extends PreferenceFragment
             for (String restriction : MANAGED_PROFILE_ONLY_RESTRICTIONS) {
                 findPreference(restriction).setEnabled(false);
             }
+        }
+    }
+
+    private static class UserRestriction {
+        String key;
+        int titleResId;
+        public UserRestriction(String key, int titleResId) {
+            this.key = key;
+            this.titleResId = titleResId;
         }
     }
 }
