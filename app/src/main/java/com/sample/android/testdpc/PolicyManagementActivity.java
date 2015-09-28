@@ -33,18 +33,16 @@ public class PolicyManagementActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        DevicePolicyManager devicePolicyManager = (DevicePolicyManager) getSystemService(
-                DEVICE_POLICY_SERVICE);
-
         if (savedInstanceState == null) {
+            DevicePolicyManager devicePolicyManager = (DevicePolicyManager) getSystemService(
+                    DEVICE_POLICY_SERVICE);
+
             String packageName = getPackageName();
             if (devicePolicyManager.isProfileOwnerApp(packageName)
                     || devicePolicyManager.isDeviceOwnerApp(packageName)) {
-                getActionBar().show();
                 getFragmentManager().beginTransaction().add(R.id.container,
                         new PolicyManagementFragment()).commit();
             } else {
-                getActionBar().hide();
                 getFragmentManager().beginTransaction().add(R.id.container,
                         new SetupManagementFragment()).commit();
             }
