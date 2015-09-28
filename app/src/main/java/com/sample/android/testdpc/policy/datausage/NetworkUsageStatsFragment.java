@@ -169,8 +169,8 @@ public class NetworkUsageStatsFragment extends ListFragment implements View.OnCl
                             mEndDate.getTime());
                     mExplanation.setText(R.string.network_stats_device_summary_explanation);
                     mDataUsageSummary.setText(getString(R.string.network_stats_device_summary,
-                            bucket.getRxBytes(), bucket.getRxPackets(), bucket.getTxBytes(),
-                            bucket.getTxPackets()));
+                            formatSize(bucket.getRxBytes()), bucket.getRxPackets(),
+                            formatSize(bucket.getTxBytes()), bucket.getTxPackets()));
                     mDataUsageSummary.setVisibility(View.VISIBLE);
                 } break;
                 case QUERY_PROFILE_POS: {
@@ -179,8 +179,8 @@ public class NetworkUsageStatsFragment extends ListFragment implements View.OnCl
                             mEndDate.getTime());
                     mExplanation.setText(R.string.network_stats_profile_summary_explanation);
                     mDataUsageSummary.setText(getString(R.string.network_stats_profile_summary,
-                            bucket.getRxBytes(), bucket.getRxPackets(), bucket.getTxBytes(),
-                            bucket.getTxPackets()));
+                            formatSize(bucket.getRxBytes()), bucket.getRxPackets(),
+                            formatSize(bucket.getTxBytes()), bucket.getTxPackets()));
                     mDataUsageSummary.setVisibility(View.VISIBLE);
                 } break;
                 case QUERY_APPSUMMARY_POS: {
@@ -262,8 +262,8 @@ public class NetworkUsageStatsFragment extends ListFragment implements View.OnCl
                             text1.setText(dateFormat.format(startDate) + " - "
                                     + dateFormat.format(endDate));
                             text2.setText(getString(R.string.network_stats_bucket_usage,
-                                    item.getRxBytes(), item.getRxPackets(), item.getTxBytes(),
-                                    item.getTxPackets()));
+                                    formatSize(item.getRxBytes()), item.getRxPackets(),
+                                    formatSize(item.getTxBytes()), item.getTxPackets()));
                             return view;
                         }
                     };
@@ -372,8 +372,7 @@ public class NetworkUsageStatsFragment extends ListFragment implements View.OnCl
         imageView.setImageDrawable(icon);
         final int bucketsCount = item.size();
         if (bucketsCount == 1) {
-            summary.setText(Formatter.formatFileSize(getActivity(),
-                    bucket.getRxBytes() + bucket.getTxBytes()));
+            summary.setText(formatSize(bucket.getRxBytes() + bucket.getTxBytes()));
             switch (bucket.getState()) {
                 case NetworkStats.Bucket.STATE_FOREGROUND: {
                     state.setText(R.string.network_stats_foreground_state);
@@ -396,6 +395,10 @@ public class NetworkUsageStatsFragment extends ListFragment implements View.OnCl
         mBackToAppsListButton.setVisibility(appHistoryVisibility);
         mDataUsageList.setVisibility(
                 appHistoryVisibility == View.VISIBLE ? View.GONE : View.VISIBLE);
+    }
+
+    private String formatSize(long sizeBytes) {
+        return Formatter.formatFileSize(getActivity(), sizeBytes);
     }
 
     private static class ViewHolder {
