@@ -62,6 +62,8 @@ public class SetupManagementFragment extends Fragment
     public void onResume() {
         super.onResume();
 
+        getActivity().getActionBar().hide();
+
         boolean canSetupDeviceOwner = false;
 
         // ACTION_PROVISION_MANAGED_DEVICE is new for Android M, cannot enable on Lollipop or
