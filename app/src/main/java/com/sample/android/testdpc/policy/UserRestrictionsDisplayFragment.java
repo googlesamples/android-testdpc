@@ -133,6 +133,7 @@ public class UserRestrictionsDisplayFragment extends PreferenceFragment
      * These user restrictions are added in MNC.
      */
     private static String[] MNC_PLUS_RESTRICTIONS = {
+            ALLOW_PARENT_PROFILE_APP_LINKING,
             DISALLOW_SAFE_BOOT
     };
 
