@@ -668,7 +668,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             captureIntent.putExtra(MediaStore.EXTRA_OUTPUT, storageUri);
             startActivityForResult(captureIntent, requestCode);
         } else {
-            showToast(R.string.activity_not_found);
+            showToast(R.string.camera_app_not_found);
         }
     }
 
