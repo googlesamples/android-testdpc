@@ -17,7 +17,7 @@ android {
     buildToolsVersion '23.0.1'
 
     defaultConfig {
-        applicationId "com.sample.android.testdpc"
+        applicationId "com.example.android.testdpc"
         minSdkVersion 21
         targetSdkVersion 23
         versionCode versionMajor * 1000 + versionMinor * 100 + versionBuild
