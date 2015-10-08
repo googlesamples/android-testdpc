@@ -108,7 +108,7 @@
     <string name="disable_camera">Disable camera</string>
     <string name="capture_image">Capture image</string>
     <string name="capture_video">Capture video</string>
-    <string name="activity_not_found">No activity is found to handle this.</string>
+    <string name="camera_app_not_found">Ensure that a camera app is enabled</string>
     <string name="play_button_label">Play</string>
     <string name="stop_button_label">Stop</string>
     <string name="delete_button_label">Delete</string>
