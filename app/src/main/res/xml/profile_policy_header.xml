@@ -25,9 +25,6 @@
         <Preference
                 android:title="@string/clear_cross_profile_intents"
                 android:key="clear_cross_profile_intent_filters"/>
-        <SwitchPreference
-                android:key="parent_profile_app_linking"
-                android:title="@string/allow_parent_profile_app_linking"/>
     </PreferenceCategory>
 
     <PreferenceCategory
@@ -48,9 +45,6 @@
         <SwitchPreference
                 android:key="disable_cross_profile_caller_id"
                 android:title="@string/disable_cross_profile_caller_id"/>
-        <SwitchPreference
-                android:key="disallow_cross_profile_copy_paste"
-                android:title="@string/disallow_cross_profile_copy_paste"/>
     </PreferenceCategory>
 
     <PreferenceCategory
