@@ -316,20 +316,17 @@
     <string name="set_accessibility_services">Set accessibility services</string>
     <string name="allow_all">Allow all</string>
     <string name="set_accessibility_services_successful">The given list of accessibility services is
-        enabled.
+        enabled
     </string>
-    <string name="set_accessibility_services_fail">Failed to set the given accessibility services
-        list.
-    </string>
+    <string name="set_accessibility_services_fail">Cannot disallow accessibility services enabled by the primary user</string>
     <string name="all_accessibility_services_enabled">All accessibility services are enabled.
     </string>
 
     <!-- Input method -->
     <string name="input_methods_title">Input methods</string>
     <string name="set_input_methods">Set input methods</string>
-    <string name="set_input_methods_successful">The given list of input methods is enabled.</string>
-    <string name="set_input_methods_fail">Failed to set the given input methods list.
-    </string>
+    <string name="set_input_methods_successful">The given list of input methods is enabled</string>
+    <string name="set_input_methods_fail">Cannot disallow input methods enabled by the primary user</string>
     <string name="all_input_methods_enabled">All input methods are enabled.</string>
 
     <!-- Account management -->
