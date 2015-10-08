@@ -53,9 +53,7 @@ import java.util.List;
  * String)}
  * 7) {@link DevicePolicyManager#removeCrossProfileWidgetProvider(android.content.ComponentName,
  * String)}
- * 8) {@link DevicePolicyManager#addUserRestriction(android.content.ComponentName, String)}
- * 9) {@link DevicePolicyManager#clearUserRestriction(android.content.ComponentName, String)}
- * 10) {@link DevicePolicyManager#setBluetoothContactSharingDisabled(ComponentName, boolean)}
+ * 8) {@link DevicePolicyManager#setBluetoothContactSharingDisabled(ComponentName, boolean)}
  */
 public class ProfilePolicyManagementFragment extends PreferenceFragment implements
         Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
@@ -68,15 +66,12 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
             = "disable_bluetooth_contact_sharing";
     private static final String DISABLE_CROSS_PROFILE_CALLER_ID_KEY
             = "disable_cross_profile_caller_id";
-    private static final String DISALLOW_CROSS_PROFILE_COPY_PASTE_KEY
-            = "disallow_cross_profile_copy_paste";
-    private static final String PARENT_PROFILE_APP_LINKING_KEY = "parent_profile_app_linking";
     private static final String REMOVE_CROSS_PROFILE_APP_WIDGETS_KEY =
             "remove_cross_profile_app_widgets";
     private static final String REMOVE_PROFILE_KEY = "remove_profile";
 
     private static String[] MNC_PLUS_PREFERENCES = {
-            DISABLE_BLUETOOTH_CONTACT_SHARING_KEY, PARENT_PROFILE_APP_LINKING_KEY
+            DISABLE_BLUETOOTH_CONTACT_SHARING_KEY
     };
 
     private DevicePolicyManager mDevicePolicyManager;
@@ -88,8 +83,6 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
     private Preference mRemoveCrossProfileAppWidgetsPreference;
     private SwitchPreference mDisableBluetoothContactSharingSwitchPreference;
     private SwitchPreference mDisableCrossProfileCallerIdSwitchPreference;
-    private SwitchPreference mDisallowCrossProfileCopyPastePreference;
-    private SwitchPreference mParentProfileAppLinkingSwitchPreference;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -180,30 +173,6 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
                 // Reload UI to verify the state of cross-profile caller Id is set correctly.
                 reloadCrossProfileCallerIdDisableUi();
                 return true;
-            case DISALLOW_CROSS_PROFILE_COPY_PASTE_KEY:
-                boolean disallowCrossProfileCopyPaste = (Boolean) newValue;
-                if (disallowCrossProfileCopyPaste) {
-                    mDevicePolicyManager.addUserRestriction(mAdminComponentName,
-                            UserManager.DISALLOW_CROSS_PROFILE_COPY_PASTE);
-                } else {
-                    mDevicePolicyManager.clearUserRestriction(mAdminComponentName,
-                            UserManager.DISALLOW_CROSS_PROFILE_COPY_PASTE);
-                }
-                // Reload UI to verify the state of cross-profile copy paste is set correctly.
-                reloadCrossProfileCopyPasteDisallowUi();
-                return true;
-            case PARENT_PROFILE_APP_LINKING_KEY:
-                boolean allow = (Boolean) newValue;
-                if (allow) {
-                    mDevicePolicyManager.addUserRestriction(mAdminComponentName,
-                            UserManager.ALLOW_PARENT_PROFILE_APP_LINKING);
-                } else {
-                    mDevicePolicyManager.clearUserRestriction(mAdminComponentName,
-                            UserManager.ALLOW_PARENT_PROFILE_APP_LINKING);
-                }
-                // Reload UI to verify the state of app linking is set correctly.
-                reloadAppLinking();
-                return true;
         }
         return false;
     }
@@ -220,17 +189,10 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
                 DISABLE_BLUETOOTH_CONTACT_SHARING_KEY);
         mDisableCrossProfileCallerIdSwitchPreference = (SwitchPreference) findPreference(
                 DISABLE_CROSS_PROFILE_CALLER_ID_KEY);
-        mDisallowCrossProfileCopyPastePreference = (SwitchPreference) findPreference(
-                DISALLOW_CROSS_PROFILE_COPY_PASTE_KEY);
-        mParentProfileAppLinkingSwitchPreference = (SwitchPreference) findPreference(
-                PARENT_PROFILE_APP_LINKING_KEY);
         mDisableBluetoothContactSharingSwitchPreference.setOnPreferenceChangeListener(this);
         mDisableCrossProfileCallerIdSwitchPreference.setOnPreferenceChangeListener(this);
-        mDisallowCrossProfileCopyPastePreference.setOnPreferenceChangeListener(this);
-        mParentProfileAppLinkingSwitchPreference.setOnPreferenceChangeListener(this);
         reloadBluetoothContactSharing();
         reloadCrossProfileCallerIdDisableUi();
-        reloadAppLinking();
     }
 
     private void reloadBluetoothContactSharing() {
@@ -248,26 +210,6 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
         boolean isCrossProfileCallerIdDisabled = mDevicePolicyManager
                 .getCrossProfileCallerIdDisabled(mAdminComponentName);
         mDisableCrossProfileCallerIdSwitchPreference.setChecked(isCrossProfileCallerIdDisabled);
-    }
-
-    private void reloadCrossProfileCopyPasteDisallowUi() {
-        UserManager um = (UserManager) getActivity().getSystemService(
-                Context.USER_SERVICE);
-        boolean isCrossProfileCopyPasteDisallowed =
-                um.hasUserRestriction(UserManager.DISALLOW_CROSS_PROFILE_COPY_PASTE);
-        mDisallowCrossProfileCopyPastePreference.setChecked(isCrossProfileCopyPasteDisallowed);
-    }
-
-    private void reloadAppLinking() {
-        if (mParentProfileAppLinkingSwitchPreference.isEnabled()) {
-            return;
-        }
-
-        UserManager um = (UserManager) getActivity().getSystemService(
-                Context.USER_SERVICE);
-        boolean isParentProfileAppLinkingAllowed =
-                um.hasUserRestriction(UserManager.ALLOW_PARENT_PROFILE_APP_LINKING);
-        mParentProfileAppLinkingSwitchPreference.setChecked(isParentProfileAppLinkingAllowed);
     }
 
     /**
