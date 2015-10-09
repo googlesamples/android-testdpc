@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
- Copyright 2015 Google Inc. All Rights Reserved.
+ Copyright (C) 2015 The Android Open Source Project
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -28,13 +28,6 @@
     </PreferenceCategory>
 
     <PreferenceCategory
-            android:title="@string/cross_profile_caller_id_title">
-        <SwitchPreference
-                android:key="disable_cross_profile_caller_id"
-                android:title="@string/disable_cross_profile_caller_id"/>
-    </PreferenceCategory>
-
-    <PreferenceCategory
             android:title="@string/cross_profile_widget_providers_title">
         <Preference
                 android:key="add_cross_profile_app_widgets"
@@ -42,6 +35,16 @@
         <Preference
                 android:key="remove_cross_profile_app_widgets"
                 android:title="@string/remove_cross_profile_app_widget_providers"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+            android:title="@string/policies_title">
+        <SwitchPreference
+                android:key="disable_bluetooth_contact_sharing"
+                android:title="@string/disable_bluetooth_contact_sharing"/>
+        <SwitchPreference
+                android:key="disable_cross_profile_caller_id"
+                android:title="@string/disable_cross_profile_caller_id"/>
     </PreferenceCategory>
 
     <PreferenceCategory

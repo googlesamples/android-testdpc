@@ -1,13 +1,14 @@
 Test Device Policy Control (Test DPC) App
 =========================================
 
-Test DPC is an app designed to help EMMs, ISVs and OEMs to test their applications and platforms in a Managed Profile effectively.
+Test DPC is an app designed to help EMMs, ISVs and OEMs to test their applications and platforms in a Managed Profile effectively. It serves as both a sample Device Policy Client and a testing application to flex the APIs available for Android for Work.
 
 Pre-requisites
 --------------
 
 - Android SDK v23
-- Android Build Tools v23.0.0 rc3
+- Android Build Tools v23.0.1
+- Android Support Repository
 
 Getting Started
 ---------------
@@ -20,16 +21,16 @@ Screenshots
 
 ![Setup](doc/setup.png "Setup screen")
 ![Policy Management](doc/policy_management.png "Home screen once the profile is setup")
-![Manage App Restrictions](doc/manage_app_restrictions.png "Manage restrictions for apps in the Work Profile")
-![Work Profile Management](doc/work_profile_management.png "Manage policies specific to the Work Profile")
+![Manage App Restrictions](doc/manage_app_restrictions.png "Manage restrictions for apps in the work profile")
+![Work Profile Management](doc/work_profile_management.png "Manage policies specific to the work profile")
+![Network Data Usage Stats](doc/network_data_usage_stats.png “Analyze data usage for specific work apps or the entire profile”) 
 
 Known Issues
 ------------
 
-1. This app will only work with devices running Android M. We will be adding support for L very shortly.
-2. Disable Camera policy does not work.
-3. No support for mime type in cross-profile intent filter creation.
-4. No support for PackageInstaller APIs.
+1. No support for mime type in cross-profile intent filter creation.
+2. No support for PackageInstaller APIs.
+3. Values are not saving correctly under Manage app permissions.
 
 Support
 -------

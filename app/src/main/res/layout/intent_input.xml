@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
- Copyright 2015 Google Inc. All Rights Reserved.
+ Copyright (C) 2015 The Android Open Source Project
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="vertical"
               android:layout_width="match_parent"
-              android:layout_height="match_parent">
+              android:layout_height="wrap_content">
 
     <TextView
             android:layout_width="wrap_content"
@@ -30,9 +30,9 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-        <com.google.android.testdpc.common.ReselectionSpinner
+        <com.example.android.testdpc.common.ReselectionSpinner
                 android:id="@+id/list_of_actions"
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"/>
 
@@ -57,7 +57,7 @@
 
         <Spinner
                 android:id="@+id/list_of_categories"
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"/>
 
@@ -84,7 +84,7 @@
 
         <Spinner
                 android:id="@+id/list_of_data_schemes"
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"/>
 
@@ -94,25 +94,33 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="+"/>
-
     </LinearLayout>
 
-    <View
-            android:layout_width="fill_parent"
-            android:layout_height="1dip"
-            android:background="#333333"
-            android:padding="10dip"/>
-
     <TextView
-            android:id="@+id/tv_intent_filter"
-            android:layout_width="fill_parent"
-            android:layout_height="150dip"
-            android:scrollbars="vertical"/>
+            android:id="@+id/data_types_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/data_types_title"/>
 
-    <View
-            android:layout_width="fill_parent"
-            android:layout_height="1dip"
-            android:background="#333333"
-            android:padding="10dip"/>
+    <LinearLayout
+            android:id="@+id/data_types_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+        <Spinner
+                android:id="@+id/list_of_data_types"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"/>
+
+        <Button
+                android:id="@+id/btn_add_data_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="+"/>
+
+    </LinearLayout>
 
 </LinearLayout>

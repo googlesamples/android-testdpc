@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
- Copyright 2015 Google Inc. All Rights Reserved.
+ Copyright (C) 2015 The Android Open Source Project
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -14,44 +14,56 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="com.example.android.basicmanagedprofile.crossprofileintentfilter
+                .AddCrossProfileIntentFragment">
 
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:tools="http://schemas.android.com/tools"
+    <include layout="@layout/intent_input"
+             android:id="@+id/intent_input_layout" />
+
+    <View android:id="@+id/horizontal_line_top"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:context="com.example.android.basicmanagedprofile.crossprofileintentfilter
-            .AddCrossProfileIntentFragment">
-
-    <LinearLayout
+            android:layout_height="1dip"
+            android:background="@android:color/black"
+            android:layout_below="@id/intent_input_layout"
+            android:padding="10dip"/>
+    <ScrollView android:id="@+id/selected_display_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:padding="10dip">
-
-        <include
-                layout="@layout/intent_input"/>
-
-        <LinearLayout
+            android:layout_height="wrap_content"
+            android:layout_below="@id/horizontal_line_top"
+            android:layout_above="@+id/horizontal_line_bottom"
+            android:fadeScrollbars="false">
+        <TextView
+                android:id="@+id/tv_intent_filter"
                 android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+    </ScrollView>
+    <View android:id="@id/horizontal_line_bottom"
+            android:layout_width="match_parent"
+            android:layout_height="1dip"
+            android:background="@android:color/black"
+            android:layout_above="@+id/buttons_layout"
+            android:padding="10dip"/>
+
+    <LinearLayout android:id="@id/buttons_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:orientation="horizontal">
+        <Button
+                android:id="@+id/btn_clear"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-            <Button
-                    android:id="@+id/btn_clear"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/clear"/>
-
-            <Button
-                    android:id="@+id/btn_add"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/add"/>
-
-        </LinearLayout>
-
+                android:layout_weight="1"
+                android:text="@string/clear"/>
+        <Button
+                android:id="@+id/btn_add"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/add"/>
     </LinearLayout>
-
-</ScrollView>
+</RelativeLayout>

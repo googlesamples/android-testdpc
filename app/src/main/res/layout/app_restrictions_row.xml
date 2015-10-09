@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
- Copyright 2015 Google Inc. All Rights Reserved.
+ Copyright (C) 2015 The Android Open Source Project
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -15,78 +15,32 @@
  limitations under the License.
 -->
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-    <Spinner
-            android:id="@+id/type"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="8dp">
+    <TextView
+            android:id="@+id/restriction_key"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:enabled="false"/>
-
-    <EditText
-            android:id="@+id/key"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/type"
-            android:layout_toLeftOf="@+id/edit_or_save_row"
-            android:hint="@string/app_restrictions_key"
-            android:lines="1"
-            android:maxLines="1"
-            android:inputType="text"
-            android:enabled="false"/>
-
-    <EditText
-            android:id="@+id/value_str"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/type"
-            android:layout_toLeftOf="@id/edit_or_save_row"
-            android:layout_below="@id/key"
-            android:hint="@string/app_restrictions_value"
-            android:lines="1"
-            android:maxLines="1"
-            android:inputType="text"
-            android:enabled="false"/>
-
-    <Switch
-            android:id="@+id/value_bool"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/type"
-            android:layout_below="@id/key"
-            android:visibility="gone"
-            android:padding="5dip"
-            android:enabled="false"/>
-
-    <Button
-            android:id="@+id/value_str_arr"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/type"
-            android:layout_toLeftOf="@id/edit_or_save_row"
-            android:lines="1"
-            android:ellipsize="end"
-            android:layout_below="@id/key"
-            android:visibility="gone"
-            android:enabled="false"/>
+            android:layout_weight="1"
+            android:layout_gravity="center"/>
 
     <ImageView
-            android:id="@id/edit_or_save_row"
+            android:id="@+id/edit_row"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
             android:src="@android:drawable/ic_menu_edit"
-            android:padding="5dip"/>
+            android:padding="5dip"
+            android:layout_gravity="center"
+            android:background="?android:attr/selectableItemBackground"/>
 
     <ImageView
             android:id="@+id/delete_row"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/edit_or_save_row"
-            android:layout_alignParentRight="true"
             android:src="@android:drawable/ic_menu_delete"
-            android:padding="5dip"/>
-
-</RelativeLayout>
+            android:padding="5dip"
+            android:layout_gravity="center"
+            android:background="?android:attr/selectableItemBackground"/>
+</LinearLayout>

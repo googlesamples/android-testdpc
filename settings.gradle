@@ -1,1 +1,2 @@
-include ':app'
+include ':TestDPC'
+project(':TestDPC').projectDir = new File(rootDir, "app")
