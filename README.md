@@ -19,11 +19,11 @@ This sample uses the Gradle build system. To build this project, use the
 Screenshots
 -----------
 
-![Setup](doc/setup.png "Setup screen")
-![Policy Management](doc/policy_management.png "Home screen once the profile is setup")
-![Manage App Restrictions](doc/manage_app_restrictions.png "Manage restrictions for apps in the work profile")
-![Work Profile Management](doc/work_profile_management.png "Manage policies specific to the work profile")
-![Network Data Usage Stats](doc/network_data_usage_stats.png "Analyze data usage for specific work apps or the entire profile")
+<img src="doc/setup.png" height="400" alt="Setup" title="Setup screen"/>
+<img src="doc/policy_management.png" height="400" alt="Policy Management" title="Home screen once the profile is setup" />
+<img src="doc/manage_app_restrictions.png" height="400" alt="Manage App Restrictions" title="Manage restrictions for apps in the work profile" />
+<img src="doc/work_profile_management.png" height="400" alt="Work Profile Management" title="Manage policies specific to the work profile" />
+<img src="doc/network_data_usage_stats.png" height="400" alt="Network Data Usage Stats" title="Analyze data usage for specific work apps or the entire profile" />
 
 Known Issues
 ------------
