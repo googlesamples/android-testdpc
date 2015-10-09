@@ -23,7 +23,7 @@ Screenshots
 ![Policy Management](doc/policy_management.png "Home screen once the profile is setup")
 ![Manage App Restrictions](doc/manage_app_restrictions.png "Manage restrictions for apps in the work profile")
 ![Work Profile Management](doc/work_profile_management.png "Manage policies specific to the work profile")
-![Network Data Usage Stats](doc/network_data_usage_stats.png “Analyze data usage for specific work apps or the entire profile”) 
+![Network Data Usage Stats](doc/network_data_usage_stats.png "Analyze data usage for specific work apps or the entire profile")
 
 Known Issues
 ------------
