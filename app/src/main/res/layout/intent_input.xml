@@ -30,7 +30,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-        <com.example.android.testdpc.common.ReselectionSpinner
+        <com.afwsamples.testdpc.common.ReselectionSpinner
                 android:id="@+id/list_of_actions"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

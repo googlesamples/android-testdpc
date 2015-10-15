@@ -16,7 +16,7 @@
 -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.example.android.testdpc">
+          package="com.afwsamples.testdpc">
 
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
@@ -106,7 +106,7 @@
         </receiver>
 
         <provider
-                android:authorities="com.example.android.testdpc.fileprovider"
+                android:authorities="com.afwsamples.testdpc.fileprovider"
                 android:name="android.support.v4.content.FileProvider"
                 android:grantUriPermissions="true"
                 android:exported="false">
