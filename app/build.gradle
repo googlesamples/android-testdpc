@@ -7,7 +7,7 @@ ext {
     // exactly 1 digit
     versionMinor = 0
     // exactly 2 digits
-    versionBuild = 4
+    versionBuild = 6
 }
 
 android {
@@ -15,7 +15,7 @@ android {
     buildToolsVersion '23.0.1'
 
     defaultConfig {
-        applicationId "com.example.android.testdpc"
+        applicationId "com.afwsamples.testdpc"
         minSdkVersion 21
         targetSdkVersion 23
         versionCode versionMajor * 1000 + versionMinor * 100 + versionBuild

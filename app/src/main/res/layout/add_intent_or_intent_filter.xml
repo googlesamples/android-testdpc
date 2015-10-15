@@ -15,11 +15,8 @@
  limitations under the License.
 -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context="com.example.android.basicmanagedprofile.crossprofileintentfilter
-                .AddCrossProfileIntentFragment">
+        android:layout_height="match_parent">
 
     <include layout="@layout/intent_input"
              android:id="@+id/intent_input_layout" />
