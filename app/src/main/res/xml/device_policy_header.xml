@@ -84,6 +84,9 @@
         <SwitchPreference
                 android:key="disable_screen_capture"
                 android:title="@string/disable_screen_capture"/>
+        <SwitchPreference
+                android:key="mute_audio"
+                android:title="@string/mute_audio"/>
     </PreferenceCategory>
 
     <PreferenceCategory

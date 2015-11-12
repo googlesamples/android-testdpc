@@ -217,6 +217,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     private static final String MANAGE_APP_RESTRICTIONS_KEY = "manage_app_restrictions";
     private static final String MANAGED_PROFILE_SPECIFIC_POLICIES_KEY = "managed_profile_policies";
     private static final String MANAGE_LOCK_TASK_LIST_KEY = "manage_lock_task";
+    private static final String MUTE_AUDIO_KEY = "mute_audio";
     private static final String NETWORK_STATS_KEY = "network_stats";
     private static final String REENABLE_KEYGUARD = "reenable_keyguard";
     private static final String REENABLE_STATUS_BAR = "reenable_status_bar";
@@ -311,6 +312,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
 
     private SwitchPreference mDisableCameraSwitchPreference;
     private SwitchPreference mDisableScreenCaptureSwitchPreference;
+    private SwitchPreference mMuteAudioSwitchPreference;
 
     private SwitchPreference mStayOnWhilePluggedInSwitchPreference;
     private SwitchPreference mInstallNonMarketAppsPreference;
@@ -360,6 +362,9 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         mDisableScreenCaptureSwitchPreference = (SwitchPreference) findPreference(
                 DISABLE_SCREEN_CAPTURE_KEY);
         mDisableScreenCaptureSwitchPreference.setOnPreferenceChangeListener(this);
+        mMuteAudioSwitchPreference = (SwitchPreference) findPreference(
+                MUTE_AUDIO_KEY);
+        mMuteAudioSwitchPreference.setOnPreferenceChangeListener(this);
         findPreference(SYSTEM_UPDATE_POLICY_KEY).setOnPreferenceClickListener(this);
         findPreference(NETWORK_STATS_KEY).setOnPreferenceClickListener(this);
         findPreference(DELEGATED_CERT_INSTALLER_KEY).setOnPreferenceClickListener(this);
@@ -404,6 +409,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
 
         reloadCameraDisableUi();
         reloadScreenCaptureDisableUi();
+        reloadMuteAudioUi();
 
         setPreferenceChangeListeners(KEYGUARD_DISABLE_PREFERENCES);
         updateKeyguardFeaturesUi();
@@ -620,6 +626,11 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                         (Boolean) newValue);
                 // Reload UI to verify that screen capture was enabled / disabled correctly.
                 reloadScreenCaptureDisableUi();
+                return true;
+            case MUTE_AUDIO_KEY:
+                mDevicePolicyManager.setMasterVolumeMuted(mAdminComponentName,
+                        (Boolean) newValue);
+                reloadMuteAudioUi();
                 return true;
             case KEY_MAX_TIME_SCREEN_LOCK:
                 try {
@@ -1205,6 +1216,11 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         boolean isScreenCaptureDisabled = mDevicePolicyManager.getScreenCaptureDisabled(
                 mAdminComponentName);
         mDisableScreenCaptureSwitchPreference.setChecked(isScreenCaptureDisabled);
+    }
+
+    private void reloadMuteAudioUi() {
+        final boolean isAudioMuted = mDevicePolicyManager.isMasterVolumeMuted(mAdminComponentName);
+        mMuteAudioSwitchPreference.setChecked(isAudioMuted);
     }
 
     /**

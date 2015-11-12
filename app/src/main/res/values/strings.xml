@@ -103,7 +103,7 @@
     <string name="clear">Clear</string>
 
     <!-- Strings for camera and screen capture -->
-    <string name="camera_title">Camera and Screen capture</string>
+    <string name="camera_title">Camera, screen capture and audio</string>
     <string name="display_media">Display Media</string>
     <string name="disable_camera">Disable camera</string>
     <string name="capture_image">Capture image</string>
@@ -113,6 +113,7 @@
     <string name="stop_button_label">Stop</string>
     <string name="delete_button_label">Delete</string>
     <string name="disable_screen_capture">Disable screen capture</string>
+    <string name="mute_audio">Mute audio</string>
 
     <!-- Stings for work profile management -->
     <string name="profile_management_title">Work profile management</string>
