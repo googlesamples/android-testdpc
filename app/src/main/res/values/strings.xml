@@ -330,6 +330,8 @@
     <string name="set_input_methods_fail">Cannot disallow input methods enabled by the primary user</string>
     <string name="all_input_methods_enabled">All input methods are enabled.</string>
 
+    <string name="loading_resuls">Loading\u2026</string>
+
     <!-- Account management -->
     <string name="account_management_title">Account management</string>
     <string name="set_disable_account_management">Toggle account management</string>

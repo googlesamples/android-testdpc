@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.afwsamples.testdpc.policy.inputmethod;
+package com.afwsamples.testdpc.policy;
 
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
@@ -22,53 +22,41 @@ import android.content.pm.ResolveInfo;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.text.TextUtils;
-import android.view.inputmethod.InputMethodInfo;
 
-import com.afwsamples.testdpc.DeviceAdminReceiver;
+import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.ToggleComponentsArrayAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Displays a list of installed input methods with a checkbox for enabling the component. All system
- * input methods are enabled by default and can't be disabled.
+ * Displays a list of available components with a checkbox for enabling the component.
+ * All components belonging to system packages are enabled by default and can't be disabled.
  */
-public class InputMethodInfoArrayAdapter extends ToggleComponentsArrayAdapter {
+public class AvailableComponentsInfoArrayAdapter extends ToggleComponentsArrayAdapter {
+    private List<String> mPermittedPackageNames = null;
 
-    private List<String> mPermittedInputType = null;
-
-    public InputMethodInfoArrayAdapter(Context context, int resource, List<ResolveInfo> objects) {
-        super(context, resource, objects);
-    }
-
-    public static List<ResolveInfo> getResolveInfoListFromInputMethodsInfoList(
-            List<InputMethodInfo> inputMethodsInfoList) {
-        List<ResolveInfo> inputMethodsResolveInfoList = new ArrayList<ResolveInfo>();
-        for (InputMethodInfo inputMethodInfo: inputMethodsInfoList) {
-            ResolveInfo resolveInfo = new ResolveInfo();
-            resolveInfo.serviceInfo = inputMethodInfo.getServiceInfo();
-            resolveInfo.resolvePackageName = inputMethodInfo.getPackageName();
-            inputMethodsResolveInfoList.add(resolveInfo);
-        }
-        return inputMethodsResolveInfoList;
+    public AvailableComponentsInfoArrayAdapter(Context context,
+            List<ResolveInfo> resolveInfoList, List<String> permittedPackageNames) {
+        super(context, R.id.pkg_name, resolveInfoList);
+        mPermittedPackageNames = permittedPackageNames;
     }
 
     /**
-     * There are three cases where a given input method in a profile is enabled.
-     * 1) There is no restriction for the permitted input methods.
-     * 2) A given input method's package name exist in the permitted input method list.
-     * 3) A given input method is a system input method.
+     * There are three cases where a given component in a profile is enabled.
+     * 1) There is no restriction on the given component.
+     * 2) The given component's package name exist in the permitted package list.
+     * 3) The given component belong to a system package.
      */
     @Override
     public boolean isComponentEnabled(ResolveInfo resolveInfo) {
         if (resolveInfo != null && resolveInfo.serviceInfo != null && !TextUtils.isEmpty(
                 resolveInfo.serviceInfo.packageName)) {
-            if (mPermittedInputType == null || isSystemApp(
+            if (mPermittedPackageNames == null || isSystemApp(
                     resolveInfo.serviceInfo.applicationInfo)) {
                 return true;
             } else {
-                return mPermittedInputType.contains(resolveInfo.serviceInfo.packageName);
+                return mPermittedPackageNames.contains(resolveInfo.serviceInfo.packageName);
             }
         }
         return false;
@@ -76,19 +64,19 @@ public class InputMethodInfoArrayAdapter extends ToggleComponentsArrayAdapter {
 
     @Override
     protected boolean canModifyComponent(int position) {
-        // System input methods are always enabled.
+        // Components in a system package are always enabled.
         return !isSystemApp(getApplicationInfo(position));
     }
 
-    public ArrayList<String> getSelectedInputMethods() {
-        ArrayList<String> selectedInputMethodsArrayList = new ArrayList<String>();
+    public ArrayList<String> getSelectedComponents() {
+        ArrayList<String> selectedComponentsArrayList = new ArrayList<String>();
         int size = getCount();
         for (int i = 0; i < size; i++) {
             if (mIsComponentCheckedList.get(i)) {
-                selectedInputMethodsArrayList.add(getItem(i).serviceInfo.packageName);
+                selectedComponentsArrayList.add(getItem(i).serviceInfo.packageName);
             }
         }
-        return selectedInputMethodsArrayList;
+        return selectedComponentsArrayList;
     }
 
     @Override
@@ -110,8 +98,6 @@ public class InputMethodInfoArrayAdapter extends ToggleComponentsArrayAdapter {
 
     @Override
     protected void initIsComponentEnabledList() {
-        mPermittedInputType = mDevicePolicyManager.getPermittedInputMethods(
-                DeviceAdminReceiver.getComponentName(getContext()));
         int size = getCount();
         for (int i = 0; i < size; i++) {
             mIsComponentCheckedList.add(isComponentEnabled(getItem(i)));
