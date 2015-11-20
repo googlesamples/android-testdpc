@@ -53,3 +53,8 @@ dependencies {
     compile "com.android.support:support-v4:22.0.0"
     compile(name:'setup-wizard-lib-platform-release', ext:'aar')
 }
+
+// Temporary workaround to use the current sdk.
+android.applicationVariants.all {
+    variant -> variant.javaCompile.options.compilerArgs << "-Xbootclasspath/p:${rootDir}/prebuilts/sdk/current/android.jar"
+}
