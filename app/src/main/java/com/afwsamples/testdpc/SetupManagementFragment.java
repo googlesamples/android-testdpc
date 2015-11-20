@@ -25,12 +25,14 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afwsamples.testdpc.common.ProvisioningStateUtil;
 import com.android.setupwizardlib.SetupWizardLayout;
 import com.android.setupwizardlib.view.NavigationBar;
-import com.afwsamples.testdpc.common.ProvisioningStateUtil;
 
 import static android.app.admin.DevicePolicyManager.ACTION_PROVISION_MANAGED_DEVICE;
 import static android.app.admin.DevicePolicyManager.ACTION_PROVISION_MANAGED_PROFILE;
@@ -47,6 +49,8 @@ public class SetupManagementFragment extends Fragment
     private static final int REQUEST_PROVISION_MANAGED_PROFILE = 1;
     private static final int REQUEST_PROVISION_DEVICE_OWNER = 2;
 
+    private Button mNavigationNextButton;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
@@ -54,7 +58,9 @@ public class SetupManagementFragment extends Fragment
         SetupWizardLayout layout = (SetupWizardLayout) view.findViewById(R.id.setup_wizard_layout);
         NavigationBar navigationBar = layout.getNavigationBar();
         navigationBar.setNavigationBarListener(this);
-        navigationBar.getNextButton().setText(R.string.setup_label);
+        navigationBar.getBackButton().setText(R.string.exit);
+        mNavigationNextButton = navigationBar.getNextButton();
+        mNavigationNextButton.setText(R.string.setup_label);
         return view;
     }
 
@@ -63,20 +69,9 @@ public class SetupManagementFragment extends Fragment
         super.onResume();
 
         getActivity().getActionBar().hide();
-
-        boolean canSetupDeviceOwner = false;
-
-        // ACTION_PROVISION_MANAGED_DEVICE is new for Android M, cannot enable on Lollipop or
-        // earlier.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            // Device owner can only be set very early in the device setup flow, we only enabled the
-            // option if we haven't passed the point of no return.
-            canSetupDeviceOwner = ProvisioningStateUtil.isDeviceUnprovisionedAndNoDeviceOwner(
-                    getActivity());
+        if (!setProvisioningMethodsVisibility()) {
+            showNoProvisioningPossibleUI();
         }
-
-        getView().findViewById(R.id.setup_device_owner).setVisibility(
-                canSetupDeviceOwner ? View.VISIBLE : View.GONE);
     }
 
     /**
@@ -122,6 +117,33 @@ public class SetupManagementFragment extends Fragment
             Toast.makeText(activity, R.string.provisioning_not_supported, Toast.LENGTH_SHORT)
                     .show();
         }
+    }
+
+    private void showNoProvisioningPossibleUI() {
+        mNavigationNextButton.setVisibility(View.GONE);
+        TextView textView = (TextView) getView().findViewById(R.id.setup_management_message_id);
+        textView.setText(R.string.provisioning_not_possible);
+    }
+
+    /**
+     * Set visibility of all provisioning methods
+     *
+     * @return false if none of the provisioning method is visible
+     */
+    private boolean setProvisioningMethodsVisibility() {
+        boolean hasProvisioningOption = false;
+        hasProvisioningOption |= setVisibility(ACTION_PROVISION_MANAGED_PROFILE,
+                R.id.setup_managed_profile);
+        hasProvisioningOption |= setVisibility(ACTION_PROVISION_MANAGED_DEVICE,
+                R.id.setup_device_owner);
+        return hasProvisioningOption;
+    }
+
+    private boolean setVisibility(String action, int radioButtonId) {
+        final int visibility = ProvisioningStateUtil.isProvisioningAllowed(getActivity(), action)
+                ? View.VISIBLE : View.GONE;
+        getView().findViewById(radioButtonId).setVisibility(visibility);
+        return visibility == View.VISIBLE;
     }
 
     @Override

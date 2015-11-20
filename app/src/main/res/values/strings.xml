@@ -24,6 +24,8 @@
     <string name="set_up_management_header">Setup Management</string>
     <string name="setup_management_message">This app is currently not the owner of this device or
         profile. Please select an option below and click NEXT to set up appropriate management by this app.</string>
+    <string name="provisioning_not_possible">TestDPC isn\'t currently allowed to be set up as the profile or device owner.</string>
+    <string name="exit">Exit</string>
     <string name="managed_account_message">Added account that requires management:</string>
     <string name="managed_account_complete_message">Added account that is now managed:</string>
     <string name="account_migration_failed_message">Account failed to migrate:</string>
