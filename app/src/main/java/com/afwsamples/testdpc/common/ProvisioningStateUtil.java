@@ -91,19 +91,21 @@ public class ProvisioningStateUtil {
      * @return true, if provisioning is allowed for corresponding action
      */
     public static boolean isProvisioningAllowed(Context context, String action) {
+        /* TODO: Remove CODENAME check once SDK_INT on device is bumped for N */
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M
+                && (!("N".equals(Build.VERSION.CODENAME)))) {
+            if (ACTION_PROVISION_MANAGED_DEVICE.equals(action)) {
+                return (Build.VERSION.SDK_INT == Build.VERSION_CODES.M)
+                        ? isDeviceUnprovisionedAndNoDeviceOwner(context) : false;
+            }
+            if (ACTION_PROVISION_MANAGED_PROFILE.equals(action)) {
+                return true;
+            }
+            return false;
+        }
         // DevicePolicyManager.isProvisioningAllowed is added in N.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            DevicePolicyManager dpm = (DevicePolicyManager) context
-                    .getSystemService(Context.DEVICE_POLICY_SERVICE);
-            return dpm.isProvisioningAllowed(action);
-        }
-        if (ACTION_PROVISION_MANAGED_DEVICE.equals(action)) {
-            return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-                    ? isDeviceUnprovisionedAndNoDeviceOwner(context) : false;
-        }
-        if (ACTION_PROVISION_MANAGED_PROFILE.equals(action)) {
-            return true;
-        }
-        return false;
+        DevicePolicyManager dpm = (DevicePolicyManager) context
+                .getSystemService(Context.DEVICE_POLICY_SERVICE);
+        return dpm.isProvisioningAllowed(action);
     }
 }
