@@ -19,11 +19,15 @@ package com.afwsamples.testdpc;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.ClipData;
+import android.content.ContentResolver;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.RadioGroup;
@@ -48,8 +52,16 @@ public class SetupManagementFragment extends Fragment
 
     private static final int REQUEST_PROVISION_MANAGED_PROFILE = 1;
     private static final int REQUEST_PROVISION_DEVICE_OWNER = 2;
+    private static final int REQUEST_GET_LOGO = 3;
+
+    // TODO: use DevicePolicyManager.EXTRA_PROVISIONING_LOGO_URI once it's available
+    private static final String EXTRA_PROVISIONING_LOGO_URI
+            = "android.app.extra.PROVISIONING_LOGO_URI";
 
     private Button mNavigationNextButton;
+    private Button mChooseLogoButton;
+
+    private Uri mLogoUri = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -61,7 +73,31 @@ public class SetupManagementFragment extends Fragment
         navigationBar.getBackButton().setText(R.string.exit);
         mNavigationNextButton = navigationBar.getNextButton();
         mNavigationNextButton.setText(R.string.setup_label);
+
+        mChooseLogoButton = (Button) view.findViewById(R.id.choose_logo_button);
+        // The extra logo uri is supported only from N
+        if (ProvisioningStateUtil.versionIsAtLeastN() && canAnAppHandleGetContent()) {
+            mChooseLogoButton.setVisibility(View.VISIBLE);
+            mChooseLogoButton.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        startActivityForResult(getGetContentIntent(), REQUEST_GET_LOGO);
+                    }
+                });
+        }
+        if (savedInstanceState != null) {
+            mLogoUri = (Uri) savedInstanceState.getParcelable(EXTRA_PROVISIONING_LOGO_URI);
+        }
+        if (mLogoUri == null) {
+            mLogoUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://"
+                    + getActivity().getPackageName() + "/" + R.drawable.ic_launcher);
+        }
         return view;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putParcelable(EXTRA_PROVISIONING_LOGO_URI, mLogoUri);
     }
 
     @Override
@@ -89,7 +125,7 @@ public class SetupManagementFragment extends Fragment
             intent.putExtra(EXTRA_PROVISIONING_DEVICE_ADMIN_PACKAGE_NAME,
                     getActivity().getPackageName());
         }
-
+        specifyLogoUri(intent);
         if (intent.resolveActivity(activity.getPackageManager()) != null) {
             startActivityForResult(intent, REQUEST_PROVISION_MANAGED_PROFILE);
         } else {
@@ -110,12 +146,20 @@ public class SetupManagementFragment extends Fragment
         Intent intent = new Intent(ACTION_PROVISION_MANAGED_DEVICE);
         intent.putExtra(EXTRA_PROVISIONING_DEVICE_ADMIN_COMPONENT_NAME,
                 DeviceAdminReceiver.getComponentName(getActivity()));
-
+        specifyLogoUri(intent);
         if (intent.resolveActivity(activity.getPackageManager()) != null) {
             startActivityForResult(intent, REQUEST_PROVISION_DEVICE_OWNER);
         } else {
             Toast.makeText(activity, R.string.provisioning_not_supported, Toast.LENGTH_SHORT)
                     .show();
+        }
+    }
+
+    private void specifyLogoUri(Intent intent) {
+        intent.putExtra(EXTRA_PROVISIONING_LOGO_URI, mLogoUri);
+        if (mLogoUri.getScheme().equals(ContentResolver.SCHEME_CONTENT)) {
+            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            intent.setClipData(ClipData.newUri(getActivity().getContentResolver(), "", mLogoUri));
         }
     }
 
@@ -163,6 +207,11 @@ public class SetupManagementFragment extends Fragment
                             Toast.LENGTH_SHORT).show();
                 }
                 break;
+            case REQUEST_GET_LOGO:
+                if (data.getData() != null) {
+                    mLogoUri = data.getData();
+                }
+                break;
         }
     }
 
@@ -179,5 +228,15 @@ public class SetupManagementFragment extends Fragment
         } else {
             provisionDeviceOwner();
         }
+    }
+
+    private Intent getGetContentIntent() {
+        Intent getContent = new Intent(Intent.ACTION_GET_CONTENT);
+        getContent.setType("image/*");
+        return getContent;
+    }
+
+    private boolean canAnAppHandleGetContent() {
+        return getGetContentIntent().resolveActivity(getActivity().getPackageManager()) != null;
     }
 }

@@ -53,6 +53,12 @@
                     style="@style/containerText"
                     android:text="@string/set_up_device_owner" />
         </RadioGroup>
+        <Button android:id="@+id/choose_logo_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/choose_logo"
+                android:visibility="gone"
+                style="@style/containerText" />
     </LinearLayout>
 
 </com.android.setupwizardlib.SetupWizardLayout>

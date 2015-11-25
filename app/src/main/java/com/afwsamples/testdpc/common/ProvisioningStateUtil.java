@@ -92,8 +92,7 @@ public class ProvisioningStateUtil {
      */
     public static boolean isProvisioningAllowed(Context context, String action) {
         /* TODO: Remove CODENAME check once SDK_INT on device is bumped for N */
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M
-                && (!("N".equals(Build.VERSION.CODENAME)))) {
+        if (!versionIsAtLeastN()) {
             if (ACTION_PROVISION_MANAGED_DEVICE.equals(action)) {
                 return (Build.VERSION.SDK_INT == Build.VERSION_CODES.M)
                         ? isDeviceUnprovisionedAndNoDeviceOwner(context) : false;
@@ -107,5 +106,11 @@ public class ProvisioningStateUtil {
         DevicePolicyManager dpm = (DevicePolicyManager) context
                 .getSystemService(Context.DEVICE_POLICY_SERVICE);
         return dpm.isProvisioningAllowed(action);
+    }
+
+    public static boolean versionIsAtLeastN() {
+        // TODO: remove the code name check.
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
+                || Build.VERSION.CODENAME.startsWith("N");
     }
 }

@@ -21,6 +21,7 @@
     <string name="cancel">Cancel</string>
     <string name="set_up_managed_profile">Set up managed profile</string>
     <string name="set_up_device_owner">Set up device owner</string>
+    <string name="choose_logo">Choose a logo</string>
     <string name="set_up_management_header">Setup Management</string>
     <string name="setup_management_message">This app is currently not the owner of this device or
         profile. Please select an option below and click NEXT to set up appropriate management by this app.</string>
