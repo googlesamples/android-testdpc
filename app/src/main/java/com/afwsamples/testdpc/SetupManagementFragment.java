@@ -208,7 +208,7 @@ public class SetupManagementFragment extends Fragment
                 }
                 break;
             case REQUEST_GET_LOGO:
-                if (data.getData() != null) {
+                if (data != null && data.getData() != null) {
                     mLogoUri = data.getData();
                 }
                 break;
