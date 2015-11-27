@@ -465,4 +465,6 @@
     <string name="stay_on_while_plugged_in">Keep the device on while plugged in</string>
     <string name="install_non_market_apps">Allow installs from unknown sources</string>
 
+    <string name="provisioning_color">Provisioning color:</string>
+    <string name="color_not_recognized">This color is not recognized</string>
 </resources>

@@ -58,7 +58,32 @@
                 android:layout_height="wrap_content"
                 android:text="@string/choose_logo"
                 android:visibility="gone"
+                android:layout_marginTop="@dimen/content_padding_between_text"
                 style="@style/containerText" />
+
+        <LinearLayout
+                android:id="@+id/provisioning_color_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="@dimen/content_padding_between_text"
+                android:orientation="horizontal"
+                android:visibility="gone">
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/provisioning_color"
+                    style="@style/containerText"/>
+            <EditText android:id="@+id/provisioning_color"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:hint="@color/teal"
+                    android:singleLine="true"
+                    android:digits="#0123456789abcdefABCDEF"
+                    android:inputType="textCapCharacters"
+                    style="@style/containerText"/>
+        </LinearLayout>
+
     </LinearLayout>
 
 </com.android.setupwizardlib.SetupWizardLayout>

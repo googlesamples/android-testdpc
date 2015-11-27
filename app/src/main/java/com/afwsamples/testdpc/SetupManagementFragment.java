@@ -22,14 +22,18 @@ import android.app.Fragment;
 import android.content.ClipData;
 import android.content.ContentResolver;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -42,6 +46,8 @@ import static android.app.admin.DevicePolicyManager.ACTION_PROVISION_MANAGED_DEV
 import static android.app.admin.DevicePolicyManager.ACTION_PROVISION_MANAGED_PROFILE;
 import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_DEVICE_ADMIN_COMPONENT_NAME;
 import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_DEVICE_ADMIN_PACKAGE_NAME;
+import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_LOGO_URI;
+import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_MAIN_COLOR;
 
 /**
  * This {@link Fragment} shows the UI that allows the user to start the setup of a managed profile
@@ -54,9 +60,6 @@ public class SetupManagementFragment extends Fragment
     private static final int REQUEST_PROVISION_DEVICE_OWNER = 2;
     private static final int REQUEST_GET_LOGO = 3;
 
-    // TODO: use DevicePolicyManager.EXTRA_PROVISIONING_LOGO_URI once it's available
-    private static final String EXTRA_PROVISIONING_LOGO_URI
-            = "android.app.extra.PROVISIONING_LOGO_URI";
 
     private Button mNavigationNextButton;
     private Button mChooseLogoButton;
@@ -75,15 +78,18 @@ public class SetupManagementFragment extends Fragment
         mNavigationNextButton.setText(R.string.setup_label);
 
         mChooseLogoButton = (Button) view.findViewById(R.id.choose_logo_button);
-        // The extra logo uri is supported only from N
-        if (ProvisioningStateUtil.versionIsAtLeastN() && canAnAppHandleGetContent()) {
-            mChooseLogoButton.setVisibility(View.VISIBLE);
-            mChooseLogoButton.setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        startActivityForResult(getGetContentIntent(), REQUEST_GET_LOGO);
-                    }
-                });
+        // The extra logo uri and color are supported only from N
+        if (ProvisioningStateUtil.versionIsAtLeastN()) {
+            if (canAnAppHandleGetContent()) {
+                mChooseLogoButton.setVisibility(View.VISIBLE);
+                mChooseLogoButton.setOnClickListener(new OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            startActivityForResult(getGetContentIntent(), REQUEST_GET_LOGO);
+                        }
+                    });
+            }
+            view.findViewById(R.id.provisioning_color_container).setVisibility(View.VISIBLE);
         }
         if (savedInstanceState != null) {
             mLogoUri = (Uri) savedInstanceState.getParcelable(EXTRA_PROVISIONING_LOGO_URI);
@@ -125,12 +131,13 @@ public class SetupManagementFragment extends Fragment
             intent.putExtra(EXTRA_PROVISIONING_DEVICE_ADMIN_PACKAGE_NAME,
                     getActivity().getPackageName());
         }
-        specifyLogoUri(intent);
-        if (intent.resolveActivity(activity.getPackageManager()) != null) {
-            startActivityForResult(intent, REQUEST_PROVISION_MANAGED_PROFILE);
-        } else {
-            Toast.makeText(activity, R.string.provisioning_not_supported, Toast.LENGTH_SHORT)
-                    .show();
+        if (maybeSpecifyNExtras(intent)) {
+            if (intent.resolveActivity(activity.getPackageManager()) != null) {
+                startActivityForResult(intent, REQUEST_PROVISION_MANAGED_PROFILE);
+            } else {
+                Toast.makeText(activity, R.string.provisioning_not_supported, Toast.LENGTH_SHORT)
+                        .show();
+            }
         }
     }
 
@@ -146,13 +153,25 @@ public class SetupManagementFragment extends Fragment
         Intent intent = new Intent(ACTION_PROVISION_MANAGED_DEVICE);
         intent.putExtra(EXTRA_PROVISIONING_DEVICE_ADMIN_COMPONENT_NAME,
                 DeviceAdminReceiver.getComponentName(getActivity()));
-        specifyLogoUri(intent);
-        if (intent.resolveActivity(activity.getPackageManager()) != null) {
-            startActivityForResult(intent, REQUEST_PROVISION_DEVICE_OWNER);
-        } else {
-            Toast.makeText(activity, R.string.provisioning_not_supported, Toast.LENGTH_SHORT)
-                    .show();
+        if (maybeSpecifyNExtras(intent)) {
+            if (intent.resolveActivity(activity.getPackageManager()) != null) {
+                startActivityForResult(intent, REQUEST_PROVISION_DEVICE_OWNER);
+            } else {
+                Toast.makeText(activity, R.string.provisioning_not_supported, Toast.LENGTH_SHORT)
+                        .show();
+            }
         }
+    }
+
+    /**
+     * @return If we can launch the intent
+     */
+    private boolean maybeSpecifyNExtras(Intent intent) {
+        if (ProvisioningStateUtil.versionIsAtLeastN()) {
+            specifyLogoUri(intent);
+            return specifyColor(intent);
+        }
+        return true;
     }
 
     private void specifyLogoUri(Intent intent) {
@@ -161,6 +180,25 @@ public class SetupManagementFragment extends Fragment
             intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             intent.setClipData(ClipData.newUri(getActivity().getContentResolver(), "", mLogoUri));
         }
+    }
+
+    private boolean specifyColor(Intent intent) {
+        String colorString = ((EditText) getView().findViewById(R.id.provisioning_color))
+                .getText().toString();
+        int provisioningColor;
+        if (TextUtils.isEmpty(colorString)) {
+            provisioningColor = getResources().getColor(R.color.teal);
+        } else {
+            try {
+                provisioningColor = Color.parseColor(colorString);
+            } catch (IllegalArgumentException e) {
+                Toast.makeText(getActivity(), R.string.color_not_recognized, Toast.LENGTH_SHORT)
+                        .show();
+                return false;
+            }
+        }
+        intent.putExtra(EXTRA_PROVISIONING_MAIN_COLOR, provisioningColor);
+        return true;
     }
 
     private void showNoProvisioningPossibleUI() {
