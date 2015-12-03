@@ -16,6 +16,8 @@
 
 package com.afwsamples.testdpc;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
@@ -24,9 +26,11 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.afwsamples.testdpc.common.LaunchIntentUtil;
 import com.android.setupwizardlib.SetupWizardLayout;
 import com.android.setupwizardlib.view.NavigationBar;
 
@@ -65,6 +69,31 @@ public class EnableProfileActivity extends Activity implements NavigationBar.Nav
         } catch (PackageManager.NameNotFoundException e) {
             Log.w("TestDPC", "Couldn't look up our own package?!?!", e);
         }
+
+        // Show the user which account now has management, if specified.
+        String addedAccount = getIntent().getStringExtra(LaunchIntentUtil.EXTRA_ACCOUNT_NAME);
+        if (addedAccount != null) {
+            View accountMigrationStatusLayout;
+            if (isAccountMigrated(addedAccount)) {
+                accountMigrationStatusLayout = findViewById(R.id.account_migration_success);
+            } else {
+                accountMigrationStatusLayout = findViewById(R.id.account_migration_fail);
+            }
+            accountMigrationStatusLayout.setVisibility(View.VISIBLE);
+            TextView managedAccountName = (TextView) accountMigrationStatusLayout.findViewById(
+                    R.id.managed_account_name);
+            managedAccountName.setText(addedAccount);
+        }
+    }
+
+    private boolean isAccountMigrated(String addedAccount) {
+        Account[] accounts = AccountManager.get(this).getAccounts();
+        for (Account account : accounts) {
+            if (addedAccount.equalsIgnoreCase(account.name)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void enableProfile() {

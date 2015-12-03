@@ -65,21 +65,6 @@
                 android:theme="@style/SetupTheme"/>
 
         <activity
-                android:name=".syncauth.SetupSyncAuthManagement"
-                android:label="@string/app_name"
-                android:theme="@style/SetupTheme"/>
-
-        <activity
-                android:name=".syncauth.FinishSyncAuthDeviceOwnerActivity"
-                android:label="@string/app_name"
-                android:theme="@style/SetupTheme"/>
-
-        <activity
-                android:name=".syncauth.FinishSyncAuthProfileOwnerActivity"
-                android:label="@string/app_name"
-                android:theme="@style/SetupTheme"/>
-
-        <activity
                 android:name=".policy.locktask.KioskModeActivity"
                 android:label="@string/kiosk_mode"
                 android:launchMode="singleInstance"

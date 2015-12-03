@@ -36,8 +36,6 @@ import android.widget.Toast;
 
 import com.afwsamples.testdpc.common.LaunchIntentUtil;
 import com.afwsamples.testdpc.cosu.EnableCosuActivity;
-import com.afwsamples.testdpc.syncauth.FinishSyncAuthDeviceOwnerActivity;
-import com.afwsamples.testdpc.syncauth.FinishSyncAuthProfileOwnerActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,27 +84,19 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
             autoGrantRequestedPermissionsToSelf(context);
         }
 
-        if (synchronousAuthLaunch) {
-            // Synchronous auth cases.
-            String accountName = LaunchIntentUtil.getAddedAccountName(extras);
-            if (isProfileOwner) {
-                launch = new Intent(context, FinishSyncAuthProfileOwnerActivity.class)
-                        .putExtra(LaunchIntentUtil.EXTRA_ACCOUNT_NAME, accountName);
-            } else {
-                launch = new Intent(context, FinishSyncAuthDeviceOwnerActivity.class)
-                        .putExtra(LaunchIntentUtil.EXTRA_ACCOUNT_NAME, accountName);
-            }
+        if (isProfileOwner) {
+            launch = new Intent(context, EnableProfileActivity.class);
+        } else if (cosuLaunch) {
+            launch = new Intent(context, EnableCosuActivity.class);
+            launch.putExtra(EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE, extras);
         } else {
-            // User or NFC launched cases.
-            if (isProfileOwner) {
-                launch = new Intent(context, EnableProfileActivity.class);
-            } else {
-                if (cosuLaunch) {
-                    launch = new Intent(context, EnableCosuActivity.class);
-                    launch.putExtra(EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE, extras);
-                } else {
-                    launch = new Intent(context, EnableDeviceOwnerActivity.class);
-                }
+            launch = new Intent(context, EnableDeviceOwnerActivity.class);
+        }
+
+        if (synchronousAuthLaunch) {
+            String accountName = LaunchIntentUtil.getAddedAccountName(extras);
+            if (accountName != null) {
+                launch.putExtra(LaunchIntentUtil.EXTRA_ACCOUNT_NAME, accountName);
             }
         }
 

@@ -28,6 +28,45 @@
             android:layout_height="match_parent"
             android:orientation="vertical"
             style="@style/contentContainer">
+
+        <LinearLayout android:id="@+id/account_migration_success"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+            <TextView android:id="@+id/managed_account_name_label"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/managed_account_complete_message"
+                    style="@style/containerText" />
+            <TextView android:id="@+id/managed_account_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/containerText"
+                    android:paddingBottom="@dimen/content_padding_between_text" />
+        </LinearLayout>
+        <LinearLayout android:id="@+id/account_migration_fail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/account_migration_failed_message"
+                    style="@style/containerText" />
+            <TextView android:id="@id/managed_account_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/containerText" />
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/add_account_later_message"
+                    style="@style/containerText"
+                    android:paddingBottom="@dimen/content_padding_between_text" />
+        </LinearLayout>
+
         <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
