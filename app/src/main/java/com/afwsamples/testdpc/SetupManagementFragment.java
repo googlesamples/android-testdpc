@@ -17,7 +17,6 @@
 package com.afwsamples.testdpc;
 
 import android.accounts.Account;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.ClipData;
@@ -138,14 +137,10 @@ public class SetupManagementFragment extends Fragment
         }
     }
 
-    /**
-     * Initiates the managed profile provisioning. If we already have a managed profile set up on
-     * this device, we will get an error dialog in the following provisioning phase.
-     */
-    private void provisionManagedProfile() {
+    private void maybeLaunchProvisioning(String intentAction, int requestCode) {
         Activity activity = getActivity();
 
-        Intent intent = new Intent(ACTION_PROVISION_MANAGED_PROFILE);
+        Intent intent = new Intent(intentAction);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             intent.putExtra(EXTRA_PROVISIONING_DEVICE_ADMIN_COMPONENT_NAME,
                     DeviceAdminReceiver.getComponentName(getActivity()));
@@ -154,43 +149,20 @@ public class SetupManagementFragment extends Fragment
                     getActivity().getPackageName());
         }
 
+        if (!maybeSpecifyNExtras(intent)) {
+            // Unable to handle user-input - can't continue.
+            return;
+        }
         maybeSpecifySyncAuthExtras(intent);
-        if (maybeSpecifyNExtras(intent)) {
-            if (intent.resolveActivity(activity.getPackageManager()) != null) {
-                startActivityForResult(intent, REQUEST_PROVISION_MANAGED_PROFILE);
-            } else {
-                Toast.makeText(activity, R.string.provisioning_not_supported, Toast.LENGTH_SHORT)
-                        .show();
-            }
+
+        if (intent.resolveActivity(activity.getPackageManager()) != null) {
+            startActivityForResult(intent, requestCode);
+        } else {
+            Toast.makeText(activity, R.string.provisioning_not_supported, Toast.LENGTH_SHORT)
+                    .show();
         }
     }
 
-    /**
-     * Initiates the device owner provisioning. If we already have a device owner set up on
-     * this device (or the device is no longer in an unprovisioned state) we will get an error
-     * dialog in the following provisioning phase.
-     */
-    @TargetApi(Build.VERSION_CODES.M) // ACTION_PROVISION_MANAGED_DEVICE is new for Android M.
-    private void provisionDeviceOwner() {
-        Activity activity = getActivity();
-
-        Intent intent = new Intent(ACTION_PROVISION_MANAGED_DEVICE);
-        intent.putExtra(EXTRA_PROVISIONING_DEVICE_ADMIN_COMPONENT_NAME,
-                DeviceAdminReceiver.getComponentName(getActivity()));
-        maybeSpecifySyncAuthExtras(intent);
-        if (maybeSpecifyNExtras(intent)) {
-            if (intent.resolveActivity(activity.getPackageManager()) != null) {
-                startActivityForResult(intent, REQUEST_PROVISION_DEVICE_OWNER);
-            } else {
-                Toast.makeText(activity, R.string.provisioning_not_supported, Toast.LENGTH_SHORT)
-                        .show();
-            }
-        }
-    }
-
-    /**
-     * @return true if we can launch the intent
-     */
     private void maybeSpecifySyncAuthExtras(Intent intent) {
         Activity activity = getActivity();
         Intent launchIntent = activity.getIntent();
@@ -321,9 +293,11 @@ public class SetupManagementFragment extends Fragment
     public void onNavigateNext() {
         RadioGroup setupOptions = (RadioGroup) getView().findViewById(R.id.setup_options);
         if (setupOptions.getCheckedRadioButtonId() == R.id.setup_managed_profile) {
-            provisionManagedProfile();
+            maybeLaunchProvisioning(ACTION_PROVISION_MANAGED_PROFILE,
+                    REQUEST_PROVISION_MANAGED_PROFILE);
         } else {
-            provisionDeviceOwner();
+            maybeLaunchProvisioning(ACTION_PROVISION_MANAGED_DEVICE,
+                    REQUEST_PROVISION_DEVICE_OWNER);
         }
     }
 
