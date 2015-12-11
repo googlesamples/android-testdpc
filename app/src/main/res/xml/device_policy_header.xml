@@ -129,6 +129,9 @@
         <Preference
                 android:key="modify_wifi_configuration"
                 android:title="@string/modify_wifi_configuration"/>
+        <Preference
+                android:key="show_wifi_mac_address"
+                android:title="@string/show_wifi_mac_address"/>
     </PreferenceCategory>
 
     <PreferenceCategory

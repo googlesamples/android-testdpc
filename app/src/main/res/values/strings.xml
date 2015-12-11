@@ -168,6 +168,9 @@
     <string name="wifi_config_fail">Failed to save the wifi configuration.</string>
     <string name="enable_wifi_config_lockdown">DO created WiFi configs are modifiable only by DO.</string>
     <string name="modify_wifi_configuration">Modify wifi configuration</string>
+    <string name="show_wifi_mac_address">Show Wi-Fi MAC address</string>
+    <string name="show_wifi_mac_address_title">Wi-Fi MAC address</string>
+    <string name="show_wifi_mac_address_not_available_msg">Wi-Fi MAC is not available</string>
     <string name="wifi_configs_header">Saved WiFi configurations</string>
     <string name="wifi_update_config_button">Update selected</string>
     <string name="wifi_remove_config_button">Remove selected</string>

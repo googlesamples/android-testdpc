@@ -228,6 +228,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     private static final String SET_INPUT_METHODS_KEY = "set_input_methods";
     private static final String SET_PERMISSION_POLICY_KEY = "set_permission_policy";
     private static final String SET_USER_RESTRICTIONS_KEY = "set_user_restrictions";
+    private static final String SHOW_WIFI_MAC_ADDRESS_KEY = "show_wifi_mac_address";
     private static final String START_KIOSK_MODE = "start_kiosk_mode";
     private static final String START_LOCK_TASK = "start_lock_task";
     private static final String STAY_ON_WHILE_PLUGGED_IN = "stay_on_while_plugged_in";
@@ -256,7 +257,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             STOP_LOCK_TASK, DISABLE_STATUS_BAR, REENABLE_STATUS_BAR, DISABLE_KEYGUARD,
             REENABLE_KEYGUARD, START_KIOSK_MODE, SYSTEM_UPDATE_POLICY_KEY, KEYGUARD_DISABLE_WIDGETS,
             KEYGUARD_DISABLE_SECURE_CAMERA, KEYGUARD_DISABLE_SECURE_NOTIFICATIONS,
-            STAY_ON_WHILE_PLUGGED_IN
+            STAY_ON_WHILE_PLUGGED_IN, SHOW_WIFI_MAC_ADDRESS_KEY
     };
 
     private static String[] MNC_PLUS_PREFERENCES = {
@@ -265,6 +266,10 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             REENABLE_STATUS_BAR, DISABLE_KEYGUARD, REENABLE_KEYGUARD, START_KIOSK_MODE,
             SET_PERMISSION_POLICY_KEY, MANAGE_APP_PERMISSIONS_KEY,STAY_ON_WHILE_PLUGGED_IN,
             WIFI_CONFIG_LOCKDOWN_ENABLE_KEY
+    };
+
+    private static String[] NYC_PLUS_PREFERENCES = {
+            SHOW_WIFI_MAC_ADDRESS_KEY
     };
 
     /**
@@ -400,6 +405,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         findPreference(CREATE_WIFI_CONFIGURATION_KEY).setOnPreferenceClickListener(this);
         findPreference(WIFI_CONFIG_LOCKDOWN_ENABLE_KEY).setOnPreferenceChangeListener(this);
         findPreference(MODIFY_WIFI_CONFIGURATION_KEY).setOnPreferenceClickListener(this);
+        findPreference(SHOW_WIFI_MAC_ADDRESS_KEY).setOnPreferenceClickListener(this);
         mInstallNonMarketAppsPreference = (SwitchPreference) findPreference(
                 INSTALL_NONMARKET_APPS_KEY);
         mInstallNonMarketAppsPreference.setOnPreferenceChangeListener(this);
@@ -592,6 +598,9 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 return true;
             case MODIFY_WIFI_CONFIGURATION_KEY:
                 showFragment(new WifiModificationFragment());
+                return true;
+            case SHOW_WIFI_MAC_ADDRESS_KEY:
+                showWifiMacAddress();
                 return true;
             case SET_USER_RESTRICTIONS_KEY:
                 showFragment(new UserRestrictionsDisplayFragment());
@@ -836,6 +845,20 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 .show();
     }
 
+    /**
+     * Shows a message box with the device wifi mac address.
+     */
+    private void showWifiMacAddress() {
+        final String macAddress = mDevicePolicyManager.getWifiMacAddress();
+        final String message = macAddress != null ? macAddress
+                : getResources().getString(R.string.show_wifi_mac_address_not_available_msg);
+        new AlertDialog.Builder(getActivity())
+                .setTitle(R.string.show_wifi_mac_address_title)
+                .setMessage(message)
+                .setPositiveButton(android.R.string.ok, null)
+                .show();
+    }
+
     private void setPreferenceChangeListeners(String[] preferenceKeys) {
         for (String key : preferenceKeys) {
             findPreference(key).setOnPreferenceChangeListener(this);
@@ -959,10 +982,20 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 findPreference(preference).setEnabled(false);
             }
         }
+        if (isBeforeN()) {
+            for (String preference : NYC_PLUS_PREFERENCES) {
+                findPreference(preference).setEnabled(false);
+            }
+        }
     }
 
     private boolean isBeforeM() {
         return Build.VERSION.SDK_INT < VERSION_CODES.M;
+    }
+
+    private boolean isBeforeN() {
+        // STOPSHIP Change to SDK_INT.
+        return isBeforeM() || !Build.VERSION.CODENAME.startsWith("N");
     }
 
     /**
