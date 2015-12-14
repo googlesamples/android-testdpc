@@ -1863,7 +1863,8 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     }
 
     private void reboot() {
-        mDevicePolicyManager.reboot(mAdminComponentName);
+        // TODO: re-enable when the SDK is updated with DPM.reboot().
+        // mDevicePolicyManager.reboot(mAdminComponentName);
     }
 
      abstract class ManageLockTaskListCallback {
