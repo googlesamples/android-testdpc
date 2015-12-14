@@ -16,6 +16,8 @@
 
 package com.afwsamples.testdpc.policy;
 
+import static android.os.UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES;
+
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -103,8 +105,6 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import static android.os.UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES;
 
 /**
  * Provides several device management functions.
@@ -242,6 +242,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     private static final String TAG_WIFI_CONFIG_CREATION = "wifi_config_creation";
     private static final String WIFI_CONFIG_LOCKDOWN_ON = "1";
     private static final String WIFI_CONFIG_LOCKDOWN_OFF = "0";
+    private static final String REBOOT = "reboot";
 
     private static final long MS_PER_SECOND = 1000;
 
@@ -257,7 +258,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             STOP_LOCK_TASK, DISABLE_STATUS_BAR, REENABLE_STATUS_BAR, DISABLE_KEYGUARD,
             REENABLE_KEYGUARD, START_KIOSK_MODE, SYSTEM_UPDATE_POLICY_KEY, KEYGUARD_DISABLE_WIDGETS,
             KEYGUARD_DISABLE_SECURE_CAMERA, KEYGUARD_DISABLE_SECURE_NOTIFICATIONS,
-            STAY_ON_WHILE_PLUGGED_IN, SHOW_WIFI_MAC_ADDRESS_KEY
+            STAY_ON_WHILE_PLUGGED_IN, SHOW_WIFI_MAC_ADDRESS_KEY, REBOOT
     };
 
     private static String[] MNC_PLUS_PREFERENCES = {
@@ -269,7 +270,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     };
 
     private static String[] NYC_PLUS_PREFERENCES = {
-            SHOW_WIFI_MAC_ADDRESS_KEY
+            SHOW_WIFI_MAC_ADDRESS_KEY, REBOOT
     };
 
     /**
@@ -410,6 +411,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 INSTALL_NONMARKET_APPS_KEY);
         mInstallNonMarketAppsPreference.setOnPreferenceChangeListener(this);
         findPreference(SET_USER_RESTRICTIONS_KEY).setOnPreferenceClickListener(this);
+        findPreference(REBOOT).setOnPreferenceClickListener(this);
 
         reloadCameraDisableUi();
         reloadScreenCaptureDisableUi();
@@ -604,6 +606,9 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 return true;
             case SET_USER_RESTRICTIONS_KEY:
                 showFragment(new UserRestrictionsDisplayFragment());
+                return true;
+            case REBOOT:
+                reboot();
                 return true;
         }
         return false;
@@ -1855,6 +1860,10 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     private void showWifiConfigCreationDialog() {
         WifiConfigCreationDialog dialog = WifiConfigCreationDialog.newInstance();
         dialog.show(getFragmentManager(), TAG_WIFI_CONFIG_CREATION);
+    }
+
+    private void reboot() {
+        mDevicePolicyManager.reboot(mAdminComponentName);
     }
 
      abstract class ManageLockTaskListCallback {

@@ -274,5 +274,8 @@
         <Preference
                 android:key="remove_device_owner"
                 android:title="@string/remove_device_owner"/>
+        <Preference
+                android:key="reboot"
+                android:title="@string/reboot"/>
     </PreferenceCategory>
 </PreferenceScreen>

@@ -85,6 +85,7 @@
         owner?
     </string>
     <string name="device_owner_removed">This app is no longer a device owner.</string>
+    <string name="reboot">Reboot device</string>
 
     <!-- Strings for cross-profile intent filters -->
     <string name="cross_profile_intents">Cross-profile intents</string>
