@@ -69,6 +69,9 @@ public class UserRestrictionsDisplayFragment extends PreferenceFragment
         implements Preference.OnPreferenceChangeListener {
     private static final String TAG = "UserRestrictions";
 
+    // TODO: Remove this variable and use UM.DISALLOW_DATA_ROAMING, when sdk is updated.
+    public static final String DISALLOW_DATA_ROAMING = "no_data_roaming";
+
     private DevicePolicyManager mDevicePolicyManager;
     private UserManager mUserManager;
     private ComponentName mAdminComponentName;
@@ -91,6 +94,8 @@ public class UserRestrictionsDisplayFragment extends PreferenceFragment
             new UserRestriction(DISALLOW_CREATE_WINDOWS, R.string.disallow_create_windows),
             new UserRestriction(DISALLOW_CROSS_PROFILE_COPY_PASTE,
                     R.string.disallow_cross_profile_copy_paste),
+            new UserRestriction(DISALLOW_DATA_ROAMING,
+                    R.string.disallow_data_roaming),
             new UserRestriction(DISALLOW_DEBUGGING_FEATURES, R.string.disallow_debugging_features),
             new UserRestriction(DISALLOW_FACTORY_RESET, R.string.disallow_factory_reset),
             new UserRestriction(DISALLOW_FUN, R.string.disallow_fun),
@@ -125,6 +130,7 @@ public class UserRestrictionsDisplayFragment extends PreferenceFragment
             DISALLOW_CONFIG_TETHERING,
             DISALLOW_CONFIG_WIFI,
             DISALLOW_CREATE_WINDOWS,
+            DISALLOW_DATA_ROAMING,
             DISALLOW_FACTORY_RESET,
             DISALLOW_FUN,
             DISALLOW_MOUNT_PHYSICAL_MEDIA,
@@ -151,6 +157,10 @@ public class UserRestrictionsDisplayFragment extends PreferenceFragment
     private static String[] MNC_PLUS_RESTRICTIONS = {
             ALLOW_PARENT_PROFILE_APP_LINKING,
             DISALLOW_SAFE_BOOT
+    };
+
+    private static String[] NYC_PLUS_RESTRICTIONS = {
+            DISALLOW_DATA_ROAMING
     };
 
     public static UserRestrictionsDisplayFragment newInstance() {
@@ -228,11 +238,25 @@ public class UserRestrictionsDisplayFragment extends PreferenceFragment
     }
 
     private void disableIncompatibleRestrictionsByApiLevel() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+        if (isBeforeM()) {
             for (String restriction : MNC_PLUS_RESTRICTIONS) {
                 findPreference(restriction).setEnabled(false);
             }
         }
+        if (isBeforeN()) {
+            for (String restriction : NYC_PLUS_RESTRICTIONS) {
+                findPreference(restriction).setEnabled(false);
+            }
+        }
+    }
+
+    private boolean isBeforeM() {
+        return Build.VERSION.SDK_INT <  Build.VERSION_CODES.M;
+    }
+
+    private boolean isBeforeN() {
+        // STOPSHIP Change to SDK_INT.
+        return isBeforeM() || !Build.VERSION.CODENAME.startsWith("N");
     }
 
     private void disableIncompatibleRestrictionsByUserType() {
