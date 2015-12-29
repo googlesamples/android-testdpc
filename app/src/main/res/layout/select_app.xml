@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Copyright 2015 The Android Open Source Project
+Copyright 2016 The Android Open Source Project
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -23,24 +23,25 @@ limitations under the License.
     <LinearLayout android:layout_width="match_parent"
                   android:layout_height="wrap_content"
                   android:orientation="horizontal">
-        <TextView android:id="@+id/delegated_cert_installer_label"
+        <TextView android:id="@+id/select_package_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/current_delegated_cert_installer"/>
+                android:text="@string/current_selected_package"/>
 
         <EditText
-                android:id="@+id/delegated_cert_installer_current"
+                android:id="@+id/selected_package_current"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:editable="false"/>
+                android:editable="false"
+                android:hint="@string/selected_package_none"/>
     </LinearLayout>
 
     <TextView android:layout_width="wrap_content"
               android:layout_height="wrap_content"
-              android:text="@string/delegated_cert_installer_instructions"/>
+              android:text="@string/select_app_instructions"/>
 
     <ListView
-            android:id="@+id/delegated_cert_installer_app_list"
+            android:id="@+id/select_app_list"
             android:scrollbars="vertical"
             android:layout_width="fill_parent"
             android:layout_height="0dp"
@@ -48,24 +49,24 @@ limitations under the License.
     </ListView>
 
     <EditText
-            android:id="@+id/delegated_cert_installer_new"
+            android:id="@+id/selected_package_new"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/delegated_cert_installer_new_label"/>
+            android:hint="@string/selected_package_new_label"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <Button android:id="@+id/delegated_cert_installer_set"
+        <Button android:id="@+id/selected_package_set"
             android:layout_width="90dip"
             android:layout_height="50dip"
-            android:text="@string/delegated_cert_installer_set" />
+            android:text="@string/selected_package_set" />
 
-        <Button android:id="@+id/delegated_cert_installer_clear"
+        <Button android:id="@+id/selected_package_clear"
             android:layout_width="90dip"
             android:layout_height="50dip"
-            android:text="@string/delegated_cert_installer_clear" />
+            android:text="@string/selected_package_clear" />
     </LinearLayout>
 </LinearLayout>

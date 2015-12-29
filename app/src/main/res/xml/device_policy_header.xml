@@ -58,6 +58,9 @@
         <Preference
                 android:key="manage_app_restrictions"
                 android:title="@string/manage_app_restrictions"/>
+        <Preference
+                android:key="app_restrictions_managing_package"
+                android:title="@string/app_restrictions_managing_package"/>
     </PreferenceCategory>
 
     <PreferenceCategory

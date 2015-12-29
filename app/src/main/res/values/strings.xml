@@ -274,6 +274,16 @@
     <string name="ensure_verify_apps">Ensure verify apps</string>
     <string name="user_restriction_error_msg">Operation not allowed</string>
 
+    <!-- Strings for select app -->
+    <string name="current_selected_package">Current package:</string>
+    <string name="selected_package_new_label">New package name</string>
+    <string name="selected_package_set">Set</string>
+    <string name="selected_package_clear">Clear</string>
+    <string name="selected_package_none">None</string>
+    <string name="select_app_instructions">Select an app from the list,
+        or manually enter a package name below:</string>
+
+
     <!-- Strings for certificate management  -->
     <string name="certificate_management_title">Certificate management</string>
     <string name="install_key_certificate">Install a private key certificate</string>
@@ -306,6 +316,7 @@
     <string name="set_app_restrictions_success">Successfully set app restrictions for %s.</string>
     <string name="app_restrictions_info">%1$s - %2$s</string>
     <string name="plus">+</string>
+    <string name="app_restrictions_managing_package">App restrictions manager</string>
 
 
     <!-- strings used in the alert dialog for editing application restrictions. -->
@@ -429,14 +440,7 @@
     </string>
 
     <!--  Strings for delegated certificate installer -->
-    <string name="manage_cert_installer">Manage delegated certificate installer</string>
-    <string name="current_delegated_cert_installer">Current delegated cert installer:</string>
-    <string name="delegated_cert_installer_new_label">New delegated cert installer package name
-    </string>
-    <string name="delegated_cert_installer_set">Set</string>
-    <string name="delegated_cert_installer_clear">Clear</string>
-    <string name="delegated_cert_installer_instructions">Select an app as the new cert installer,
-        or manually enter its package name below:</string>
+    <string name="manage_cert_installer">Delegated cert installer</string>
 
     <!-- Strings for permission policies -->
     <string name="permission_management">Permission management</string>
