@@ -13,7 +13,7 @@ ext {
 }
 
 android {
-    compileSdkVersion 'android-23'
+    compileSdkVersion 24
     buildToolsVersion '23.0.1'
 
     defaultConfig {
