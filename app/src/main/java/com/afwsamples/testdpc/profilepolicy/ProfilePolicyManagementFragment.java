@@ -66,12 +66,18 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
             = "disable_bluetooth_contact_sharing";
     private static final String DISABLE_CROSS_PROFILE_CALLER_ID_KEY
             = "disable_cross_profile_caller_id";
+    private static final String DISABLE_CROSS_PROFILE_CONTACTS_SEARCH_KEY
+            = "disable_cross_profile_contacts_search";
     private static final String REMOVE_CROSS_PROFILE_APP_WIDGETS_KEY =
             "remove_cross_profile_app_widgets";
     private static final String REMOVE_PROFILE_KEY = "remove_profile";
 
     private static String[] MNC_PLUS_PREFERENCES = {
             DISABLE_BLUETOOTH_CONTACT_SHARING_KEY
+    };
+
+    private static String[] NYC_PLUS_PREFERENCES = {
+            DISABLE_CROSS_PROFILE_CONTACTS_SEARCH_KEY
     };
 
     private DevicePolicyManager mDevicePolicyManager;
@@ -83,6 +89,7 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
     private Preference mRemoveCrossProfileAppWidgetsPreference;
     private SwitchPreference mDisableBluetoothContactSharingSwitchPreference;
     private SwitchPreference mDisableCrossProfileCallerIdSwitchPreference;
+    private SwitchPreference mDisableCrossProfileContactsSearchSwitchPreference;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -173,6 +180,13 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
                 // Reload UI to verify the state of cross-profile caller Id is set correctly.
                 reloadCrossProfileCallerIdDisableUi();
                 return true;
+            case DISABLE_CROSS_PROFILE_CONTACTS_SEARCH_KEY:
+                boolean disableCrossProfileContactsSearch = (Boolean) newValue;
+                mDevicePolicyManager.setCrossProfileContactsSearchDisabled(mAdminComponentName,
+                        disableCrossProfileContactsSearch);
+                // Reload UI to verify the state of cross-profile contacts search is set correctly.
+                reloadCrossProfileContactsSearchDisableUi();
+                return true;
         }
         return false;
     }
@@ -189,8 +203,11 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
                 DISABLE_BLUETOOTH_CONTACT_SHARING_KEY);
         mDisableCrossProfileCallerIdSwitchPreference = (SwitchPreference) findPreference(
                 DISABLE_CROSS_PROFILE_CALLER_ID_KEY);
+        mDisableCrossProfileContactsSearchSwitchPreference = (SwitchPreference) findPreference(
+                DISABLE_CROSS_PROFILE_CONTACTS_SEARCH_KEY);
         mDisableBluetoothContactSharingSwitchPreference.setOnPreferenceChangeListener(this);
         mDisableCrossProfileCallerIdSwitchPreference.setOnPreferenceChangeListener(this);
+        mDisableCrossProfileContactsSearchSwitchPreference.setOnPreferenceChangeListener(this);
         reloadBluetoothContactSharing();
         reloadCrossProfileCallerIdDisableUi();
     }
@@ -210,6 +227,14 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
         boolean isCrossProfileCallerIdDisabled = mDevicePolicyManager
                 .getCrossProfileCallerIdDisabled(mAdminComponentName);
         mDisableCrossProfileCallerIdSwitchPreference.setChecked(isCrossProfileCallerIdDisabled);
+    }
+
+
+    private void reloadCrossProfileContactsSearchDisableUi() {
+        boolean isCrossProfileContactsSearchDisabled = mDevicePolicyManager
+                .getCrossProfileContactsSearchDisabled(mAdminComponentName);
+        mDisableCrossProfileContactsSearchSwitchPreference.setChecked(
+                isCrossProfileContactsSearchDisabled);
     }
 
     /**
@@ -302,9 +327,22 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
                 findPreference(preference).setEnabled(false);
             }
         }
+
+        if(isBeforeN()) {
+            // The following options depend on NYC APIs.
+            for (String preference : NYC_PLUS_PREFERENCES) {
+                findPreference(preference).setEnabled(false);
+            }
+        }
     }
 
     private boolean isBeforeM() {
         return Build.VERSION.SDK_INT < Build.VERSION_CODES.M;
+    }
+
+    private boolean isBeforeN() {
+        return Build.VERSION.SDK_INT < Build.VERSION_CODES.N
+                //TODO: remove it Build.VERSION.SDK_INT == N
+                && !Build.VERSION.CODENAME.startsWith("N");
     }
 }

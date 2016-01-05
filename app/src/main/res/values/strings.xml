@@ -143,6 +143,7 @@
     <string name="policies_title">Policies</string>
     <string name="disable_bluetooth_contact_sharing">Disable bluetooth contact sharing</string>
     <string name="disable_cross_profile_caller_id">Disable cross-profile caller ID</string>
+    <string name="disable_cross_profile_contacts_search">Disable cross-profile contacts search</string>
 
     <!-- Strings for wifi management -->
     <string name="wifi_management_title">Wifi management</string>

@@ -45,6 +45,9 @@
         <SwitchPreference
                 android:key="disable_cross_profile_caller_id"
                 android:title="@string/disable_cross_profile_caller_id"/>
+        <SwitchPreference
+                android:key="disable_cross_profile_contacts_search"
+                android:title="@string/disable_cross_profile_contacts_search"/>
     </PreferenceCategory>
 
     <PreferenceCategory
