@@ -80,19 +80,6 @@ public class SetupManagementFragment extends Fragment
         mNavigationNextButton.setText(R.string.setup_label);
 
         mChooseLogoButton = (Button) view.findViewById(R.id.choose_logo_button);
-        // The extra logo uri and color are supported only from N
-        if (ProvisioningStateUtil.versionIsAtLeastN()) {
-            if (canAnAppHandleGetContent()) {
-                mChooseLogoButton.setVisibility(View.VISIBLE);
-                mChooseLogoButton.setOnClickListener(new OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            startActivityForResult(getGetContentIntent(), REQUEST_GET_LOGO);
-                        }
-                    });
-            }
-            view.findViewById(R.id.provisioning_color_container).setVisibility(View.VISIBLE);
-        }
         if (savedInstanceState != null) {
             mLogoUri = (Uri) savedInstanceState.getParcelable(EXTRA_PROVISIONING_LOGO_URI);
         }
@@ -132,7 +119,22 @@ public class SetupManagementFragment extends Fragment
         super.onResume();
 
         getActivity().getActionBar().hide();
-        if (!setProvisioningMethodsVisibility()) {
+        if (setProvisioningMethodsVisibility()) {
+            // The extra logo uri and color are supported only from N
+            if (ProvisioningStateUtil.versionIsAtLeastN()) {
+                if (canAnAppHandleGetContent()) {
+                    mChooseLogoButton.setVisibility(View.VISIBLE);
+                    mChooseLogoButton.setOnClickListener(new OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                startActivityForResult(getGetContentIntent(), REQUEST_GET_LOGO);
+                            }
+                        });
+                }
+                getView().findViewById(R.id.provisioning_color_container).setVisibility(
+                        View.VISIBLE);
+            }
+        } else {
             showNoProvisioningPossibleUI();
         }
     }
