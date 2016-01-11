@@ -250,6 +250,7 @@
     <string name="disallow_config_wifi">Disallow config Wi-Fi</string>
     <string name="disallow_create_windows">Disallow create windows</string>
     <string name="disallow_cross_profile_copy_paste">Disallow cross-profile copy/paste</string>
+    <string name="disallow_data_roaming">Disallow data roaming</string>
     <string name="disallow_debugging_features">Disallow debugging features</string>
     <string name="disallow_factory_reset">Disallow factory reset</string>
     <string name="disallow_fun">Disallow fun</string>
