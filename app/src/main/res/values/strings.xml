@@ -470,6 +470,7 @@
     <string name="maximum_lock_time">Max time to screen lock (seconds)</string>
     <string name="maximum_password_fails">Max password failures for local wipe</string>
     <string name="not_valid_input">Failed to update: Not a valid input</string>
+    <string name="lock_screen_message">Lock screen message</string>
 
     <!-- Strings for managing Settings -->
     <string name="settings_management_title">Settings management</string>
