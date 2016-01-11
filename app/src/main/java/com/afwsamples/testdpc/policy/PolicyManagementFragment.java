@@ -109,60 +109,65 @@ import java.util.Set;
 
 /**
  * Provides several device management functions.
- * These include
- * 1) {@link DevicePolicyManager#setLockTaskPackages(android.content.ComponentName, String[])}
- * 2) {@link DevicePolicyManager#isLockTaskPermitted(String)}
- * 3) {@link UserManager#DISALLOW_DEBUGGING_FEATURES}
- * 4) {@link UserManager#DISALLOW_INSTALL_UNKNOWN_SOURCES}
- * 5) {@link UserManager#DISALLOW_REMOVE_USER}
- * 6) {@link UserManager#DISALLOW_ADD_USER}
- * 7) {@link UserManager#DISALLOW_FACTORY_RESET}
- * 8) {@link UserManager#DISALLOW_CONFIG_CREDENTIALS}
- * 9) {@link UserManager#DISALLOW_SHARE_LOCATION}
- * 10) {@link UserManager#DISALLOW_CONFIG_TETHERING}
- * 11) {@link UserManager#DISALLOW_ADJUST_VOLUME}
- * 12) {@link UserManager#DISALLOW_UNMUTE_MICROPHONE}
- * 13) {@link UserManager#DISALLOW_MODIFY_ACCOUNTS}
- * 14) {@link UserManager#DISALLOW_SAFE_BOOT}
- * 15) {@link UserManager#DISALLOW_OUTGOING_BEAM}}
- * 16) {@link UserManager#DISALLOW_CREATE_WINDOWS}}
- * 17) {@link DevicePolicyManager#clearDeviceOwnerApp(String)}
- * 18) {@link DevicePolicyManager#getPermittedAccessibilityServices(android.content.ComponentName)}
- * 19) {@link DevicePolicyManager#getPermittedInputMethods(android.content.ComponentName)}
- * 20) {@link DevicePolicyManager#setAccountManagementDisabled(android.content.ComponentName,
- * String, boolean)}
- * 21) {@link DevicePolicyManager#getAccountTypesWithManagementDisabled()}
- * 22) {@link DevicePolicyManager#createAndInitializeUser(android.content.ComponentName, String,
- * String, android.content.ComponentName, android.os.Bundle)}
- * 23) {@link DevicePolicyManager#removeUser(android.content.ComponentName, android.os.UserHandle)}
- * 24) {@link DevicePolicyManager#setUninstallBlocked(android.content.ComponentName, String,
- * boolean)}
- * 25) {@link DevicePolicyManager#isUninstallBlocked(android.content.ComponentName, String)}
- * 26) {@link DevicePolicyManager#setCameraDisabled(android.content.ComponentName, boolean)}
- * 27) {@link DevicePolicyManager#getCameraDisabled(android.content.ComponentName)}
- * 28) {@link DevicePolicyManager#enableSystemApp(android.content.ComponentName,
- * android.content.Intent)}
- * 29) {@link DevicePolicyManager#enableSystemApp(android.content.ComponentName, String)}
- * 30) {@link DevicePolicyManager#setApplicationRestrictions(android.content.ComponentName, String,
- * android.os.Bundle)}
- * 31) {@link DevicePolicyManager#installKeyPair(android.content.ComponentName,
- * java.security.PrivateKey, java.security.cert.Certificate, String)}
- * 32) {@link DevicePolicyManager#installCaCert(android.content.ComponentName, byte[])}
- * 33) {@link DevicePolicyManager#uninstallAllUserCaCerts(android.content.ComponentName)}
- * 34) {@link DevicePolicyManager#getInstalledCaCerts(android.content.ComponentName)}
- * 35) {@link DevicePolicyManager#setStatusBarDisabled(ComponentName, boolean)}
- * 36) {@link DevicePolicyManager#setKeyguardDisabled(ComponentName, boolean)}
- * 37) {@link DevicePolicyManager#setPermissionPolicy(android.content.ComponentName, int)}
- * 38) {@link DevicePolicyManager#getPermissionPolicy(android.content.ComponentName)}
- * 39) {@link DevicePolicyManager#setPermissionGrantState(ComponentName, String, String, int)} (
- * android.content.ComponentName, String, String, boolean)}
- * 40) {@link DevicePolicyManager#setScreenCaptureDisabled(ComponentName, boolean)}
- * 41) {@link DevicePolicyManager#getScreenCaptureDisabled(ComponentName)}
- * 42) {@link DevicePolicyManager#setKeyguardDisabledFeatures(ComponentName, int)}
- * 43) {@link DevicePolicyManager#setMaximumTimeToLock(ComponentName, long)}
- * 44) {@link DevicePolicyManager#setMaximumFailedPasswordsForWipe(ComponentName, int)}
- * 45) {@link DevicePolicyManager#setApplicationHidden(ComponentName, String, boolean)}
- * 46) {@link UserManager#DISALLOW_CONFIG_WIFI}
+ *
+ * These include:
+ * <ul>
+ * <li> {@link DevicePolicyManager#setLockTaskPackages(android.content.ComponentName, String[])} </li>
+ * <li> {@link DevicePolicyManager#isLockTaskPermitted(String)} </li>
+ * <li> {@link UserManager#DISALLOW_DEBUGGING_FEATURES} </li>
+ * <li> {@link UserManager#DISALLOW_INSTALL_UNKNOWN_SOURCES} </li>
+ * <li> {@link UserManager#DISALLOW_REMOVE_USER} </li>
+ * <li> {@link UserManager#DISALLOW_ADD_USER} </li>
+ * <li> {@link UserManager#DISALLOW_FACTORY_RESET} </li>
+ * <li> {@link UserManager#DISALLOW_CONFIG_CREDENTIALS} </li>
+ * <li> {@link UserManager#DISALLOW_SHARE_LOCATION} </li>
+ * <li> {@link UserManager#DISALLOW_CONFIG_TETHERING} </li>
+ * <li> {@link UserManager#DISALLOW_ADJUST_VOLUME} </li>
+ * <li> {@link UserManager#DISALLOW_UNMUTE_MICROPHONE} </li>
+ * <li> {@link UserManager#DISALLOW_MODIFY_ACCOUNTS} </li>
+ * <li> {@link UserManager#DISALLOW_SAFE_BOOT} </li>
+ * <li> {@link UserManager#DISALLOW_OUTGOING_BEAM}} </li>
+ * <li> {@link UserManager#DISALLOW_CREATE_WINDOWS}} </li>
+ * <li> {@link DevicePolicyManager#clearDeviceOwnerApp(String)} </li>
+ * <li> {@link DevicePolicyManager#getPermittedAccessibilityServices(android.content.ComponentName)}
+ * </li>
+ * <li> {@link DevicePolicyManager#getPermittedInputMethods(android.content.ComponentName)} </li>
+ * <li> {@link DevicePolicyManager#setAccountManagementDisabled(android.content.ComponentName,
+ *             String, boolean)} </li>
+ * <li> {@link DevicePolicyManager#getAccountTypesWithManagementDisabled()} </li>
+ * <li> {@link DevicePolicyManager#createAndInitializeUser(android.content.ComponentName, String,
+ *             String, android.content.ComponentName, android.os.Bundle)} </li>
+ * <li> {@link DevicePolicyManager#removeUser(android.content.ComponentName,
+               android.os.UserHandle)} </li>
+ * <li> {@link DevicePolicyManager#setUninstallBlocked(android.content.ComponentName, String,
+ *             boolean)} </li>
+ * <li> {@link DevicePolicyManager#isUninstallBlocked(android.content.ComponentName, String)} </li>
+ * <li> {@link DevicePolicyManager#setCameraDisabled(android.content.ComponentName, boolean)} </li>
+ * <li> {@link DevicePolicyManager#getCameraDisabled(android.content.ComponentName)} </li>
+ * <li> {@link DevicePolicyManager#enableSystemApp(android.content.ComponentName,
+ *             android.content.Intent)} </li>
+ * <li> {@link DevicePolicyManager#enableSystemApp(android.content.ComponentName, String)} </li>
+ * <li> {@link DevicePolicyManager#setApplicationRestrictions(android.content.ComponentName, String,
+ *       android.os.Bundle)} </li>
+ * <li> {@link DevicePolicyManager#installKeyPair(android.content.ComponentName,
+ *             java.security.PrivateKey, java.security.cert.Certificate, String)} </li>
+ * <li> {@link DevicePolicyManager#installCaCert(android.content.ComponentName, byte[])} </li>
+ * <li> {@link DevicePolicyManager#uninstallAllUserCaCerts(android.content.ComponentName)} </li>
+ * <li> {@link DevicePolicyManager#getInstalledCaCerts(android.content.ComponentName)} </li>
+ * <li> {@link DevicePolicyManager#setStatusBarDisabled(ComponentName, boolean)} </li>
+ * <li> {@link DevicePolicyManager#setKeyguardDisabled(ComponentName, boolean)} </li>
+ * <li> {@link DevicePolicyManager#setPermissionPolicy(android.content.ComponentName, int)} </li>
+ * <li> {@link DevicePolicyManager#getPermissionPolicy(android.content.ComponentName)} </li>
+ * <li> {@link DevicePolicyManager#setPermissionGrantState(ComponentName, String, String, int) (
+ *        android.content.ComponentName, String, String, boolean)} </li>
+ * <li> {@link DevicePolicyManager#setScreenCaptureDisabled(ComponentName, boolean)} </li>
+ * <li> {@link DevicePolicyManager#getScreenCaptureDisabled(ComponentName)} </li>
+ * <li> {@link DevicePolicyManager#setKeyguardDisabledFeatures(ComponentName, int)} </li>
+ * <li> {@link DevicePolicyManager#setMaximumTimeToLock(ComponentName, long)} </li>
+ * <li> {@link DevicePolicyManager#setMaximumFailedPasswordsForWipe(ComponentName, int)} </li>
+ * <li> {@link DevicePolicyManager#setApplicationHidden(ComponentName, String, boolean)} </li>
+ * <li> {@link UserManager#DISALLOW_CONFIG_WIFI} </li>
+ * </ul>
  */
 public class PolicyManagementFragment extends PreferenceFragment implements
         Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
