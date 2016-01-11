@@ -47,6 +47,7 @@ import android.preference.SwitchPreference;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.security.KeyChain;
+import android.security.KeyChainAliasCallback;
 import android.support.v4.content.FileProvider;
 import android.text.InputType;
 import android.text.TextUtils;
@@ -151,6 +152,7 @@ import java.util.Set;
  *       android.os.Bundle)} </li>
  * <li> {@link DevicePolicyManager#installKeyPair(android.content.ComponentName,
  *             java.security.PrivateKey, java.security.cert.Certificate, String)} </li>
+ * <li> {@link DevicePolicyManager#removeKeyPair(android.content.ComponentName, String)} </li>
  * <li> {@link DevicePolicyManager#installCaCert(android.content.ComponentName, byte[])} </li>
  * <li> {@link DevicePolicyManager#uninstallAllUserCaCerts(android.content.ComponentName)} </li>
  * <li> {@link DevicePolicyManager#getInstalledCaCerts(android.content.ComponentName)} </li>
@@ -229,6 +231,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     private static final String REENABLE_STATUS_BAR = "reenable_status_bar";
     private static final String REMOVE_ALL_CERTIFICATES_KEY = "remove_all_ca_certificates";
     private static final String REMOVE_DEVICE_OWNER_KEY = "remove_device_owner";
+    private static final String REMOVE_KEY_CERTIFICATE_KEY = "remove_key_certificate";
     private static final String REMOVE_USER_KEY = "remove_user";
     private static final String SET_ACCESSIBILITY_SERVICES_KEY = "set_accessibility_services";
     private static final String SET_DISABLE_ACCOUNT_MANAGEMENT_KEY
@@ -278,7 +281,8 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     };
 
     private static String[] NYC_PLUS_PREFERENCES = {
-            APP_RESTRICTIONS_MANAGING_PACKAGE_KEY, SHOW_WIFI_MAC_ADDRESS_KEY, REBOOT
+            APP_RESTRICTIONS_MANAGING_PACKAGE_KEY, REBOOT, REMOVE_KEY_CERTIFICATE_KEY,
+            SHOW_WIFI_MAC_ADDRESS_KEY
     };
 
     /**
@@ -404,6 +408,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         findPreference(MANAGE_APP_RESTRICTIONS_KEY).setOnPreferenceClickListener(this);
         findPreference(APP_RESTRICTIONS_MANAGING_PACKAGE_KEY).setOnPreferenceClickListener(this);
         findPreference(INSTALL_KEY_CERTIFICATE_KEY).setOnPreferenceClickListener(this);
+        findPreference(REMOVE_KEY_CERTIFICATE_KEY).setOnPreferenceClickListener(this);
         findPreference(INSTALL_CA_CERTIFICATE_KEY).setOnPreferenceClickListener(this);
         findPreference(GET_CA_CERTIFICATES_KEY).setOnPreferenceClickListener(this);
         findPreference(REMOVE_ALL_CERTIFICATES_KEY).setOnPreferenceClickListener(this);
@@ -549,6 +554,9 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 return true;
             case INSTALL_KEY_CERTIFICATE_KEY:
                 showFileViewerForImportingCertificate(INSTALL_KEY_CERTIFICATE_REQUEST_CODE);
+                return true;
+            case REMOVE_KEY_CERTIFICATE_KEY:
+                choosePrivateKeyForRemoval();
                 return true;
             case INSTALL_CA_CERTIFICATE_KEY:
                 showFileViewerForImportingCertificate(INSTALL_CA_CERTIFICATE_REQUEST_CODE);
@@ -1456,6 +1464,38 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                     }
                 })
                 .show();
+    }
+
+    /**
+     * Selects a private/public key pair to uninstall, using the system dialog to choose
+     * an alias.
+     *
+     * Once the alias is chosen and deleted, a {@link Toast} shows status- success or failure.
+     */
+    private void choosePrivateKeyForRemoval() {
+        KeyChain.choosePrivateKeyAlias(getActivity(), new KeyChainAliasCallback() {
+            @Override
+            public void alias(String alias) {
+                if (alias == null) {
+                    // No value was chosen.
+                    return;
+                }
+
+                final boolean removed =
+                        mDevicePolicyManager.removeKeyPair(mAdminComponentName, alias);
+
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (removed) {
+                            showToast(R.string.remove_keypair_successfully);
+                        } else {
+                            showToast(R.string.remove_keypair_fail);
+                        }
+                    }
+                });
+            }
+        }, /* keyTypes[] */ null, /* issuers[] */ null, /* uri */ null, /* alias */ null);
     }
 
     /**

@@ -286,7 +286,10 @@
 
     <!-- Strings for certificate management  -->
     <string name="certificate_management_title">Certificate management</string>
-    <string name="install_key_certificate">Install a private key certificate</string>
+    <string name="install_key_certificate">Install a private/public key pair</string>
+    <string name="remove_key_certificate">Remove a private/public key pair</string>
+    <string name="remove_keypair_successfully">The key pair is removed.</string>
+    <string name="remove_keypair_fail">The key pair failed to remove.</string>
     <string name="key_override_alias">Override client certificates with alias</string>
     <string name="certificate_password_prompt_title">Extract certificate</string>
     <string name="certificate_password_prompt_enter_password">Type the password to extract the

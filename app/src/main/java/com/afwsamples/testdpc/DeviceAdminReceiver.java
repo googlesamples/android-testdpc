@@ -29,6 +29,7 @@ import android.content.pm.PermissionInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.PersistableBundle;
+import android.os.Process;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
@@ -185,6 +186,11 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
     @Override
     public String onChoosePrivateKeyAlias(Context context, Intent intent, int uid, Uri uri,
             String alias) {
+        if (uid == Process.myUid()) {
+            // Always show the chooser if we were the one requesting the cert.
+            return null;
+        }
+
         String chosenAlias = PreferenceManager.getDefaultSharedPreferences(context)
                 .getString(OVERRIDE_KEY_SELECTION_KEY, null);
         if (!TextUtils.isEmpty(chosenAlias)) {
