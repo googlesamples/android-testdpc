@@ -204,6 +204,14 @@
     <string name="unhide_apps_empty">No apps are currently hidden.</string>
     <string name="unhide_apps_success">%s is no longer hidden.</string>
     <string name="unhide_apps_failure">%s cannot be unhidden.</string>
+    <string name="suspend_apps_title">Suspend apps</string>
+    <string name="suspend_apps_empty">All apps are suspended.</string>
+    <string name="suspend_apps_success">%s is now suspended.</string>
+    <string name="suspend_apps_failure">%s cannot be suspended.</string>
+    <string name="unsuspend_apps_title">Unsuspend apps</string>
+    <string name="unsuspend_apps_empty">No apps are currently suspended.</string>
+    <string name="unsuspend_apps_success">%s is no longer suspended.</string>
+    <string name="unsuspend_apps_failure">%s cannot be unsuspended.</string>
 
     <!-- Strings for lock task -->
     <string name="lock_task_title">Lock task</string>

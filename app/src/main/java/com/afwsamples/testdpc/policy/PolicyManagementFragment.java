@@ -245,8 +245,10 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     private static final String START_LOCK_TASK = "start_lock_task";
     private static final String STAY_ON_WHILE_PLUGGED_IN = "stay_on_while_plugged_in";
     private static final String STOP_LOCK_TASK = "stop_lock_task";
+    private static final String SUSPEND_APPS_KEY = "suspend_apps";
     private static final String SYSTEM_UPDATE_POLICY_KEY = "system_update_policy";
     private static final String UNHIDE_APPS_KEY = "unhide_apps";
+    private static final String UNSUSPEND_APPS_KEY = "unsuspend_apps";
     private static final String WIPE_DATA_KEY = "wipe_data";
     private static final String CREATE_WIFI_CONFIGURATION_KEY = "create_wifi_configuration";
     private static final String WIFI_CONFIG_LOCKDOWN_ENABLE_KEY = "enable_wifi_config_lockdown";
@@ -283,7 +285,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
 
     private static String[] NYC_PLUS_PREFERENCES = {
             APP_RESTRICTIONS_MANAGING_PACKAGE_KEY, REBOOT, REMOVE_KEY_CERTIFICATE_KEY,
-            SHOW_WIFI_MAC_ADDRESS_KEY, KEY_LOCK_SCREEN_MESSAGE
+            SHOW_WIFI_MAC_ADDRESS_KEY, KEY_LOCK_SCREEN_MESSAGE, SUSPEND_APPS_KEY, UNSUSPEND_APPS_KEY
     };
 
     /**
@@ -406,6 +408,8 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         findPreference(ENABLE_SYSTEM_APPS_BY_INTENT_KEY).setOnPreferenceClickListener(this);
         findPreference(HIDE_APPS_KEY).setOnPreferenceClickListener(this);
         findPreference(UNHIDE_APPS_KEY).setOnPreferenceClickListener(this);
+        findPreference(SUSPEND_APPS_KEY).setOnPreferenceClickListener(this);
+        findPreference(UNSUSPEND_APPS_KEY).setOnPreferenceClickListener(this);
         findPreference(MANAGE_APP_RESTRICTIONS_KEY).setOnPreferenceClickListener(this);
         findPreference(APP_RESTRICTIONS_MANAGING_PACKAGE_KEY).setOnPreferenceClickListener(this);
         findPreference(INSTALL_KEY_CERTIFICATE_KEY).setOnPreferenceClickListener(this);
@@ -541,6 +545,12 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 return true;
             case UNHIDE_APPS_KEY:
                 showHideAppsPrompt(true);
+                return true;
+            case SUSPEND_APPS_KEY:
+                showSuspendAppsPrompt(false);
+                return true;
+            case UNSUSPEND_APPS_KEY:
+                showSuspendAppsPrompt(true);
                 return true;
             case MANAGE_APP_RESTRICTIONS_KEY:
                 showFragment(new ManageAppRestrictionsFragment());
@@ -1674,10 +1684,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         final List<String> showApps = new ArrayList<> ();
         if (showHiddenApps) {
             // Find all hidden packages using the GET_UNINSTALLED_PACKAGES flag
-            List<ApplicationInfo> allApps = mPackageManager.getInstalledApplications(
-                    PackageManager.GET_UNINSTALLED_PACKAGES);
-            Collections.sort(allApps, new ApplicationInfo.DisplayNameComparator(mPackageManager));
-            for (ApplicationInfo applicationInfo : allApps) {
+            for (ApplicationInfo applicationInfo : getAllInstalledApplicationsSorted()) {
                 if (mDevicePolicyManager.isApplicationHidden(mAdminComponentName,
                         applicationInfo.packageName)) {
                     showApps.add(applicationInfo.packageName);
@@ -1685,14 +1692,10 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             }
         } else {
             // Find all non-hidden apps with a launcher icon
-            final Intent launcherIntent = new Intent(Intent.ACTION_MAIN);
-            launcherIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-            final List<ResolveInfo> launcherIntentResolvers = mPackageManager
-                    .queryIntentActivities(launcherIntent, 0);
-            Collections.sort(launcherIntentResolvers,
-                    new ResolveInfo.DisplayNameComparator(mPackageManager));
-            for (ResolveInfo res : launcherIntentResolvers) {
-                if (!showApps.contains(res.activityInfo.packageName)) {
+            for (ResolveInfo res : getAllLauncherIntentResolversSorted()) {
+                if (!showApps.contains(res.activityInfo.packageName)
+                        && !mDevicePolicyManager.isApplicationHidden(mAdminComponentName,
+                                res.activityInfo.packageName)) {
                     showApps.add(res.activityInfo.packageName);
                 }
             }
@@ -1733,6 +1736,85 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                     })
                     .show();
         }
+    }
+
+    /**
+     * Shows an alert dialog which displays a list of suspended/non-suspended apps.
+     */
+    private void showSuspendAppsPrompt(final boolean showSuspendedApps) {
+        final List<String> showApps = new ArrayList<>();
+        if (showSuspendedApps) {
+            // Find all suspended packages using the GET_UNINSTALLED_PACKAGES flag.
+            for (ApplicationInfo applicationInfo : getAllInstalledApplicationsSorted()) {
+                if (mDevicePolicyManager.getPackageSuspended(mAdminComponentName,
+                        applicationInfo.packageName)) {
+                    showApps.add(applicationInfo.packageName);
+                }
+            }
+        } else {
+            // Find all non-suspended apps with a launcher icon.
+            for (ResolveInfo res : getAllLauncherIntentResolversSorted()) {
+                if (!showApps.contains(res.activityInfo.packageName)
+                        && !mDevicePolicyManager.getPackageSuspended(mAdminComponentName,
+                        res.activityInfo.packageName)) {
+                    showApps.add(res.activityInfo.packageName);
+                }
+            }
+        }
+
+        if (showApps.isEmpty()) {
+            showToast(showSuspendedApps ?
+                    R.string.unsuspend_apps_empty : R.string.suspend_apps_empty);
+        } else {
+            AppInfoArrayAdapter appInfoArrayAdapter = new AppInfoArrayAdapter(getActivity(),
+                    R.id.pkg_name, showApps, true);
+            final int dialogTitleResId;
+            final int successResId;
+            final int failureResId;
+            if (showSuspendedApps) {
+                // Showing a dialog to unsuspend an app.
+                dialogTitleResId = R.string.unsuspend_apps_title;
+                successResId = R.string.unsuspend_apps_success;
+                failureResId = R.string.unsuspend_apps_failure;
+            } else {
+                // Showing a dialog to suspend an app.
+                dialogTitleResId = R.string.suspend_apps_title;
+                successResId = R.string.suspend_apps_success;
+                failureResId = R.string.suspend_apps_failure;
+            }
+            new AlertDialog.Builder(getActivity())
+                    .setTitle(getString(dialogTitleResId))
+                    .setAdapter(appInfoArrayAdapter, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int position) {
+                            String packageName = showApps.get(position);
+                            if (mDevicePolicyManager.setPackageSuspended(mAdminComponentName,
+                                    packageName, !showSuspendedApps)) {
+                                showToast(successResId, packageName);
+                            } else {
+                                showToast(getString(failureResId, packageName), Toast.LENGTH_LONG);
+                            }
+                        }
+                    })
+                    .show();
+        }
+    }
+
+    private List<ResolveInfo> getAllLauncherIntentResolversSorted() {
+        final Intent launcherIntent = new Intent(Intent.ACTION_MAIN);
+        launcherIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+        final List<ResolveInfo> launcherIntentResolvers = mPackageManager
+                .queryIntentActivities(launcherIntent, 0);
+        Collections.sort(launcherIntentResolvers,
+                new ResolveInfo.DisplayNameComparator(mPackageManager));
+        return launcherIntentResolvers;
+    }
+
+    private List<ApplicationInfo> getAllInstalledApplicationsSorted() {
+        List<ApplicationInfo> allApps = mPackageManager.getInstalledApplications(
+                PackageManager.GET_UNINSTALLED_PACKAGES);
+        Collections.sort(allApps, new ApplicationInfo.DisplayNameComparator(mPackageManager));
+        return allApps;
     }
 
     private void showToast(int msgId, Object... args) {
