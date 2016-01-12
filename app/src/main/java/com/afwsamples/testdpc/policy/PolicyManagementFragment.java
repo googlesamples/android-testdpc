@@ -219,6 +219,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             = "keyguard_disable_unredacted_notifications";
     private static final String KEYGUARD_DISABLE_WIDGETS = "keyguard_disable_widgets";
     private static final String KEYGUARD_PREFERENCES = "keyguard_preferences";
+    private static final String KEY_LOCK_SCREEN_MESSAGE = "key_lock_screen_message";
     private static final String KEY_MAX_FAILS_BEFORE_WIPE = "key_max_fails_before_wipe";
     private static final String KEY_MAX_TIME_SCREEN_LOCK = "key_max_time_screen_lock";
     private static final String MANAGE_APP_PERMISSIONS_KEY = "manage_app_permissions";
@@ -269,7 +270,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             STOP_LOCK_TASK, DISABLE_STATUS_BAR, REENABLE_STATUS_BAR, DISABLE_KEYGUARD,
             REENABLE_KEYGUARD, START_KIOSK_MODE, SYSTEM_UPDATE_POLICY_KEY, KEYGUARD_DISABLE_WIDGETS,
             KEYGUARD_DISABLE_SECURE_CAMERA, KEYGUARD_DISABLE_SECURE_NOTIFICATIONS,
-            STAY_ON_WHILE_PLUGGED_IN, SHOW_WIFI_MAC_ADDRESS_KEY, REBOOT
+            STAY_ON_WHILE_PLUGGED_IN, SHOW_WIFI_MAC_ADDRESS_KEY, REBOOT, KEY_LOCK_SCREEN_MESSAGE
     };
 
     private static String[] MNC_PLUS_PREFERENCES = {
@@ -282,7 +283,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
 
     private static String[] NYC_PLUS_PREFERENCES = {
             APP_RESTRICTIONS_MANAGING_PACKAGE_KEY, REBOOT, REMOVE_KEY_CERTIFICATE_KEY,
-            SHOW_WIFI_MAC_ADDRESS_KEY
+            SHOW_WIFI_MAC_ADDRESS_KEY, KEY_LOCK_SCREEN_MESSAGE
     };
 
     /**
@@ -416,6 +417,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         findPreference(SET_PERMISSION_POLICY_KEY).setOnPreferenceClickListener(this);
         findPreference(MANAGE_APP_PERMISSIONS_KEY).setOnPreferenceClickListener(this);
         findPreference(KEY_MAX_TIME_SCREEN_LOCK).setOnPreferenceChangeListener(this);
+        findPreference(KEY_LOCK_SCREEN_MESSAGE).setOnPreferenceChangeListener(this);
         findPreference(KEY_MAX_FAILS_BEFORE_WIPE).setOnPreferenceChangeListener(this);
         findPreference(CREATE_WIFI_CONFIGURATION_KEY).setOnPreferenceClickListener(this);
         findPreference(WIFI_CONFIG_LOCKDOWN_ENABLE_KEY).setOnPreferenceChangeListener(this);
@@ -671,6 +673,10 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 } catch (NumberFormatException e) {
                     showToast(R.string.not_valid_input);
                 }
+                return true;
+            case KEY_LOCK_SCREEN_MESSAGE:
+                mDevicePolicyManager.setDeviceOwnerLockScreenInfo(mAdminComponentName,
+                        (String) newValue);
                 return true;
             case KEY_MAX_FAILS_BEFORE_WIPE:
                 try {

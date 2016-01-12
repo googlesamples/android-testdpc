@@ -184,6 +184,12 @@
                 android:dialogTitle="@string/maximum_password_fails"
                 android:inputType="number"
                 android:defaultValue="0" />
+        <EditTextPreference
+                android:key="key_lock_screen_message"
+                android:title="@string/lock_screen_message"
+                android:dialogTitle="@string/lock_screen_message"
+                android:inputType="text"
+                android:defaultValue="" />
     </PreferenceCategory>
 
     <PreferenceCategory
