@@ -172,6 +172,9 @@
                 android:dialogTitle="@string/maximum_password_fails"
                 android:inputType="number"
                 android:defaultValue="0" />
+        <Preference
+                android:key="password_constraints"
+                android:title="@string/password_constraints"/>
     </PreferenceCategory>
 
     <PreferenceCategory

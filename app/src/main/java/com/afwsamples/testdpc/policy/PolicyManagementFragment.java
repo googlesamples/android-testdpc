@@ -71,6 +71,7 @@ import com.afwsamples.testdpc.common.MediaDisplayFragment;
 import com.afwsamples.testdpc.policy.blockuninstallation.BlockUninstallationInfoArrayAdapter;
 import com.afwsamples.testdpc.policy.certificate.DelegatedCertInstallerFragment;
 import com.afwsamples.testdpc.policy.datausage.NetworkUsageStatsFragment;
+import com.afwsamples.testdpc.policy.keyguard.PasswordConstraintsFragment;
 import com.afwsamples.testdpc.policy.locktask.KioskModeActivity;
 import com.afwsamples.testdpc.policy.locktask.LockTaskAppInfoArrayAdapter;
 import com.afwsamples.testdpc.policy.systemupdatepolicy.SystemUpdatePolicyFragment;
@@ -216,6 +217,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     private static final String MANAGED_PROFILE_SPECIFIC_POLICIES_KEY = "managed_profile_policies";
     private static final String MANAGE_LOCK_TASK_LIST_KEY = "manage_lock_task";
     private static final String NETWORK_STATS_KEY = "network_stats";
+    private static final String PASSWORD_CONSTRAINTS_KEY = "password_constraints";
     private static final String REENABLE_KEYGUARD = "reenable_keyguard";
     private static final String REENABLE_STATUS_BAR = "reenable_status_bar";
     private static final String REMOVE_ALL_CERTIFICATES_KEY = "remove_all_ca_certificates";
@@ -358,6 +360,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         mDisableScreenCaptureSwitchPreference = (SwitchPreference) findPreference(
                 DISABLE_SCREEN_CAPTURE_KEY);
         mDisableScreenCaptureSwitchPreference.setOnPreferenceChangeListener(this);
+        findPreference(PASSWORD_CONSTRAINTS_KEY).setOnPreferenceClickListener(this);
         findPreference(SYSTEM_UPDATE_POLICY_KEY).setOnPreferenceClickListener(this);
         findPreference(NETWORK_STATS_KEY).setOnPreferenceClickListener(this);
         findPreference(DELEGATED_CERT_INSTALLER_KEY).setOnPreferenceClickListener(this);
@@ -536,6 +539,9 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 return true;
             case MANAGED_PROFILE_SPECIFIC_POLICIES_KEY:
                 showFragment(new ProfilePolicyManagementFragment());
+                return true;
+            case PASSWORD_CONSTRAINTS_KEY:
+                showFragment(new PasswordConstraintsFragment());
                 return true;
             case SYSTEM_UPDATE_POLICY_KEY:
                 showFragment(new SystemUpdatePolicyFragment());
