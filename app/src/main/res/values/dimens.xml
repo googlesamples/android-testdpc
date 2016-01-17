@@ -36,4 +36,7 @@
 
     <!-- Spacing between an EditText and its TextView label. -->
     <dimen name="label_edittext_padding">8dp</dimen>
+
+    <!-- Dimens used in displaying support message. -->
+    <dimen name="message_padding">16dp</dimen>
 </resources>

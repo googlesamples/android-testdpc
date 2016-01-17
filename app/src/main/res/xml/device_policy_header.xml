@@ -288,6 +288,16 @@
     </PreferenceCategory>
 
     <PreferenceCategory
+            android:title="@string/support_messages">
+        <Preference
+                android:key="set_short_support_message"
+                android:title="@string/set_short_support_message" />
+        <Preference
+                android:key="set_long_support_message"
+                android:title="@string/set_long_support_message" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
             android:title="@string/device_owner_management">
         <Preference
                 android:key="wipe_data"

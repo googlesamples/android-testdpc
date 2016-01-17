@@ -509,4 +509,23 @@
 
     <string name="provisioning_color">Provisioning color:</string>
     <string name="color_not_recognized">This color is not recognized</string>
+
+    <!-- Strings for setting support messages -->
+    <string name="support_messages">Support messages</string>
+    <string name="set_short_support_message">Set short support message</string>
+    <string name="set_long_support_message">Set long support message</string>
+    <string name="set_message">set message</string>
+    <string name="clear_message">clear message</string>
+    <string name="set_default_message">set default message</string>
+    <string name="default_short_message">
+        This action is disabled by your administrator. Contact someone@example.com for support.
+    </string>
+    <string name="default_long_message">
+        This profile or device is managed by TestDPC. You can contact tech
+        support on:\n\n
+        America: +1 555-0100\n\n
+        APAC: +1 555-0100\n\n
+        Europe: +1 555-0100\n\n
+        Email: someone@example.com
+    </string>
 </resources>

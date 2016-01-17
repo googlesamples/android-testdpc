@@ -169,6 +169,8 @@ import java.util.Set;
  * <li> {@link DevicePolicyManager#setMaximumTimeToLock(ComponentName, long)} </li>
  * <li> {@link DevicePolicyManager#setMaximumFailedPasswordsForWipe(ComponentName, int)} </li>
  * <li> {@link DevicePolicyManager#setApplicationHidden(ComponentName, String, boolean)} </li>
+ * <li> {@link DevicePolicyManager#setShortSupportMessage(ComponentName, String)} </li>
+ * <li> {@link DevicePolicyManager#setLongSupportMessage(ComponentName, String)} </li>
  * <li> {@link UserManager#DISALLOW_CONFIG_WIFI} </li>
  * </ul>
  */
@@ -240,7 +242,9 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     private static final String SET_DISABLE_ACCOUNT_MANAGEMENT_KEY
             = "set_disable_account_management";
     private static final String SET_INPUT_METHODS_KEY = "set_input_methods";
+    private static final String SET_LONG_SUPPORT_MESSAGE_KEY = "set_long_support_message";
     private static final String SET_PERMISSION_POLICY_KEY = "set_permission_policy";
+    private static final String SET_SHORT_SUPPORT_MESSAGE_KEY = "set_short_support_message";
     private static final String SET_USER_RESTRICTIONS_KEY = "set_user_restrictions";
     private static final String SHOW_WIFI_MAC_ADDRESS_KEY = "show_wifi_mac_address";
     private static final String START_KIOSK_MODE = "start_kiosk_mode";
@@ -287,7 +291,8 @@ public class PolicyManagementFragment extends PreferenceFragment implements
 
     private static String[] NYC_PLUS_PREFERENCES = {
             APP_RESTRICTIONS_MANAGING_PACKAGE_KEY, REBOOT, REMOVE_KEY_CERTIFICATE_KEY,
-            SHOW_WIFI_MAC_ADDRESS_KEY, KEY_LOCK_SCREEN_MESSAGE, SUSPEND_APPS_KEY, UNSUSPEND_APPS_KEY
+            SHOW_WIFI_MAC_ADDRESS_KEY, KEY_LOCK_SCREEN_MESSAGE, SUSPEND_APPS_KEY,
+            UNSUSPEND_APPS_KEY, SET_SHORT_SUPPORT_MESSAGE_KEY, SET_LONG_SUPPORT_MESSAGE_KEY
     };
 
     /**
@@ -435,6 +440,8 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         mInstallNonMarketAppsPreference.setOnPreferenceChangeListener(this);
         findPreference(SET_USER_RESTRICTIONS_KEY).setOnPreferenceClickListener(this);
         findPreference(REBOOT).setOnPreferenceClickListener(this);
+        findPreference(SET_SHORT_SUPPORT_MESSAGE_KEY).setOnPreferenceClickListener(this);
+        findPreference(SET_LONG_SUPPORT_MESSAGE_KEY).setOnPreferenceClickListener(this);
 
         reloadCameraDisableUi();
         reloadScreenCaptureDisableUi();
@@ -647,6 +654,14 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 return true;
             case REBOOT:
                 reboot();
+                return true;
+            case SET_SHORT_SUPPORT_MESSAGE_KEY:
+                showFragment(SetSupportMessageFragment.newInstance(
+                        SetSupportMessageFragment.TYPE_SHORT));
+                return true;
+            case SET_LONG_SUPPORT_MESSAGE_KEY:
+                showFragment(SetSupportMessageFragment.newInstance(
+                        SetSupportMessageFragment.TYPE_LONG));
                 return true;
         }
         return false;
