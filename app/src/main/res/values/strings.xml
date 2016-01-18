@@ -482,6 +482,26 @@
     <string name="not_valid_input">Failed to update: Not a valid input</string>
     <string name="lock_screen_message">Lock screen message</string>
 
+    <!-- Strings for password policies -->
+    <string name="password_constraints">Password constraints</string>
+
+    <string name="minimum_password_quality">Minimum password quality:</string>
+    <string name="password_quality_unspecified">Unspecified</string>
+    <string name="password_quality_something">Something</string>
+    <string name="password_quality_numeric">Numeric</string>
+    <string name="password_quality_numeric_complex">Numeric (Complex)</string>
+    <string name="password_quality_alphabetic">Alphabetic</string>
+    <string name="password_quality_alphanumeric">Alphanumeric</string>
+    <string name="password_quality_complex">Complex</string>
+
+    <string name="password_min_length">Minimum password length:</string>
+    <string name="password_min_letters">Minimum number of letters:</string>
+    <string name="password_min_numeric">Minimum number of digits:</string>
+    <string name="password_min_lowercase">Minimum number of lower-case characters:</string>
+    <string name="password_min_uppercase">Minimum number of upper-case characters:</string>
+    <string name="password_min_symbols">Minimum number of symbols:</string>
+    <string name="password_min_nonletter">Minimum number of non-letters:</string>
+
     <!-- Strings for managing Settings -->
     <string name="settings_management_title">Settings management</string>
     <string name="stay_on_while_plugged_in">Keep the device on while plugged in</string>

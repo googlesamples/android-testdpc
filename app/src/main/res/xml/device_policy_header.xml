@@ -196,6 +196,9 @@
                 android:dialogTitle="@string/lock_screen_message"
                 android:inputType="text"
                 android:defaultValue="" />
+        <Preference
+                android:key="password_constraints"
+                android:title="@string/password_constraints"/>
     </PreferenceCategory>
 
     <PreferenceCategory
