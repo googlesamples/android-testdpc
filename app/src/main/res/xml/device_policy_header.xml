@@ -300,6 +300,9 @@
     <PreferenceCategory
             android:title="@string/device_owner_management">
         <Preference
+                android:key="request_bugreport"
+                android:title="@string/request_bugreport"/>
+        <Preference
                 android:key="wipe_data"
                 android:title="@string/wipe_data"/>
         <Preference
