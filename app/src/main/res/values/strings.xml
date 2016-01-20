@@ -354,6 +354,12 @@
     <string name="bugreport_failure_failed_completing">Bugreport collection operation failed</string>
     <string name="bugreport_failure_file_no_longer_available">Bugreport file is no longer available for collection</string>
 
+    <!-- Enterprise process logging -->
+    <string name="enable_process_logging">Enable process logging</string>
+    <string name="request_process_logs">Request process logs</string>
+    <string name="failed_to_retrieve_process_logs">Failed to retrieve process logs, they were probably accessed less than 2 hours ago</string>
+    <string name="process_logs_retrieved_message">---- Logs retrieved  %s ----</string>
+
     <!-- Accessibility -->
     <string name="accessibility_title">Accessibility</string>
     <string name="set_accessibility_services">Set accessibility services</string>

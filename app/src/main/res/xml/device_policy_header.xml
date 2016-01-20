@@ -307,6 +307,12 @@
 
     <PreferenceCategory
             android:title="@string/device_owner_management">
+        <SwitchPreference
+                android:key="enable_process_logging"
+                android:title="@string/enable_process_logging"/>
+        <Preference
+                android:key="request_process_logs"
+                android:title="@string/request_process_logs"/>
         <Preference
                 android:key="request_bugreport"
                 android:title="@string/request_bugreport"/>
