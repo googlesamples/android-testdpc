@@ -46,6 +46,7 @@ import static android.os.UserManager.DISALLOW_CONFIG_VPN;
 import static android.os.UserManager.DISALLOW_CONFIG_WIFI;
 import static android.os.UserManager.DISALLOW_CREATE_WINDOWS;
 import static android.os.UserManager.DISALLOW_CROSS_PROFILE_COPY_PASTE;
+import static android.os.UserManager.DISALLOW_DATA_ROAMING;
 import static android.os.UserManager.DISALLOW_DEBUGGING_FEATURES;
 import static android.os.UserManager.DISALLOW_FACTORY_RESET;
 import static android.os.UserManager.DISALLOW_FUN;
@@ -68,9 +69,6 @@ import static android.os.UserManager.ENSURE_VERIFY_APPS;
 public class UserRestrictionsDisplayFragment extends PreferenceFragment
         implements Preference.OnPreferenceChangeListener {
     private static final String TAG = "UserRestrictions";
-
-    // TODO: Remove this variable and use UM.DISALLOW_DATA_ROAMING, when sdk is updated.
-    public static final String DISALLOW_DATA_ROAMING = "no_data_roaming";
 
     private DevicePolicyManager mDevicePolicyManager;
     private UserManager mUserManager;
