@@ -476,6 +476,9 @@
     <string name="password_min_symbols">Minimum number of symbols:</string>
     <string name="password_min_nonletter">Minimum number of non-letters:</string>
 
+    <string name="password_not_compliant_title">Password is not compliant</string>
+    <string name="password_not_compliant_content">Touch to set a new lock screen password.</string>
+
     <!-- Strings for managing Settings -->
     <string name="settings_management_title">Settings management</string>
     <string name="stay_on_while_plugged_in">Keep the device on while plugged in</string>

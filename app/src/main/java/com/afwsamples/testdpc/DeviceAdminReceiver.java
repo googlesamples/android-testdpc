@@ -20,6 +20,9 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.annotation.TargetApi;
 import android.app.admin.DevicePolicyManager;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -51,6 +54,24 @@ import static com.afwsamples.testdpc.policy.PolicyManagementFragment.OVERRIDE_KE
  */
 public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
     private static final String TAG = "DeviceAdminReceiver";
+
+    public static final String ACTION_PASSWORD_REQUIREMENTS_CHANGED =
+            "com.afwsamples.testdpc.policy.PASSWORD_REQUIREMENTS_CHANGED";
+
+    private static final int CHANGE_PASSWORD_NOTIFICATION_ID = 101;
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        switch (intent.getAction()) {
+            case ACTION_PASSWORD_REQUIREMENTS_CHANGED:
+            case Intent.ACTION_BOOT_COMPLETED:
+                updatePasswordQualityNotification(context);
+                break;
+            default:
+               super.onReceive(context, intent);
+               break;
+        }
+    }
 
     @Override
     public void onProfileProvisioningComplete(Context context, Intent intent) {
@@ -212,5 +233,31 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
      */
     public static ComponentName getComponentName(Context context) {
         return new ComponentName(context.getApplicationContext(), DeviceAdminReceiver.class);
+    }
+
+    @Override
+    public void onPasswordChanged(Context context, Intent intent) {
+        updatePasswordQualityNotification(context);
+    }
+
+    private static void updatePasswordQualityNotification(Context context) {
+        DevicePolicyManager devicePolicyManager = (DevicePolicyManager) context.getSystemService(
+                Context.DEVICE_POLICY_SERVICE);
+        NotificationManager nm = (NotificationManager)
+                context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        if (!devicePolicyManager.isActivePasswordSufficient()) {
+            Notification.Builder warn = new Notification.Builder(context)
+                    .setOngoing(true)
+                    .setSmallIcon(R.drawable.ic_launcher)
+                    .setTicker(context.getText(R.string.password_not_compliant_title))
+                    .setContentTitle(context.getText(R.string.password_not_compliant_title))
+                    .setContentText(context.getText(R.string.password_not_compliant_content))
+                    .setContentIntent(PendingIntent.getActivity(context, /*requestCode*/ -1,
+                            new Intent(DevicePolicyManager.ACTION_SET_NEW_PASSWORD), /*flags*/ 0));
+            nm.notify(CHANGE_PASSWORD_NOTIFICATION_ID, warn.getNotification());
+        } else {
+            nm.cancel(CHANGE_PASSWORD_NOTIFICATION_ID);
+        }
     }
 }
