@@ -192,6 +192,11 @@
         <Preference
                 android:key="password_constraints"
                 android:title="@string/password_constraints"/>
+        <Preference
+                android:key="reset_password"
+                android:title="@string/reset_password"
+                android:dialogTitle="@string/reset_password"
+                android:inputType="textPassword" />
     </PreferenceCategory>
 
     <PreferenceCategory

@@ -241,6 +241,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     private static final String REMOVE_KEY_CERTIFICATE_KEY = "remove_key_certificate";
     private static final String REMOVE_USER_KEY = "remove_user";
     private static final String REQUEST_BUGREPORT_KEY = "request_bugreport";
+    private static final String RESET_PASSWORD_KEY = "reset_password";
     private static final String SET_ACCESSIBILITY_SERVICES_KEY = "set_accessibility_services";
     private static final String SET_ALWAYS_ON_VPN_KEY = "set_always_on_vpn";
     private static final String SET_DISABLE_ACCOUNT_MANAGEMENT_KEY
@@ -307,6 +308,10 @@ public class PolicyManagementFragment extends PreferenceFragment implements
      */
     private static String[] MANAGED_PROFILE_MNC_PLUS_PREFERENCES = {
             KEYGUARD_PREFERENCES
+    };
+
+    private static String[] MANAGED_PROFILE_NYC_PLUS_PREFERENCES = {
+            RESET_PASSWORD_KEY
     };
 
     private static final String[] MANAGED_PROFILE_SPECIFIC_OPTIONS = {
@@ -398,6 +403,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 MUTE_AUDIO_KEY);
         mMuteAudioSwitchPreference.setOnPreferenceChangeListener(this);
         findPreference(PASSWORD_CONSTRAINTS_KEY).setOnPreferenceClickListener(this);
+        findPreference(RESET_PASSWORD_KEY).setOnPreferenceClickListener(this);
         findPreference(SYSTEM_UPDATE_POLICY_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_ALWAYS_ON_VPN_KEY).setOnPreferenceClickListener(this);
         findPreference(NETWORK_STATS_KEY).setOnPreferenceClickListener(this);
@@ -498,6 +504,9 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             case CHECK_LOCK_TASK_PERMITTED_KEY:
                 showCheckLockTaskPermittedPrompt();
                 return true;
+            case RESET_PASSWORD_KEY:
+                showResetPasswordPrompt();
+                return false;
             case START_LOCK_TASK:
                 getActivity().startLockTask();
                 return true;
@@ -876,6 +885,55 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     }
 
     /**
+     * Shows a prompt to ask for a password to reset to and to set whether this requires
+     * re-entry before any further changes and/or whether the password needs to be entered during
+     * boot to start the user.
+     */
+    private void showResetPasswordPrompt() {
+        View dialogView = getActivity().getLayoutInflater().inflate(
+                R.layout.reset_password_dialog, null);
+
+        final EditText passwordView = (EditText) dialogView.findViewById(
+                R.id.password);
+        final CheckBox requireEntry = (CheckBox) dialogView.findViewById(
+                R.id.require_password_entry_checkbox);
+        final CheckBox requireOnBoot = (CheckBox) dialogView.findViewById(
+                R.id.require_password_on_boot_checkbox);
+
+        DialogInterface.OnClickListener resetListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int which) {
+                String password = passwordView.getText().toString();
+                if (TextUtils.isEmpty(password)) {
+                    password = null;
+                }
+
+                int flags = 0;
+                flags |= requireEntry.isChecked() ?
+                        DevicePolicyManager.RESET_PASSWORD_REQUIRE_ENTRY : 0;
+                flags |= requireOnBoot.isChecked() ?
+                        DevicePolicyManager.RESET_PASSWORD_DO_NOT_ASK_CREDENTIALS_ON_BOOT : 0;
+
+                boolean ok = false;
+                try {
+                    ok = mDevicePolicyManager.resetPassword(password, flags);
+                } catch (IllegalArgumentException iae) {
+                    // Bad password, eg. 2 characters where system minimum length is 4.
+                    Log.w(TAG, "Failed to reset password", iae);
+                }
+                showToast(ok ? R.string.password_reset_success : R.string.password_reset_failed);
+            }
+        };
+
+        new AlertDialog.Builder(getActivity())
+                .setTitle(R.string.reset_password)
+                .setView(dialogView)
+                .setPositiveButton(android.R.string.ok, resetListener)
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    /**
      * Shows a prompt to ask for confirmation on wiping the data and also provide an option
      * to set if external storage and factory reset protection data also needs to wiped.
      */
@@ -1041,6 +1099,11 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             }
             if (isBeforeM()) {
                 for (String preference : MANAGED_PROFILE_MNC_PLUS_PREFERENCES) {
+                    findPreference(preference).setEnabled(false);
+                }
+            }
+            if (isBeforeN()) {
+                for (String preference : MANAGED_PROFILE_NYC_PLUS_PREFERENCES) {
                     findPreference(preference).setEnabled(false);
                 }
             }
