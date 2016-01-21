@@ -59,6 +59,7 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
             "com.afwsamples.testdpc.policy.PASSWORD_REQUIREMENTS_CHANGED";
 
     private static final int CHANGE_PASSWORD_NOTIFICATION_ID = 101;
+    private static final int PASSWORD_FAILED_NOTIFICATION_ID = 102;
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -233,6 +234,45 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
      */
     public static ComponentName getComponentName(Context context) {
         return new ComponentName(context.getApplicationContext(), DeviceAdminReceiver.class);
+    }
+
+    @Override
+    public void onPasswordFailed(Context context, Intent intent) {
+        DevicePolicyManager devicePolicyManager = (DevicePolicyManager) context.getSystemService(
+                Context.DEVICE_POLICY_SERVICE);
+        /*
+         * Post a notification to show:
+         *  - how many wrong passwords have been entered;
+         *  - how many wrong passwords need to be entered for the device to be wiped.
+         */
+        int attempts = devicePolicyManager.getCurrentFailedPasswordAttempts();
+        int maxAttempts = devicePolicyManager.getMaximumFailedPasswordsForWipe(null);
+
+        String title = context.getQuantityString(
+                R.plurals.password_failed_attempts_title, attempts, attempts);
+        String content = maxAttempts == 0
+                ? context.getString(R.string.password_failed_no_limit_set)
+                : context.getQuantityString(
+                        R.plurals.password_failed_attempts_content, maxAttempts, maxAttempts);
+
+        Notification.Builder warn = new Notification.Builder(context)
+                .setSmallIcon(R.drawable.ic_launcher)
+                .setTicker(title)
+                .setContentTitle(title)
+                .setContentText(content)
+                .setContentIntent(PendingIntent.getActivity(context, /* requestCode */ -1,
+                        new Intent(DevicePolicyManager.ACTION_SET_NEW_PASSWORD), /* flags */ 0));
+
+        NotificationManager nm = (NotificationManager)
+                context.getSystemService(Context.NOTIFICATION_SERVICE);
+        nm.notify(PASSWORD_FAILED_NOTIFICATION_ID, warn.getNotification());
+    }
+
+    @Override
+    public void onPasswordSucceeded(Context context, Intent intent) {
+        NotificationManager nm = (NotificationManager)
+                context.getSystemService(Context.NOTIFICATION_SERVICE);
+        nm.cancel(PASSWORD_FAILED_NOTIFICATION_ID);
     }
 
     @Override
