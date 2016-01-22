@@ -27,7 +27,9 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PermissionInfo;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
+import android.os.ParcelFileDescriptor;
 import android.os.PersistableBundle;
 import android.os.Process;
 import android.preference.PreferenceManager;
@@ -35,9 +37,16 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.common.LaunchIntentUtil;
 import com.afwsamples.testdpc.cosu.EnableCosuActivity;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -120,6 +129,84 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
 
         launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(launch);
+    }
+
+    @TargetApi(Build.VERSION_CODES.N)
+    @Override
+    public void onBugreportSharingDeclined(Context context, Intent intent) {
+        Log.i(TAG, "Bugreport sharing declined");
+        Util.showNotification(context, R.string.bugreport_title,
+                context.getString(R.string.bugreport_sharing_declined),
+                Util.BUGREPORT_NOTIFICATION_ID);
+    }
+
+    @TargetApi(Build.VERSION_CODES.N)
+    @Override
+    public void onBugreportShared(final Context context, Intent intent,
+            final String bugreportFileHash) {
+        Log.i(TAG, "Bugreport shared, hash: " + bugreportFileHash);
+        final Uri bugreportUri = intent.getData();
+
+        final PendingResult result = goAsync();
+        new AsyncTask<Void, Void, String>() {
+            @Override
+            protected String doInBackground(Void... params) {
+                File outputBugreportFile;
+                String message;
+                InputStream in;
+                OutputStream out;
+                try {
+                    ParcelFileDescriptor mInputPfd = context.getContentResolver()
+                            .openFileDescriptor(bugreportUri, "r");
+                    in = new FileInputStream(mInputPfd.getFileDescriptor());
+                    outputBugreportFile = new File(context.getExternalFilesDir(null),
+                            bugreportUri.getLastPathSegment());
+                    out = new FileOutputStream(outputBugreportFile);
+                    byte[] buffer = new byte[1024];
+                    int read;
+                    while ((read = in.read(buffer)) != -1) {
+                        out.write(buffer, 0, read);
+                    }
+                    in.close();
+                    out.close();
+                    message = context.getString(R.string.received_bugreport,
+                            outputBugreportFile.getPath(), bugreportFileHash);
+                } catch (IOException e) {
+                    Log.e(TAG, e.getMessage());
+                    message = context.getString(R.string.received_bugreport_failed_retrieval);
+                }
+                return message;
+            }
+
+            @Override
+            protected void onPostExecute(String message) {
+                Util.showNotification(context, R.string.bugreport_title,
+                        message, Util.BUGREPORT_NOTIFICATION_ID);
+                result.finish();
+            }
+
+        }.execute();
+    }
+
+    @TargetApi(Build.VERSION_CODES.N)
+    @Override
+    public void onBugreportFailed(Context context, Intent intent, int failureCode) {
+        String failureReason;
+        switch (failureCode) {
+            case BUGREPORT_FAILURE_FILE_NO_LONGER_AVAILABLE:
+                failureReason = context.getString(
+                        R.string.bugreport_failure_file_no_longer_available);
+                break;
+            case BUGREPORT_FAILURE_FAILED_COMPLETING:
+                //fall through
+            default:
+                failureReason = context.getString(
+                        R.string.bugreport_failure_failed_completing);
+        }
+        Log.i(TAG, "Bugreport failed: " + failureReason);
+        Util.showNotification(context, R.string.bugreport_title,
+                context.getString(R.string.bugreport_failure_message, failureReason),
+                Util.BUGREPORT_NOTIFICATION_ID);
     }
 
     @TargetApi(Build.VERSION_CODES.M)

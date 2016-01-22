@@ -70,6 +70,7 @@ import android.widget.Toast;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.AppInfoArrayAdapter;
+import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.common.MediaDisplayFragment;
 import com.afwsamples.testdpc.policy.blockuninstallation.BlockUninstallationInfoArrayAdapter;
 import com.afwsamples.testdpc.policy.certificate.DelegatedCertInstallerFragment;
@@ -238,6 +239,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     private static final String REMOVE_DEVICE_OWNER_KEY = "remove_device_owner";
     private static final String REMOVE_KEY_CERTIFICATE_KEY = "remove_key_certificate";
     private static final String REMOVE_USER_KEY = "remove_user";
+    private static final String REQUEST_BUGREPORT_KEY = "request_bugreport";
     private static final String SET_ACCESSIBILITY_SERVICES_KEY = "set_accessibility_services";
     private static final String SET_DISABLE_ACCOUNT_MANAGEMENT_KEY
             = "set_disable_account_management";
@@ -278,7 +280,8 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             STOP_LOCK_TASK, DISABLE_STATUS_BAR, REENABLE_STATUS_BAR, DISABLE_KEYGUARD,
             REENABLE_KEYGUARD, START_KIOSK_MODE, SYSTEM_UPDATE_POLICY_KEY, KEYGUARD_DISABLE_WIDGETS,
             KEYGUARD_DISABLE_SECURE_CAMERA, KEYGUARD_DISABLE_SECURE_NOTIFICATIONS,
-            STAY_ON_WHILE_PLUGGED_IN, SHOW_WIFI_MAC_ADDRESS_KEY, REBOOT, KEY_LOCK_SCREEN_MESSAGE
+            STAY_ON_WHILE_PLUGGED_IN, SHOW_WIFI_MAC_ADDRESS_KEY, REBOOT, KEY_LOCK_SCREEN_MESSAGE,
+            REQUEST_BUGREPORT_KEY
     };
 
     private static String[] MNC_PLUS_PREFERENCES = {
@@ -292,7 +295,8 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     private static String[] NYC_PLUS_PREFERENCES = {
             APP_RESTRICTIONS_MANAGING_PACKAGE_KEY, REBOOT, REMOVE_KEY_CERTIFICATE_KEY,
             SHOW_WIFI_MAC_ADDRESS_KEY, KEY_LOCK_SCREEN_MESSAGE, SUSPEND_APPS_KEY,
-            UNSUSPEND_APPS_KEY, SET_SHORT_SUPPORT_MESSAGE_KEY, SET_LONG_SUPPORT_MESSAGE_KEY
+            UNSUSPEND_APPS_KEY, SET_SHORT_SUPPORT_MESSAGE_KEY, SET_LONG_SUPPORT_MESSAGE_KEY,
+            REQUEST_BUGREPORT_KEY
     };
 
     /**
@@ -405,6 +409,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         mStayOnWhilePluggedInSwitchPreference.setOnPreferenceChangeListener(this);
         findPreference(WIPE_DATA_KEY).setOnPreferenceClickListener(this);
         findPreference(REMOVE_DEVICE_OWNER_KEY).setOnPreferenceClickListener(this);
+        findPreference(REQUEST_BUGREPORT_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_ACCESSIBILITY_SERVICES_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_INPUT_METHODS_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_DISABLE_ACCOUNT_MANAGEMENT_KEY).setOnPreferenceClickListener(this);
@@ -505,6 +510,16 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 return true;
             case REMOVE_DEVICE_OWNER_KEY:
                 showRemoveDeviceOwnerPrompt();
+                return true;
+            case REQUEST_BUGREPORT_KEY:
+                boolean startedSuccessfully = mDevicePolicyManager.requestBugreport(
+                        mAdminComponentName);
+                if (!startedSuccessfully) {
+                    Context context = getContext();
+                    Util.showNotification(context, R.string.bugreport_title,
+                            context.getString(R.string.bugreport_failure_throttled),
+                            Util.BUGREPORT_NOTIFICATION_ID);
+                }
                 return true;
             case SET_ACCESSIBILITY_SERVICES_KEY:
                 // Avoid starting the same task twice.
