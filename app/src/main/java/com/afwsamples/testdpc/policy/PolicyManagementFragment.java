@@ -74,10 +74,11 @@ import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.common.MediaDisplayFragment;
 import com.afwsamples.testdpc.policy.blockuninstallation.BlockUninstallationInfoArrayAdapter;
 import com.afwsamples.testdpc.policy.certificate.DelegatedCertInstallerFragment;
-import com.afwsamples.testdpc.policy.datausage.NetworkUsageStatsFragment;
 import com.afwsamples.testdpc.policy.keyguard.PasswordConstraintsFragment;
 import com.afwsamples.testdpc.policy.locktask.KioskModeActivity;
 import com.afwsamples.testdpc.policy.locktask.LockTaskAppInfoArrayAdapter;
+import com.afwsamples.testdpc.policy.networking.AlwaysOnVpnFragment;
+import com.afwsamples.testdpc.policy.networking.NetworkUsageStatsFragment;
 import com.afwsamples.testdpc.policy.systemupdatepolicy.SystemUpdatePolicyFragment;
 import com.afwsamples.testdpc.policy.wifimanagement.WifiConfigCreationDialog;
 import com.afwsamples.testdpc.policy.wifimanagement.WifiModificationFragment;
@@ -241,6 +242,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     private static final String REMOVE_USER_KEY = "remove_user";
     private static final String REQUEST_BUGREPORT_KEY = "request_bugreport";
     private static final String SET_ACCESSIBILITY_SERVICES_KEY = "set_accessibility_services";
+    private static final String SET_ALWAYS_ON_VPN_KEY = "set_always_on_vpn";
     private static final String SET_DISABLE_ACCOUNT_MANAGEMENT_KEY
             = "set_disable_account_management";
     private static final String SET_INPUT_METHODS_KEY = "set_input_methods";
@@ -294,9 +296,9 @@ public class PolicyManagementFragment extends PreferenceFragment implements
 
     private static String[] NYC_PLUS_PREFERENCES = {
             APP_RESTRICTIONS_MANAGING_PACKAGE_KEY, REBOOT, REMOVE_KEY_CERTIFICATE_KEY,
-            SHOW_WIFI_MAC_ADDRESS_KEY, KEY_LOCK_SCREEN_MESSAGE, SUSPEND_APPS_KEY,
-            UNSUSPEND_APPS_KEY, SET_SHORT_SUPPORT_MESSAGE_KEY, SET_LONG_SUPPORT_MESSAGE_KEY,
-            REQUEST_BUGREPORT_KEY
+            SET_ALWAYS_ON_VPN_KEY, SHOW_WIFI_MAC_ADDRESS_KEY, KEY_LOCK_SCREEN_MESSAGE,
+            SUSPEND_APPS_KEY, UNSUSPEND_APPS_KEY, SET_SHORT_SUPPORT_MESSAGE_KEY,
+            SET_LONG_SUPPORT_MESSAGE_KEY, REQUEST_BUGREPORT_KEY
     };
 
     /**
@@ -397,6 +399,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         mMuteAudioSwitchPreference.setOnPreferenceChangeListener(this);
         findPreference(PASSWORD_CONSTRAINTS_KEY).setOnPreferenceClickListener(this);
         findPreference(SYSTEM_UPDATE_POLICY_KEY).setOnPreferenceClickListener(this);
+        findPreference(SET_ALWAYS_ON_VPN_KEY).setOnPreferenceClickListener(this);
         findPreference(NETWORK_STATS_KEY).setOnPreferenceClickListener(this);
         findPreference(DELEGATED_CERT_INSTALLER_KEY).setOnPreferenceClickListener(this);
         findPreference(DISABLE_STATUS_BAR).setOnPreferenceClickListener(this);
@@ -613,6 +616,9 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 return true;
             case SYSTEM_UPDATE_POLICY_KEY:
                 showFragment(new SystemUpdatePolicyFragment());
+                return true;
+            case SET_ALWAYS_ON_VPN_KEY:
+                showFragment(new AlwaysOnVpnFragment());
                 return true;
             case NETWORK_STATS_KEY:
                 showFragment(new NetworkUsageStatsFragment());

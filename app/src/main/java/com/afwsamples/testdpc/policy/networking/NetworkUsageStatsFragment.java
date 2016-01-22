@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.afwsamples.testdpc.policy.datausage;
+package com.afwsamples.testdpc.policy.networking;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
@@ -88,6 +88,8 @@ public class NetworkUsageStatsFragment extends ListFragment implements View.OnCl
             Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         View view = inflater.inflate(R.layout.network_usage_stats, container, false);
+
+        getActivity().getActionBar().setTitle(R.string.data_usage);
 
         mPackageManager = getActivity().getPackageManager();
         mNetstatsManager = (NetworkStatsManager)getActivity().getSystemService(

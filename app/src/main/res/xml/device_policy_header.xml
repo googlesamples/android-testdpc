@@ -124,13 +124,6 @@
     </PreferenceCategory>
 
     <PreferenceCategory
-            android:title="@string/data_usage">
-        <Preference
-                android:key="network_stats"
-                android:title="@string/network_stats"/>
-    </PreferenceCategory>
-
-    <PreferenceCategory
             android:title="@string/wifi_management_title">
         <Preference
                 android:key="create_wifi_configuration"
@@ -222,6 +215,16 @@
         <Preference
                 android:key="managed_profile_policies"
                 android:title="@string/managed_profile_specific_policy_title"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+            android:title="@string/networking_management_title">
+        <Preference
+                android:key="network_stats"
+                android:title="@string/network_stats"/>
+        <Preference
+                android:key="set_always_on_vpn"
+                android:title="@string/set_always_on_vpn" />
     </PreferenceCategory>
 
     <PreferenceCategory

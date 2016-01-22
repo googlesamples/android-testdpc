@@ -426,6 +426,10 @@
     <string name="system_update_policy_window_end_label">Maintenance window end:</string>
     <string name="system_update_policy_set_policy">Set new policy</string>
 
+    <!-- Strings for networking -->
+    <string name="networking_management_title">Networking</string>
+    <string name="set_always_on_vpn">Set always-on VPN</string>
+
     <!--  Strings for data usage -->
     <string name="data_usage">Data usage</string>
     <string name="network_stats">Network Data Usage Stats</string>
