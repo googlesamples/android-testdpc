@@ -20,6 +20,7 @@ import android.app.Fragment;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -153,6 +154,8 @@ public final class PasswordConstraintsFragment extends Fragment implements
         mMinUpperCase.setText(Integer.toString(mDpm.getPasswordMinimumUpperCase(mAdminComponent)));
         mMinSymbols.setText(Integer.toString(mDpm.getPasswordMinimumSymbols(mAdminComponent)));
         mMinNonLetter.setText(Integer.toString(mDpm.getPasswordMinimumNonLetter(mAdminComponent)));
+
+        sendPasswordChangedBroadcast();
     }
 
     @Override
@@ -160,6 +163,7 @@ public final class PasswordConstraintsFragment extends Fragment implements
         if (view == mQualityGroup) {
             mDpm.setPasswordQuality(mAdminComponent, checkedId);
         }
+        sendPasswordChangedBroadcast();
     }
 
     @Override
@@ -191,6 +195,7 @@ public final class PasswordConstraintsFragment extends Fragment implements
         } else if (editable == mMinNonLetter.getEditableText()) {
             mDpm.setPasswordMinimumNonLetter(mAdminComponent, value);
         }
+        sendPasswordChangedBroadcast();
     }
 
     @Override
@@ -207,4 +212,19 @@ public final class PasswordConstraintsFragment extends Fragment implements
         return field;
     }
 
+    /**
+     * Notify the admin receiver that something about the password has changed - in this context,
+     * a minimum password requirement policy.
+     *
+     * This has to be sent manually because the system server only sends broadcasts for changes to
+     * the actual password, not any of the constraints related it it.
+     *
+     * <p>May trigger a show/hide of the notification warning to change the password through
+     * Settings.
+     **/
+    private void sendPasswordChangedBroadcast() {
+        Intent changedIntent = new Intent(DeviceAdminReceiver.ACTION_PASSWORD_REQUIREMENTS_CHANGED);
+        changedIntent.setComponent(mAdminComponent);
+        getContext().sendBroadcast(changedIntent);
+    }
 }
