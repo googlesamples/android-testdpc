@@ -331,11 +331,11 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
         int attempts = devicePolicyManager.getCurrentFailedPasswordAttempts();
         int maxAttempts = devicePolicyManager.getMaximumFailedPasswordsForWipe(null);
 
-        String title = context.getQuantityString(
+        String title = context.getResources().getQuantityString(
                 R.plurals.password_failed_attempts_title, attempts, attempts);
         String content = maxAttempts == 0
                 ? context.getString(R.string.password_failed_no_limit_set)
-                : context.getQuantityString(
+                : context.getResources().getQuantityString(
                         R.plurals.password_failed_attempts_content, maxAttempts, maxAttempts);
 
         Notification.Builder warn = new Notification.Builder(context)
