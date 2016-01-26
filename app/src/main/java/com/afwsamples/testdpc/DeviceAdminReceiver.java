@@ -269,13 +269,6 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
     }
 
     @Override
-    public void onPasswordSucceeded(Context context, Intent intent) {
-        NotificationManager nm = (NotificationManager)
-                context.getSystemService(Context.NOTIFICATION_SERVICE);
-        nm.cancel(PASSWORD_FAILED_NOTIFICATION_ID);
-    }
-
-    @Override
     public void onPasswordChanged(Context context, Intent intent) {
         updatePasswordQualityNotification(context);
     }
