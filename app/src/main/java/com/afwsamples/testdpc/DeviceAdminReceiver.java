@@ -359,6 +359,13 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
     private static void updatePasswordQualityNotification(Context context) {
         DevicePolicyManager devicePolicyManager = (DevicePolicyManager) context.getSystemService(
                 Context.DEVICE_POLICY_SERVICE);
+
+        if (!devicePolicyManager.isProfileOwnerApp(context.getPackageName())
+                && !devicePolicyManager.isDeviceOwnerApp(context.getPackageName())) {
+            // Only try to update the notification if we are a profile or device owner.
+            return;
+        }
+
         NotificationManager nm = (NotificationManager)
                 context.getSystemService(Context.NOTIFICATION_SERVICE);
 
