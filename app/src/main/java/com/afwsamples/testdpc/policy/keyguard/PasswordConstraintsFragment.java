@@ -36,13 +36,15 @@ import android.widget.Toast;
 
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
+import com.afwsamples.testdpc.common.ProfileOrParentFragment;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
  * This fragment provides functionalities to set password constraint policies as a profile
- * or device owner.
+ * or device owner. In the former case, it is also possible to set password constraints on
+ * the parent profile.
  *
  * <p>These include:
  * <ul>
@@ -55,8 +57,15 @@ import java.util.Map;
  * <li>{@link DevicePolicyManager#setPasswordMinimumNonLetter(ComponentName, String)}</li>
  * </ul>
  */
-public final class PasswordConstraintsFragment extends Fragment implements
+public final class PasswordConstraintsFragment extends ProfileOrParentFragment implements
         RadioGroup.OnCheckedChangeListener, TextWatcher {
+
+    public static class Container extends ProfileOrParentFragment.Container {
+        @Override
+        public Class<? extends ProfileOrParentFragment> getContentClass() {
+            return PasswordConstraintsFragment.class;
+        }
+    }
 
     private static final Map<Integer, Integer> PASSWORD_QUALITIES = new LinkedHashMap<>(7);
     static {
@@ -100,16 +109,10 @@ public final class PasswordConstraintsFragment extends Fragment implements
     private EditText mMinSymbols;
     private EditText mMinNonLetter;
 
-    private DevicePolicyManager mDpm;
-    private ComponentName mAdminComponent;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getActivity().getActionBar().setTitle(R.string.password_constraints);
-
-        mDpm = (DevicePolicyManager) getActivity().getSystemService(Context.DEVICE_POLICY_SERVICE);
-        mAdminComponent = DeviceAdminReceiver.getComponentName(getActivity());
     }
 
     @Override
@@ -144,16 +147,16 @@ public final class PasswordConstraintsFragment extends Fragment implements
         super.onResume();
 
         // Set the password quality radio group to show the requirement, if there is one.
-        mQualityGroup.check(mDpm.getPasswordQuality(mAdminComponent));
+        mQualityGroup.check(getDpm().getPasswordQuality(getAdmin()));
 
         // Update all of our minimum requirement fields via getPasswordMinimum(.*)
-        mMinLength.setText(Integer.toString(mDpm.getPasswordMinimumLength(mAdminComponent)));
-        mMinLetters.setText(Integer.toString(mDpm.getPasswordMinimumLetters(mAdminComponent)));
-        mMinNumeric.setText(Integer.toString(mDpm.getPasswordMinimumNumeric(mAdminComponent)));
-        mMinLowerCase.setText(Integer.toString(mDpm.getPasswordMinimumLowerCase(mAdminComponent)));
-        mMinUpperCase.setText(Integer.toString(mDpm.getPasswordMinimumUpperCase(mAdminComponent)));
-        mMinSymbols.setText(Integer.toString(mDpm.getPasswordMinimumSymbols(mAdminComponent)));
-        mMinNonLetter.setText(Integer.toString(mDpm.getPasswordMinimumNonLetter(mAdminComponent)));
+        mMinLength.setText(Integer.toString(getDpm().getPasswordMinimumLength(getAdmin())));
+        mMinLetters.setText(Integer.toString(getDpm().getPasswordMinimumLetters(getAdmin())));
+        mMinNumeric.setText(Integer.toString(getDpm().getPasswordMinimumNumeric(getAdmin())));
+        mMinLowerCase.setText(Integer.toString(getDpm().getPasswordMinimumLowerCase(getAdmin())));
+        mMinUpperCase.setText(Integer.toString(getDpm().getPasswordMinimumUpperCase(getAdmin())));
+        mMinSymbols.setText(Integer.toString(getDpm().getPasswordMinimumSymbols(getAdmin())));
+        mMinNonLetter.setText(Integer.toString(getDpm().getPasswordMinimumNonLetter(getAdmin())));
 
         sendPasswordChangedBroadcast();
     }
@@ -161,7 +164,7 @@ public final class PasswordConstraintsFragment extends Fragment implements
     @Override
     public void onCheckedChanged(RadioGroup view, int checkedId) {
         if (view == mQualityGroup) {
-            mDpm.setPasswordQuality(mAdminComponent, checkedId);
+            getDpm().setPasswordQuality(getAdmin(), checkedId);
         }
         sendPasswordChangedBroadcast();
     }
@@ -181,19 +184,19 @@ public final class PasswordConstraintsFragment extends Fragment implements
         }
 
         if (editable == mMinLength.getEditableText()) {
-            mDpm.setPasswordMinimumLength(mAdminComponent, value);
+            getDpm().setPasswordMinimumLength(getAdmin(), value);
         } else if (editable == mMinLetters.getEditableText()) {
-            mDpm.setPasswordMinimumLetters(mAdminComponent, value);
+            getDpm().setPasswordMinimumLetters(getAdmin(), value);
         } else if (editable == mMinNumeric.getEditableText()) {
-            mDpm.setPasswordMinimumNumeric(mAdminComponent, value);
+            getDpm().setPasswordMinimumNumeric(getAdmin(), value);
         } else if (editable == mMinLowerCase.getEditableText()) {
-            mDpm.setPasswordMinimumLowerCase(mAdminComponent, value);
+            getDpm().setPasswordMinimumLowerCase(getAdmin(), value);
         } else if (editable == mMinUpperCase.getEditableText()) {
-            mDpm.setPasswordMinimumUpperCase(mAdminComponent, value);
+            getDpm().setPasswordMinimumUpperCase(getAdmin(), value);
         } else if (editable == mMinSymbols.getEditableText()) {
-            mDpm.setPasswordMinimumSymbols(mAdminComponent, value);
+            getDpm().setPasswordMinimumSymbols(getAdmin(), value);
         } else if (editable == mMinNonLetter.getEditableText()) {
-            mDpm.setPasswordMinimumNonLetter(mAdminComponent, value);
+            getDpm().setPasswordMinimumNonLetter(getAdmin(), value);
         }
         sendPasswordChangedBroadcast();
     }
@@ -224,7 +227,7 @@ public final class PasswordConstraintsFragment extends Fragment implements
      **/
     private void sendPasswordChangedBroadcast() {
         Intent changedIntent = new Intent(DeviceAdminReceiver.ACTION_PASSWORD_REQUIREMENTS_CHANGED);
-        changedIntent.setComponent(mAdminComponent);
+        changedIntent.setComponent(getAdmin());
         getContext().sendBroadcast(changedIntent);
     }
 }
