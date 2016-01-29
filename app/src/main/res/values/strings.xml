@@ -58,6 +58,9 @@
     <string name="provisioning_not_supported">Device provisioning is not enabled. Stopping.</string>
     <string name="provisioning_failed_or_cancelled">Provisioning failed or cancelled.</string>
 
+    <string name="work_profile">Work profile</string>
+    <string name="personal_profile">Personal profile</string>
+
     <string name="managed_profile_specific_policy_category_title">Managed profile policy</string>
     <string name="managed_profile_specific_policy_title">Manage work profile specific policy
     </string>

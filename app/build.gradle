@@ -51,5 +51,6 @@ android {
 
 dependencies {
     compile "com.android.support:support-v4:22.0.0"
+    compile "com.android.support:support-v13:22.0.0"
     compile(name:'setup-wizard-lib-platform-release', ext:'aar')
 }
