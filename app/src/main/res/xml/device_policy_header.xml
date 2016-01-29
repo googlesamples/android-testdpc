@@ -236,6 +236,9 @@
                 android:key="create_and_initialize_user"
                 android:title="@string/create_and_initialize_user"/>
         <Preference
+                android:key="create_and_manage_user"
+                android:title="@string/create_and_manage_user"/>
+        <Preference
                 android:key="remove_user"
                 android:title="@string/remove_user"/>
     </PreferenceCategory>

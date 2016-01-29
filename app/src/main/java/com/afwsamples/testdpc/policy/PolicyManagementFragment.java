@@ -198,6 +198,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     private static final String CAPTURE_VIDEO_KEY = "capture_video";
     private static final String CHECK_LOCK_TASK_PERMITTED_KEY = "check_lock_task_permitted";
     private static final String CREATE_AND_INITIALIZE_USER_KEY = "create_and_initialize_user";
+    private static final String CREATE_AND_MANAGE_USER_KEY = "create_and_manage_user";
     private static final String DELEGATED_CERT_INSTALLER_KEY = "manage_cert_installer";
     private static final String DEVICE_OWNER_STATUS_KEY = "device_owner_status";
     private static final String DISABLE_CAMERA_KEY = "disable_camera";
@@ -277,7 +278,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             STOP_LOCK_TASK, DISABLE_STATUS_BAR, REENABLE_STATUS_BAR, DISABLE_KEYGUARD,
             REENABLE_KEYGUARD, START_KIOSK_MODE, SYSTEM_UPDATE_POLICY_KEY, STAY_ON_WHILE_PLUGGED_IN,
             SHOW_WIFI_MAC_ADDRESS_KEY, REBOOT_KEY, REQUEST_BUGREPORT_KEY, ENABLE_PROCESS_LOGGING,
-            REQUEST_PROCESS_LOGS, SET_AUTO_TIME_REQUIRED_KEY
+            REQUEST_PROCESS_LOGS, SET_AUTO_TIME_REQUIRED_KEY, CREATE_AND_MANAGE_USER_KEY
     };
 
     private static String[] MNC_PLUS_PREFERENCES = {
@@ -292,7 +293,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             APP_RESTRICTIONS_MANAGING_PACKAGE_KEY, REBOOT_KEY, REMOVE_KEY_CERTIFICATE_KEY,
             SET_ALWAYS_ON_VPN_KEY, SHOW_WIFI_MAC_ADDRESS_KEY, SUSPEND_APPS_KEY, UNSUSPEND_APPS_KEY,
             SET_SHORT_SUPPORT_MESSAGE_KEY, SET_LONG_SUPPORT_MESSAGE_KEY, REQUEST_BUGREPORT_KEY,
-            ENABLE_PROCESS_LOGGING, REQUEST_PROCESS_LOGS
+            ENABLE_PROCESS_LOGGING, REQUEST_PROCESS_LOGS, CREATE_AND_MANAGE_USER_KEY
     };
 
     /**
@@ -359,6 +360,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         findPreference(START_LOCK_TASK).setOnPreferenceClickListener(this);
         findPreference(STOP_LOCK_TASK).setOnPreferenceClickListener(this);
         findPreference(CREATE_AND_INITIALIZE_USER_KEY).setOnPreferenceClickListener(this);
+        findPreference(CREATE_AND_MANAGE_USER_KEY).setOnPreferenceClickListener(this);
         findPreference(REMOVE_USER_KEY).setOnPreferenceClickListener(this);
         mDisableCameraSwitchPreference = (SwitchPreference) findPreference(DISABLE_CAMERA_KEY);
         findPreference(CAPTURE_IMAGE_KEY).setOnPreferenceClickListener(this);
@@ -533,7 +535,10 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 showDisableAccountTypeList();
                 return true;
             case CREATE_AND_INITIALIZE_USER_KEY:
-                showCreateUserPrompt();
+                showCreateAndInitializeUserPrompt();
+                return true;
+            case CREATE_AND_MANAGE_USER_KEY:
+                showCreateAndManageUserPrompt();
                 return true;
             case REMOVE_USER_KEY:
                 showRemoveUserPrompt();
@@ -1191,7 +1196,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
      * For user creation:
      * Shows a prompt to ask for the username that would be used for creating a new user.
      */
-    private void showCreateUserPrompt() {
+    private void showCreateAndInitializeUserPrompt() {
         if (getActivity() == null || getActivity().isFinishing()) {
             return;
         }
@@ -1213,6 +1218,56 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                                     new Bundle());
                             if (userHandle != null) {
                                 long serialNumber = mUserManager.getSerialNumberForUser(userHandle);
+                                showToast(R.string.user_created, serialNumber);
+                                return;
+                            }
+                            showToast(R.string.failed_to_create_user);
+                        }
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    /**
+     * For user creation:
+     * Shows a prompt asking for the username of the new user and whether the setup wizard should
+     * be skipped.
+     */
+    private void showCreateAndManageUserPrompt() {
+        if (getActivity() == null || getActivity().isFinishing()) {
+            return;
+        }
+
+        final View dialogView = getActivity().getLayoutInflater().inflate(
+                R.layout.create_and_manage_user_dialog_prompt, null);
+
+        final EditText userNameEditText = (EditText) dialogView.findViewById(R.id.user_name);
+        userNameEditText.setHint(R.string.enter_username_hint);
+        final CheckBox skipSetupWizardCheckBox = (CheckBox) dialogView.findViewById(
+                R.id.skip_setup_wizard_checkbox);
+
+        new AlertDialog.Builder(getActivity())
+                .setTitle(R.string.create_and_manage_user)
+                .setView(dialogView)
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        String name = userNameEditText.getText().toString();
+                        if (!TextUtils.isEmpty(name)) {
+                            int flags = skipSetupWizardCheckBox.isChecked()
+                                    ? DevicePolicyManager.SKIP_SETUP_WIZARD : 0;
+
+                            UserHandle userHandle = mDevicePolicyManager.createAndManageUser(
+                                    mAdminComponentName,
+                                    name,
+                                    mAdminComponentName,
+                                    null,
+                                    flags);
+
+                            if (userHandle != null) {
+                                long serialNumber =
+                                        mUserManager.getSerialNumberForUser(userHandle);
                                 showToast(R.string.user_created, serialNumber);
                                 return;
                             }
