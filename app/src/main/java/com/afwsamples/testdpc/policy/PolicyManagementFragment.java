@@ -72,6 +72,7 @@ import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.AppInfoArrayAdapter;
 import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.common.MediaDisplayFragment;
+import com.afwsamples.testdpc.policy.ProcessLogsFragment;
 import com.afwsamples.testdpc.policy.blockuninstallation.BlockUninstallationInfoArrayAdapter;
 import com.afwsamples.testdpc.policy.certificate.DelegatedCertInstallerFragment;
 import com.afwsamples.testdpc.policy.keyguard.PasswordConstraintsFragment;
@@ -203,6 +204,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     private static final String DISABLE_KEYGUARD = "disable_keyguard";
     private static final String DISABLE_SCREEN_CAPTURE_KEY = "disable_screen_capture";
     private static final String DISABLE_STATUS_BAR = "disable_status_bar";
+    private static final String ENABLE_PROCESS_LOGGING = "enable_process_logging";
     private static final String ENABLE_SYSTEM_APPS_BY_INTENT_KEY = "enable_system_apps_by_intent";
     private static final String ENABLE_SYSTEM_APPS_BY_PACKAGE_NAME_KEY
             = "enable_system_apps_by_package_name";
@@ -241,6 +243,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     private static final String REMOVE_KEY_CERTIFICATE_KEY = "remove_key_certificate";
     private static final String REMOVE_USER_KEY = "remove_user";
     private static final String REQUEST_BUGREPORT_KEY = "request_bugreport";
+    private static final String REQUEST_PROCESS_LOGS = "request_process_logs";
     private static final String RESET_PASSWORD_KEY = "reset_password";
     private static final String SET_ACCESSIBILITY_SERVICES_KEY = "set_accessibility_services";
     private static final String SET_ALWAYS_ON_VPN_KEY = "set_always_on_vpn";
@@ -284,7 +287,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             REENABLE_KEYGUARD, START_KIOSK_MODE, SYSTEM_UPDATE_POLICY_KEY, KEYGUARD_DISABLE_WIDGETS,
             KEYGUARD_DISABLE_SECURE_CAMERA, KEYGUARD_DISABLE_SECURE_NOTIFICATIONS,
             STAY_ON_WHILE_PLUGGED_IN, SHOW_WIFI_MAC_ADDRESS_KEY, REBOOT, KEY_LOCK_SCREEN_MESSAGE,
-            REQUEST_BUGREPORT_KEY
+            REQUEST_BUGREPORT_KEY, ENABLE_PROCESS_LOGGING, REQUEST_PROCESS_LOGS
     };
 
     private static String[] MNC_PLUS_PREFERENCES = {
@@ -299,7 +302,8 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             APP_RESTRICTIONS_MANAGING_PACKAGE_KEY, REBOOT, REMOVE_KEY_CERTIFICATE_KEY,
             SET_ALWAYS_ON_VPN_KEY, SHOW_WIFI_MAC_ADDRESS_KEY, KEY_LOCK_SCREEN_MESSAGE,
             SUSPEND_APPS_KEY, UNSUSPEND_APPS_KEY, SET_SHORT_SUPPORT_MESSAGE_KEY,
-            SET_LONG_SUPPORT_MESSAGE_KEY, REQUEST_BUGREPORT_KEY
+            SET_LONG_SUPPORT_MESSAGE_KEY, REQUEST_BUGREPORT_KEY, ENABLE_PROCESS_LOGGING,
+            REQUEST_PROCESS_LOGS
     };
 
     /**
@@ -353,6 +357,8 @@ public class PolicyManagementFragment extends PreferenceFragment implements
 
     private SwitchPreference mStayOnWhilePluggedInSwitchPreference;
     private SwitchPreference mInstallNonMarketAppsPreference;
+
+    private SwitchPreference mEnableProcessLoggingPreference;
 
     private GetAccessibilityServicesTask mGetAccessibilityServicesTask = null;
     private GetInputMethodsTask mGetInputMethodsTask = null;
@@ -419,6 +425,10 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         findPreference(WIPE_DATA_KEY).setOnPreferenceClickListener(this);
         findPreference(REMOVE_DEVICE_OWNER_KEY).setOnPreferenceClickListener(this);
         findPreference(REQUEST_BUGREPORT_KEY).setOnPreferenceClickListener(this);
+        mEnableProcessLoggingPreference = (SwitchPreference) findPreference(
+                ENABLE_PROCESS_LOGGING);
+        mEnableProcessLoggingPreference.setOnPreferenceChangeListener(this);
+        findPreference(REQUEST_PROCESS_LOGS).setOnPreferenceClickListener(this);
         findPreference(SET_ACCESSIBILITY_SERVICES_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_INPUT_METHODS_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_DISABLE_ACCOUNT_MANAGEMENT_KEY).setOnPreferenceClickListener(this);
@@ -460,6 +470,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         reloadCameraDisableUi();
         reloadScreenCaptureDisableUi();
         reloadMuteAudioUi();
+        reloadEnableProcessLoggingUi();
 
         setPreferenceChangeListeners(KEYGUARD_DISABLE_PREFERENCES);
         updateKeyguardFeaturesUi();
@@ -532,6 +543,9 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                             context.getString(R.string.bugreport_failure_throttled),
                             Util.BUGREPORT_NOTIFICATION_ID);
                 }
+                return true;
+            case REQUEST_PROCESS_LOGS:
+                showFragment(new ProcessLogsFragment());
                 return true;
             case SET_ACCESSIBILITY_SERVICES_KEY:
                 // Avoid starting the same task twice.
@@ -715,6 +729,11 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 mDevicePolicyManager.setCameraDisabled(mAdminComponentName, (Boolean) newValue);
                 // Reload UI to verify the camera is enable / disable correctly.
                 reloadCameraDisableUi();
+                return true;
+            case ENABLE_PROCESS_LOGGING:
+                mDevicePolicyManager.setDeviceLoggingEnabled(mAdminComponentName,
+                        (Boolean) newValue);
+                reloadEnableProcessLoggingUi();
                 return true;
             case DISABLE_SCREEN_CAPTURE_KEY:
                 mDevicePolicyManager.setScreenCaptureDisabled(mAdminComponentName,
@@ -1387,6 +1406,13 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     private void reloadCameraDisableUi() {
         boolean isCameraDisabled = mDevicePolicyManager.getCameraDisabled(mAdminComponentName);
         mDisableCameraSwitchPreference.setChecked(isCameraDisabled);
+    }
+
+    private void reloadEnableProcessLoggingUi() {
+        boolean isProcessLoggingEnabled = mDevicePolicyManager.getDeviceLoggingEnabled(
+                mAdminComponentName);
+        mEnableProcessLoggingPreference.setChecked(isProcessLoggingEnabled);
+        findPreference(REQUEST_PROCESS_LOGS).setEnabled(isProcessLoggingEnabled);
     }
 
     private void reloadScreenCaptureDisableUi() {
