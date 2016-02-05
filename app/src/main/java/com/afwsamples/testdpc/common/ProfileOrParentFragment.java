@@ -22,6 +22,8 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.UserManager;
+import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
 import android.support.v13.app.FragmentTabHost;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -39,10 +41,13 @@ import com.afwsamples.testdpc.R;
  * If there is no parent user (for example, if the managed user is controlled by a Device Owner),
  * the fragment will be shown directly.
  */
-public abstract class ProfileOrParentFragment extends Fragment {
+public abstract class ProfileOrParentFragment extends PreferenceFragment {
     private static final String LOG_TAG = "ProfileOrParentFragment";
 
     private static final String EXTRA_PARENT_PROFILE = "com.afwsamples.testdpc.extra.PARENT";
+
+    // Tag to append to the name of the SharedPreferences if we are running as a parent instance.
+    private static final String TAG_PARENT = ":parent";
 
     public abstract static class Container extends Fragment {
         @Override
@@ -102,7 +107,6 @@ public abstract class ProfileOrParentFragment extends Fragment {
         public abstract Class<? extends ProfileOrParentFragment> getContentClass();
     }
 
-
     private DevicePolicyManager mDevicePolicyManager;
     private ComponentName mAdminComponent;
     private boolean mParentInstance;
@@ -136,15 +140,18 @@ public abstract class ProfileOrParentFragment extends Fragment {
             mParentInstance = arguments.getBoolean(EXTRA_PARENT_PROFILE, false);
         }
 
+        mAdminComponent = DeviceAdminReceiver.getComponentName(getActivity());
+
         // Get a device policy manager for the current user.
         mDevicePolicyManager = (DevicePolicyManager)
                 getActivity().getSystemService(Context.DEVICE_POLICY_SERVICE);
 
-        mAdminComponent = DeviceAdminReceiver.getComponentName(getActivity());
-
         // Switch to parent profile if we are running on their behalf.
         if (mParentInstance) {
             mDevicePolicyManager = mDevicePolicyManager.getParentProfileInstance(mAdminComponent);
+
+            final PreferenceManager pm = getPreferenceManager();
+            pm.setSharedPreferencesName(pm.getSharedPreferencesName() + TAG_PARENT);
         }
     }
 }

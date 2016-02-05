@@ -509,7 +509,7 @@
     <!-- Strings for password policies -->
     <string name="password_constraints">Password constraints</string>
 
-    <string name="minimum_password_quality">Minimum password quality:</string>
+    <string name="minimum_password_quality">Minimum password quality</string>
     <string name="password_quality_unspecified">Unspecified</string>
     <string name="password_quality_something">Something</string>
     <string name="password_quality_numeric">Numeric</string>
@@ -518,13 +518,13 @@
     <string name="password_quality_alphanumeric">Alphanumeric</string>
     <string name="password_quality_complex">Complex</string>
 
-    <string name="password_min_length">Minimum password length:</string>
-    <string name="password_min_letters">Minimum number of letters:</string>
-    <string name="password_min_numeric">Minimum number of digits:</string>
-    <string name="password_min_lowercase">Minimum number of lower-case characters:</string>
-    <string name="password_min_uppercase">Minimum number of upper-case characters:</string>
-    <string name="password_min_symbols">Minimum number of symbols:</string>
-    <string name="password_min_nonletter">Minimum number of non-letters:</string>
+    <string name="password_min_length">Minimum password length</string>
+    <string name="password_min_letters">Minimum number of letters</string>
+    <string name="password_min_numeric">Minimum number of digits</string>
+    <string name="password_min_lowercase">Minimum number of lower-case characters</string>
+    <string name="password_min_uppercase">Minimum number of upper-case characters</string>
+    <string name="password_min_symbols">Minimum number of symbols</string>
+    <string name="password_min_nonletter">Minimum number of non-letters</string>
 
     <string name="password_not_compliant_title">Password is not compliant</string>
     <string name="password_not_compliant_content">Touch to set a new lock screen password.</string>
