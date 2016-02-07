@@ -1409,10 +1409,12 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     }
 
     private void reloadEnableProcessLoggingUi() {
-        boolean isProcessLoggingEnabled = mDevicePolicyManager.getDeviceLoggingEnabled(
-                mAdminComponentName);
-        mEnableProcessLoggingPreference.setChecked(isProcessLoggingEnabled);
-        findPreference(REQUEST_PROCESS_LOGS).setEnabled(isProcessLoggingEnabled);
+        if (mDevicePolicyManager.isDeviceOwnerApp(mPackageName)) {
+            boolean isProcessLoggingEnabled = mDevicePolicyManager.getDeviceLoggingEnabled(
+                    mAdminComponentName);
+            mEnableProcessLoggingPreference.setChecked(isProcessLoggingEnabled);
+            findPreference(REQUEST_PROCESS_LOGS).setEnabled(isProcessLoggingEnabled);
+        }
     }
 
     private void reloadScreenCaptureDisableUi() {
