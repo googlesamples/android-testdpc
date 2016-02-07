@@ -265,6 +265,9 @@
 
     <PreferenceCategory
             android:title="@string/device_owner_management">
+        <SwitchPreference
+                android:key="set_auto_time_required"
+                android:title="@string/set_auto_time_required" />
         <Preference
                 android:key="wipe_data"
                 android:title="@string/wipe_data"/>

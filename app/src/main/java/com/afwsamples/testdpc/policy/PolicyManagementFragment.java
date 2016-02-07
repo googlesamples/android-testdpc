@@ -224,6 +224,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     private static final String REMOVE_DEVICE_OWNER_KEY = "remove_device_owner";
     private static final String REMOVE_USER_KEY = "remove_user";
     private static final String SET_ACCESSIBILITY_SERVICES_KEY = "set_accessibility_services";
+    private static final String SET_AUTO_TIME_REQUIRED_KEY = "set_auto_time_required";
     private static final String SET_DISABLE_ACCOUNT_MANAGEMENT_KEY
             = "set_disable_account_management";
     private static final String SET_INPUT_METHODS_KEY = "set_input_methods";
@@ -257,7 +258,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             STOP_LOCK_TASK, DISABLE_STATUS_BAR, REENABLE_STATUS_BAR, DISABLE_KEYGUARD,
             REENABLE_KEYGUARD, START_KIOSK_MODE, SYSTEM_UPDATE_POLICY_KEY, KEYGUARD_DISABLE_WIDGETS,
             KEYGUARD_DISABLE_SECURE_CAMERA, KEYGUARD_DISABLE_SECURE_NOTIFICATIONS,
-            STAY_ON_WHILE_PLUGGED_IN
+            SET_AUTO_TIME_REQUIRED_KEY, STAY_ON_WHILE_PLUGGED_IN
     };
 
     private static String[] MNC_PLUS_PREFERENCES = {
@@ -314,6 +315,8 @@ public class PolicyManagementFragment extends PreferenceFragment implements
 
     private SwitchPreference mStayOnWhilePluggedInSwitchPreference;
     private SwitchPreference mInstallNonMarketAppsPreference;
+
+    private SwitchPreference mSetAutoTimeRequiredPreference;
 
     private GetAccessibilityServicesTask mGetAccessibilityServicesTask = null;
     private GetInputMethodsTask mGetInputMethodsTask = null;
@@ -402,9 +405,13 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 INSTALL_NONMARKET_APPS_KEY);
         mInstallNonMarketAppsPreference.setOnPreferenceChangeListener(this);
         findPreference(SET_USER_RESTRICTIONS_KEY).setOnPreferenceClickListener(this);
+        mSetAutoTimeRequiredPreference = (SwitchPreference) findPreference(
+                SET_AUTO_TIME_REQUIRED_KEY);
+        mSetAutoTimeRequiredPreference.setOnPreferenceChangeListener(this);
 
         reloadCameraDisableUi();
         reloadScreenCaptureDisableUi();
+        reloadSetAutoTimeRequiredUi();
 
         setPreferenceChangeListeners(KEYGUARD_DISABLE_PREFERENCES);
         updateKeyguardFeaturesUi();
@@ -658,6 +665,11 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                         Settings.Secure.INSTALL_NON_MARKET_APPS,
                         newValue.equals(true) ? "1" : "0");
                 updateInstallNonMarketAppsPreference();
+                return true;
+            case SET_AUTO_TIME_REQUIRED_KEY:
+                mDevicePolicyManager.setAutoTimeRequired(mAdminComponentName,
+                        newValue.equals(true));
+                reloadSetAutoTimeRequiredUi();
                 return true;
         }
         return false;
@@ -1209,6 +1221,13 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         boolean isScreenCaptureDisabled = mDevicePolicyManager.getScreenCaptureDisabled(
                 mAdminComponentName);
         mDisableScreenCaptureSwitchPreference.setChecked(isScreenCaptureDisabled);
+    }
+
+    private void reloadSetAutoTimeRequiredUi() {
+        if (mDevicePolicyManager.isDeviceOwnerApp(mPackageName)) {
+            boolean isAutoTimeRequired = mDevicePolicyManager.getAutoTimeRequired();
+            mSetAutoTimeRequiredPreference.setChecked(isAutoTimeRequired);
+        }
     }
 
     /**
