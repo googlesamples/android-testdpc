@@ -19,6 +19,7 @@ package com.afwsamples.testdpc.common;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
+import android.text.format.DateUtils;
 
 import com.afwsamples.testdpc.R;
 
@@ -28,6 +29,7 @@ import com.afwsamples.testdpc.R;
 public class Util {
 
     public static final int BUGREPORT_NOTIFICATION_ID = 1;
+    public static final int PASSWORD_EXPIRATION_NOTIFICATION_ID = 2;
 
     public static void showNotification(Context context, int titleId, String msg,
             int notificationId) {
@@ -41,4 +43,23 @@ public class Util {
                 .build();
         mNotificationManager.notify(notificationId, notification);
     }
+
+    /**
+     * Format a friendly datetime for the current locale according to device policy documentation.
+     * If the timestamp doesn't represent a real date, it will be interpreted as {@code null}.
+     *
+     * @return A {@link CharSequence} such as "12:35 PM today" or "June 15, 2033", or {@code null}
+     * in the case that {@param timestampMs} equals zero.
+     */
+    public static CharSequence formatTimestamp(long timestampMs) {
+        if (timestampMs == 0) {
+            // DevicePolicyManager documentation describes this timestamp as having no effect,
+            // so show nothing for this case as the policy has not been set.
+            return null;
+        }
+
+        return DateUtils.formatSameDayTime(timestampMs, System.currentTimeMillis(),
+                DateUtils.FORMAT_SHOW_WEEKDAY, DateUtils.FORMAT_SHOW_TIME);
+    }
+
 }
