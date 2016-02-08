@@ -151,7 +151,7 @@ public final class PasswordConstraintsFragment extends ProfileOrParentFragment i
         }
 
         // By default, show the new value as a summary.
-        String summary = newValue.toString();
+        CharSequence summary = newValue.toString();
 
         switch (preference.getKey()) {
             case Keys.QUALITY: {
