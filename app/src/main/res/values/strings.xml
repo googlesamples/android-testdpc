@@ -76,6 +76,7 @@
     <string name="this_is_a_managed_profile_owner">This app is a managed profile owner.
         Some of the management options are not available.</string>
     <string name="device_owner_management">Device owner management</string>
+    <string name="set_auto_time_required">Set auto (network) time required</string>
     <string name="wipe_data">Wipe data</string>
     <string name="wipe_data_title">Wipe data?</string>
     <string name="wipe_data_confirmation">Are you sure you want to wipe the data?</string>

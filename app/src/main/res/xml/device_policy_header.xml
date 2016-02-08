@@ -308,6 +308,9 @@
     <PreferenceCategory
             android:title="@string/device_owner_management">
         <SwitchPreference
+                android:key="set_auto_time_required"
+                android:title="@string/set_auto_time_required" />
+        <SwitchPreference
                 android:key="enable_process_logging"
                 android:title="@string/enable_process_logging"/>
         <Preference
