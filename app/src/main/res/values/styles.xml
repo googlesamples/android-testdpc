@@ -49,40 +49,6 @@
         <item name="android:lineSpacingMultiplier">1.2</item>
     </style>
 
-    <style name="password_screen">
-        <item name="android:paddingStart">@dimen/activity_horizontal_margin</item>
-        <item name="android:paddingEnd">@dimen/activity_horizontal_margin</item>
-        <item name="android:paddingTop">@dimen/activity_vertical_margin</item>
-        <item name="android:paddingBottom">@dimen/activity_vertical_margin</item>
-        <item name="android:orientation">vertical</item>
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-    </style>
-
-    <style name="password_item_label">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:textColor">?android:attr/textColorPrimary</item>
-        <item name="android:textSize">@dimen/content_text_size</item>
-        <item name="android:padding">@dimen/label_edittext_padding</item>
-    </style>
-
-    <style name="password_item_content_numeric">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:ems">3</item>
-        <item name="android:inputType">number</item>
-        <item name="android:gravity">center</item>
-        <item name="android:selectAllOnFocus">true</item>
-        <item name="android:textColor">?android:attr/textColorPrimary</item>
-    </style>
-
-    <style name="radio_group">
-        <item name="android:padding">@dimen/inset_padding</item>
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-    </style>
-
     <style name="wifi_item">
         <item name="android:layout_marginTop">8dip</item>
         <item name="android:layout_marginStart">8dip</item>
