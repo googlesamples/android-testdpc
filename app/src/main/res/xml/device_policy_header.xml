@@ -160,18 +160,9 @@
 
     <PreferenceCategory
             android:title="@string/lock_category" >
-        <EditTextPreference
-                android:key="key_max_time_screen_lock"
-                android:title="@string/maximum_lock_time"
-                android:dialogTitle="@string/maximum_lock_time"
-                android:inputType="number"
-                android:defaultValue="0" />
-        <EditTextPreference
-                android:key="key_max_fails_before_wipe"
-                android:title="@string/maximum_password_fails"
-                android:dialogTitle="@string/maximum_password_fails"
-                android:inputType="number"
-                android:defaultValue="0" />
+        <Preference
+                android:key="lock_screen_policy"
+                android:title="@string/lock_screen_policy"/>
         <Preference
                 android:key="password_constraints"
                 android:title="@string/password_constraints"/>

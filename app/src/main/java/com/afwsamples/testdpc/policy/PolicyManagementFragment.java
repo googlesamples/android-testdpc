@@ -71,6 +71,7 @@ import com.afwsamples.testdpc.common.MediaDisplayFragment;
 import com.afwsamples.testdpc.policy.blockuninstallation.BlockUninstallationInfoArrayAdapter;
 import com.afwsamples.testdpc.policy.certificate.DelegatedCertInstallerFragment;
 import com.afwsamples.testdpc.policy.datausage.NetworkUsageStatsFragment;
+import com.afwsamples.testdpc.policy.keyguard.LockScreenPolicyFragment;
 import com.afwsamples.testdpc.policy.keyguard.PasswordConstraintsFragment;
 import com.afwsamples.testdpc.policy.locktask.KioskModeActivity;
 import com.afwsamples.testdpc.policy.locktask.LockTaskAppInfoArrayAdapter;
@@ -210,8 +211,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             = "keyguard_disable_unredacted_notifications";
     private static final String KEYGUARD_DISABLE_WIDGETS = "keyguard_disable_widgets";
     private static final String KEYGUARD_PREFERENCES = "keyguard_preferences";
-    private static final String KEY_MAX_FAILS_BEFORE_WIPE = "key_max_fails_before_wipe";
-    private static final String KEY_MAX_TIME_SCREEN_LOCK = "key_max_time_screen_lock";
+    private static final String LOCK_SCREEN_POLICY_KEY = "lock_screen_policy";
     private static final String MANAGE_APP_PERMISSIONS_KEY = "manage_app_permissions";
     private static final String MANAGE_APP_RESTRICTIONS_KEY = "manage_app_restrictions";
     private static final String MANAGED_PROFILE_SPECIFIC_POLICIES_KEY = "managed_profile_policies";
@@ -363,6 +363,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         mDisableScreenCaptureSwitchPreference = (SwitchPreference) findPreference(
                 DISABLE_SCREEN_CAPTURE_KEY);
         mDisableScreenCaptureSwitchPreference.setOnPreferenceChangeListener(this);
+        findPreference(LOCK_SCREEN_POLICY_KEY).setOnPreferenceClickListener(this);
         findPreference(PASSWORD_CONSTRAINTS_KEY).setOnPreferenceClickListener(this);
         findPreference(SYSTEM_UPDATE_POLICY_KEY).setOnPreferenceClickListener(this);
         findPreference(NETWORK_STATS_KEY).setOnPreferenceClickListener(this);
@@ -396,8 +397,6 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         findPreference(MANAGED_PROFILE_SPECIFIC_POLICIES_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_PERMISSION_POLICY_KEY).setOnPreferenceClickListener(this);
         findPreference(MANAGE_APP_PERMISSIONS_KEY).setOnPreferenceClickListener(this);
-        findPreference(KEY_MAX_TIME_SCREEN_LOCK).setOnPreferenceChangeListener(this);
-        findPreference(KEY_MAX_FAILS_BEFORE_WIPE).setOnPreferenceChangeListener(this);
         findPreference(CREATE_WIFI_CONFIGURATION_KEY).setOnPreferenceClickListener(this);
         findPreference(WIFI_CONFIG_LOCKDOWN_ENABLE_KEY).setOnPreferenceChangeListener(this);
         findPreference(MODIFY_WIFI_CONFIGURATION_KEY).setOnPreferenceClickListener(this);
@@ -547,6 +546,9 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             case MANAGED_PROFILE_SPECIFIC_POLICIES_KEY:
                 showFragment(new ProfilePolicyManagementFragment());
                 return true;
+            case LOCK_SCREEN_POLICY_KEY:
+                showFragment(new LockScreenPolicyFragment());
+                return true;
             case PASSWORD_CONSTRAINTS_KEY:
                 showFragment(new PasswordConstraintsFragment());
                 return true;
@@ -631,22 +633,6 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                         (Boolean) newValue);
                 // Reload UI to verify that screen capture was enabled / disabled correctly.
                 reloadScreenCaptureDisableUi();
-                return true;
-            case KEY_MAX_TIME_SCREEN_LOCK:
-                try {
-                    mDevicePolicyManager.setMaximumTimeToLock(mAdminComponentName,
-                            Long.parseLong((String) newValue) * MS_PER_SECOND);
-                } catch (NumberFormatException e) {
-                    showToast(R.string.not_valid_input);
-                }
-                return true;
-            case KEY_MAX_FAILS_BEFORE_WIPE:
-                try {
-                    mDevicePolicyManager.setMaximumFailedPasswordsForWipe(mAdminComponentName,
-                            Integer.parseInt((String) newValue));
-                } catch (NumberFormatException e) {
-                    showToast(R.string.not_valid_input);
-                }
                 return true;
             case STAY_ON_WHILE_PLUGGED_IN:
                 mDevicePolicyManager.setGlobalSetting(mAdminComponentName,
