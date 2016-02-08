@@ -30,10 +30,12 @@ import android.widget.Toast;
 
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
+import com.afwsamples.testdpc.common.Util;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
+import java.util.concurrent.TimeUnit;
 
 /**
  * This fragment provides functionalities to set password constraint policies as a profile
@@ -67,6 +69,9 @@ public final class PasswordConstraintsFragment extends PreferenceFragment implem
     }
 
     abstract static class Keys {
+        final static String EXPIRATION_TIME = "password_expiration_time";
+        final static String EXPIRATION_BY_ALL = "password_expiration_aggregate";
+
         final static String QUALITY = "minimum_password_quality";
 
         final static String MIN_LENGTH = "password_min_length";
@@ -131,6 +136,9 @@ public final class PasswordConstraintsFragment extends PreferenceFragment implem
         quality.setEntries(entries.toArray(new CharSequence[0]));
         quality.setEntryValues(values.toArray(new CharSequence[0]));
 
+        // Expiration times.
+        setup(Keys.EXPIRATION_TIME, null);
+
         // Minimum quality requirement.
         setup(Keys.QUALITY, PASSWORD_QUALITIES.floorKey(getDpm().getPasswordQuality(getAdmin())));
 
@@ -142,6 +150,14 @@ public final class PasswordConstraintsFragment extends PreferenceFragment implem
         setup(Keys.MIN_UPPERCASE, getDpm().getPasswordMinimumUpperCase(getAdmin()));
         setup(Keys.MIN_SYMBOLS, getDpm().getPasswordMinimumSymbols(getAdmin()));
         setup(Keys.MIN_NONLETTER, getDpm().getPasswordMinimumNonLetter(getAdmin()));
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // Settings that may have been changed by other users need updating.
+        updateExpirationTimes();
     }
 
     @Override
@@ -162,6 +178,11 @@ public final class PasswordConstraintsFragment extends PreferenceFragment implem
         CharSequence summary = newValue.toString();
 
         switch (preference.getKey()) {
+            case Keys.EXPIRATION_TIME: {
+                getDpm().setPasswordExpirationTimeout(getAdmin(), TimeUnit.SECONDS.toMillis(value));
+                updateExpirationTimes();
+                return true;
+            }
             case Keys.QUALITY: {
                 final ListPreference list = (ListPreference) preference;
                 // Store newValue now so getEntry() can return the new setting
@@ -223,6 +244,17 @@ public final class PasswordConstraintsFragment extends PreferenceFragment implem
             summary = p.getEntry();
         }
         field.setSummary(summary);
+    }
+
+    /**
+     * Refresh summaries for settings related to the next password expiration.
+     */
+    private void updateExpirationTimes() {
+        final Preference byAdmin = findPreference(Keys.EXPIRATION_TIME);
+        final Preference byAll = findPreference(Keys.EXPIRATION_BY_ALL);
+
+        byAdmin.setSummary(Util.formatTimestamp(getDpm().getPasswordExpiration(getAdmin())));
+        byAll.setSummary(Util.formatTimestamp(getDpm().getPasswordExpiration(null)));
     }
 
     /**

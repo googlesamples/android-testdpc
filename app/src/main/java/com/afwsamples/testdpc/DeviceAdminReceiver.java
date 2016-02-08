@@ -38,6 +38,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.afwsamples.testdpc.common.LaunchIntentUtil;
+import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.cosu.EnableCosuActivity;
 import com.afwsamples.testdpc.syncauth.FinishSyncAuthDeviceOwnerActivity;
 import com.afwsamples.testdpc.syncauth.FinishSyncAuthProfileOwnerActivity;
@@ -234,6 +235,23 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
      */
     public static ComponentName getComponentName(Context context) {
         return new ComponentName(context.getApplicationContext(), DeviceAdminReceiver.class);
+    }
+
+    @Override
+    public void onPasswordExpiring(Context context, Intent intent) {
+        DevicePolicyManager devicePolicyManager = (DevicePolicyManager) context.getSystemService(
+                Context.DEVICE_POLICY_SERVICE);
+
+        final long timeNow = System.currentTimeMillis();
+        final long timeAdminExpires =
+                devicePolicyManager.getPasswordExpiration(getComponentName(context));
+        final boolean expiredBySelf = (timeNow >= timeAdminExpires && timeAdminExpires != 0);
+
+        Util.showNotification(context, R.string.password_expired_title,
+                context.getString(expiredBySelf
+                        ? R.string.password_expired_by_self
+                        : R.string.password_expired_by_others),
+                Util.PASSWORD_EXPIRATION_NOTIFICATION_ID);
     }
 
     @Override

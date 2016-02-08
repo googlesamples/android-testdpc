@@ -480,6 +480,14 @@
     <string name="password_not_compliant_title">Password is not compliant</string>
     <string name="password_not_compliant_content">Touch to set a new lock screen password.</string>
 
+    <string name="password_expiration">Password expiration</string>
+    <string name="password_expiration_seconds">Password expiration (seconds)</string>
+    <string name="password_expiration_aggregate">Expiration by all/other admins</string>
+
+    <string name="password_expired_title">Password has expired</string>
+    <string name="password_expired_by_self">According to a policy set by TestDPC.</string>
+    <string name="password_expired_by_others">According to a policy set by another admin.</string>
+
     <plurals name="password_failed_attempts_title">
         <item quantity="one">Password entered incorrectly %d time</item>
         <item quantity="other">Password entered incorrectly %d times</item>
