@@ -22,30 +22,27 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextUtils;
-import android.text.TextWatcher;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
+import android.preference.EditTextPreference;
+import android.preference.ListPreference;
+import android.preference.Preference;
+import android.preference.PreferenceFragment;
 import android.widget.Toast;
 
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.TreeMap;
 
 /**
  * This fragment provides functionalities to set password constraint policies as a profile
- * or device owner.
+ * or device owner. In the former case, it is also possible to set password constraints on
+ * the parent profile.
  *
  * <p>These include:
  * <ul>
+ * <li>{@link DevicePolicyManager#setPasswordQuality(ComponentName, int)}</li>
  * <li>{@link DevicePolicyManager#setPasswordMinimumLength(ComponentName, String)}</li>
  * <li>{@link DevicePolicyManager#setPasswordMinimumLetters(ComponentName, String)}</li>
  * <li>{@link DevicePolicyManager#setPasswordMinimumNumeric(ComponentName, String)}</li>
@@ -55,10 +52,33 @@ import java.util.Map;
  * <li>{@link DevicePolicyManager#setPasswordMinimumNonLetter(ComponentName, String)}</li>
  * </ul>
  */
-public final class PasswordConstraintsFragment extends Fragment implements
-        RadioGroup.OnCheckedChangeListener, TextWatcher {
+public final class PasswordConstraintsFragment extends PreferenceFragment implements
+        Preference.OnPreferenceChangeListener {
 
-    private static final Map<Integer, Integer> PASSWORD_QUALITIES = new LinkedHashMap<>(7);
+    private DevicePolicyManager mDevicePolicyManager;
+    private ComponentName mAdminComponent;
+
+    private DevicePolicyManager getDpm() {
+        return mDevicePolicyManager;
+    }
+
+    private ComponentName getAdmin() {
+        return mAdminComponent;
+    }
+
+    abstract static class Keys {
+        final static String QUALITY = "minimum_password_quality";
+
+        final static String MIN_LENGTH = "password_min_length";
+        final static String MIN_LETTERS = "password_min_letters";
+        final static String MIN_NUMERIC = "password_min_numeric";
+        final static String MIN_LOWERCASE = "password_min_lowercase";
+        final static String MIN_UPPERCASE = "password_min_uppercase";
+        final static String MIN_SYMBOLS = "password_min_symbols";
+        final static String MIN_NONLETTER = "password_min_nonletter";
+    }
+
+    private static final TreeMap<Integer, Integer> PASSWORD_QUALITIES = new TreeMap<>();
     static {
         // IDs of settings for {@link DevicePolicyManager#setPasswordQuality(ComponentName, int)}.
         final int[] policyIds = new int[] {
@@ -88,128 +108,121 @@ public final class PasswordConstraintsFragment extends Fragment implements
         }
     };
 
-    // Radio list of all complexity settings, as defined above.
-    private RadioGroup mQualityGroup;
-
-    // Individual minimum password attribute requirements.
-    private EditText mMinLength;
-    private EditText mMinLetters;
-    private EditText mMinNumeric;
-    private EditText mMinLowerCase;
-    private EditText mMinUpperCase;
-    private EditText mMinSymbols;
-    private EditText mMinNonLetter;
-
-    private DevicePolicyManager mDpm;
-    private ComponentName mAdminComponent;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getActivity().getActionBar().setTitle(R.string.password_constraints);
 
-        mDpm = (DevicePolicyManager) getActivity().getSystemService(Context.DEVICE_POLICY_SERVICE);
+        mDevicePolicyManager = (DevicePolicyManager)
+                getActivity().getSystemService(Context.DEVICE_POLICY_SERVICE);
         mAdminComponent = DeviceAdminReceiver.getComponentName(getActivity());
-    }
 
-    @Override
-    public View onCreateView(LayoutInflater layoutInflater, ViewGroup container,
-            Bundle savedInstanceState) {
-        final View root = layoutInflater.inflate(R.layout.password_quality, null);
+        addPreferencesFromResource(R.xml.password_constraint_preferences);
 
-        // Create numeric text fields
-        mMinLength = findAndPrepareField(root, R.id.password_min_length);
-        mMinLetters = findAndPrepareField(root, R.id.password_min_letters);
-        mMinNumeric = findAndPrepareField(root, R.id.password_min_numeric);
-        mMinLowerCase = findAndPrepareField(root, R.id.password_min_lowercase);
-        mMinUpperCase = findAndPrepareField(root, R.id.password_min_uppercase);
-        mMinSymbols = findAndPrepareField(root, R.id.password_min_symbols);
-        mMinNonLetter = findAndPrepareField(root, R.id.password_min_nonletter);
-
-        // Create radio group for password quality
-        mQualityGroup = (RadioGroup) root.findViewById(R.id.password_quality);
-        for (Map.Entry<Integer, Integer> entry : PASSWORD_QUALITIES.entrySet()) {
-            final RadioButton choice = new RadioButton(getContext());
-            choice.setId(entry.getKey());
-            choice.setText(entry.getValue());
-            mQualityGroup.addView(choice);
+        // Populate password quality settings - messy because the only API for this requires two
+        // separate String[]s.
+        List<CharSequence> entries = new ArrayList<>();
+        List<CharSequence> values = new ArrayList<>();
+        for (TreeMap.Entry<Integer, Integer> entry : PASSWORD_QUALITIES.entrySet()) {
+            values.add(Integer.toString(entry.getKey()));
+            entries.add(getString(entry.getValue()));
         }
-        mQualityGroup.setOnCheckedChangeListener(this);
+        ListPreference quality = (ListPreference) findPreference(Keys.QUALITY);
+        quality.setEntries(entries.toArray(new CharSequence[0]));
+        quality.setEntryValues(values.toArray(new CharSequence[0]));
 
-        return root;
+        // Minimum quality requirement.
+        setup(Keys.QUALITY, PASSWORD_QUALITIES.floorKey(getDpm().getPasswordQuality(getAdmin())));
+
+        // Minimum length requirements.
+        setup(Keys.MIN_LENGTH, getDpm().getPasswordMinimumLength(getAdmin()));
+        setup(Keys.MIN_LETTERS, getDpm().getPasswordMinimumLetters(getAdmin()));
+        setup(Keys.MIN_NUMERIC, getDpm().getPasswordMinimumNumeric(getAdmin()));
+        setup(Keys.MIN_LOWERCASE, getDpm().getPasswordMinimumLowerCase(getAdmin()));
+        setup(Keys.MIN_UPPERCASE, getDpm().getPasswordMinimumUpperCase(getAdmin()));
+        setup(Keys.MIN_SYMBOLS, getDpm().getPasswordMinimumSymbols(getAdmin()));
+        setup(Keys.MIN_NONLETTER, getDpm().getPasswordMinimumNonLetter(getAdmin()));
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-
-        // Set the password quality radio group to show the requirement, if there is one.
-        mQualityGroup.check(mDpm.getPasswordQuality(mAdminComponent));
-
-        // Update all of our minimum requirement fields via getPasswordMinimum(.*)
-        mMinLength.setText(Integer.toString(mDpm.getPasswordMinimumLength(mAdminComponent)));
-        mMinLetters.setText(Integer.toString(mDpm.getPasswordMinimumLetters(mAdminComponent)));
-        mMinNumeric.setText(Integer.toString(mDpm.getPasswordMinimumNumeric(mAdminComponent)));
-        mMinLowerCase.setText(Integer.toString(mDpm.getPasswordMinimumLowerCase(mAdminComponent)));
-        mMinUpperCase.setText(Integer.toString(mDpm.getPasswordMinimumUpperCase(mAdminComponent)));
-        mMinSymbols.setText(Integer.toString(mDpm.getPasswordMinimumSymbols(mAdminComponent)));
-        mMinNonLetter.setText(Integer.toString(mDpm.getPasswordMinimumNonLetter(mAdminComponent)));
-
-        sendPasswordChangedBroadcast();
-    }
-
-    @Override
-    public void onCheckedChanged(RadioGroup view, int checkedId) {
-        if (view == mQualityGroup) {
-            mDpm.setPasswordQuality(mAdminComponent, checkedId);
-        }
-        sendPasswordChangedBroadcast();
-    }
-
-    @Override
-    public void afterTextChanged(Editable editable) {
-        if (TextUtils.isEmpty(editable.toString())) {
-            return;
-        }
-
+    public boolean onPreferenceChange(Preference preference, Object newValue) {
         final int value;
-        try {
-            value = Integer.parseInt(editable.toString());
-        } catch (NumberFormatException e) {
-            Toast.makeText(getActivity(), R.string.not_valid_input, Toast.LENGTH_SHORT).show();
+        if (newValue instanceof String && ((String) newValue).length() != 0) {
+            try {
+                value = Integer.parseInt((String) newValue);
+            } catch (NumberFormatException e) {
+                Toast.makeText(getActivity(), R.string.not_valid_input, Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        } else {
+            value = 0;
+        }
+
+        // By default, show the new value as a summary.
+        CharSequence summary = newValue.toString();
+
+        switch (preference.getKey()) {
+            case Keys.QUALITY: {
+                final ListPreference list = (ListPreference) preference;
+                // Store newValue now so getEntry() can return the new setting
+                list.setValue((String) newValue);
+                summary = list.getEntry();
+                getDpm().setPasswordQuality(getAdmin(), value);
+                break;
+            }
+            case Keys.MIN_LENGTH:
+                getDpm().setPasswordMinimumLength(getAdmin(), value);
+                break;
+            case Keys.MIN_LETTERS:
+                getDpm().setPasswordMinimumLetters(getAdmin(), value);
+                break;
+            case Keys.MIN_NUMERIC:
+                getDpm().setPasswordMinimumNumeric(getAdmin(), value);
+                break;
+            case Keys.MIN_LOWERCASE:
+                getDpm().setPasswordMinimumLowerCase(getAdmin(), value);
+                break;
+            case Keys.MIN_UPPERCASE:
+                getDpm().setPasswordMinimumUpperCase(getAdmin(), value);
+                break;
+            case Keys.MIN_SYMBOLS:
+                getDpm().setPasswordMinimumSymbols(getAdmin(), value);
+                break;
+            case Keys.MIN_NONLETTER:
+                getDpm().setPasswordMinimumNonLetter(getAdmin(), value);
+                break;
+            default:
+                return false;
+        }
+
+        preference.setSummary(summary);
+        sendPasswordRequirementsChanged();
+        return true;
+    }
+
+    /**
+     * Set an initial value. Updates the summary to match.
+     */
+    private void setup(String key, Object adminSetting) {
+        Preference field = findPreference(key);
+        field.setOnPreferenceChangeListener(this);
+
+        if (adminSetting == null) {
             return;
         }
 
-        if (editable == mMinLength.getEditableText()) {
-            mDpm.setPasswordMinimumLength(mAdminComponent, value);
-        } else if (editable == mMinLetters.getEditableText()) {
-            mDpm.setPasswordMinimumLetters(mAdminComponent, value);
-        } else if (editable == mMinNumeric.getEditableText()) {
-            mDpm.setPasswordMinimumNumeric(mAdminComponent, value);
-        } else if (editable == mMinLowerCase.getEditableText()) {
-            mDpm.setPasswordMinimumLowerCase(mAdminComponent, value);
-        } else if (editable == mMinUpperCase.getEditableText()) {
-            mDpm.setPasswordMinimumUpperCase(mAdminComponent, value);
-        } else if (editable == mMinSymbols.getEditableText()) {
-            mDpm.setPasswordMinimumSymbols(mAdminComponent, value);
-        } else if (editable == mMinNonLetter.getEditableText()) {
-            mDpm.setPasswordMinimumNonLetter(mAdminComponent, value);
+        final String stringSetting = adminSetting.toString();
+        CharSequence summary = stringSetting;
+
+        if (field instanceof EditTextPreference) {
+            EditTextPreference p = (EditTextPreference) field;
+            p.setText(stringSetting);
+        } else if (field instanceof ListPreference) {
+            ListPreference p = (ListPreference) field;
+            p.setValue(stringSetting);
+            summary = p.getEntry();
         }
-        sendPasswordChangedBroadcast();
-    }
-
-    @Override
-    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-    }
-
-    @Override
-    public void onTextChanged(CharSequence s, int start, int count, int after) {
-    }
-
-    private EditText findAndPrepareField(View root, final int id) {
-        EditText field = (EditText) root.findViewById(id);
-        field.addTextChangedListener(this);
-        return field;
+        field.setSummary(summary);
     }
 
     /**
@@ -221,10 +234,10 @@ public final class PasswordConstraintsFragment extends Fragment implements
      *
      * <p>May trigger a show/hide of the notification warning to change the password through
      * Settings.
-     **/
-    private void sendPasswordChangedBroadcast() {
+     */
+    private void sendPasswordRequirementsChanged() {
         Intent changedIntent = new Intent(DeviceAdminReceiver.ACTION_PASSWORD_REQUIREMENTS_CHANGED);
-        changedIntent.setComponent(mAdminComponent);
+        changedIntent.setComponent(getAdmin());
         getContext().sendBroadcast(changedIntent);
     }
 }
