@@ -473,6 +473,9 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 SET_AUTO_TIME_REQUIRED_KEY);
         mSetAutoTimeRequiredPreference.setOnPreferenceChangeListener(this);
 
+        disableIncompatibleManagementOptionsInCurrentProfile();
+        disableIncompatibleManagementOptionsByApiLevel();
+
         reloadCameraDisableUi();
         reloadScreenCaptureDisableUi();
         reloadMuteAudioUi();
@@ -481,8 +484,6 @@ public class PolicyManagementFragment extends PreferenceFragment implements
 
         setPreferenceChangeListeners(KEYGUARD_DISABLE_PREFERENCES);
         updateKeyguardFeaturesUi();
-        disableIncompatibleManagementOptionsInCurrentProfile();
-        disableIncompatibleManagementOptionsByApiLevel();
     }
 
     @Override
@@ -1421,7 +1422,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     }
 
     private void reloadEnableProcessLoggingUi() {
-        if (mDevicePolicyManager.isDeviceOwnerApp(mPackageName)) {
+        if (mEnableProcessLoggingPreference.isEnabled()) {
             boolean isProcessLoggingEnabled = mDevicePolicyManager.getDeviceLoggingEnabled(
                     mAdminComponentName);
             mEnableProcessLoggingPreference.setChecked(isProcessLoggingEnabled);
