@@ -147,29 +147,6 @@
     </PreferenceCategory>
 
     <PreferenceCategory
-            android:key="keyguard_preferences"
-            android:title="@string/keyguard_features">
-        <SwitchPreference
-                android:key="keyguard_disable_widgets"
-                android:title="@string/keyguard_disable_widgets"/>
-        <SwitchPreference
-                android:key="keyguard_disable_secure_camera"
-                android:title="@string/keyguard_disable_secure_camera"/>
-        <SwitchPreference
-                android:key="keyguard_disable_secure_notifications"
-                android:title="@string/keyguard_disable_secure_notifications"/>
-        <SwitchPreference
-                android:key="keyguard_disable_unredacted_notifications"
-                android:title="@string/keyguard_disable_unredacted_notifications"/>
-        <SwitchPreference
-                android:key="keyguard_disable_trust_agents"
-                android:title="@string/keyguard_disable_trust_agents"/>
-        <SwitchPreference
-                android:key="keyguard_disable_fingerprint"
-                android:title="@string/keyguard_disable_fingerprint"/>
-    </PreferenceCategory>
-
-    <PreferenceCategory
             android:title="@string/lock_category" >
         <EditTextPreference
                 android:key="key_lock_screen_message"

@@ -116,6 +116,7 @@ public abstract class ProfileOrParentFragment extends PreferenceFragment {
     private DevicePolicyManager mDevicePolicyManager;
     private ComponentName mAdminComponent;
     private boolean mParentInstance;
+    private boolean mProfileOwner;
 
     /**
      * @return a {@link DevicePolicyManager} instance for the profile this tab should affect.
@@ -134,6 +135,13 @@ public abstract class ProfileOrParentFragment extends PreferenceFragment {
      */
     protected final boolean isParentProfileInstance() {
         return mParentInstance;
+    }
+
+    /**
+     * @return {@code true} if this tab represents a top-level user, {@code false} otherwise.
+     */
+    protected final boolean isManagedProfileInstance() {
+        return mProfileOwner && !isParentProfileInstance();
     }
 
     @Override
@@ -159,5 +167,8 @@ public abstract class ProfileOrParentFragment extends PreferenceFragment {
             final PreferenceManager pm = getPreferenceManager();
             pm.setSharedPreferencesName(pm.getSharedPreferencesName() + TAG_PARENT);
         }
+
+        // Store whether we are the profile owner for faster lookup.
+        mProfileOwner = mDevicePolicyManager.isProfileOwnerApp(getActivity().getPackageName());
     }
 }

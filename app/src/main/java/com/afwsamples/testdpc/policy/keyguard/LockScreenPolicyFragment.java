@@ -18,18 +18,21 @@ package com.afwsamples.testdpc.policy.keyguard;
 
 import android.app.Fragment;
 import android.app.admin.DevicePolicyManager;
-import android.content.ComponentName;
-import android.content.Context;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
-import android.preference.PreferenceFragment;
+import android.preference.PreferenceGroup;
+import android.preference.TwoStatePreference;
+import android.util.ArrayMap;
 import android.widget.Toast;
 
-import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.ProfileOrParentFragment;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -52,6 +55,56 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
 
         static final String MAX_TIME_SCREEN_LOCK = "key_max_time_screen_lock";
         static final String MAX_TIME_SCREEN_LOCK_ALL = "key_max_time_screen_lock_aggregate";
+
+        static final String KEYGUARD_FEATURES_CATEGORY = "keyguard_features";
+
+        static final String KEYGUARD_DISABLE_FINGERPRINT = "keyguard_disable_fingerprint";
+        static final String KEYGUARD_DISABLE_SECURE_CAMERA = "keyguard_disable_secure_camera";
+        static final String KEYGUARD_DISABLE_SECURE_NOTIFICATIONS
+                = "keyguard_disable_secure_notifications";
+        static final String KEYGUARD_DISABLE_TRUST_AGENTS = "keyguard_disable_trust_agents";
+        static final String KEYGUARD_DISABLE_UNREDACTED_NOTIFICATIONS
+                = "keyguard_disable_unredacted_notifications";
+        static final String KEYGUARD_DISABLE_WIDGETS = "keyguard_disable_widgets";
+
+        static final Set<String> NOT_APPLICABLE_TO_PARENT
+                = new HashSet<>(Arrays.asList(new String[] {
+            KEYGUARD_DISABLE_SECURE_CAMERA,
+            KEYGUARD_DISABLE_SECURE_NOTIFICATIONS,
+            KEYGUARD_DISABLE_UNREDACTED_NOTIFICATIONS,
+            KEYGUARD_DISABLE_WIDGETS
+        }));
+
+        static final Set<String> NOT_APPLICABLE_TO_PROFILE
+                = new HashSet<>(Arrays.asList(new String[]{
+            KEYGUARD_DISABLE_SECURE_CAMERA,
+            KEYGUARD_DISABLE_SECURE_NOTIFICATIONS,
+            KEYGUARD_DISABLE_WIDGETS
+        }));
+    }
+
+    private static final Map<String, Integer> KEYGUARD_FEATURES = new ArrayMap<>();
+    static {
+        KEYGUARD_FEATURES.put(Keys.KEYGUARD_DISABLE_FINGERPRINT,
+                DevicePolicyManager.KEYGUARD_DISABLE_FINGERPRINT);
+
+        KEYGUARD_FEATURES.put(Keys.KEYGUARD_DISABLE_SECURE_CAMERA,
+                DevicePolicyManager.KEYGUARD_DISABLE_SECURE_CAMERA);
+
+        KEYGUARD_FEATURES.put(Keys.KEYGUARD_DISABLE_SECURE_NOTIFICATIONS,
+                DevicePolicyManager.KEYGUARD_DISABLE_SECURE_NOTIFICATIONS);
+
+        KEYGUARD_FEATURES.put(Keys.KEYGUARD_DISABLE_UNREDACTED_NOTIFICATIONS,
+                DevicePolicyManager.KEYGUARD_DISABLE_UNREDACTED_NOTIFICATIONS);
+
+        KEYGUARD_FEATURES.put(Keys.KEYGUARD_DISABLE_TRUST_AGENTS,
+                DevicePolicyManager.KEYGUARD_DISABLE_TRUST_AGENTS);
+
+        KEYGUARD_FEATURES.put(Keys.KEYGUARD_DISABLE_FINGERPRINT,
+                DevicePolicyManager.KEYGUARD_DISABLE_FINGERPRINT);
+
+        KEYGUARD_FEATURES.put(Keys.KEYGUARD_DISABLE_WIDGETS,
+                DevicePolicyManager.KEYGUARD_DISABLE_WIDGETS_ALL);
     }
 
     @Override
@@ -64,6 +117,11 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
         setup(Keys.MAX_FAILS_BEFORE_WIPE, getDpm().getMaximumFailedPasswordsForWipe(getAdmin()));
         setup(Keys.MAX_TIME_SCREEN_LOCK,
                 TimeUnit.MILLISECONDS.toSeconds(getDpm().getMaximumTimeToLock(getAdmin())));
+
+        final int disabledFeatures = getDpm().getKeyguardDisabledFeatures(getAdmin());
+        for (Map.Entry<String, Integer> flag : KEYGUARD_FEATURES.entrySet()) {
+            setup(flag.getKey(), (disabledFeatures & flag.getValue()) != 0 ? true : false);
+        }
     }
 
     @Override
@@ -74,6 +132,21 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
 
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
+        if (KEYGUARD_FEATURES.containsKey(preference.getKey())) {
+            final int flag = KEYGUARD_FEATURES.get(preference.getKey());
+
+            int disabledFeatures = getDpm().getKeyguardDisabledFeatures(getAdmin());
+            if ((Boolean) newValue) {
+                disabledFeatures |= flag;
+            } else {
+                disabledFeatures &= ~flag;
+            }
+            getDpm().setKeyguardDisabledFeatures(getAdmin(), disabledFeatures);
+
+            int newDisabledFeatures = getDpm().getKeyguardDisabledFeatures(getAdmin());
+            return disabledFeatures == newDisabledFeatures;
+        }
+
         switch (preference.getKey()) {
             case Keys.MAX_FAILS_BEFORE_WIPE:
                 try {
@@ -120,17 +193,24 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
     /**
      * Set an initial value. Updates the summary to match.
      */
-    private void setup(String key, long adminSetting) {
+    private void setup(String key, Object adminSetting) {
         Preference pref = findPreference(key);
+
+        // If the preference is not applicable, just hide it instead.
+        if ((Keys.NOT_APPLICABLE_TO_PARENT.contains(key) && isParentProfileInstance())
+                || (Keys.NOT_APPLICABLE_TO_PROFILE.contains(key) && isManagedProfileInstance())) {
+            pref.setEnabled(false);
+            return;
+        }
+
         pref.setOnPreferenceChangeListener(this);
 
-        if (adminSetting != 0) {
-            final String stringSetting = Long.toString(adminSetting);
-
-            if (pref instanceof EditTextPreference) {
-                ((EditTextPreference) pref).setText(stringSetting);
-            }
-            pref.setSummary(stringSetting);
+        if (pref instanceof EditTextPreference) {
+            final String stringValue = adminSetting.toString();
+            ((EditTextPreference) pref).setText(stringValue);
+            pref.setSummary("0".equals(stringValue) ? null : stringValue);
+        } else if (pref instanceof TwoStatePreference) {
+            ((TwoStatePreference) pref).setChecked((Boolean) adminSetting);
         }
     }
 

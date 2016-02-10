@@ -169,7 +169,6 @@ import java.util.Set;
  *        android.content.ComponentName, String, String, boolean)} </li>
  * <li> {@link DevicePolicyManager#setScreenCaptureDisabled(ComponentName, boolean)} </li>
  * <li> {@link DevicePolicyManager#getScreenCaptureDisabled(ComponentName)} </li>
- * <li> {@link DevicePolicyManager#setKeyguardDisabledFeatures(ComponentName, int)} </li>
  * <li> {@link DevicePolicyManager#setMaximumTimeToLock(ComponentName, long)} </li>
  * <li> {@link DevicePolicyManager#setMaximumFailedPasswordsForWipe(ComponentName, int)} </li>
  * <li> {@link DevicePolicyManager#setApplicationHidden(ComponentName, String, boolean)} </li>
@@ -218,14 +217,6 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     private static final String INSTALL_KEY_CERTIFICATE_KEY = "install_key_certificate";
     private static final String INSTALL_NONMARKET_APPS_KEY
             = "install_nonmarket_apps";
-    private static final String KEYGUARD_DISABLE_FINGERPRINT = "keyguard_disable_fingerprint";
-    private static final String KEYGUARD_DISABLE_SECURE_CAMERA = "keyguard_disable_secure_camera";
-    private static final String KEYGUARD_DISABLE_SECURE_NOTIFICATIONS
-            = "keyguard_disable_secure_notifications";
-    private static final String KEYGUARD_DISABLE_TRUST_AGENTS = "keyguard_disable_trust_agents";
-    private static final String KEYGUARD_DISABLE_UNREDACTED_NOTIFICATIONS
-            = "keyguard_disable_unredacted_notifications";
-    private static final String KEYGUARD_DISABLE_WIDGETS = "keyguard_disable_widgets";
     private static final String KEYGUARD_PREFERENCES = "keyguard_preferences";
     private static final String KEY_LOCK_SCREEN_MESSAGE = "key_lock_screen_message";
     private static final String LOCK_SCREEN_POLICY_KEY = "lock_screen_policy";
@@ -285,11 +276,9 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             WIPE_DATA_KEY, REMOVE_DEVICE_OWNER_KEY, CREATE_AND_INITIALIZE_USER_KEY, REMOVE_USER_KEY,
             MANAGE_LOCK_TASK_LIST_KEY, CHECK_LOCK_TASK_PERMITTED_KEY, START_LOCK_TASK,
             STOP_LOCK_TASK, DISABLE_STATUS_BAR, REENABLE_STATUS_BAR, DISABLE_KEYGUARD,
-            REENABLE_KEYGUARD, START_KIOSK_MODE, SYSTEM_UPDATE_POLICY_KEY, KEYGUARD_DISABLE_WIDGETS,
-            KEYGUARD_DISABLE_SECURE_CAMERA, KEYGUARD_DISABLE_SECURE_NOTIFICATIONS,
-            STAY_ON_WHILE_PLUGGED_IN, SHOW_WIFI_MAC_ADDRESS_KEY, REBOOT, KEY_LOCK_SCREEN_MESSAGE,
-            REQUEST_BUGREPORT_KEY, ENABLE_PROCESS_LOGGING, REQUEST_PROCESS_LOGS,
-            SET_AUTO_TIME_REQUIRED_KEY
+            REENABLE_KEYGUARD, START_KIOSK_MODE, SYSTEM_UPDATE_POLICY_KEY, STAY_ON_WHILE_PLUGGED_IN,
+            SHOW_WIFI_MAC_ADDRESS_KEY, REBOOT, KEY_LOCK_SCREEN_MESSAGE, REQUEST_BUGREPORT_KEY,
+            ENABLE_PROCESS_LOGGING, REQUEST_PROCESS_LOGS, SET_AUTO_TIME_REQUIRED_KEY
     };
 
     private static String[] MNC_PLUS_PREFERENCES = {
@@ -324,29 +313,6 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             MANAGED_PROFILE_SPECIFIC_POLICIES_KEY
     };
 
-    /**
-     * Contains the list of preferences for keyguard features. Must have the same order and size
-     * with {@link PolicyManagementFragment#KEYGUARD_DISABLE_FLAGS}.
-     */
-    private static final String[] KEYGUARD_DISABLE_PREFERENCES = {
-            KEYGUARD_DISABLE_WIDGETS, KEYGUARD_DISABLE_SECURE_CAMERA,
-            KEYGUARD_DISABLE_SECURE_NOTIFICATIONS, KEYGUARD_DISABLE_UNREDACTED_NOTIFICATIONS,
-            KEYGUARD_DISABLE_TRUST_AGENTS, KEYGUARD_DISABLE_FINGERPRINT
-    };
-
-    /**
-     * Contains the list of DevicePolicyManager flags for keyguard features. Must have the same
-     * order and size with {@link PolicyManagementFragment#KEYGUARD_DISABLE_PREFERENCES}.
-     */
-    private static int[] KEYGUARD_DISABLE_FLAGS = {
-            DevicePolicyManager.KEYGUARD_DISABLE_WIDGETS_ALL,
-            DevicePolicyManager.KEYGUARD_DISABLE_SECURE_CAMERA,
-            DevicePolicyManager.KEYGUARD_DISABLE_SECURE_NOTIFICATIONS,
-            DevicePolicyManager.KEYGUARD_DISABLE_UNREDACTED_NOTIFICATIONS,
-            DevicePolicyManager.KEYGUARD_DISABLE_TRUST_AGENTS,
-            DevicePolicyManager.KEYGUARD_DISABLE_FINGERPRINT
-    };
-
     private DevicePolicyManager mDevicePolicyManager;
     private PackageManager mPackageManager;
     private String mPackageName;
@@ -373,11 +339,6 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        if (KEYGUARD_DISABLE_PREFERENCES.length != KEYGUARD_DISABLE_FLAGS.length) {
-            throw new IllegalStateException("KEYGUARD_DISABLE_PREFERENCES must have the same length"
-                    + "as KEYGUARD_DISABLE_FLAGS");
-        }
 
         mAdminComponentName = DeviceAdminReceiver.getComponentName(getActivity());
         mDevicePolicyManager = (DevicePolicyManager) getActivity().getSystemService(
@@ -480,9 +441,6 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         reloadMuteAudioUi();
         reloadEnableProcessLoggingUi();
         reloadSetAutoTimeRequiredUi();
-
-        setPreferenceChangeListeners(KEYGUARD_DISABLE_PREFERENCES);
-        updateKeyguardFeaturesUi();
     }
 
     @Override
@@ -724,12 +682,6 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         String key = preference.getKey();
-
-        if (Arrays.asList(KEYGUARD_DISABLE_PREFERENCES).contains(key)) {
-            ((SwitchPreference) preference).setChecked((Boolean) newValue);
-            updateKeyguardDisabledFeatures();
-            return false;
-        }
 
         switch (key) {
             case OVERRIDE_KEY_SELECTION_KEY:
@@ -1025,25 +977,6 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     }
 
     /**
-     * Updates all preferences in keyguard features section.
-     */
-    private void updateKeyguardFeaturesUi() {
-        int flags = mDevicePolicyManager.getKeyguardDisabledFeatures(mAdminComponentName);
-        for (int i = 0; i < KEYGUARD_DISABLE_PREFERENCES.length; i++) {
-            int flag = KEYGUARD_DISABLE_FLAGS[i];
-            String key = KEYGUARD_DISABLE_PREFERENCES[i];
-            SwitchPreference preference = (SwitchPreference) findPreference(key);
-            preference.setChecked((flags & flag) != 0);
-        }
-    }
-
-    private void updateKeyguardDisabledFeatures() {
-        int flags = createKeyguardDisabledFlag();
-        mDevicePolicyManager.setKeyguardDisabledFeatures(mAdminComponentName, flags);
-        updateKeyguardFeaturesUi();
-    }
-
-    /**
      * Update the preference switch for {@link Settings.Global#STAY_ON_WHILE_PLUGGED_IN} setting.
      *
      * <p>
@@ -1086,20 +1019,6 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 getActivity().getContentResolver(), Settings.Secure.INSTALL_NON_MARKET_APPS, 0);
         mInstallNonMarketAppsPreference.setChecked(
                 isInstallNonMarketAppsAllowed == 0 ? false : true);
-    }
-
-    /**
-     * Creates the keyguard disabled flag for sending back to DevicePolicyManager.
-     */
-    private int createKeyguardDisabledFlag() {
-        int flags = DevicePolicyManager.KEYGUARD_DISABLE_FEATURES_NONE;
-        for (int i = 0; i < KEYGUARD_DISABLE_PREFERENCES.length; i++) {
-            int flag = KEYGUARD_DISABLE_FLAGS[i];
-            String key = KEYGUARD_DISABLE_PREFERENCES[i];
-            SwitchPreference preference = (SwitchPreference) findPreference(key);
-            flags |= preference.isChecked() ? flag : 0;
-        }
-        return flags;
     }
 
     /**

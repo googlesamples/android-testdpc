@@ -43,4 +43,27 @@
                 android:title="@string/maximum_password_fails_all_admins"
                 android:selectable="false" />
     </PreferenceCategory>
+
+    <PreferenceCategory
+            android:key="keyguard_features"
+            android:title="@string/keyguard_features">
+        <SwitchPreference
+                android:key="keyguard_disable_widgets"
+                android:title="@string/keyguard_disable_widgets"/>
+        <SwitchPreference
+                android:key="keyguard_disable_secure_camera"
+                android:title="@string/keyguard_disable_secure_camera"/>
+        <SwitchPreference
+                android:key="keyguard_disable_secure_notifications"
+                android:title="@string/keyguard_disable_secure_notifications"/>
+        <SwitchPreference
+                android:key="keyguard_disable_unredacted_notifications"
+                android:title="@string/keyguard_disable_unredacted_notifications"/>
+        <SwitchPreference
+                android:key="keyguard_disable_trust_agents"
+                android:title="@string/keyguard_disable_trust_agents"/>
+        <SwitchPreference
+                android:key="keyguard_disable_fingerprint"
+                android:title="@string/keyguard_disable_fingerprint"/>
+    </PreferenceCategory>
 </PreferenceScreen>
