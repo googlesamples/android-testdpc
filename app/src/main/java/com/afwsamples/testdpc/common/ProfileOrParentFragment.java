@@ -20,6 +20,8 @@ import android.app.Fragment;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.UserManager;
 import android.preference.PreferenceFragment;
@@ -57,8 +59,10 @@ public abstract class ProfileOrParentFragment extends PreferenceFragment {
             final UserManager userManager = (UserManager)
                     getActivity().getSystemService(Context.USER_SERVICE);
 
-            if (userManager.getUserProfiles().size() == 1) {
-                // No need for a tabbed view if there's just one item.
+            if (userManager.getUserProfiles().size() == 1
+                    || Build.VERSION.SDK_INT < VERSION_CODES.N) {
+                // No need for a tabbed view if there's just one item, or if the OS we are running
+                // under does not support parent policies.
                 try {
                     getFragmentManager()
                             .popBackStack();

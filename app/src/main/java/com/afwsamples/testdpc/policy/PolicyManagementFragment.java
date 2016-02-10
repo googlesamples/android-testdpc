@@ -1172,8 +1172,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     }
 
     private boolean isBeforeN() {
-        // STOPSHIP Change to SDK_INT.
-        return isBeforeM() || !Build.VERSION.CODENAME.startsWith("N");
+        return Build.VERSION.SDK_INT < VERSION_CODES.N;
     }
 
     /**
