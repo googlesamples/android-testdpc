@@ -28,6 +28,7 @@ import android.widget.Toast;
 
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
+import com.afwsamples.testdpc.common.ProfileOrParentFragment;
 
 import java.util.concurrent.TimeUnit;
 
@@ -35,18 +36,14 @@ import java.util.concurrent.TimeUnit;
  * This fragment provides functionalities to set policies on keyguard interaction as a profile
  * or device owner.
  */
-public final class LockScreenPolicyFragment extends PreferenceFragment implements
+public final class LockScreenPolicyFragment extends ProfileOrParentFragment implements
         Preference.OnPreferenceChangeListener {
 
-    private DevicePolicyManager mDevicePolicyManager;
-    private ComponentName mAdminComponent;
-
-    private DevicePolicyManager getDpm() {
-        return mDevicePolicyManager;
-    }
-
-    private ComponentName getAdmin() {
-        return mAdminComponent;
+    public static class Container extends ProfileOrParentFragment.Container {
+        @Override
+        public Class<? extends ProfileOrParentFragment> getContentClass() {
+            return LockScreenPolicyFragment.class;
+        }
     }
 
     abstract static class Keys {
@@ -61,10 +58,6 @@ public final class LockScreenPolicyFragment extends PreferenceFragment implement
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getActivity().getActionBar().setTitle(R.string.lock_screen_policy);
-
-        mDevicePolicyManager = (DevicePolicyManager)
-                getActivity().getSystemService(Context.DEVICE_POLICY_SERVICE);
-        mAdminComponent = DeviceAdminReceiver.getComponentName(getActivity());
 
         addPreferencesFromResource(R.xml.lock_screen_preferences);
 

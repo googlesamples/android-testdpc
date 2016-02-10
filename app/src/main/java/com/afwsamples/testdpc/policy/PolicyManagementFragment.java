@@ -642,7 +642,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 showFragment(new ProfilePolicyManagementFragment());
                 return true;
             case LOCK_SCREEN_POLICY_KEY:
-                showFragment(new LockScreenPolicyFragment());
+                showFragment(new LockScreenPolicyFragment.Container());
                 return true;
             case PASSWORD_CONSTRAINTS_KEY:
                 showFragment(new PasswordConstraintsFragment.Container());
