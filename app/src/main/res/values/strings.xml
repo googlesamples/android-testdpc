@@ -502,8 +502,13 @@
 
     <!-- Strings for screen lock policies -->
     <string name="lock_category">Lock screen</string>
-    <string name="maximum_lock_time">Max time to screen lock (seconds)</string>
+
+    <string name="lock_screen_policy">Lock screen restrictions</string>
+    <string name="maximum_lock_time_category">Max time to screen lock</string>
+    <string name="maximum_lock_time_seconds">Max time to screen lock (seconds)</string>
+    <string name="maximum_lock_time_all_admins">Max time as set by all/other admins</string>
     <string name="maximum_password_fails">Max password failures for local wipe</string>
+    <string name="maximum_password_fails_all_admins">Max failures as set by all/other admins</string>
     <string name="not_valid_input">Failed to update: Not a valid input</string>
     <string name="lock_screen_message">Lock screen message</string>
 
