@@ -17,6 +17,16 @@
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory
+            android:title="@string/lock_screen_message">
+        <EditTextPreference
+                android:key="key_lock_screen_message"
+                android:title="@string/lock_screen_message"
+                android:dialogTitle="@string/lock_screen_message"
+                android:inputType="text"
+                android:defaultValue="" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
             android:title="@string/maximum_lock_time_category" >
         <EditTextPreference
                 android:key="key_max_time_screen_lock"

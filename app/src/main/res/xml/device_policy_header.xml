@@ -148,12 +148,6 @@
 
     <PreferenceCategory
             android:title="@string/lock_category" >
-        <EditTextPreference
-                android:key="key_lock_screen_message"
-                android:title="@string/lock_screen_message"
-                android:dialogTitle="@string/lock_screen_message"
-                android:inputType="text"
-                android:defaultValue="" />
         <Preference
                 android:key="lock_screen_policy"
                 android:title="@string/lock_screen_policy"/>
