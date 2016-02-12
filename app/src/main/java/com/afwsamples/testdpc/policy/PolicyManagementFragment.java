@@ -35,8 +35,6 @@ import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.BatteryManager;
-import android.os.Build;
-import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.UserHandle;
 import android.os.UserManager;
@@ -1034,12 +1032,12 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             for (String preference : PRIMARY_USER_ONLY_PREFERENCES) {
                 findPreference(preference).setEnabled(false);
             }
-            if (isBeforeM()) {
+            if (Util.isBeforeM()) {
                 for (String preference : MANAGED_PROFILE_MNC_PLUS_PREFERENCES) {
                     findPreference(preference).setEnabled(false);
                 }
             }
-            if (isBeforeN()) {
+            if (Util.isBeforeN()) {
                 for (String preference : MANAGED_PROFILE_NYC_PLUS_PREFERENCES) {
                     findPreference(preference).setEnabled(false);
                 }
@@ -1059,26 +1057,17 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     }
 
     private void disableIncompatibleManagementOptionsByApiLevel() {
-        if (isBeforeM()) {
+        if (Util.isBeforeM()) {
             // The following options depend on MNC APIs.
             for (String preference : MNC_PLUS_PREFERENCES) {
                 findPreference(preference).setEnabled(false);
             }
         }
-        if (isBeforeN()) {
+        if (Util.isBeforeN()) {
             for (String preference : NYC_PLUS_PREFERENCES) {
                 findPreference(preference).setEnabled(false);
             }
         }
-    }
-
-    private boolean isBeforeM() {
-        return Build.VERSION.SDK_INT < VERSION_CODES.M;
-    }
-
-    private boolean isBeforeN() {
-        // STOPSHIP Change to SDK_INT.
-        return isBeforeM() || !Build.VERSION.CODENAME.startsWith("N");
     }
 
     /**

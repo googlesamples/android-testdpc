@@ -59,10 +59,7 @@ public abstract class ProfileOrParentFragment extends PreferenceFragment {
             final UserManager userManager = (UserManager)
                     getActivity().getSystemService(Context.USER_SERVICE);
 
-            // STOPSHIP Change to < VERSION_CODES.N.
-            if (userManager.getUserProfiles().size() == 1
-                    || Build.VERSION.SDK_INT < VERSION_CODES.M
-                    || !Build.VERSION.CODENAME.startsWith("N")) {
+            if (userManager.getUserProfiles().size() == 1 || Util.isBeforeN()) {
                 // No need for a tabbed view if there's just one item, or if the OS we are running
                 // under does not support parent policies.
                 try {

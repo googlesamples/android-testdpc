@@ -19,6 +19,8 @@ package com.afwsamples.testdpc.common;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
+import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.text.format.DateUtils;
 
 import com.afwsamples.testdpc.R;
@@ -62,4 +64,12 @@ public class Util {
                 DateUtils.FORMAT_SHOW_WEEKDAY, DateUtils.FORMAT_SHOW_TIME);
     }
 
+    public static boolean isBeforeM() {
+        return Build.VERSION.SDK_INT < VERSION_CODES.M;
+    }
+
+    public static boolean isBeforeN() {
+        // STOPSHIP Change to SDK_INT.
+        return isBeforeM() || !Build.VERSION.CODENAME.startsWith("N");
+    }
 }

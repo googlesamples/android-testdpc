@@ -34,6 +34,7 @@ import android.widget.Toast;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.AppInfoArrayAdapter;
+import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.profilepolicy.crossprofileintentfilter.AddCrossProfileIntentFilterFragment;
 import com.afwsamples.testdpc.profilepolicy.crossprofilewidgetprovider.ManageCrossProfileWidgetProviderUtil;
 
@@ -321,28 +322,18 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
     }
 
     private void disableIncompatibleManagementOptionsByApiLevel() {
-        if (isBeforeM()) {
+        if (Util.isBeforeM()) {
             // The following options depend on MNC APIs.
             for (String preference : MNC_PLUS_PREFERENCES) {
                 findPreference(preference).setEnabled(false);
             }
         }
 
-        if(isBeforeN()) {
+        if (Util.isBeforeN()) {
             // The following options depend on NYC APIs.
             for (String preference : NYC_PLUS_PREFERENCES) {
                 findPreference(preference).setEnabled(false);
             }
         }
-    }
-
-    private boolean isBeforeM() {
-        return Build.VERSION.SDK_INT < Build.VERSION_CODES.M;
-    }
-
-    private boolean isBeforeN() {
-        return Build.VERSION.SDK_INT < Build.VERSION_CODES.N
-                //TODO: remove it Build.VERSION.SDK_INT == N
-                && !Build.VERSION.CODENAME.startsWith("N");
     }
 }

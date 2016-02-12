@@ -32,6 +32,7 @@ import android.widget.Toast;
 
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
+import com.afwsamples.testdpc.common.Util;
 
 import static android.os.UserManager.ALLOW_PARENT_PROFILE_APP_LINKING;
 import static android.os.UserManager.DISALLOW_ADD_USER;
@@ -236,25 +237,16 @@ public class UserRestrictionsDisplayFragment extends PreferenceFragment
     }
 
     private void disableIncompatibleRestrictionsByApiLevel() {
-        if (isBeforeM()) {
+        if (Util.isBeforeM()) {
             for (String restriction : MNC_PLUS_RESTRICTIONS) {
                 findPreference(restriction).setEnabled(false);
             }
         }
-        if (isBeforeN()) {
+        if (Util.isBeforeN()) {
             for (String restriction : NYC_PLUS_RESTRICTIONS) {
                 findPreference(restriction).setEnabled(false);
             }
         }
-    }
-
-    private boolean isBeforeM() {
-        return Build.VERSION.SDK_INT <  Build.VERSION_CODES.M;
-    }
-
-    private boolean isBeforeN() {
-        // STOPSHIP Change to SDK_INT.
-        return isBeforeM() || !Build.VERSION.CODENAME.startsWith("N");
     }
 
     private void disableIncompatibleRestrictionsByUserType() {
