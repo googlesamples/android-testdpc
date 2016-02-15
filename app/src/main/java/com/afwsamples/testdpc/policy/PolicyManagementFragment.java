@@ -32,6 +32,7 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.BatteryManager;
@@ -68,8 +69,8 @@ import android.widget.Toast;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.AppInfoArrayAdapter;
-import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.common.MediaDisplayFragment;
+import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.policy.ProcessLogsFragment;
 import com.afwsamples.testdpc.policy.blockuninstallation.BlockUninstallationInfoArrayAdapter;
 import com.afwsamples.testdpc.policy.certificate.DelegatedCertInstallerFragment;
@@ -225,6 +226,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     private static final String MUTE_AUDIO_KEY = "mute_audio";
     private static final String NETWORK_STATS_KEY = "network_stats";
     private static final String PASSWORD_CONSTRAINTS_KEY = "password_constraints";
+    private static final String REBOOT_KEY = "reboot";
     private static final String REENABLE_KEYGUARD = "reenable_keyguard";
     private static final String REENABLE_STATUS_BAR = "reenable_status_bar";
     private static final String REMOVE_ALL_CERTIFICATES_KEY = "remove_all_ca_certificates";
@@ -241,6 +243,8 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             = "set_disable_account_management";
     private static final String SET_INPUT_METHODS_KEY = "set_input_methods";
     private static final String SET_LONG_SUPPORT_MESSAGE_KEY = "set_long_support_message";
+    private static final String SET_ORGANIZATION_COLOR_KEY = "set_organization_color";
+    private static final String SET_ORGANIZATION_NAME_KEY = "set_organization_name";
     private static final String SET_PERMISSION_POLICY_KEY = "set_permission_policy";
     private static final String SET_SHORT_SUPPORT_MESSAGE_KEY = "set_short_support_message";
     private static final String SET_USER_RESTRICTIONS_KEY = "set_user_restrictions";
@@ -260,7 +264,6 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     private static final String TAG_WIFI_CONFIG_CREATION = "wifi_config_creation";
     private static final String WIFI_CONFIG_LOCKDOWN_ON = "1";
     private static final String WIFI_CONFIG_LOCKDOWN_OFF = "0";
-    private static final String REBOOT = "reboot";
 
     private static final long MS_PER_SECOND = 1000;
 
@@ -275,7 +278,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             MANAGE_LOCK_TASK_LIST_KEY, CHECK_LOCK_TASK_PERMITTED_KEY, START_LOCK_TASK,
             STOP_LOCK_TASK, DISABLE_STATUS_BAR, REENABLE_STATUS_BAR, DISABLE_KEYGUARD,
             REENABLE_KEYGUARD, START_KIOSK_MODE, SYSTEM_UPDATE_POLICY_KEY, STAY_ON_WHILE_PLUGGED_IN,
-            SHOW_WIFI_MAC_ADDRESS_KEY, REBOOT, KEY_LOCK_SCREEN_MESSAGE, REQUEST_BUGREPORT_KEY,
+            SHOW_WIFI_MAC_ADDRESS_KEY, REBOOT_KEY, KEY_LOCK_SCREEN_MESSAGE, REQUEST_BUGREPORT_KEY,
             ENABLE_PROCESS_LOGGING, REQUEST_PROCESS_LOGS, SET_AUTO_TIME_REQUIRED_KEY
     };
 
@@ -288,11 +291,11 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     };
 
     private static String[] NYC_PLUS_PREFERENCES = {
-            APP_RESTRICTIONS_MANAGING_PACKAGE_KEY, REBOOT, REMOVE_KEY_CERTIFICATE_KEY,
+            APP_RESTRICTIONS_MANAGING_PACKAGE_KEY, REBOOT_KEY, REMOVE_KEY_CERTIFICATE_KEY,
             SET_ALWAYS_ON_VPN_KEY, SHOW_WIFI_MAC_ADDRESS_KEY, KEY_LOCK_SCREEN_MESSAGE,
             SUSPEND_APPS_KEY, UNSUSPEND_APPS_KEY, SET_SHORT_SUPPORT_MESSAGE_KEY,
             SET_LONG_SUPPORT_MESSAGE_KEY, REQUEST_BUGREPORT_KEY, ENABLE_PROCESS_LOGGING,
-            REQUEST_PROCESS_LOGS
+            REQUEST_PROCESS_LOGS, SET_ORGANIZATION_COLOR_KEY, SET_ORGANIZATION_NAME_KEY
     };
 
     /**
@@ -424,12 +427,14 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 INSTALL_NONMARKET_APPS_KEY);
         mInstallNonMarketAppsPreference.setOnPreferenceChangeListener(this);
         findPreference(SET_USER_RESTRICTIONS_KEY).setOnPreferenceClickListener(this);
-        findPreference(REBOOT).setOnPreferenceClickListener(this);
+        findPreference(REBOOT_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_SHORT_SUPPORT_MESSAGE_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_LONG_SUPPORT_MESSAGE_KEY).setOnPreferenceClickListener(this);
         mSetAutoTimeRequiredPreference = (SwitchPreference) findPreference(
                 SET_AUTO_TIME_REQUIRED_KEY);
         mSetAutoTimeRequiredPreference.setOnPreferenceChangeListener(this);
+        findPreference(SET_ORGANIZATION_COLOR_KEY).setOnPreferenceChangeListener(this);
+        findPreference(SET_ORGANIZATION_NAME_KEY).setOnPreferenceChangeListener(this);
 
         disableIncompatibleManagementOptionsInCurrentProfile();
         disableIncompatibleManagementOptionsByApiLevel();
@@ -662,7 +667,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             case SET_USER_RESTRICTIONS_KEY:
                 showFragment(new UserRestrictionsDisplayFragment());
                 return true;
-            case REBOOT:
+            case REBOOT_KEY:
                 reboot();
                 return true;
             case SET_SHORT_SUPPORT_MESSAGE_KEY:
@@ -732,6 +737,24 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 mDevicePolicyManager.setAutoTimeRequired(mAdminComponentName,
                         newValue.equals(true));
                 reloadSetAutoTimeRequiredUi();
+                return true;
+            case SET_ORGANIZATION_COLOR_KEY:
+                if (!TextUtils.isEmpty((String) newValue)) {
+                    int organizationColor;
+                    try {
+                        organizationColor = Color.parseColor((String) newValue);
+                    } catch (IllegalArgumentException e) {
+                        showToast(R.string.color_not_recognized);
+                        return false;
+                    }
+                    mDevicePolicyManager.setOrganizationColor(mAdminComponentName,
+                            organizationColor);
+                    return true;
+                }
+                showToast(R.string.empty_color_error);
+                return false;
+            case SET_ORGANIZATION_NAME_KEY:
+                mDevicePolicyManager.setOrganizationName(mAdminComponentName, (String) newValue);
                 return true;
         }
         return false;

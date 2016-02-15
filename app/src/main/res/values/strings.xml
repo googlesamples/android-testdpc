@@ -587,4 +587,10 @@
         Europe: +1 555-0100\n\n
         Email: someone@example.com
     </string>
+
+    <!-- Strings for organization info -->
+    <string name="organization_info">Organization info</string>
+    <string name="set_organization_color">Set organization color</string>
+    <string name="set_organization_name">Set organization name</string>
+    <string name="empty_color_error">Not allowed to set empty color</string>
 </resources>
