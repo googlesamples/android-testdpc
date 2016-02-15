@@ -39,4 +39,17 @@
 
     <!-- Dimens used in displaying support message. -->
     <dimen name="message_padding">16dp</dimen>
+
+    <!-- Dimens used in color picker dialog -->
+    <dimen name="color_picker_title_height">60dp</dimen>
+    <dimen name="color_picker_title_size">24sp</dimen>
+    <dimen name="color_picker_padding_start_end">16dp</dimen>
+    <dimen name="color_picker_padding_top_bottom">12dp</dimen>
+    <dimen name="color_picker_text_size">16sp</dimen>
+
+    <!-- Dimens used for displaying provisioning params -->
+    <dimen name="params_padding_start_end">8dp</dimen>
+    <dimen name="params_padding_top_bottom">8dp</dimen>
+    <dimen name="params_preview_logo_max_height">24dp</dimen>
+    <dimen name="params_preview_logo_max_width">48dp</dimen>
 </resources>

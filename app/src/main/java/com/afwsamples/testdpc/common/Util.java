@@ -19,11 +19,18 @@ package com.afwsamples.testdpc.common;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Build.VERSION_CODES;
 import android.text.format.DateUtils;
+import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.afwsamples.testdpc.R;
+
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 
 /**
  * Common utility functions.
@@ -62,6 +69,30 @@ public class Util {
 
         return DateUtils.formatSameDayTime(timestampMs, System.currentTimeMillis(),
                 DateUtils.FORMAT_SHOW_WEEKDAY, DateUtils.FORMAT_SHOW_TIME);
+    }
+
+    public static void updateImageView(Context context, ImageView imageView, Uri uri) {
+        try {
+            InputStream inputStream = context.getContentResolver().openInputStream(uri);
+            // Avoid decoding the entire image if the imageView holding this image is smaller.
+            BitmapFactory.Options bounds = new BitmapFactory.Options();
+            bounds.inJustDecodeBounds = true;
+            BitmapFactory.decodeStream(inputStream, null, bounds);
+            int streamWidth = bounds.outWidth;
+            int streamHeight = bounds.outHeight;
+            int maxDesiredWidth = imageView.getMaxWidth();
+            int maxDesiredHeight = imageView.getMaxHeight();
+            int ratio = Math.max(streamWidth / maxDesiredWidth, streamHeight / maxDesiredHeight);
+            if (ratio > 1) {
+                bounds.inSampleSize = ratio;
+            }
+            bounds.inJustDecodeBounds = false;
+
+            inputStream = context.getContentResolver().openInputStream(uri);
+            imageView.setImageBitmap(BitmapFactory.decodeStream(inputStream, null, bounds));
+        } catch (FileNotFoundException e) {
+            Toast.makeText(context, R.string.error_opening_image_file, Toast.LENGTH_SHORT);
+        }
     }
 
     public static boolean isBeforeM() {

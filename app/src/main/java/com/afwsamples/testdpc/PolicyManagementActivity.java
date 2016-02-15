@@ -44,7 +44,7 @@ public class PolicyManagementActivity extends Activity {
                         new PolicyManagementFragment()).commit();
             } else {
                 getFragmentManager().beginTransaction().add(R.id.container,
-                        new SetupManagementFragment()).commit();
+                        new SetupManagementFragment(), SetupManagementFragment.FRAGMENT_TAG).commit();
             }
         }
     }

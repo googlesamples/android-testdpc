@@ -21,7 +21,6 @@
     <string name="cancel">Cancel</string>
     <string name="set_up_managed_profile">Set up managed profile</string>
     <string name="set_up_device_owner">Set up device owner</string>
-    <string name="choose_logo">Choose a logo</string>
     <string name="set_up_management_header">Setup Management</string>
     <string name="setup_management_message">This app is currently not the owner of this device or
         profile. Please select an option below and click NEXT to set up appropriate management by this app.</string>
@@ -57,6 +56,11 @@
     <string name="migration_not_supported">Unable to migrate account into profile, please add manually.</string>
     <string name="provisioning_not_supported">Device provisioning is not enabled. Stopping.</string>
     <string name="provisioning_failed_or_cancelled">Provisioning failed or cancelled.</string>
+    <string name="provisioning_params_title">Select provisioning parameters</string>
+    <string name="provisioning_params_color">Color: </string>
+    <string name="provisioning_params_logo">Logo: </string>
+    <string name="provisioning_params_select">Select</string>
+    <string name="error_opening_image_file">Error occured while opening image file</string>
 
     <string name="work_profile">Work profile</string>
     <string name="personal_profile">Personal profile</string>
@@ -566,9 +570,6 @@
     <string name="stay_on_while_plugged_in">Keep the device on while plugged in</string>
     <string name="install_non_market_apps">Allow installs from unknown sources</string>
 
-    <string name="provisioning_color">Provisioning color:</string>
-    <string name="color_not_recognized">This color is not recognized</string>
-
     <!-- Strings for setting support messages -->
     <string name="support_messages">Support messages</string>
     <string name="set_short_support_message">Set short support message</string>
@@ -593,4 +594,16 @@
     <string name="set_organization_color">Set organization color</string>
     <string name="set_organization_name">Set organization name</string>
     <string name="empty_color_error">Not allowed to set empty color</string>
+    <string name="color_not_recognized">This color is not recognized</string>
+
+    <!-- strings used in the color picker dialog -->
+    <string name="color_picker_done">Done</string>
+    <string name="pick_color">Pick a color</string>
+    <string name="color_red_label">R</string>
+    <string name="color_green_label">G</string>
+    <string name="color_blue_label">B</string>
+    <string name="enter_color_value">Enter value:</string>
+    <string name="update_color">Update</string>
+    <string name="not_valid_color">Not a valid color</string>
+    <string name="color_format">#AARRGGBB</string>
 </resources>

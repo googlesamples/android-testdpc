@@ -22,24 +22,25 @@ import android.app.Fragment;
 import android.content.ClipData;
 import android.content.ContentResolver;
 import android.content.Intent;
-import android.graphics.Color;
+import android.content.res.ColorStateList;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PersistableBundle;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afwsamples.testdpc.common.ColorPicker;
 import com.afwsamples.testdpc.common.LaunchIntentUtil;
 import com.afwsamples.testdpc.common.ProvisioningStateUtil;
+import com.afwsamples.testdpc.common.Util;
 import com.android.setupwizardlib.SetupWizardLayout;
 import com.android.setupwizardlib.view.NavigationBar;
 
@@ -56,21 +57,42 @@ import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_MAIN_COLO
  * This {@link Fragment} shows the UI that allows the user to start the setup of a managed profile
  * or configuration of a device-owner if the device is in an appropriate state.
  */
-public class SetupManagementFragment extends Fragment
-        implements NavigationBar.NavigationBarListener {
+public class SetupManagementFragment extends Fragment implements
+        NavigationBar.NavigationBarListener, View.OnClickListener,
+        ColorPicker.OnColorSelectListener {
+    // Tag for creating this fragment. This tag can be used to retrieve this fragment.
+    public static final String FRAGMENT_TAG = "SetupManagementFragment";
 
     private static final int REQUEST_PROVISION_MANAGED_PROFILE = 1;
     private static final int REQUEST_PROVISION_DEVICE_OWNER = 2;
     private static final int REQUEST_GET_LOGO = 3;
 
     private Button mNavigationNextButton;
-    private Button mChooseLogoButton;
+    private ImageButton mParamsIndicator;
+    private View mParamsView;
+    private static final int[] STATE_EXPANDED = new int[] {R.attr.state_expanded};
+    private static final int[] STATE_COLLAPSED = new int[] {-R.attr.state_expanded};
 
+    private ImageView mColorPreviewView;
+    private TextView mColorValue;
+    private ImageView mLogoPreviewView;
+    private TextView mLogoValue;
+
+    private int mCurrentColor;
     private Uri mLogoUri = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+            mLogoUri = (Uri) savedInstanceState.getParcelable(EXTRA_PROVISIONING_LOGO_URI);
+            mCurrentColor = savedInstanceState.getInt(EXTRA_PROVISIONING_MAIN_COLOR);
+        } else {
+            mLogoUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://"
+                    + getActivity().getPackageName() + "/" + R.drawable.ic_launcher);
+            mCurrentColor = getResources().getColor(R.color.teal);
+        }
+
         View view = inflater.inflate(R.layout.setup_management_fragment, container, false);
         SetupWizardLayout layout = (SetupWizardLayout) view.findViewById(R.id.setup_wizard_layout);
         NavigationBar navigationBar = layout.getNavigationBar();
@@ -79,14 +101,15 @@ public class SetupManagementFragment extends Fragment
         mNavigationNextButton = navigationBar.getNextButton();
         mNavigationNextButton.setText(R.string.setup_label);
 
-        mChooseLogoButton = (Button) view.findViewById(R.id.choose_logo_button);
-        if (savedInstanceState != null) {
-            mLogoUri = (Uri) savedInstanceState.getParcelable(EXTRA_PROVISIONING_LOGO_URI);
-        }
-        if (mLogoUri == null) {
-            mLogoUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://"
-                    + getActivity().getPackageName() + "/" + R.drawable.ic_launcher);
-        }
+        mParamsView = view.findViewById(R.id.params);
+        mParamsIndicator = (ImageButton) view.findViewById(R.id.params_indicator);
+        mParamsIndicator.setOnClickListener(this);
+
+        view.findViewById(R.id.color_select_button).setOnClickListener(this);
+        mColorValue = (TextView) view.findViewById(R.id.selected_color_value);
+        mColorValue.setText(String.format(ColorPicker.COLOR_STRING_FORMATTER, mCurrentColor));
+        mColorPreviewView = (ImageView) view.findViewById(R.id.preview_color);
+        mColorPreviewView.setImageTintList(ColorStateList.valueOf(mCurrentColor));
 
         Intent launchIntent = getActivity().getIntent();
         if (LaunchIntentUtil.isSynchronousAuthLaunch(launchIntent)) {
@@ -112,6 +135,8 @@ public class SetupManagementFragment extends Fragment
     @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putParcelable(EXTRA_PROVISIONING_LOGO_URI, mLogoUri);
+        outState.putInt(EXTRA_PROVISIONING_MAIN_COLOR, mCurrentColor);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -122,17 +147,14 @@ public class SetupManagementFragment extends Fragment
         if (setProvisioningMethodsVisibility()) {
             // The extra logo uri and color are supported only from N
             if (ProvisioningStateUtil.versionIsAtLeastN()) {
+                getView().findViewById(R.id.params_title).setVisibility(View.VISIBLE);
                 if (canAnAppHandleGetContent()) {
-                    mChooseLogoButton.setVisibility(View.VISIBLE);
-                    mChooseLogoButton.setOnClickListener(new OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                startActivityForResult(getGetContentIntent(), REQUEST_GET_LOGO);
-                            }
-                        });
+                    getView().findViewById(
+                            R.id.choose_logo_item_layout).setVisibility(View.VISIBLE);
+                    getView().findViewById(R.id.logo_select_button).setOnClickListener(this);
+                    mLogoValue = (TextView) getView().findViewById(R.id.selected_logo_value);
+                    mLogoPreviewView = (ImageView) getView().findViewById(R.id.preview_logo);
                 }
-                getView().findViewById(R.id.provisioning_color_container).setVisibility(
-                        View.VISIBLE);
             }
         } else {
             showNoProvisioningPossibleUI();
@@ -199,7 +221,7 @@ public class SetupManagementFragment extends Fragment
     private boolean maybeSpecifyNExtras(Intent intent) {
         if (ProvisioningStateUtil.versionIsAtLeastN()) {
             specifyLogoUri(intent);
-            return specifyColor(intent);
+            specifyColor(intent);
         }
         return true;
     }
@@ -212,23 +234,8 @@ public class SetupManagementFragment extends Fragment
         }
     }
 
-    private boolean specifyColor(Intent intent) {
-        String colorString = ((EditText) getView().findViewById(R.id.provisioning_color))
-                .getText().toString();
-        int provisioningColor;
-        if (TextUtils.isEmpty(colorString)) {
-            provisioningColor = getResources().getColor(R.color.teal);
-        } else {
-            try {
-                provisioningColor = Color.parseColor(colorString);
-            } catch (IllegalArgumentException e) {
-                Toast.makeText(getActivity(), R.string.color_not_recognized, Toast.LENGTH_SHORT)
-                        .show();
-                return false;
-            }
-        }
-        intent.putExtra(EXTRA_PROVISIONING_MAIN_COLOR, provisioningColor);
-        return true;
+    private void specifyColor(Intent intent) {
+        intent.putExtra(EXTRA_PROVISIONING_MAIN_COLOR, mCurrentColor);
     }
 
     private void showNoProvisioningPossibleUI() {
@@ -281,9 +288,40 @@ public class SetupManagementFragment extends Fragment
             case REQUEST_GET_LOGO:
                 if (data != null && data.getData() != null) {
                     mLogoUri = data.getData();
+                    mLogoValue.setText(mLogoUri.getLastPathSegment());
+                    Util.updateImageView(getActivity(), mLogoPreviewView, mLogoUri);
                 }
                 break;
         }
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.params_indicator :
+                if (mParamsView.getVisibility() == View.VISIBLE) {
+                    mParamsView.setVisibility(View.GONE);
+                    mParamsIndicator.setImageState(STATE_COLLAPSED, false);
+                } else {
+                    mParamsIndicator.setImageState(STATE_EXPANDED, false);
+                    mParamsView.setVisibility(View.VISIBLE);
+                }
+                break;
+            case R.id.color_select_button:
+                ColorPicker.newInstance(mCurrentColor, FRAGMENT_TAG)
+                        .show(getFragmentManager(), "colorPicker");
+                break;
+            case R.id.logo_select_button:
+                startActivityForResult(getGetContentIntent(), REQUEST_GET_LOGO);
+                break;
+        }
+    }
+
+    @Override
+    public void onColorSelected(int colorValue) {
+        mCurrentColor = colorValue;
+        mColorValue.setText(String.format(ColorPicker.COLOR_STRING_FORMATTER, colorValue));
+        mColorPreviewView.setImageTintList(ColorStateList.valueOf(colorValue));
     }
 
     @Override
