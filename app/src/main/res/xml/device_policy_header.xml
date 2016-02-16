@@ -275,16 +275,12 @@
 
     <PreferenceCategory
             android:title="@string/organization_info">
-        <EditTextPreference
+        <Preference
                 android:key="set_organization_color"
-                android:title="@string/set_organization_color"
-                android:hint="@color/teal"
-                android:singleLine="true"
-                android:digits="#0123456789abcdefABCDEF"
-                android:inputType="textCapCharacters"/>
+                android:title="@string/set_organization_color" />
         <EditTextPreference
                 android:key="set_organization_name"
-                android:title="@string/set_organization_name"/>
+                android:title="@string/set_organization_name" />
     </PreferenceCategory>
 
     <PreferenceCategory

@@ -42,11 +42,16 @@ public class ColorPicker extends DialogFragment implements SeekBar.OnSeekBarChan
         View.OnClickListener {
     private static final String ARG_COLOR_VALUE = "init_color";
     private static final String ARG_LISTENER_FRAGMENT_TAG = "listener_fragment_tag";
+    private static final String ARG_ID = "id";
 
     public static final String COLOR_STRING_FORMATTER = "#%08x";
 
     private String mListenerTag;
     private int mCurrentColor;
+    // Id given as an argument while initiating this class, this will be passed as is to the
+    // listener on callback. Since there could be multiple elements initiating this, caller
+    // can use this to differentiate those.
+    private String mId;
 
     private View mTitleHeader;
     private SeekBar mRedBar;
@@ -60,11 +65,12 @@ public class ColorPicker extends DialogFragment implements SeekBar.OnSeekBarChan
     private Button mCancelButton;
     private Button mPreviewButton;
 
-    public static ColorPicker newInstance(int initColor, String listenerTag) {
+    public static ColorPicker newInstance(int initColor, String listenerTag, String id) {
         ColorPicker fragment = new ColorPicker();
         Bundle args = new Bundle();
         args.putInt(ARG_COLOR_VALUE, initColor);
         args.putString(ARG_LISTENER_FRAGMENT_TAG, listenerTag);
+        args.putString(ARG_ID, id);
         fragment.setArguments(args);
         return fragment;
     }
@@ -75,10 +81,12 @@ public class ColorPicker extends DialogFragment implements SeekBar.OnSeekBarChan
         if (savedInstanceState != null) {
             mCurrentColor = savedInstanceState.getInt(ARG_COLOR_VALUE);
             mListenerTag = savedInstanceState.getString(ARG_LISTENER_FRAGMENT_TAG);
+            mId = savedInstanceState.getString(ARG_ID);
         } else if (getArguments() != null) {
             mCurrentColor = getArguments().getInt(ARG_COLOR_VALUE,
                     getResources().getColor(R.color.teal));
             mListenerTag = getArguments().getString(ARG_LISTENER_FRAGMENT_TAG);
+            mId = getArguments().getString(ARG_ID);
         }
     }
 
@@ -95,7 +103,7 @@ public class ColorPicker extends DialogFragment implements SeekBar.OnSeekBarChan
                                 OnColorSelectListener listener = (OnColorSelectListener)
                                         getFragmentManager().findFragmentByTag(mListenerTag);
                                 if (listener != null) {
-                                    listener.onColorSelected(mCurrentColor);
+                                    listener.onColorSelected(mCurrentColor, mId);
                                 }
                             }
                         })
@@ -120,6 +128,7 @@ public class ColorPicker extends DialogFragment implements SeekBar.OnSeekBarChan
     public void onSaveInstanceState(Bundle outState) {
         outState.putInt(ARG_COLOR_VALUE, mCurrentColor);
         outState.putString(ARG_LISTENER_FRAGMENT_TAG, mListenerTag);
+        outState.putString(ARG_ID, mId);
         super.onSaveInstanceState(outState);
     }
 
@@ -183,7 +192,7 @@ public class ColorPicker extends DialogFragment implements SeekBar.OnSeekBarChan
     }
 
     public interface OnColorSelectListener {
-        void onColorSelected(int selectedColor);
+        void onColorSelected(int selectedColor, String id);
     }
 
     /**
