@@ -18,6 +18,16 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory
+            android:title="@string/organization_info">
+        <Preference
+                android:key="set_organization_color"
+                android:title="@string/set_organization_color" />
+        <EditTextPreference
+                android:key="set_organization_name"
+                android:title="@string/set_organization_name" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
             android:title="@string/cross_profile_intents">
         <Preference
                 android:title="@string/add_cross_profile_intents_title"

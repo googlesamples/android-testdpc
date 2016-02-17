@@ -32,7 +32,6 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.BatteryManager;
@@ -69,10 +68,8 @@ import android.widget.Toast;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.AppInfoArrayAdapter;
-import com.afwsamples.testdpc.common.ColorPicker;
 import com.afwsamples.testdpc.common.MediaDisplayFragment;
 import com.afwsamples.testdpc.common.Util;
-import com.afwsamples.testdpc.policy.ProcessLogsFragment;
 import com.afwsamples.testdpc.policy.blockuninstallation.BlockUninstallationInfoArrayAdapter;
 import com.afwsamples.testdpc.policy.certificate.DelegatedCertInstallerFragment;
 import com.afwsamples.testdpc.policy.keyguard.LockScreenPolicyFragment;
@@ -178,8 +175,7 @@ import java.util.Set;
  * </ul>
  */
 public class PolicyManagementFragment extends PreferenceFragment implements
-        Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener,
-        ColorPicker.OnColorSelectListener {
+        Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
     // Tag for creating this fragment. This tag can be used to retrieve this fragment.
     public static final String FRAGMENT_TAG = "PolicyManagementFragment";
 
@@ -247,8 +243,6 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             = "set_disable_account_management";
     private static final String SET_INPUT_METHODS_KEY = "set_input_methods";
     private static final String SET_LONG_SUPPORT_MESSAGE_KEY = "set_long_support_message";
-    private static final String SET_ORGANIZATION_COLOR_KEY = "set_organization_color";
-    private static final String SET_ORGANIZATION_NAME_KEY = "set_organization_name";
     private static final String SET_PERMISSION_POLICY_KEY = "set_permission_policy";
     private static final String SET_SHORT_SUPPORT_MESSAGE_KEY = "set_short_support_message";
     private static final String SET_USER_RESTRICTIONS_KEY = "set_user_restrictions";
@@ -277,8 +271,6 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             BatteryManager.BATTERY_PLUGGED_WIRELESS);
     private static final String DONT_STAY_ON = "0";
 
-    private static final String ORGANIZATION_COLOR_ID = "organizationColor";
-
     private static final String[] PRIMARY_USER_ONLY_PREFERENCES = {
             WIPE_DATA_KEY, REMOVE_DEVICE_OWNER_KEY, CREATE_AND_INITIALIZE_USER_KEY, REMOVE_USER_KEY,
             MANAGE_LOCK_TASK_LIST_KEY, CHECK_LOCK_TASK_PERMITTED_KEY, START_LOCK_TASK,
@@ -300,8 +292,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             APP_RESTRICTIONS_MANAGING_PACKAGE_KEY, REBOOT_KEY, REMOVE_KEY_CERTIFICATE_KEY,
             SET_ALWAYS_ON_VPN_KEY, SHOW_WIFI_MAC_ADDRESS_KEY, SUSPEND_APPS_KEY, UNSUSPEND_APPS_KEY,
             SET_SHORT_SUPPORT_MESSAGE_KEY, SET_LONG_SUPPORT_MESSAGE_KEY, REQUEST_BUGREPORT_KEY,
-            ENABLE_PROCESS_LOGGING, REQUEST_PROCESS_LOGS, SET_ORGANIZATION_COLOR_KEY,
-            SET_ORGANIZATION_NAME_KEY
+            ENABLE_PROCESS_LOGGING, REQUEST_PROCESS_LOGS
     };
 
     /**
@@ -335,9 +326,6 @@ public class PolicyManagementFragment extends PreferenceFragment implements
 
     private SwitchPreference mEnableProcessLoggingPreference;
     private SwitchPreference mSetAutoTimeRequiredPreference;
-
-    private Preference mSetOrganizationNamePreference;
-    private Preference mSetOrganizationColorPreference;
 
     private GetAccessibilityServicesTask mGetAccessibilityServicesTask = null;
     private GetInputMethodsTask mGetInputMethodsTask = null;
@@ -441,7 +429,6 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         mSetAutoTimeRequiredPreference = (SwitchPreference) findPreference(
                 SET_AUTO_TIME_REQUIRED_KEY);
         mSetAutoTimeRequiredPreference.setOnPreferenceChangeListener(this);
-        initializeOrganizationInfoPreferences();
 
         disableIncompatibleManagementOptionsInCurrentProfile();
         disableIncompatibleManagementOptionsByApiLevel();
@@ -607,7 +594,8 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 showToast(R.string.all_ca_certificates_removed);
                 return true;
             case MANAGED_PROFILE_SPECIFIC_POLICIES_KEY:
-                showFragment(new ProfilePolicyManagementFragment());
+                showFragment(new ProfilePolicyManagementFragment(),
+                        ProfilePolicyManagementFragment.FRAGMENT_TAG);
                 return true;
             case LOCK_SCREEN_POLICY_KEY:
                 showFragment(new LockScreenPolicyFragment.Container());
@@ -685,40 +673,8 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 showFragment(SetSupportMessageFragment.newInstance(
                         SetSupportMessageFragment.TYPE_LONG));
                 return true;
-            case SET_ORGANIZATION_COLOR_KEY:
-                int colorValue = getActivity().getResources().getColor(R.color.teal);
-                final CharSequence summary = mSetOrganizationColorPreference.getSummary();
-                if (summary != null) {
-                    try {
-                         colorValue = Color.parseColor(summary.toString());
-                    } catch (IllegalArgumentException e) {
-                        // Ignore
-                    }
-                }
-                ColorPicker.newInstance(colorValue, FRAGMENT_TAG, ORGANIZATION_COLOR_ID)
-                        .show(getFragmentManager(), "colorPicker");
         }
         return false;
-    }
-
-    @Override
-    public void onColorSelected(int colorValue, String id) {
-        if (ORGANIZATION_COLOR_ID.equals(id)) {
-            mDevicePolicyManager.setOrganizationColor(mAdminComponentName, colorValue);
-            mSetOrganizationColorPreference.setSummary(
-                    String.format(ColorPicker.COLOR_STRING_FORMATTER, colorValue));
-        }
-    }
-
-    private void initializeOrganizationInfoPreferences() {
-        mSetOrganizationColorPreference = findPreference(SET_ORGANIZATION_COLOR_KEY);
-        mSetOrganizationColorPreference.setOnPreferenceClickListener(this);
-        mSetOrganizationNamePreference = findPreference(SET_ORGANIZATION_NAME_KEY);
-        mSetOrganizationNamePreference.setOnPreferenceChangeListener(this);
-
-        final int colorValue = mDevicePolicyManager.getOrganizationColor(mAdminComponentName);
-        mSetOrganizationColorPreference.setSummary(
-                String.format(ColorPicker.COLOR_STRING_FORMATTER, colorValue));
     }
 
     @Override
@@ -772,10 +728,6 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 mDevicePolicyManager.setAutoTimeRequired(mAdminComponentName,
                         newValue.equals(true));
                 reloadSetAutoTimeRequiredUi();
-                return true;
-            case SET_ORGANIZATION_NAME_KEY:
-                mDevicePolicyManager.setOrganizationName(mAdminComponentName, (String) newValue);
-                mSetOrganizationNamePreference.setSummary((String) newValue);
                 return true;
         }
         return false;
@@ -2073,6 +2025,12 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         FragmentManager fragmentManager = getFragmentManager();
         fragmentManager.beginTransaction().addToBackStack(PolicyManagementFragment.class.getName())
                 .replace(R.id.container, fragment).commit();
+    }
+
+    private void showFragment(final Fragment fragment, String tag) {
+        FragmentManager fragmentManager = getFragmentManager();
+        fragmentManager.beginTransaction().addToBackStack(PolicyManagementFragment.class.getName())
+                .replace(R.id.container, fragment, tag).commit();
     }
 
     private void startKioskMode(String[] lockTaskArray) {

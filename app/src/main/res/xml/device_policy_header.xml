@@ -268,16 +268,6 @@
     </PreferenceCategory>
 
     <PreferenceCategory
-            android:title="@string/organization_info">
-        <Preference
-                android:key="set_organization_color"
-                android:title="@string/set_organization_color" />
-        <EditTextPreference
-                android:key="set_organization_name"
-                android:title="@string/set_organization_name" />
-    </PreferenceCategory>
-
-    <PreferenceCategory
             android:title="@string/device_owner_management">
         <SwitchPreference
                 android:key="set_auto_time_required"
