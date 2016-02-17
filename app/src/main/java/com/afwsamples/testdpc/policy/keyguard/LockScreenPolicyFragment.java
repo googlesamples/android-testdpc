@@ -28,6 +28,7 @@ import android.widget.Toast;
 
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.ProfileOrParentFragment;
+import com.afwsamples.testdpc.common.Util;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -50,6 +51,8 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
     }
 
     abstract static class Keys {
+        static final String LOCK_SCREEN_MESSAGE = "key_lock_screen_message";
+
         static final String MAX_FAILS_BEFORE_WIPE = "key_max_fails_before_wipe";
         static final String MAX_FAILS_BEFORE_WIPE_ALL = "key_max_fails_before_wipe_aggregate";
 
@@ -76,10 +79,20 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
         }));
 
         static final Set<String> NOT_APPLICABLE_TO_PROFILE
-                = new HashSet<>(Arrays.asList(new String[]{
+                = new HashSet<>(Arrays.asList(new String[] {
             KEYGUARD_DISABLE_SECURE_CAMERA,
             KEYGUARD_DISABLE_SECURE_NOTIFICATIONS,
             KEYGUARD_DISABLE_WIDGETS
+        }));
+
+        static final Set<String> DEVICE_OWNER_ONLY
+                = new HashSet<>(Arrays.asList(new String[] {
+            LOCK_SCREEN_MESSAGE
+        }));
+
+        static final Set<String> NYC_PLUS
+                = new HashSet<>(Arrays.asList(new String[] {
+            LOCK_SCREEN_MESSAGE
         }));
     }
 
@@ -114,6 +127,9 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
 
         addPreferencesFromResource(R.xml.lock_screen_preferences);
 
+        setup(Keys.LOCK_SCREEN_MESSAGE,
+                Util.isBeforeN() ? null : getDpm().getDeviceOwnerLockScreenInfo());
+
         setup(Keys.MAX_FAILS_BEFORE_WIPE, getDpm().getMaximumFailedPasswordsForWipe(getAdmin()));
         setup(Keys.MAX_TIME_SCREEN_LOCK,
                 TimeUnit.MILLISECONDS.toSeconds(getDpm().getMaximumTimeToLock(getAdmin())));
@@ -133,21 +149,15 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         if (KEYGUARD_FEATURES.containsKey(preference.getKey())) {
-            final int flag = KEYGUARD_FEATURES.get(preference.getKey());
-
-            int disabledFeatures = getDpm().getKeyguardDisabledFeatures(getAdmin());
-            if ((Boolean) newValue) {
-                disabledFeatures |= flag;
-            } else {
-                disabledFeatures &= ~flag;
-            }
-            getDpm().setKeyguardDisabledFeatures(getAdmin(), disabledFeatures);
-
-            int newDisabledFeatures = getDpm().getKeyguardDisabledFeatures(getAdmin());
-            return disabledFeatures == newDisabledFeatures;
+            final int featureFlag = KEYGUARD_FEATURES.get(preference.getKey());
+            return updateKeyguardFeatures(featureFlag, (Boolean) newValue);
         }
 
         switch (preference.getKey()) {
+            case Keys.LOCK_SCREEN_MESSAGE:
+                getDpm().setDeviceOwnerLockScreenInfo(getAdmin(), (String) newValue);
+                preference.setSummary((String) newValue);
+                return true;
             case Keys.MAX_FAILS_BEFORE_WIPE:
                 try {
                     final int setting = parseInt((String) newValue);
@@ -176,6 +186,20 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
         return true;
     }
 
+    private boolean updateKeyguardFeatures(int flag, boolean newValue) {
+        int disabledFeatures = getDpm().getKeyguardDisabledFeatures(getAdmin());
+        if (newValue) {
+            disabledFeatures |= flag;
+        } else {
+            disabledFeatures &= ~flag;
+        }
+        getDpm().setKeyguardDisabledFeatures(getAdmin(), disabledFeatures);
+
+        // Verify that the new setting stuck.
+        int newDisabledFeatures = getDpm().getKeyguardDisabledFeatures(getAdmin());
+        return disabledFeatures == newDisabledFeatures;
+    }
+
     private void updateAggregates() {
         final int maxFailedPasswords = getDpm().getMaximumFailedPasswordsForWipe(null);
         findPreference(Keys.MAX_FAILS_BEFORE_WIPE_ALL).setSummary(
@@ -198,20 +222,27 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
 
         // If the preference is not applicable, just hide it instead.
         if ((Keys.NOT_APPLICABLE_TO_PARENT.contains(key) && isParentProfileInstance())
-                || (Keys.NOT_APPLICABLE_TO_PROFILE.contains(key) && isManagedProfileInstance())) {
+                || (Keys.NOT_APPLICABLE_TO_PROFILE.contains(key) && isManagedProfileInstance())
+                || (Keys.DEVICE_OWNER_ONLY.contains(key) && !isDeviceOwner())
+                || (Keys.NYC_PLUS.contains(key) && Util.isBeforeN())) {
             pref.setEnabled(false);
             return;
         }
 
-        pref.setOnPreferenceChangeListener(this);
-
+        // Set up initial state and possibly a descriptive summary of said state.
         if (pref instanceof EditTextPreference) {
-            final String stringValue = adminSetting.toString();
+            String stringValue = (adminSetting != null ? adminSetting.toString() : null);
+            if (adminSetting instanceof Number && "0".equals(stringValue)) {
+                stringValue = null;
+            }
             ((EditTextPreference) pref).setText(stringValue);
-            pref.setSummary("0".equals(stringValue) ? null : stringValue);
+            pref.setSummary(stringValue);
         } else if (pref instanceof TwoStatePreference) {
             ((TwoStatePreference) pref).setChecked((Boolean) adminSetting);
         }
+
+        // Start listening for change events.
+        pref.setOnPreferenceChangeListener(this);
     }
 
     private int parseInt(String value) throws NumberFormatException {
@@ -220,6 +251,10 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
 
     private long parseLong(String value) throws NumberFormatException {
         return value.length() != 0 ? Long.parseLong(value) : 0L;
+    }
+
+    private boolean isDeviceOwner() {
+        return getDpm().isDeviceOwnerApp(getContext().getPackageName());
     }
 
     private void showToast(int titleId) {

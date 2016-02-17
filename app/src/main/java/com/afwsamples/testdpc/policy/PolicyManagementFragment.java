@@ -222,7 +222,6 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     private static final String INSTALL_NONMARKET_APPS_KEY
             = "install_nonmarket_apps";
     private static final String KEYGUARD_PREFERENCES = "keyguard_preferences";
-    private static final String KEY_LOCK_SCREEN_MESSAGE = "key_lock_screen_message";
     private static final String LOCK_SCREEN_POLICY_KEY = "lock_screen_policy";
     private static final String MANAGE_APP_PERMISSIONS_KEY = "manage_app_permissions";
     private static final String MANAGE_APP_RESTRICTIONS_KEY = "manage_app_restrictions";
@@ -285,8 +284,8 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             MANAGE_LOCK_TASK_LIST_KEY, CHECK_LOCK_TASK_PERMITTED_KEY, START_LOCK_TASK,
             STOP_LOCK_TASK, DISABLE_STATUS_BAR, REENABLE_STATUS_BAR, DISABLE_KEYGUARD,
             REENABLE_KEYGUARD, START_KIOSK_MODE, SYSTEM_UPDATE_POLICY_KEY, STAY_ON_WHILE_PLUGGED_IN,
-            SHOW_WIFI_MAC_ADDRESS_KEY, REBOOT_KEY, KEY_LOCK_SCREEN_MESSAGE, REQUEST_BUGREPORT_KEY,
-            ENABLE_PROCESS_LOGGING, REQUEST_PROCESS_LOGS, SET_AUTO_TIME_REQUIRED_KEY
+            SHOW_WIFI_MAC_ADDRESS_KEY, REBOOT_KEY, REQUEST_BUGREPORT_KEY, ENABLE_PROCESS_LOGGING,
+            REQUEST_PROCESS_LOGS, SET_AUTO_TIME_REQUIRED_KEY
     };
 
     private static String[] MNC_PLUS_PREFERENCES = {
@@ -299,10 +298,10 @@ public class PolicyManagementFragment extends PreferenceFragment implements
 
     private static String[] NYC_PLUS_PREFERENCES = {
             APP_RESTRICTIONS_MANAGING_PACKAGE_KEY, REBOOT_KEY, REMOVE_KEY_CERTIFICATE_KEY,
-            SET_ALWAYS_ON_VPN_KEY, SHOW_WIFI_MAC_ADDRESS_KEY, KEY_LOCK_SCREEN_MESSAGE,
-            SUSPEND_APPS_KEY, UNSUSPEND_APPS_KEY, SET_SHORT_SUPPORT_MESSAGE_KEY,
-            SET_LONG_SUPPORT_MESSAGE_KEY, REQUEST_BUGREPORT_KEY, ENABLE_PROCESS_LOGGING,
-            REQUEST_PROCESS_LOGS, SET_ORGANIZATION_COLOR_KEY, SET_ORGANIZATION_NAME_KEY
+            SET_ALWAYS_ON_VPN_KEY, SHOW_WIFI_MAC_ADDRESS_KEY, SUSPEND_APPS_KEY, UNSUSPEND_APPS_KEY,
+            SET_SHORT_SUPPORT_MESSAGE_KEY, SET_LONG_SUPPORT_MESSAGE_KEY, REQUEST_BUGREPORT_KEY,
+            ENABLE_PROCESS_LOGGING, REQUEST_PROCESS_LOGS, SET_ORGANIZATION_COLOR_KEY,
+            SET_ORGANIZATION_NAME_KEY
     };
 
     /**
@@ -428,7 +427,6 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         findPreference(MANAGED_PROFILE_SPECIFIC_POLICIES_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_PERMISSION_POLICY_KEY).setOnPreferenceClickListener(this);
         findPreference(MANAGE_APP_PERMISSIONS_KEY).setOnPreferenceClickListener(this);
-        findPreference(KEY_LOCK_SCREEN_MESSAGE).setOnPreferenceChangeListener(this);
         findPreference(CREATE_WIFI_CONFIGURATION_KEY).setOnPreferenceClickListener(this);
         findPreference(WIFI_CONFIG_LOCKDOWN_ENABLE_KEY).setOnPreferenceChangeListener(this);
         findPreference(MODIFY_WIFI_CONFIGURATION_KEY).setOnPreferenceClickListener(this);
@@ -751,10 +749,6 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 mDevicePolicyManager.setMasterVolumeMuted(mAdminComponentName,
                         (Boolean) newValue);
                 reloadMuteAudioUi();
-                return true;
-            case KEY_LOCK_SCREEN_MESSAGE:
-                mDevicePolicyManager.setDeviceOwnerLockScreenInfo(mAdminComponentName,
-                        (String) newValue);
                 return true;
             case STAY_ON_WHILE_PLUGGED_IN:
                 mDevicePolicyManager.setGlobalSetting(mAdminComponentName,
