@@ -1811,9 +1811,9 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     /**
      * Shows an alert dialog which displays a list of suspended/non-suspended apps.
      */
-    private void showSuspendAppsPrompt(final boolean showSuspendedApps) {
+    private void showSuspendAppsPrompt(final boolean forUnsuspending) {
         final List<String> showApps = new ArrayList<>();
-        if (showSuspendedApps) {
+        if (forUnsuspending) {
             // Find all suspended packages using the GET_UNINSTALLED_PACKAGES flag.
             for (ApplicationInfo applicationInfo : getAllInstalledApplicationsSorted()) {
                 if (mDevicePolicyManager.getPackageSuspended(mAdminComponentName,
@@ -1833,15 +1833,16 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         }
 
         if (showApps.isEmpty()) {
-            showToast(showSuspendedApps ?
-                    R.string.unsuspend_apps_empty : R.string.suspend_apps_empty);
+            showToast(forUnsuspending
+                    ? R.string.unsuspend_apps_empty
+                    : R.string.suspend_apps_empty);
         } else {
             AppInfoArrayAdapter appInfoArrayAdapter = new AppInfoArrayAdapter(getActivity(),
                     R.id.pkg_name, showApps, true);
             final int dialogTitleResId;
             final int successResId;
             final int failureResId;
-            if (showSuspendedApps) {
+            if (forUnsuspending) {
                 // Showing a dialog to unsuspend an app.
                 dialogTitleResId = R.string.unsuspend_apps_title;
                 successResId = R.string.unsuspend_apps_success;
@@ -1858,8 +1859,8 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                         @Override
                         public void onClick(DialogInterface dialog, int position) {
                             String packageName = showApps.get(position);
-                            if (mDevicePolicyManager.setPackageSuspended(mAdminComponentName,
-                                    packageName, !showSuspendedApps)) {
+                            if (mDevicePolicyManager.setPackagesSuspended(mAdminComponentName,
+                                    new String[] {packageName}, !forUnsuspending).length == 0) {
                                 showToast(successResId, packageName);
                             } else {
                                 showToast(getString(failureResId, packageName), Toast.LENGTH_LONG);
