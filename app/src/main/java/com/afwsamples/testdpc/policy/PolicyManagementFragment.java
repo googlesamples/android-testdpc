@@ -29,7 +29,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -710,11 +709,6 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             mDevicePolicyManager.setOrganizationColor(mAdminComponentName, colorValue);
             mSetOrganizationColorPreference.setSummary(
                     String.format(ColorPicker.COLOR_STRING_FORMATTER, colorValue));
-            final SharedPreferences preferences =
-                    getPreferenceManager().getDefaultSharedPreferences(getActivity());
-            final SharedPreferences.Editor editor = preferences.edit();
-            editor.putInt(SET_ORGANIZATION_COLOR_KEY, colorValue);
-            editor.commit();
         }
     }
 
@@ -724,10 +718,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         mSetOrganizationNamePreference = findPreference(SET_ORGANIZATION_NAME_KEY);
         mSetOrganizationNamePreference.setOnPreferenceChangeListener(this);
 
-        final SharedPreferences preferences =
-                getPreferenceManager().getDefaultSharedPreferences(getActivity());
-        int colorValue = preferences.getInt(SET_ORGANIZATION_COLOR_KEY,
-                getActivity().getResources().getColor(R.color.teal));
+        final int colorValue = mDevicePolicyManager.getOrganizationColor(mAdminComponentName);
         mSetOrganizationColorPreference.setSummary(
                 String.format(ColorPicker.COLOR_STRING_FORMATTER, colorValue));
     }
