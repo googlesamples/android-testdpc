@@ -593,8 +593,6 @@
     <string name="organization_info">Organization info</string>
     <string name="set_organization_color">Set organization color</string>
     <string name="set_organization_name">Set organization name</string>
-    <string name="empty_color_error">Not allowed to set empty color</string>
-    <string name="color_not_recognized">This color is not recognized</string>
 
     <!-- strings used in the color picker dialog -->
     <string name="color_picker_done">Done</string>

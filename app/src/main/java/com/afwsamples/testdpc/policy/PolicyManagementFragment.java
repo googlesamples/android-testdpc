@@ -29,6 +29,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -69,6 +70,7 @@ import android.widget.Toast;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.AppInfoArrayAdapter;
+import com.afwsamples.testdpc.common.ColorPicker;
 import com.afwsamples.testdpc.common.MediaDisplayFragment;
 import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.policy.ProcessLogsFragment;
@@ -177,7 +179,11 @@ import java.util.Set;
  * </ul>
  */
 public class PolicyManagementFragment extends PreferenceFragment implements
-        Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
+        Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener,
+        ColorPicker.OnColorSelectListener {
+    // Tag for creating this fragment. This tag can be used to retrieve this fragment.
+    public static final String FRAGMENT_TAG = "PolicyManagementFragment";
+
     private static final int INSTALL_KEY_CERTIFICATE_REQUEST_CODE = 7689;
     private static final int INSTALL_CA_CERTIFICATE_REQUEST_CODE = 7690;
     private static final int CAPTURE_IMAGE_REQUEST_CODE = 7691;
@@ -273,6 +279,8 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             BatteryManager.BATTERY_PLUGGED_WIRELESS);
     private static final String DONT_STAY_ON = "0";
 
+    private static final String ORGANIZATION_COLOR_ID = "organizationColor";
+
     private static final String[] PRIMARY_USER_ONLY_PREFERENCES = {
             WIPE_DATA_KEY, REMOVE_DEVICE_OWNER_KEY, CREATE_AND_INITIALIZE_USER_KEY, REMOVE_USER_KEY,
             MANAGE_LOCK_TASK_LIST_KEY, CHECK_LOCK_TASK_PERMITTED_KEY, START_LOCK_TASK,
@@ -329,6 +337,9 @@ public class PolicyManagementFragment extends PreferenceFragment implements
 
     private SwitchPreference mEnableProcessLoggingPreference;
     private SwitchPreference mSetAutoTimeRequiredPreference;
+
+    private Preference mSetOrganizationNamePreference;
+    private Preference mSetOrganizationColorPreference;
 
     private GetAccessibilityServicesTask mGetAccessibilityServicesTask = null;
     private GetInputMethodsTask mGetInputMethodsTask = null;
@@ -433,8 +444,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         mSetAutoTimeRequiredPreference = (SwitchPreference) findPreference(
                 SET_AUTO_TIME_REQUIRED_KEY);
         mSetAutoTimeRequiredPreference.setOnPreferenceChangeListener(this);
-        findPreference(SET_ORGANIZATION_COLOR_KEY).setOnPreferenceChangeListener(this);
-        findPreference(SET_ORGANIZATION_NAME_KEY).setOnPreferenceChangeListener(this);
+        initializeOrganizationInfoPreferences();
 
         disableIncompatibleManagementOptionsInCurrentProfile();
         disableIncompatibleManagementOptionsByApiLevel();
@@ -678,8 +688,48 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 showFragment(SetSupportMessageFragment.newInstance(
                         SetSupportMessageFragment.TYPE_LONG));
                 return true;
+            case SET_ORGANIZATION_COLOR_KEY:
+                int colorValue = getActivity().getResources().getColor(R.color.teal);
+                final CharSequence summary = mSetOrganizationColorPreference.getSummary();
+                if (summary != null) {
+                    try {
+                         colorValue = Color.parseColor(summary.toString());
+                    } catch (IllegalArgumentException e) {
+                        // Ignore
+                    }
+                }
+                ColorPicker.newInstance(colorValue, FRAGMENT_TAG, ORGANIZATION_COLOR_ID)
+                        .show(getFragmentManager(), "colorPicker");
         }
         return false;
+    }
+
+    @Override
+    public void onColorSelected(int colorValue, String id) {
+        if (ORGANIZATION_COLOR_ID.equals(id)) {
+            mDevicePolicyManager.setOrganizationColor(mAdminComponentName, colorValue);
+            mSetOrganizationColorPreference.setSummary(
+                    String.format(ColorPicker.COLOR_STRING_FORMATTER, colorValue));
+            final SharedPreferences preferences =
+                    getPreferenceManager().getDefaultSharedPreferences(getActivity());
+            final SharedPreferences.Editor editor = preferences.edit();
+            editor.putInt(SET_ORGANIZATION_COLOR_KEY, colorValue);
+            editor.commit();
+        }
+    }
+
+    private void initializeOrganizationInfoPreferences() {
+        mSetOrganizationColorPreference = findPreference(SET_ORGANIZATION_COLOR_KEY);
+        mSetOrganizationColorPreference.setOnPreferenceClickListener(this);
+        mSetOrganizationNamePreference = findPreference(SET_ORGANIZATION_NAME_KEY);
+        mSetOrganizationNamePreference.setOnPreferenceChangeListener(this);
+
+        final SharedPreferences preferences =
+                getPreferenceManager().getDefaultSharedPreferences(getActivity());
+        int colorValue = preferences.getInt(SET_ORGANIZATION_COLOR_KEY,
+                getActivity().getResources().getColor(R.color.teal));
+        mSetOrganizationColorPreference.setSummary(
+                String.format(ColorPicker.COLOR_STRING_FORMATTER, colorValue));
     }
 
     @Override
@@ -738,23 +788,9 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                         newValue.equals(true));
                 reloadSetAutoTimeRequiredUi();
                 return true;
-            case SET_ORGANIZATION_COLOR_KEY:
-                if (!TextUtils.isEmpty((String) newValue)) {
-                    int organizationColor;
-                    try {
-                        organizationColor = Color.parseColor((String) newValue);
-                    } catch (IllegalArgumentException e) {
-                        showToast(R.string.color_not_recognized);
-                        return false;
-                    }
-                    mDevicePolicyManager.setOrganizationColor(mAdminComponentName,
-                            organizationColor);
-                    return true;
-                }
-                showToast(R.string.empty_color_error);
-                return false;
             case SET_ORGANIZATION_NAME_KEY:
                 mDevicePolicyManager.setOrganizationName(mAdminComponentName, (String) newValue);
+                mSetOrganizationNamePreference.setSummary((String) newValue);
                 return true;
         }
         return false;

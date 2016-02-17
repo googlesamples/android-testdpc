@@ -308,7 +308,7 @@ public class SetupManagementFragment extends Fragment implements
                 }
                 break;
             case R.id.color_select_button:
-                ColorPicker.newInstance(mCurrentColor, FRAGMENT_TAG)
+                ColorPicker.newInstance(mCurrentColor, FRAGMENT_TAG, "provisioningColor")
                         .show(getFragmentManager(), "colorPicker");
                 break;
             case R.id.logo_select_button:
@@ -318,7 +318,7 @@ public class SetupManagementFragment extends Fragment implements
     }
 
     @Override
-    public void onColorSelected(int colorValue) {
+    public void onColorSelected(int colorValue, String id) {
         mCurrentColor = colorValue;
         mColorValue.setText(String.format(ColorPicker.COLOR_STRING_FORMATTER, colorValue));
         mColorPreviewView.setImageTintList(ColorStateList.valueOf(colorValue));
