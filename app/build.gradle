@@ -7,9 +7,9 @@ ext {
     // 1 or more digits
     versionMajor = 2
     // exactly 1 digit
-    versionMinor = 0
+    versionMinor = 5
     // exactly 2 digits
-    versionBuild = 6
+    versionBuild = 0
 }
 
 android {
