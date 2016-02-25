@@ -40,6 +40,7 @@ import android.os.UserHandle;
 import android.os.UserManager;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
+import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.SwitchPreference;
 import android.provider.MediaStore;
@@ -256,6 +257,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     private static final String SYSTEM_UPDATE_POLICY_KEY = "system_update_policy";
     private static final String UNHIDE_APPS_KEY = "unhide_apps";
     private static final String UNSUSPEND_APPS_KEY = "unsuspend_apps";
+    private static final String USER_MANAGEMENT_CATEGORY_KEY = "user_management";
     private static final String WIPE_DATA_KEY = "wipe_data";
     private static final String CREATE_WIFI_CONFIGURATION_KEY = "create_wifi_configuration";
     private static final String WIFI_CONFIG_LOCKDOWN_ENABLE_KEY = "enable_wifi_config_lockdown";
@@ -1068,6 +1070,14 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             for (String preference : NYC_PLUS_PREFERENCES) {
                 findPreference(preference).setEnabled(false);
             }
+        } else {
+            // DevicePolicyManager.createAndInitializeUser() was deprecated in M and removed in N.
+            // TODO: removePreference is not recursive, so the parent PreferenceGroup has to be
+            // known for removal, calling from the root PreferenceScreen does not work. For now,
+            // this is the only removed preference. If removing needs to be done more often, a
+            // recursive implementation for removePreference might be better.
+            ((PreferenceCategory) findPreference(USER_MANAGEMENT_CATEGORY_KEY))
+                    .removePreference(findPreference(CREATE_AND_INITIALIZE_USER_KEY));
         }
     }
 

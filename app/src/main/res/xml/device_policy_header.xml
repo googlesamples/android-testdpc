@@ -231,6 +231,7 @@
     </PreferenceCategory>
 
     <PreferenceCategory
+            android:key="user_management"
             android:title="@string/user_management">
         <Preference
                 android:key="create_and_initialize_user"
