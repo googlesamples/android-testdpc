@@ -233,13 +233,20 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
 
     private void initializeOrganizationInfoPreferences() {
         mSetOrganizationColorPreference = findPreference(SET_ORGANIZATION_COLOR_KEY);
-        mSetOrganizationColorPreference.setOnPreferenceClickListener(this);
         mSetOrganizationNamePreference = findPreference(SET_ORGANIZATION_NAME_KEY);
-        mSetOrganizationNamePreference.setOnPreferenceChangeListener(this);
 
-        final int colorValue = mDevicePolicyManager.getOrganizationColor(mAdminComponentName);
-        mSetOrganizationColorPreference.setSummary(
-                String.format(ColorPicker.COLOR_STRING_FORMATTER, colorValue));
+        if (mSetOrganizationColorPreference.isEnabled()) {
+            mSetOrganizationColorPreference.setOnPreferenceClickListener(this);
+            final int colorValue = mDevicePolicyManager.getOrganizationColor(mAdminComponentName);
+            mSetOrganizationColorPreference.setSummary(
+                    String.format(ColorPicker.COLOR_STRING_FORMATTER, colorValue));
+        }
+
+        if (mSetOrganizationNamePreference.isEnabled()) {
+            mSetOrganizationNamePreference.setOnPreferenceChangeListener(this);
+            final String name = mDevicePolicyManager.getOrganizationName(mAdminComponentName);
+            mSetOrganizationNamePreference.setSummary(name);
+        }
     }
 
     private void showAddCrossProfileIntentFilterFragment() {
@@ -275,6 +282,10 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
     }
 
     private void reloadCrossProfileCallerIdDisableUi() {
+        if (!mDisableCrossProfileCallerIdSwitchPreference.isEnabled()) {
+            return;
+        }
+
         boolean isCrossProfileCallerIdDisabled = mDevicePolicyManager
                 .getCrossProfileCallerIdDisabled(mAdminComponentName);
         mDisableCrossProfileCallerIdSwitchPreference.setChecked(isCrossProfileCallerIdDisabled);
@@ -282,6 +293,10 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
 
 
     private void reloadCrossProfileContactsSearchDisableUi() {
+        if (!mDisableCrossProfileContactsSearchSwitchPreference.isEnabled()) {
+            return;
+        }
+
         boolean isCrossProfileContactsSearchDisabled = mDevicePolicyManager
                 .getCrossProfileContactsSearchDisabled(mAdminComponentName);
         mDisableCrossProfileContactsSearchSwitchPreference.setChecked(
