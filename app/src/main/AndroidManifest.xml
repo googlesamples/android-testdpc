@@ -102,6 +102,12 @@
                     android:resource="@xml/filepaths" />
         </provider>
 
+        <service android:name=".profilepolicy.apprestrictions.AppRestrictionsProxy">
+            <intent-filter>
+                <action android:name="com.android.vending.dpc.APPLICATION_RESTRICTIONS_PROXY" />
+            </intent-filter>
+        </service>
+
     </application>
 
 </manifest>
