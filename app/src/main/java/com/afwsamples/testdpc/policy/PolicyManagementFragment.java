@@ -139,8 +139,6 @@ import java.util.Set;
  * <li> {@link DevicePolicyManager#setAccountManagementDisabled(android.content.ComponentName,
  *             String, boolean)} </li>
  * <li> {@link DevicePolicyManager#getAccountTypesWithManagementDisabled()} </li>
- * <li> {@link DevicePolicyManager#createAndInitializeUser(android.content.ComponentName, String,
- *             String, android.content.ComponentName, android.os.Bundle)} </li>
  * <li> {@link DevicePolicyManager#removeUser(android.content.ComponentName,
                android.os.UserHandle)} </li>
  * <li> {@link DevicePolicyManager#setUninstallBlocked(android.content.ComponentName, String,
@@ -198,7 +196,6 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     private static final String CAPTURE_IMAGE_KEY = "capture_image";
     private static final String CAPTURE_VIDEO_KEY = "capture_video";
     private static final String CHECK_LOCK_TASK_PERMITTED_KEY = "check_lock_task_permitted";
-    private static final String CREATE_AND_INITIALIZE_USER_KEY = "create_and_initialize_user";
     private static final String CREATE_AND_MANAGE_USER_KEY = "create_and_manage_user";
     private static final String DELEGATED_CERT_INSTALLER_KEY = "manage_cert_installer";
     private static final String DEVICE_OWNER_STATUS_KEY = "device_owner_status";
@@ -257,7 +254,6 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     private static final String SYSTEM_UPDATE_POLICY_KEY = "system_update_policy";
     private static final String UNHIDE_APPS_KEY = "unhide_apps";
     private static final String UNSUSPEND_APPS_KEY = "unsuspend_apps";
-    private static final String USER_MANAGEMENT_CATEGORY_KEY = "user_management";
     private static final String WIPE_DATA_KEY = "wipe_data";
     private static final String CREATE_WIFI_CONFIGURATION_KEY = "create_wifi_configuration";
     private static final String WIFI_CONFIG_LOCKDOWN_ENABLE_KEY = "enable_wifi_config_lockdown";
@@ -275,7 +271,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     private static final String DONT_STAY_ON = "0";
 
     private static final String[] PRIMARY_USER_ONLY_PREFERENCES = {
-            WIPE_DATA_KEY, REMOVE_DEVICE_OWNER_KEY, CREATE_AND_INITIALIZE_USER_KEY, REMOVE_USER_KEY,
+            WIPE_DATA_KEY, REMOVE_DEVICE_OWNER_KEY, REMOVE_USER_KEY,
             MANAGE_LOCK_TASK_LIST_KEY, CHECK_LOCK_TASK_PERMITTED_KEY, START_LOCK_TASK,
             STOP_LOCK_TASK, DISABLE_STATUS_BAR, REENABLE_STATUS_BAR, DISABLE_KEYGUARD,
             REENABLE_KEYGUARD, START_KIOSK_MODE, SYSTEM_UPDATE_POLICY_KEY, STAY_ON_WHILE_PLUGGED_IN,
@@ -361,7 +357,6 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         findPreference(CHECK_LOCK_TASK_PERMITTED_KEY).setOnPreferenceClickListener(this);
         findPreference(START_LOCK_TASK).setOnPreferenceClickListener(this);
         findPreference(STOP_LOCK_TASK).setOnPreferenceClickListener(this);
-        findPreference(CREATE_AND_INITIALIZE_USER_KEY).setOnPreferenceClickListener(this);
         findPreference(CREATE_AND_MANAGE_USER_KEY).setOnPreferenceClickListener(this);
         findPreference(REMOVE_USER_KEY).setOnPreferenceClickListener(this);
         mDisableCameraSwitchPreference = (SwitchPreference) findPreference(DISABLE_CAMERA_KEY);
@@ -535,9 +530,6 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 return true;
             case GET_DISABLE_ACCOUNT_MANAGEMENT_KEY:
                 showDisableAccountTypeList();
-                return true;
-            case CREATE_AND_INITIALIZE_USER_KEY:
-                showCreateAndInitializeUserPrompt();
                 return true;
             case CREATE_AND_MANAGE_USER_KEY:
                 showCreateAndManageUserPrompt();
@@ -1070,14 +1062,6 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             for (String preference : NYC_PLUS_PREFERENCES) {
                 findPreference(preference).setEnabled(false);
             }
-        } else {
-            // DevicePolicyManager.createAndInitializeUser() was deprecated in M and removed in N.
-            // TODO: removePreference is not recursive, so the parent PreferenceGroup has to be
-            // known for removal, calling from the root PreferenceScreen does not work. For now,
-            // this is the only removed preference. If removing needs to be done more often, a
-            // recursive implementation for removePreference might be better.
-            ((PreferenceCategory) findPreference(USER_MANAGEMENT_CATEGORY_KEY))
-                    .removePreference(findPreference(CREATE_AND_INITIALIZE_USER_KEY));
         }
     }
 
@@ -1200,43 +1184,6 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                     .setPositiveButton(android.R.string.ok, null)
                     .show();
         }
-    }
-
-    /**
-     * For user creation:
-     * Shows a prompt to ask for the username that would be used for creating a new user.
-     */
-    private void showCreateAndInitializeUserPrompt() {
-        if (getActivity() == null || getActivity().isFinishing()) {
-            return;
-        }
-        View view = LayoutInflater.from(getActivity()).inflate(R.layout.simple_edittext, null);
-        final EditText input = (EditText) view.findViewById(R.id.input);
-        input.setHint(R.string.enter_username_hint);
-
-        new AlertDialog.Builder(getActivity())
-                .setTitle(R.string.create_and_initialize_user)
-                .setView(view)
-                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        String name = input.getText().toString();
-                        String ownerName = getString(R.string.app_name);
-                        if (!TextUtils.isEmpty(name)) {
-                            UserHandle userHandle = mDevicePolicyManager.createAndInitializeUser(
-                                    mAdminComponentName, name, ownerName, mAdminComponentName,
-                                    new Bundle());
-                            if (userHandle != null) {
-                                long serialNumber = mUserManager.getSerialNumberForUser(userHandle);
-                                showToast(R.string.user_created, serialNumber);
-                                return;
-                            }
-                            showToast(R.string.failed_to_create_user);
-                        }
-                    }
-                })
-                .setNegativeButton(android.R.string.cancel, null)
-                .show();
     }
 
     /**
