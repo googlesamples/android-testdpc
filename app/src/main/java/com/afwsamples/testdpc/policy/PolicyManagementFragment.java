@@ -216,7 +216,6 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     private static final String INSTALL_KEY_CERTIFICATE_KEY = "install_key_certificate";
     private static final String INSTALL_NONMARKET_APPS_KEY
             = "install_nonmarket_apps";
-    private static final String KEYGUARD_PREFERENCES = "keyguard_preferences";
     private static final String LOCK_SCREEN_POLICY_KEY = "lock_screen_policy";
     private static final String MANAGE_APP_PERMISSIONS_KEY = "manage_app_permissions";
     private static final String MANAGE_APP_RESTRICTIONS_KEY = "manage_app_restrictions";
@@ -295,13 +294,9 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     };
 
     /**
-     * Preferences that are allowed only in MNC+ if it profile owner. This does not restrict device
-     * owner.
+     * Preferences that are allowed only in NYC+ if it is profile owner. This does not restrict
+     * device owner.
      */
-    private static String[] MANAGED_PROFILE_MNC_PLUS_PREFERENCES = {
-            KEYGUARD_PREFERENCES
-    };
-
     private static String[] MANAGED_PROFILE_NYC_PLUS_PREFERENCES = {
             RESET_PASSWORD_KEY
     };
@@ -1026,11 +1021,6 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             // Some of the management options can only be applied in a primary profile.
             for (String preference : PRIMARY_USER_ONLY_PREFERENCES) {
                 findPreference(preference).setEnabled(false);
-            }
-            if (Util.isBeforeM()) {
-                for (String preference : MANAGED_PROFILE_MNC_PLUS_PREFERENCES) {
-                    findPreference(preference).setEnabled(false);
-                }
             }
             if (Util.isBeforeN()) {
                 for (String preference : MANAGED_PROFILE_NYC_PLUS_PREFERENCES) {
