@@ -80,6 +80,7 @@ import com.afwsamples.testdpc.policy.wifimanagement.WifiConfigCreationDialog;
 import com.afwsamples.testdpc.policy.wifimanagement.WifiModificationFragment;
 import com.afwsamples.testdpc.profilepolicy.ProfilePolicyManagementFragment;
 import com.afwsamples.testdpc.profilepolicy.addsystemapps.EnableSystemAppsByIntentFragment;
+import com.afwsamples.testdpc.profilepolicy.apprestrictions.AppRestrictionsManagingPackageFragment;
 import com.afwsamples.testdpc.profilepolicy.apprestrictions.ManageAppRestrictionsFragment;
 import com.afwsamples.testdpc.profilepolicy.permission.ManageAppPermissionsFragment;
 
@@ -178,6 +179,8 @@ public class PolicyManagementFragment extends PreferenceFragment implements
 
     public static final String OVERRIDE_KEY_SELECTION_KEY = "override_key_selection";
 
+    private static final String APP_RESTRICTIONS_MANAGING_PACKAGE_KEY
+            = "app_restrictions_managing_package";
     private static final String BLOCK_UNINSTALLATION_BY_PKG_KEY = "block_uninstallation_by_pkg";
     private static final String BLOCK_UNINSTALLATION_LIST_KEY = "block_uninstallation_list";
     private static final String CAPTURE_IMAGE_KEY = "capture_image";
@@ -266,7 +269,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             NETWORK_STATS_KEY, DELEGATED_CERT_INSTALLER_KEY, DISABLE_STATUS_BAR,
             REENABLE_STATUS_BAR, DISABLE_KEYGUARD, REENABLE_KEYGUARD, START_KIOSK_MODE,
             SET_PERMISSION_POLICY_KEY, MANAGE_APP_PERMISSIONS_KEY,STAY_ON_WHILE_PLUGGED_IN,
-            WIFI_CONFIG_LOCKDOWN_ENABLE_KEY
+            WIFI_CONFIG_LOCKDOWN_ENABLE_KEY, APP_RESTRICTIONS_MANAGING_PACKAGE_KEY
     };
 
     /**
@@ -390,6 +393,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         findPreference(HIDE_APPS_KEY).setOnPreferenceClickListener(this);
         findPreference(UNHIDE_APPS_KEY).setOnPreferenceClickListener(this);
         findPreference(MANAGE_APP_RESTRICTIONS_KEY).setOnPreferenceClickListener(this);
+        findPreference(APP_RESTRICTIONS_MANAGING_PACKAGE_KEY).setOnPreferenceClickListener(this);
         findPreference(INSTALL_KEY_CERTIFICATE_KEY).setOnPreferenceClickListener(this);
         findPreference(INSTALL_CA_CERTIFICATE_KEY).setOnPreferenceClickListener(this);
         findPreference(GET_CA_CERTIFICATES_KEY).setOnPreferenceClickListener(this);
@@ -523,6 +527,9 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 return true;
             case MANAGE_APP_RESTRICTIONS_KEY:
                 showFragment(new ManageAppRestrictionsFragment());
+                return true;
+            case APP_RESTRICTIONS_MANAGING_PACKAGE_KEY:
+                showFragment(new AppRestrictionsManagingPackageFragment());
                 return true;
             case SET_PERMISSION_POLICY_KEY:
                 showSetPermissionPolicyDialog();
