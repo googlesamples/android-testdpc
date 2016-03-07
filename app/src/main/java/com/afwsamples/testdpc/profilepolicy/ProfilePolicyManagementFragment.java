@@ -401,4 +401,9 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
             }
         }
     }
+
+    @Override
+    public Context getContext() {
+        return (Context) getActivity();
+    }
 }

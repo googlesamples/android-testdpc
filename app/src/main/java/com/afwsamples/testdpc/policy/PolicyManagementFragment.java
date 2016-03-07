@@ -2071,4 +2071,9 @@ public class PolicyManagementFragment extends PreferenceFragment implements
      abstract class ManageLockTaskListCallback {
         public abstract void onPositiveButtonClicked(String[] lockTaskArray);
     }
+
+    @Override
+    public Context getContext() {
+        return (Context) getActivity();
+    }
 }

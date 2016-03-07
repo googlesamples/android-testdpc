@@ -142,6 +142,11 @@ public abstract class ProfileOrParentFragment extends PreferenceFragment {
     }
 
     @Override
+    public Context getContext() {
+        return (Context) getActivity();
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
