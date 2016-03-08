@@ -90,6 +90,15 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
             LOCK_SCREEN_MESSAGE
         }));
 
+        /**
+         * Preferences that are allowed only in MNC+ if it is profile owner. This does not restrict
+         * device owner.
+         */
+        static final Set<String> PROFILE_OWNER_ONLY_MNC_PLUS
+                = new HashSet<>(Arrays.asList(new String[] {
+            KEYGUARD_FEATURES_CATEGORY
+        }));
+
         static final Set<String> NYC_PLUS
                 = new HashSet<>(Arrays.asList(new String[] {
             LOCK_SCREEN_MESSAGE
@@ -134,6 +143,7 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
         setup(Keys.MAX_TIME_SCREEN_LOCK,
                 TimeUnit.MILLISECONDS.toSeconds(getDpm().getMaximumTimeToLock(getAdmin())));
 
+        disableIncompatibleManagementOptionsInCurrentProfile();
         final int disabledFeatures = getDpm().getKeyguardDisabledFeatures(getAdmin());
         for (Map.Entry<String, Integer> flag : KEYGUARD_FEATURES.entrySet()) {
             setup(flag.getKey(), (disabledFeatures & flag.getValue()) != 0 ? true : false);
@@ -219,7 +229,9 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
      */
     private void setup(String key, Object adminSetting) {
         Preference pref = findPreference(key);
-
+        if (!pref.isEnabled()) {
+            return;
+        }
         // If the preference is not applicable, just hide it instead.
         if ((Keys.NOT_APPLICABLE_TO_PARENT.contains(key) && isParentProfileInstance())
                 || (Keys.NOT_APPLICABLE_TO_PROFILE.contains(key) && isManagedProfileInstance())
@@ -245,6 +257,14 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
         pref.setOnPreferenceChangeListener(this);
     }
 
+    private void disableIncompatibleManagementOptionsInCurrentProfile() {
+        if (isProfileOwner() && Util.isBeforeM()) {
+            for (String preference : Keys.PROFILE_OWNER_ONLY_MNC_PLUS) {
+                findPreference(preference).setEnabled(false);
+            }
+        }
+    }
+
     private int parseInt(String value) throws NumberFormatException {
         return value.length() != 0 ? Integer.parseInt(value) : 0;
     }
@@ -255,6 +275,10 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
 
     private boolean isDeviceOwner() {
         return getDpm().isDeviceOwnerApp(getContext().getPackageName());
+    }
+
+    private boolean isProfileOwner() {
+        return getDpm().isProfileOwnerApp(getContext().getPackageName());
     }
 
     private void showToast(int titleId) {
