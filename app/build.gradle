@@ -19,7 +19,7 @@ android {
     defaultConfig {
         applicationId "com.afwsamples.testdpc"
         minSdkVersion 21
-        targetSdkVersion 'N'
+        targetSdkVersion 23
         versionCode versionMajor * 1000 + versionMinor * 100 + versionBuild
         versionName "${versionMajor}.${versionMinor}.${versionBuild}"
     }
@@ -47,6 +47,17 @@ android {
             dirs 'libs'
         }
     }
+
+    productFlavors {
+        standard {
+            targetSdkVersion 23
+        }
+
+        N {
+            targetSdkVersion 'N'
+        }
+    }
+
 }
 
 dependencies {
