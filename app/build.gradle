@@ -5,9 +5,9 @@ apply from: '../dist.gradle'
 ext {
     /* Version code for *next* release, bump *after* a release is created. */
     // 1 or more digits
-    versionMajor = 2
+    versionMajor = 3
     // exactly 1 digit
-    versionMinor = 6
+    versionMinor = 0
     // exactly 2 digits
     versionBuild = 0
 }
