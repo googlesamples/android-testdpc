@@ -60,11 +60,11 @@ android {
         }
     }
 
-    /* TODO: remove once release version of N sdk is released */
+    /* TODO: Remove once release version of N SDK is released. */
        applicationVariants.all { variant ->
            variant.outputs.each { output ->
                output.processManifest.doLast {
-                   // minSdkVersion and targetSdkVersion are overridden if we build against preview
+                   // minSdkVersion and targetSdkVersion are overrided if we build against preview
                    // SDK, let us override them again here.
                    minSdkVersion = variant.getMergedFlavor().minSdkVersion.getApiString();
                    targetSdkVersion = variant.getMergedFlavor().targetSdkVersion.getApiString();
