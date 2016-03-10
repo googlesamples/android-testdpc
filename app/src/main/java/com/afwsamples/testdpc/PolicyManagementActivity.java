@@ -41,10 +41,12 @@ public class PolicyManagementActivity extends Activity {
             if (devicePolicyManager.isProfileOwnerApp(packageName)
                     || devicePolicyManager.isDeviceOwnerApp(packageName)) {
                 getFragmentManager().beginTransaction().add(R.id.container,
-                        new PolicyManagementFragment()).commit();
+                        new PolicyManagementFragment(),
+                        PolicyManagementFragment.FRAGMENT_TAG).commit();
             } else {
                 getFragmentManager().beginTransaction().add(R.id.container,
-                        new SetupManagementFragment()).commit();
+                        new SetupManagementFragment(),
+                        SetupManagementFragment.FRAGMENT_TAG).commit();
             }
         }
     }

@@ -20,6 +20,9 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.annotation.TargetApi;
 import android.app.admin.DevicePolicyManager;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -27,18 +30,27 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PermissionInfo;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
+import android.os.ParcelFileDescriptor;
 import android.os.PersistableBundle;
+import android.os.Process;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.common.LaunchIntentUtil;
+import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.cosu.EnableCosuActivity;
-import com.afwsamples.testdpc.syncauth.FinishSyncAuthDeviceOwnerActivity;
-import com.afwsamples.testdpc.syncauth.FinishSyncAuthProfileOwnerActivity;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,6 +63,25 @@ import static com.afwsamples.testdpc.policy.PolicyManagementFragment.OVERRIDE_KE
  */
 public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
     private static final String TAG = "DeviceAdminReceiver";
+
+    public static final String ACTION_PASSWORD_REQUIREMENTS_CHANGED =
+            "com.afwsamples.testdpc.policy.PASSWORD_REQUIREMENTS_CHANGED";
+
+    private static final int CHANGE_PASSWORD_NOTIFICATION_ID = 101;
+    private static final int PASSWORD_FAILED_NOTIFICATION_ID = 102;
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        switch (intent.getAction()) {
+            case ACTION_PASSWORD_REQUIREMENTS_CHANGED:
+            case Intent.ACTION_BOOT_COMPLETED:
+                updatePasswordQualityNotification(context);
+                break;
+            default:
+               super.onReceive(context, intent);
+               break;
+        }
+    }
 
     @Override
     public void onProfileProvisioningComplete(Context context, Intent intent) {
@@ -86,27 +117,19 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
             autoGrantRequestedPermissionsToSelf(context);
         }
 
-        if (synchronousAuthLaunch) {
-            // Synchronous auth cases.
-            String accountName = LaunchIntentUtil.getAddedAccountName(extras);
-            if (isProfileOwner) {
-                launch = new Intent(context, FinishSyncAuthProfileOwnerActivity.class)
-                        .putExtra(LaunchIntentUtil.EXTRA_ACCOUNT_NAME, accountName);
-            } else {
-                launch = new Intent(context, FinishSyncAuthDeviceOwnerActivity.class)
-                        .putExtra(LaunchIntentUtil.EXTRA_ACCOUNT_NAME, accountName);
-            }
+        if (isProfileOwner) {
+            launch = new Intent(context, EnableProfileActivity.class);
+        } else if (cosuLaunch) {
+            launch = new Intent(context, EnableCosuActivity.class);
+            launch.putExtra(EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE, extras);
         } else {
-            // User or NFC launched cases.
-            if (isProfileOwner) {
-                launch = new Intent(context, EnableProfileActivity.class);
-            } else {
-                if (cosuLaunch) {
-                    launch = new Intent(context, EnableCosuActivity.class);
-                    launch.putExtra(EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE, extras);
-                } else {
-                    launch = new Intent(context, EnableDeviceOwnerActivity.class);
-                }
+            launch = new Intent(context, EnableDeviceOwnerActivity.class);
+        }
+
+        if (synchronousAuthLaunch) {
+            String accountName = LaunchIntentUtil.getAddedAccountName(extras);
+            if (accountName != null) {
+                launch.putExtra(LaunchIntentUtil.EXTRA_ACCOUNT_NAME, accountName);
             }
         }
 
@@ -129,6 +152,84 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
 
         launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(launch);
+    }
+
+    @TargetApi(Build.VERSION_CODES.N)
+    @Override
+    public void onBugreportSharingDeclined(Context context, Intent intent) {
+        Log.i(TAG, "Bugreport sharing declined");
+        Util.showNotification(context, R.string.bugreport_title,
+                context.getString(R.string.bugreport_sharing_declined),
+                Util.BUGREPORT_NOTIFICATION_ID);
+    }
+
+    @TargetApi(Build.VERSION_CODES.N)
+    @Override
+    public void onBugreportShared(final Context context, Intent intent,
+            final String bugreportFileHash) {
+        Log.i(TAG, "Bugreport shared, hash: " + bugreportFileHash);
+        final Uri bugreportUri = intent.getData();
+
+        final PendingResult result = goAsync();
+        new AsyncTask<Void, Void, String>() {
+            @Override
+            protected String doInBackground(Void... params) {
+                File outputBugreportFile;
+                String message;
+                InputStream in;
+                OutputStream out;
+                try {
+                    ParcelFileDescriptor mInputPfd = context.getContentResolver()
+                            .openFileDescriptor(bugreportUri, "r");
+                    in = new FileInputStream(mInputPfd.getFileDescriptor());
+                    outputBugreportFile = new File(context.getExternalFilesDir(null),
+                            bugreportUri.getLastPathSegment());
+                    out = new FileOutputStream(outputBugreportFile);
+                    byte[] buffer = new byte[1024];
+                    int read;
+                    while ((read = in.read(buffer)) != -1) {
+                        out.write(buffer, 0, read);
+                    }
+                    in.close();
+                    out.close();
+                    message = context.getString(R.string.received_bugreport,
+                            outputBugreportFile.getPath(), bugreportFileHash);
+                } catch (IOException e) {
+                    Log.e(TAG, e.getMessage());
+                    message = context.getString(R.string.received_bugreport_failed_retrieval);
+                }
+                return message;
+            }
+
+            @Override
+            protected void onPostExecute(String message) {
+                Util.showNotification(context, R.string.bugreport_title,
+                        message, Util.BUGREPORT_NOTIFICATION_ID);
+                result.finish();
+            }
+
+        }.execute();
+    }
+
+    @TargetApi(Build.VERSION_CODES.N)
+    @Override
+    public void onBugreportFailed(Context context, Intent intent, int failureCode) {
+        String failureReason;
+        switch (failureCode) {
+            case BUGREPORT_FAILURE_FILE_NO_LONGER_AVAILABLE:
+                failureReason = context.getString(
+                        R.string.bugreport_failure_file_no_longer_available);
+                break;
+            case BUGREPORT_FAILURE_FAILED_COMPLETING:
+                //fall through
+            default:
+                failureReason = context.getString(
+                        R.string.bugreport_failure_failed_completing);
+        }
+        Log.i(TAG, "Bugreport failed: " + failureReason);
+        Util.showNotification(context, R.string.bugreport_title,
+                context.getString(R.string.bugreport_failure_message, failureReason),
+                Util.BUGREPORT_NOTIFICATION_ID);
     }
 
     @TargetApi(Build.VERSION_CODES.M)
@@ -195,6 +296,11 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
     @Override
     public String onChoosePrivateKeyAlias(Context context, Intent intent, int uid, Uri uri,
             String alias) {
+        if (uid == Process.myUid()) {
+            // Always show the chooser if we were the one requesting the cert.
+            return null;
+        }
+
         String chosenAlias = PreferenceManager.getDefaultSharedPreferences(context)
                 .getString(OVERRIDE_KEY_SELECTION_KEY, null);
         if (!TextUtils.isEmpty(chosenAlias)) {
@@ -212,5 +318,87 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
      */
     public static ComponentName getComponentName(Context context) {
         return new ComponentName(context.getApplicationContext(), DeviceAdminReceiver.class);
+    }
+
+    @Override
+    public void onPasswordExpiring(Context context, Intent intent) {
+        DevicePolicyManager devicePolicyManager = (DevicePolicyManager) context.getSystemService(
+                Context.DEVICE_POLICY_SERVICE);
+
+        final long timeNow = System.currentTimeMillis();
+        final long timeAdminExpires =
+                devicePolicyManager.getPasswordExpiration(getComponentName(context));
+        final boolean expiredBySelf = (timeNow >= timeAdminExpires && timeAdminExpires != 0);
+
+        Util.showNotification(context, R.string.password_expired_title,
+                context.getString(expiredBySelf
+                        ? R.string.password_expired_by_self
+                        : R.string.password_expired_by_others),
+                Util.PASSWORD_EXPIRATION_NOTIFICATION_ID);
+    }
+
+    @Override
+    public void onPasswordFailed(Context context, Intent intent) {
+        DevicePolicyManager devicePolicyManager = (DevicePolicyManager) context.getSystemService(
+                Context.DEVICE_POLICY_SERVICE);
+        /*
+         * Post a notification to show:
+         *  - how many wrong passwords have been entered;
+         *  - how many wrong passwords need to be entered for the device to be wiped.
+         */
+        int attempts = devicePolicyManager.getCurrentFailedPasswordAttempts();
+        int maxAttempts = devicePolicyManager.getMaximumFailedPasswordsForWipe(null);
+
+        String title = context.getResources().getQuantityString(
+                R.plurals.password_failed_attempts_title, attempts, attempts);
+        String content = maxAttempts == 0
+                ? context.getString(R.string.password_failed_no_limit_set)
+                : context.getResources().getQuantityString(
+                        R.plurals.password_failed_attempts_content, maxAttempts, maxAttempts);
+
+        Notification.Builder warn = new Notification.Builder(context)
+                .setSmallIcon(R.drawable.ic_launcher)
+                .setTicker(title)
+                .setContentTitle(title)
+                .setContentText(content)
+                .setContentIntent(PendingIntent.getActivity(context, /* requestCode */ -1,
+                        new Intent(DevicePolicyManager.ACTION_SET_NEW_PASSWORD), /* flags */ 0));
+
+        NotificationManager nm = (NotificationManager)
+                context.getSystemService(Context.NOTIFICATION_SERVICE);
+        nm.notify(PASSWORD_FAILED_NOTIFICATION_ID, warn.getNotification());
+    }
+
+    @Override
+    public void onPasswordChanged(Context context, Intent intent) {
+        updatePasswordQualityNotification(context);
+    }
+
+    private static void updatePasswordQualityNotification(Context context) {
+        DevicePolicyManager devicePolicyManager = (DevicePolicyManager) context.getSystemService(
+                Context.DEVICE_POLICY_SERVICE);
+
+        if (!devicePolicyManager.isProfileOwnerApp(context.getPackageName())
+                && !devicePolicyManager.isDeviceOwnerApp(context.getPackageName())) {
+            // Only try to update the notification if we are a profile or device owner.
+            return;
+        }
+
+        NotificationManager nm = (NotificationManager)
+                context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        if (!devicePolicyManager.isActivePasswordSufficient()) {
+            Notification.Builder warn = new Notification.Builder(context)
+                    .setOngoing(true)
+                    .setSmallIcon(R.drawable.ic_launcher)
+                    .setTicker(context.getText(R.string.password_not_compliant_title))
+                    .setContentTitle(context.getText(R.string.password_not_compliant_title))
+                    .setContentText(context.getText(R.string.password_not_compliant_content))
+                    .setContentIntent(PendingIntent.getActivity(context, /*requestCode*/ -1,
+                            new Intent(DevicePolicyManager.ACTION_SET_NEW_PASSWORD), /*flags*/ 0));
+            nm.notify(CHANGE_PASSWORD_NOTIFICATION_ID, warn.getNotification());
+        } else {
+            nm.cancel(CHANGE_PASSWORD_NOTIFICATION_ID);
+        }
     }
 }

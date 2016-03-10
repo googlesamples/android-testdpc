@@ -28,7 +28,19 @@
             android:layout_height="match_parent"
             android:orientation="vertical"
             style="@style/contentContainer">
-        <TextView
+        <TextView android:id="@+id/managed_account_desc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/managed_account_message"
+                style="@style/containerText"
+                android:visibility="gone" />
+        <TextView android:id="@+id/managed_account_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/containerText"
+                android:paddingBottom="@dimen/content_padding_between_text"
+                android:visibility="gone" />
+        <TextView android:id="@+id/setup_management_message_id"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/setup_management_message"
@@ -43,6 +55,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/set_up_managed_profile"
+                    android:visibility="gone"
                     style="@style/containerText"
                     android:checked="true" />
             <RadioButton android:id="@+id/setup_device_owner"
@@ -52,6 +65,9 @@
                     style="@style/containerText"
                     android:text="@string/set_up_device_owner" />
         </RadioGroup>
+
+        <include layout="@layout/provisioning_params_display" />
+
     </LinearLayout>
 
 </com.android.setupwizardlib.SetupWizardLayout>

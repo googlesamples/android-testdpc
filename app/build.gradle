@@ -3,16 +3,16 @@ apply plugin: 'com.android.application'
 ext {
     /* Version code for *next* release, bump *after* a release is created. */
     // 1 or more digits
-    versionMajor = 2
+    versionMajor = 3
     // exactly 1 digit
     versionMinor = 0
     // exactly 2 digits
-    versionBuild = 6
+    versionBuild = 0
 }
 
 android {
-    compileSdkVersion 'android-23'
-    buildToolsVersion '23.0.1'
+    compileSdkVersion 'android-N'
+    buildToolsVersion '23.0.2'
 
     defaultConfig {
         applicationId "com.afwsamples.testdpc"
@@ -39,9 +39,42 @@ android {
             dirs 'libs'
         }
     }
+
+    productFlavors {
+        standard {
+            minSdkVersion 21
+            targetSdkVersion 23
+        }
+
+        N {
+            minSdkVersion 'N'
+            targetSdkVersion 'N'
+        }
+    }
+
+    /* TODO: remove once release version of N sdk is released */
+       applicationVariants.all { variant ->
+           variant.outputs.each { output ->
+               output.processManifest.doLast {
+                   // minSdkVersion and targetSdkVersion are overridden if we build against preview
+                   // SDK, let us override them again here.
+                   minSdkVersion = variant.getMergedFlavor().minSdkVersion.getApiString();
+                   targetSdkVersion = variant.getMergedFlavor().targetSdkVersion.getApiString();
+
+                   def manifestOutFile = output.processManifest.manifestOutputFile
+                   def newFileContents = manifestOutFile.getText('UTF-8').
+                           replace('android:minSdkVersion="N"',
+                                   'android:minSdkVersion="' + minSdkVersion + '"')
+                   newFileContents = newFileContents.replace('android:targetSdkVersion="N"',
+                           'android:targetSdkVersion="' + targetSdkVersion + '"')
+                   manifestOutFile.write(newFileContents, 'UTF-8')
+               }
+           }
+       }
 }
 
 dependencies {
     compile "com.android.support:support-v4:22.0.0"
+    compile "com.android.support:support-v13:22.0.0"
     compile(name:'setup-wizard-lib-platform-release', ext:'aar')
 }

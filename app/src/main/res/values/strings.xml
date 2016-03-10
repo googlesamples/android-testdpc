@@ -24,6 +24,8 @@
     <string name="set_up_management_header">Setup Management</string>
     <string name="setup_management_message">This app is currently not the owner of this device or
         profile. Please select an option below and click NEXT to set up appropriate management by this app.</string>
+    <string name="provisioning_not_possible">TestDPC isn\'t currently allowed to be set up as the profile or device owner.</string>
+    <string name="exit">Exit</string>
     <string name="managed_account_message">Added account that requires management:</string>
     <string name="managed_account_complete_message">Added account that is now managed:</string>
     <string name="account_migration_failed_message">Account failed to migrate:</string>
@@ -54,6 +56,14 @@
     <string name="migration_not_supported">Unable to migrate account into profile, please add manually.</string>
     <string name="provisioning_not_supported">Device provisioning is not enabled. Stopping.</string>
     <string name="provisioning_failed_or_cancelled">Provisioning failed or cancelled.</string>
+    <string name="provisioning_params_title">Select provisioning parameters</string>
+    <string name="provisioning_params_color">Color: </string>
+    <string name="provisioning_params_logo">Logo: </string>
+    <string name="provisioning_params_select">Select</string>
+    <string name="error_opening_image_file">Error occured while opening image file</string>
+
+    <string name="work_profile">Work profile</string>
+    <string name="personal_profile">Personal profile</string>
 
     <string name="managed_profile_specific_policy_category_title">Managed profile policy</string>
     <string name="managed_profile_specific_policy_title">Manage work profile specific policy
@@ -70,6 +80,7 @@
     <string name="this_is_a_managed_profile_owner">This app is a managed profile owner.
         Some of the management options are not available.</string>
     <string name="device_owner_management">Device owner management</string>
+    <string name="set_auto_time_required">Set auto (network) time required</string>
     <string name="wipe_data">Wipe data</string>
     <string name="wipe_data_title">Wipe data?</string>
     <string name="wipe_data_confirmation">Are you sure you want to wipe the data?</string>
@@ -82,6 +93,7 @@
         owner?
     </string>
     <string name="device_owner_removed">This app is no longer a device owner.</string>
+    <string name="reboot">Reboot device</string>
 
     <!-- Strings for cross-profile intent filters -->
     <string name="cross_profile_intents">Cross-profile intents</string>
@@ -103,7 +115,7 @@
     <string name="clear">Clear</string>
 
     <!-- Strings for camera and screen capture -->
-    <string name="camera_title">Camera and Screen capture</string>
+    <string name="camera_title">Camera, screen capture and audio</string>
     <string name="display_media">Display Media</string>
     <string name="disable_camera">Disable camera</string>
     <string name="capture_image">Capture image</string>
@@ -113,6 +125,7 @@
     <string name="stop_button_label">Stop</string>
     <string name="delete_button_label">Delete</string>
     <string name="disable_screen_capture">Disable screen capture</string>
+    <string name="mute_audio">Mute audio</string>
 
     <!-- Stings for work profile management -->
     <string name="profile_management_title">Work profile management</string>
@@ -138,6 +151,7 @@
     <string name="policies_title">Policies</string>
     <string name="disable_bluetooth_contact_sharing">Disable bluetooth contact sharing</string>
     <string name="disable_cross_profile_caller_id">Disable cross-profile caller ID</string>
+    <string name="disable_cross_profile_contacts_search">Disable cross-profile contacts search</string>
 
     <!-- Strings for wifi management -->
     <string name="wifi_management_title">Wifi management</string>
@@ -164,6 +178,9 @@
     <string name="wifi_config_fail">Failed to save the wifi configuration.</string>
     <string name="enable_wifi_config_lockdown">DO created WiFi configs are modifiable only by DO.</string>
     <string name="modify_wifi_configuration">Modify wifi configuration</string>
+    <string name="show_wifi_mac_address">Show Wi-Fi MAC address</string>
+    <string name="show_wifi_mac_address_title">Wi-Fi MAC address</string>
+    <string name="show_wifi_mac_address_not_available_msg">Wi-Fi MAC is not available</string>
     <string name="wifi_configs_header">Saved WiFi configurations</string>
     <string name="wifi_update_config_button">Update selected</string>
     <string name="wifi_remove_config_button">Remove selected</string>
@@ -196,6 +213,14 @@
     <string name="unhide_apps_empty">No apps are currently hidden.</string>
     <string name="unhide_apps_success">%s is no longer hidden.</string>
     <string name="unhide_apps_failure">%s cannot be unhidden.</string>
+    <string name="suspend_apps_title">Suspend apps</string>
+    <string name="suspend_apps_empty">All apps are suspended.</string>
+    <string name="suspend_apps_success">%s is now suspended.</string>
+    <string name="suspend_apps_failure">%s cannot be suspended.</string>
+    <string name="unsuspend_apps_title">Unsuspend apps</string>
+    <string name="unsuspend_apps_empty">No apps are currently suspended.</string>
+    <string name="unsuspend_apps_success">%s is no longer suspended.</string>
+    <string name="unsuspend_apps_failure">%s cannot be unsuspended.</string>
 
     <!-- Strings for lock task -->
     <string name="lock_task_title">Lock task</string>
@@ -242,6 +267,7 @@
     <string name="disallow_config_wifi">Disallow config Wi-Fi</string>
     <string name="disallow_create_windows">Disallow create windows</string>
     <string name="disallow_cross_profile_copy_paste">Disallow cross-profile copy/paste</string>
+    <string name="disallow_data_roaming">Disallow data roaming</string>
     <string name="disallow_debugging_features">Disallow debugging features</string>
     <string name="disallow_factory_reset">Disallow factory reset</string>
     <string name="disallow_fun">Disallow fun</string>
@@ -266,9 +292,22 @@
     <string name="ensure_verify_apps">Ensure verify apps</string>
     <string name="user_restriction_error_msg">Operation not allowed</string>
 
+    <!-- Strings for select app -->
+    <string name="current_selected_package">Current package:</string>
+    <string name="selected_package_new_label">New package name</string>
+    <string name="selected_package_set">Set</string>
+    <string name="selected_package_clear">Clear</string>
+    <string name="selected_package_none">None</string>
+    <string name="select_app_instructions">Select an app from the list,
+        or manually enter a package name below:</string>
+
+
     <!-- Strings for certificate management  -->
     <string name="certificate_management_title">Certificate management</string>
-    <string name="install_key_certificate">Install a private key certificate</string>
+    <string name="install_key_certificate">Install a private/public key pair</string>
+    <string name="remove_key_certificate">Remove a private/public key pair</string>
+    <string name="remove_keypair_successfully">The key pair is removed.</string>
+    <string name="remove_keypair_fail">The key pair failed to remove.</string>
     <string name="key_override_alias">Override client certificates with alias</string>
     <string name="certificate_password_prompt_title">Extract certificate</string>
     <string name="certificate_password_prompt_enter_password">Type the password to extract the
@@ -298,6 +337,7 @@
     <string name="set_app_restrictions_success">Successfully set app restrictions for %s.</string>
     <string name="app_restrictions_info">%1$s - %2$s</string>
     <string name="plus">+</string>
+    <string name="app_restrictions_managing_package">App restrictions manager</string>
 
 
     <!-- strings used in the alert dialog for editing application restrictions. -->
@@ -310,6 +350,23 @@
     <string name="value_not_valid">Restriction value is not valid</string>
     <string name="restriction_save_label">Save</string>
     <string name="restriction_cancel_label">Cancel</string>
+
+    <!-- Remote bugreport -->
+    <string name="bugreport_title">Bugreport</string>
+    <string name="request_bugreport">Request bugreport</string>
+    <string name="received_bugreport">Received bugreport %1$s hash: %2$s</string>
+    <string name="received_bugreport_failed_retrieval">Received bugreport file, but failed to retrieve it</string>
+    <string name="bugreport_sharing_declined">User declined sharing bugreport</string>
+    <string name="bugreport_failure_message">Bugreport request failed: %s</string>
+    <string name="bugreport_failure_throttled">Bugreport is already being collected on this device</string>
+    <string name="bugreport_failure_failed_completing">Bugreport collection operation failed</string>
+    <string name="bugreport_failure_file_no_longer_available">Bugreport file is no longer available for collection</string>
+
+    <!-- Enterprise process logging -->
+    <string name="enable_process_logging">Enable process logging</string>
+    <string name="request_process_logs">Request process logs</string>
+    <string name="failed_to_retrieve_process_logs">Failed to retrieve process logs, they were probably accessed less than 2 hours ago</string>
+    <string name="process_logs_retrieved_message">---- Logs retrieved  %s ----</string>
 
     <!-- Accessibility -->
     <string name="accessibility_title">Accessibility</string>
@@ -329,6 +386,8 @@
     <string name="set_input_methods_fail">Cannot disallow input methods enabled by the primary user</string>
     <string name="all_input_methods_enabled">All input methods are enabled.</string>
 
+    <string name="loading_resuls">Loading\u2026</string>
+
     <!-- Account management -->
     <string name="account_management_title">Account management</string>
     <string name="set_disable_account_management">Toggle account management</string>
@@ -346,6 +405,8 @@
     <!-- User management -->
     <string name="user_management">User management</string>
     <string name="create_and_initialize_user">Create and initialize user</string>
+    <string name="create_and_manage_user">Create and manage user</string>
+    <string name="skip_setup_wizard">Skip setup wizard</string>
     <string name="remove_user">Remove user</string>
     <string name="user_created">Successfully created user with serial number %1$d.</string>
     <string name="enter_username_hint">Enter a username</string>
@@ -380,6 +441,10 @@
     <string name="system_update_policy_window_start_label">Maintenance window start:</string>
     <string name="system_update_policy_window_end_label">Maintenance window end:</string>
     <string name="system_update_policy_set_policy">Set new policy</string>
+
+    <!-- Strings for networking -->
+    <string name="networking_management_title">Networking</string>
+    <string name="set_always_on_vpn">Set always-on VPN</string>
 
     <!--  Strings for data usage -->
     <string name="data_usage">Data usage</string>
@@ -419,14 +484,7 @@
     </string>
 
     <!--  Strings for delegated certificate installer -->
-    <string name="manage_cert_installer">Manage delegated certificate installer</string>
-    <string name="current_delegated_cert_installer">Current delegated cert installer:</string>
-    <string name="delegated_cert_installer_new_label">New delegated cert installer package name
-    </string>
-    <string name="delegated_cert_installer_set">Set</string>
-    <string name="delegated_cert_installer_clear">Clear</string>
-    <string name="delegated_cert_installer_instructions">Select an app as the new cert installer,
-        or manually enter its package name below:</string>
+    <string name="manage_cert_installer">Delegated cert installer</string>
 
     <!-- Strings for permission policies -->
     <string name="permission_management">Permission management</string>
@@ -450,13 +508,102 @@
 
     <!-- Strings for screen lock policies -->
     <string name="lock_category">Lock screen</string>
-    <string name="maximum_lock_time">Max time to screen lock (seconds)</string>
+
+    <string name="lock_screen_policy">Lock screen restrictions</string>
+    <string name="maximum_lock_time_category">Max time to screen lock</string>
+    <string name="maximum_lock_time_seconds">Max time to screen lock (seconds)</string>
+    <string name="maximum_lock_time_all_admins">Max time as set by all/other admins</string>
     <string name="maximum_password_fails">Max password failures for local wipe</string>
+    <string name="maximum_password_fails_all_admins">Max failures as set by all/other admins</string>
     <string name="not_valid_input">Failed to update: Not a valid input</string>
+    <string name="lock_screen_message">Lock screen message</string>
+
+    <!-- Strings for password policies -->
+    <string name="password_constraints">Password constraints</string>
+
+    <string name="minimum_password_quality">Minimum password quality</string>
+    <string name="password_quality_unspecified">Unspecified</string>
+    <string name="password_quality_something">Something</string>
+    <string name="password_quality_numeric">Numeric</string>
+    <string name="password_quality_numeric_complex">Numeric (Complex)</string>
+    <string name="password_quality_alphabetic">Alphabetic</string>
+    <string name="password_quality_alphanumeric">Alphanumeric</string>
+    <string name="password_quality_complex">Complex</string>
+
+    <string name="password_min_length">Minimum password length</string>
+    <string name="password_min_letters">Minimum number of letters</string>
+    <string name="password_min_numeric">Minimum number of digits</string>
+    <string name="password_min_lowercase">Minimum number of lower-case characters</string>
+    <string name="password_min_uppercase">Minimum number of upper-case characters</string>
+    <string name="password_min_symbols">Minimum number of symbols</string>
+    <string name="password_min_nonletter">Minimum number of non-letters</string>
+
+    <string name="password_not_compliant_title">Password is not compliant</string>
+    <string name="password_not_compliant_content">Touch to set a new lock screen password.</string>
+
+    <string name="password_expiration">Password expiration</string>
+    <string name="password_expiration_seconds">Password expiration (seconds)</string>
+    <string name="password_expiration_aggregate">Expiration by all/other admins</string>
+
+    <string name="password_expired_title">Password has expired</string>
+    <string name="password_expired_by_self">According to a policy set by TestDPC.</string>
+    <string name="password_expired_by_others">According to a policy set by another admin.</string>
+
+    <plurals name="password_failed_attempts_title">
+        <item quantity="one">Password entered incorrectly %d time</item>
+        <item quantity="other">Password entered incorrectly %d times</item>
+    </plurals>
+    <plurals name="password_failed_attempts_content">
+        <item quantity="one">Set to wipe after %d attempt.</item>
+        <item quantity="other">Set to wipe after %d attempts.</item>
+    </plurals>
+    <string name="password_failed_no_limit_set">No limit set on failed password attempts.</string>
+
+    <!-- Strings for setting a new password -->
+    <string name="reset_password">Reset password</string>
+    <string name="new_password">New password</string>
+    <string name="require_password_entry">Require strongest available authentication type on next unlock</string>
+    <string name="require_password_on_boot">Require password to start user</string>
+    <string name="password_reset_success">Password has been reset</string>
+    <string name="password_reset_failed">Failed to reset password</string>
 
     <!-- Strings for managing Settings -->
     <string name="settings_management_title">Settings management</string>
     <string name="stay_on_while_plugged_in">Keep the device on while plugged in</string>
     <string name="install_non_market_apps">Allow installs from unknown sources</string>
 
+    <!-- Strings for setting support messages -->
+    <string name="support_messages">Support messages</string>
+    <string name="set_short_support_message">Set short support message</string>
+    <string name="set_long_support_message">Set long support message</string>
+    <string name="set_message">set message</string>
+    <string name="clear_message">clear message</string>
+    <string name="set_default_message">set default message</string>
+    <string name="default_short_message">
+        This action is disabled by your administrator. Contact someone@example.com for support.
+    </string>
+    <string name="default_long_message">
+        This profile or device is managed by TestDPC. You can contact tech
+        support on:\n\n
+        America: +1 555-0100\n\n
+        APAC: +1 555-0100\n\n
+        Europe: +1 555-0100\n\n
+        Email: someone@example.com
+    </string>
+
+    <!-- Strings for organization info -->
+    <string name="organization_info">Organization info</string>
+    <string name="set_organization_color">Set organization color</string>
+    <string name="set_organization_name">Set organization name</string>
+
+    <!-- strings used in the color picker dialog -->
+    <string name="color_picker_done">Done</string>
+    <string name="pick_color">Pick a color</string>
+    <string name="color_red_label">R</string>
+    <string name="color_green_label">G</string>
+    <string name="color_blue_label">B</string>
+    <string name="enter_color_value">Enter value:</string>
+    <string name="update_color">Update</string>
+    <string name="not_valid_color">Not a valid color</string>
+    <string name="color_format">#AARRGGBB</string>
 </resources>

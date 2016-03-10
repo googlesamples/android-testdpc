@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 The Android Open Source Project
+ * Copyright (C) 2016 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.afwsamples.testdpc.policy.certificate;
+package com.afwsamples.testdpc.policy.networking;
 
 import android.app.admin.DevicePolicyManager;
 import android.content.Context;
@@ -25,12 +25,15 @@ import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.SelectAppFragment;
 
 /**
- * This fragment provides functionalities related to delegated certificate installer.
- * These include
- * 1) {@link DevicePolicyManager#setCertInstallerPackage}
- * 2) {@link DevicePolicyManager#getCertInstallerPackage}
+ * This fragment provides a setting for always-on VPN apps.
+ *
+ * <p>APIs exercised:
+ * <ul>
+ * <li> {@link DevicePolicyManager#setAlwaysOnVpnPackage} </li>
+ * <li> {@link DevicePolicyManager#getAlwaysOnVpnPackage} </li>
+ * </ul>
  */
-public class DelegatedCertInstallerFragment extends SelectAppFragment {
+public class AlwaysOnVpnFragment extends SelectAppFragment {
 
     private DevicePolicyManager mDpm;
 
@@ -43,21 +46,21 @@ public class DelegatedCertInstallerFragment extends SelectAppFragment {
     @Override
     public void onResume() {
         super.onResume();
-        getActivity().getActionBar().setTitle(R.string.manage_cert_installer);
+        getActivity().getActionBar().setTitle(R.string.set_always_on_vpn);
     }
 
     @Override
     protected void setSelectedPackage(String pkgName) {
-        mDpm.setCertInstallerPackage(DeviceAdminReceiver.getComponentName(getActivity()), pkgName);
+        mDpm.setAlwaysOnVpnPackage(DeviceAdminReceiver.getComponentName(getActivity()), pkgName);
     }
 
     @Override
     protected void clearSelectedPackage() {
-        mDpm.setCertInstallerPackage(DeviceAdminReceiver.getComponentName(getActivity()), null);
+        setSelectedPackage(null);
     }
 
     @Override
     protected String getSelectedPackage() {
-        return mDpm.getCertInstallerPackage(DeviceAdminReceiver.getComponentName(getActivity()));
+        return mDpm.getAlwaysOnVpnPackage(DeviceAdminReceiver.getComponentName(getActivity()));
     }
 }

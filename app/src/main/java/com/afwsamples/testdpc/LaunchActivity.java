@@ -23,7 +23,6 @@ import android.widget.Toast;
 
 import com.afwsamples.testdpc.common.LaunchIntentUtil;
 import com.afwsamples.testdpc.common.ProvisioningStateUtil;
-import com.afwsamples.testdpc.syncauth.SetupSyncAuthManagement;
 
 /**
  * <p>Application launch activity that decides the most appropriate initial activity for the
@@ -33,9 +32,10 @@ import com.afwsamples.testdpc.syncauth.SetupSyncAuthManagement;
  * <ol>
  *     <li>If TestDPC is already managing the device or profile, forward to the policy management
  *         activity.
- *     <li>If TestDPC was launched as part of synchronous authentication, forward to the syncauth
- *         package activities to allow in-line management setup immediately after an account
- *         requiring management is added (before the end of the Add Account or Setup Wizard flows).
+ *     <li>If TestDPC was launched as part of synchronous authentication, forward all intent extras
+ *         to the setup activities and wait for that activity to finish; allows in-line management
+ *         setup immediately after an account is added (before the end of the Add Account or Setup
+ *         Wizard flows).
  *     <li>Otherwise, present the non-sync-auth setup options.
  * </ol>
  */
@@ -52,9 +52,10 @@ public class LaunchActivity extends Activity {
             return;
         }
 
+        Intent intent = new Intent(this, PolicyManagementActivity.class);
         if (ProvisioningStateUtil.isManagedByTestDPC(this)) {
             // Device or profile owner is enforced, allow the user to modify management policies.
-            startActivity(new Intent(this, PolicyManagementActivity.class));
+            startActivity(intent);
             finish();
         } else if (ProvisioningStateUtil.isManaged(this)) {
             // Device or profile owner is a different app to TestDPC - abort.
@@ -63,21 +64,19 @@ public class LaunchActivity extends Activity {
             setResult(RESULT_CANCELED);
             finish();
         } else if (LaunchIntentUtil.isSynchronousAuthLaunch(getIntent())) {
+            // Forward all extras from original launch intent.
+            intent.putExtras(getIntent().getExtras());
+
             // For synchronous auth either Setup Wizard or Add Account will launch this activity
             // with startActivityForResult(), and continue the account/device setup flow once a
             // result is returned - so we need to wait for a result from any activities we launch
             // and return a result based upon the outcome of those activities to whichever activity
             // launched us.
-            Intent syncAuthIntent = new Intent(this, SetupSyncAuthManagement.class)
-                    // Forward all extras from original launch intent.
-                    .putExtras(getIntent().getExtras());
-            startActivityForResult(syncAuthIntent, REQUEST_CODE_SYNC_AUTH);
+            startActivityForResult(intent, REQUEST_CODE_SYNC_AUTH);
         } else {
             // Either a user launched us, or we're triggered from an NFC provisioning bump - go to
             // pre-M setup options.
-
-            // TODO: Split this into a distinct set of activities similarly to sync-auth activities.
-            startActivity(new Intent(this, PolicyManagementActivity.class));
+            startActivity(intent);
             finish();
         }
     }

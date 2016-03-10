@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ Copyright 2016 The Android Open Source Project
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+    <TextView android:id="@+id/title_header"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/color_picker_title_height"
+            android:gravity="center_vertical"
+            android:text="@string/pick_color"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/color_picker_title_size"
+            tools:background="@color/teal"
+            android:paddingStart="@dimen/color_picker_padding_start_end"
+            android:paddingEnd="@dimen/color_picker_padding_start_end" />
+    <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/color_picker_padding_top_bottom"
+            android:paddingStart="@dimen/color_picker_padding_start_end"
+            android:paddingEnd="@dimen/color_picker_padding_start_end"
+            android:scrollbarStyle="outsideOverlay">
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingTop="@dimen/color_picker_padding_top_bottom"
+                    android:paddingBottom="@dimen/color_picker_padding_top_bottom">
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:focusable="false"
+                        android:text="@string/color_red_label"
+                        android:textSize="@dimen/color_picker_text_size"
+                        android:textColor="@color/red" />
+                <SeekBar android:id="@+id/red_bar"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:thumbTint="@color/red"
+                        android:progressTint="@color/red"
+                        android:max="255"
+                        tools:progress="100" />
+                <TextView android:id="@+id/red_bar_value"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:focusable="false"
+                        android:textColor="@color/red"
+                        android:textSize="@dimen/color_picker_text_size"
+                        tools:text="100" />
+            </LinearLayout>
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingTop="@dimen/color_picker_padding_top_bottom"
+                    android:paddingBottom="@dimen/color_picker_padding_top_bottom">
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:focusable="false"
+                        android:text="@string/color_green_label"
+                        android:textSize="@dimen/color_picker_text_size"
+                        android:textColor="@color/green" />
+                <SeekBar android:id="@+id/green_bar"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:thumbTint="@color/green"
+                        android:progressTint="@color/green"
+                        android:max="255"
+                        tools:progress="100" />
+                <TextView android:id="@+id/green_bar_value"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:focusable="false"
+                        android:textColor="@color/green"
+                        android:textSize="@dimen/color_picker_text_size"
+                        tools:text="100" />
+            </LinearLayout>
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingTop="@dimen/color_picker_padding_top_bottom"
+                    android:paddingBottom="@dimen/color_picker_padding_top_bottom">
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:focusable="false"
+                        android:text="@string/color_blue_label"
+                        android:textSize="@dimen/color_picker_text_size"
+                        android:textColor="@color/blue" />
+                <SeekBar android:id="@+id/blue_bar"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:thumbTint="@color/blue"
+                        android:progressTint="@color/blue"
+                        android:max="255"
+                        tools:progress="100" />
+                <TextView android:id="@+id/blue_bar_value"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:focusable="false"
+                        android:textColor="@color/blue"
+                        android:textSize="@dimen/color_picker_text_size"
+                        tools:text="100" />
+            </LinearLayout>
+
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingTop="@dimen/color_picker_padding_top_bottom"
+                    android:paddingBottom="@dimen/color_picker_padding_top_bottom"
+                    android:gravity="start">
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingEnd="@dimen/color_picker_padding_start_end"
+                        android:text="@string/enter_color_value"
+                        android:textSize="@dimen/color_picker_text_size" />
+                <EditText android:id="@+id/color_value"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:ems="5"
+                        android:hint="@string/color_format"
+                        android:textSize="@dimen/color_picker_text_size"
+                        android:digits="#0123456789abcdefABCDEF"
+                        android:inputType="textNoSuggestions" />
+                <Button android:id="@+id/color_preview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingStart="@dimen/color_picker_padding_start_end"
+                        android:text="@string/update_color"
+                        style="?android:attr/buttonBarButtonStyle" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

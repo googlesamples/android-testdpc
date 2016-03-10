@@ -17,10 +17,12 @@
 package com.afwsamples.testdpc.profilepolicy.permission;
 
 import android.app.admin.DevicePolicyManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.ArrayAdapter;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -34,28 +36,41 @@ import java.util.List;
  * Renders a list app permissions with allow/deny radio buttons.
  */
 public class AppPermissionsArrayAdapter
-        extends ArrayAdapter<AppPermissionsArrayAdapter.AppPermission> {
+        extends ArrayAdapter<AppPermissionsArrayAdapter.AppPermission>
+        implements RadioGroup.OnCheckedChangeListener {
 
     private final DevicePolicyManager mDpm;
+    private final ComponentName mAdminComponentName;
 
     public AppPermissionsArrayAdapter(Context context, int resource,
-                                      List<AppPermission> objects) {
+            List<AppPermission> objects) {
         super(context, resource, objects);
         mDpm = (DevicePolicyManager) getContext().getSystemService(Context.DEVICE_POLICY_SERVICE);
+        mAdminComponentName = DeviceAdminReceiver.getComponentName(context);
     }
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
-        AppPermissionsArrayAdapter.AppPermission permission = getItem(position);
-
-        if (convertView == null) {
+        AppPermissionsViewHolder viewHolder;
+        if (convertView == null || !(convertView.getTag() instanceof AppPermissionsViewHolder)) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.permission_row,
                     parent, false);
+
+            viewHolder = new AppPermissionsViewHolder();
+            viewHolder.permissionName = (TextView) convertView.findViewById(R.id.permission_name);
+            viewHolder.permissionGroup =
+                    (RadioGroup) convertView.findViewById(R.id.permission_group);
+            viewHolder.permissionGroup.setOnCheckedChangeListener(this);
+
+            convertView.setTag(viewHolder);
+        } else {
+            viewHolder = (AppPermissionsViewHolder) convertView.getTag();
         }
 
-        ViewHolder viewHolder = new ViewHolder(convertView);
-        viewHolder.permissionName.setText(permission.permissionName);
-        switch (permission.permissionState) {
+        viewHolder.appPermission = getItem(position);
+        viewHolder.permissionName.setText(viewHolder.appPermission.permissionName);
+        viewHolder.permissionGroup.setTag(viewHolder.appPermission);
+        switch (viewHolder.appPermission.permissionState) {
             case DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED:
                 viewHolder.permissionGroup.check(R.id.permission_allow);
                 break;
@@ -66,34 +81,27 @@ public class AppPermissionsArrayAdapter
                 viewHolder.permissionGroup.check(R.id.permission_deny);
                 break;
         }
-        viewHolder.permissionGroup.setOnCheckedChangeListener(
-                new RadioGroup.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(RadioGroup radioGroup, int i) {
-                        AppPermission permission = getItem(position);
-                        switch (i) {
-                            case R.id.permission_allow:
-                                permission.permissionState =
-                                        DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED;
-                                break;
-                            case R.id.permission_default:
-                                permission.permissionState =
-                                        DevicePolicyManager.PERMISSION_GRANT_STATE_DEFAULT;
-                                break;
-                            case R.id.permission_deny:
-                                permission.permissionState =
-                                        DevicePolicyManager.PERMISSION_GRANT_STATE_DENIED;
-                                break;
-                        }
-                        mDpm.setPermissionGrantState(
-                                DeviceAdminReceiver.getComponentName(getContext()),
-                                permission.pkgName, permission.permissionName,
-                                permission.permissionState);
-                    }
-                });
-
-        convertView.setTag(viewHolder);
         return convertView;
+    }
+
+    @Override
+    public void onCheckedChanged(RadioGroup radioGroup, int checkedId) {
+        final AppPermission appPermission = (AppPermission) radioGroup.getTag();
+        switch (checkedId) {
+            case R.id.permission_allow: {
+                appPermission.permissionState = DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED;
+            } break;
+            case R.id.permission_default: {
+                appPermission.permissionState = DevicePolicyManager.PERMISSION_GRANT_STATE_DEFAULT;
+            } break;
+            case R.id.permission_deny: {
+                appPermission.permissionState = DevicePolicyManager.PERMISSION_GRANT_STATE_DENIED;
+            } break;
+        }
+        mDpm.setPermissionGrantState(mAdminComponentName,
+                appPermission.pkgName,
+                appPermission.permissionName,
+                appPermission.permissionState);
     }
 
     /**
@@ -112,14 +120,9 @@ public class AppPermissionsArrayAdapter
         }
     }
 
-    private final class ViewHolder {
-        final public TextView permissionName;
-        final public RadioGroup permissionGroup;
-
-        public ViewHolder(View view)
-        {
-            this.permissionName = (TextView) view.findViewById(R.id.permission_name);
-            this.permissionGroup = (RadioGroup) view.findViewById(R.id.permission_group);
-        }
+    private final class AppPermissionsViewHolder {
+        TextView permissionName;
+        RadioGroup permissionGroup;
+        AppPermission appPermission;
     }
 }

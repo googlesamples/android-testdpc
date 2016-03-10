@@ -21,9 +21,11 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.afwsamples.testdpc.common.LaunchIntentUtil;
 import com.android.setupwizardlib.SetupWizardLayout;
 import com.android.setupwizardlib.view.NavigationBar;
 
@@ -54,6 +56,16 @@ public class EnableDeviceOwnerActivity extends Activity
             appLabel.setText(packageManager.getApplicationLabel(applicationInfo));
         } catch (PackageManager.NameNotFoundException e) {
             Log.w("TestDPC", "Couldn't look up our own package?!?!", e);
+        }
+
+        // Show the user which account now has management, if specified.
+        String addedAccount = getIntent().getStringExtra(LaunchIntentUtil.EXTRA_ACCOUNT_NAME);
+        if (addedAccount != null) {
+            findViewById(R.id.managed_account_name_label).setVisibility(View.VISIBLE);
+
+            TextView managedAccountName = (TextView) findViewById(R.id.managed_account_name);
+            managedAccountName.setText(addedAccount);
+            managedAccountName.setVisibility(View.VISIBLE);
         }
     }
 

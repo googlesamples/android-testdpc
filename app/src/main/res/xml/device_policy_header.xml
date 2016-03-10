@@ -56,8 +56,17 @@
                 android:key="unhide_apps"
                 android:title="@string/unhide_apps_title"/>
         <Preference
+                android:key="suspend_apps"
+                android:title="@string/suspend_apps_title"/>
+        <Preference
+                android:key="unsuspend_apps"
+                android:title="@string/unsuspend_apps_title"/>
+        <Preference
                 android:key="manage_app_restrictions"
                 android:title="@string/manage_app_restrictions"/>
+        <Preference
+                android:key="app_restrictions_managing_package"
+                android:title="@string/app_restrictions_managing_package"/>
     </PreferenceCategory>
 
     <PreferenceCategory
@@ -84,6 +93,9 @@
         <SwitchPreference
                 android:key="disable_screen_capture"
                 android:title="@string/disable_screen_capture"/>
+        <SwitchPreference
+                android:key="mute_audio"
+                android:title="@string/mute_audio"/>
     </PreferenceCategory>
 
     <PreferenceCategory
@@ -91,6 +103,9 @@
         <Preference
                 android:key="install_key_certificate"
                 android:title="@string/install_key_certificate"/>
+        <Preference
+                android:key="remove_key_certificate"
+                android:title="@string/remove_key_certificate"/>
         <EditTextPreference
                 android:key="override_key_selection"
                 android:title="@string/key_override_alias"/>
@@ -109,13 +124,6 @@
     </PreferenceCategory>
 
     <PreferenceCategory
-            android:title="@string/data_usage">
-        <Preference
-                android:key="network_stats"
-                android:title="@string/network_stats"/>
-    </PreferenceCategory>
-
-    <PreferenceCategory
             android:title="@string/wifi_management_title">
         <Preference
                 android:key="create_wifi_configuration"
@@ -126,6 +134,9 @@
         <Preference
                 android:key="modify_wifi_configuration"
                 android:title="@string/modify_wifi_configuration"/>
+        <Preference
+                android:key="show_wifi_mac_address"
+                android:title="@string/show_wifi_mac_address"/>
     </PreferenceCategory>
 
     <PreferenceCategory
@@ -136,42 +147,18 @@
     </PreferenceCategory>
 
     <PreferenceCategory
-            android:key="keyguard_preferences"
-            android:title="@string/keyguard_features">
-        <SwitchPreference
-                android:key="keyguard_disable_widgets"
-                android:title="@string/keyguard_disable_widgets"/>
-        <SwitchPreference
-                android:key="keyguard_disable_secure_camera"
-                android:title="@string/keyguard_disable_secure_camera"/>
-        <SwitchPreference
-                android:key="keyguard_disable_secure_notifications"
-                android:title="@string/keyguard_disable_secure_notifications"/>
-        <SwitchPreference
-                android:key="keyguard_disable_unredacted_notifications"
-                android:title="@string/keyguard_disable_unredacted_notifications"/>
-        <SwitchPreference
-                android:key="keyguard_disable_trust_agents"
-                android:title="@string/keyguard_disable_trust_agents"/>
-        <SwitchPreference
-                android:key="keyguard_disable_fingerprint"
-                android:title="@string/keyguard_disable_fingerprint"/>
-    </PreferenceCategory>
-
-    <PreferenceCategory
             android:title="@string/lock_category" >
-        <EditTextPreference
-                android:key="key_max_time_screen_lock"
-                android:title="@string/maximum_lock_time"
-                android:dialogTitle="@string/maximum_lock_time"
-                android:inputType="number"
-                android:defaultValue="0" />
-        <EditTextPreference
-                android:key="key_max_fails_before_wipe"
-                android:title="@string/maximum_password_fails"
-                android:dialogTitle="@string/maximum_password_fails"
-                android:inputType="number"
-                android:defaultValue="0" />
+        <Preference
+                android:key="lock_screen_policy"
+                android:title="@string/lock_screen_policy"/>
+        <Preference
+                android:key="password_constraints"
+                android:title="@string/password_constraints"/>
+        <Preference
+                android:key="reset_password"
+                android:title="@string/reset_password"
+                android:dialogTitle="@string/reset_password"
+                android:inputType="textPassword" />
     </PreferenceCategory>
 
     <PreferenceCategory
@@ -195,6 +182,16 @@
         <Preference
                 android:key="managed_profile_policies"
                 android:title="@string/managed_profile_specific_policy_title"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+            android:title="@string/networking_management_title">
+        <Preference
+                android:key="network_stats"
+                android:title="@string/network_stats"/>
+        <Preference
+                android:key="set_always_on_vpn"
+                android:title="@string/set_always_on_vpn" />
     </PreferenceCategory>
 
     <PreferenceCategory
@@ -236,8 +233,8 @@
     <PreferenceCategory
             android:title="@string/user_management">
         <Preference
-                android:key="create_and_initialize_user"
-                android:title="@string/create_and_initialize_user"/>
+                android:key="create_and_manage_user"
+                android:title="@string/create_and_manage_user"/>
         <Preference
                 android:key="remove_user"
                 android:title="@string/remove_user"/>
@@ -261,12 +258,37 @@
     </PreferenceCategory>
 
     <PreferenceCategory
+            android:title="@string/support_messages">
+        <Preference
+                android:key="set_short_support_message"
+                android:title="@string/set_short_support_message" />
+        <Preference
+                android:key="set_long_support_message"
+                android:title="@string/set_long_support_message" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
             android:title="@string/device_owner_management">
+        <SwitchPreference
+                android:key="set_auto_time_required"
+                android:title="@string/set_auto_time_required" />
+        <SwitchPreference
+                android:key="enable_process_logging"
+                android:title="@string/enable_process_logging"/>
+        <Preference
+                android:key="request_process_logs"
+                android:title="@string/request_process_logs"/>
+        <Preference
+                android:key="request_bugreport"
+                android:title="@string/request_bugreport"/>
         <Preference
                 android:key="wipe_data"
                 android:title="@string/wipe_data"/>
         <Preference
                 android:key="remove_device_owner"
                 android:title="@string/remove_device_owner"/>
+        <Preference
+                android:key="reboot"
+                android:title="@string/reboot"/>
     </PreferenceCategory>
 </PreferenceScreen>

@@ -23,6 +23,7 @@ import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.UserManager;
@@ -34,6 +35,8 @@ import android.widget.Toast;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.AppInfoArrayAdapter;
+import com.afwsamples.testdpc.common.ColorPicker;
+import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.profilepolicy.crossprofileintentfilter.AddCrossProfileIntentFilterFragment;
 import com.afwsamples.testdpc.profilepolicy.crossprofilewidgetprovider.ManageCrossProfileWidgetProviderUtil;
 
@@ -56,7 +59,11 @@ import java.util.List;
  * 8) {@link DevicePolicyManager#setBluetoothContactSharingDisabled(ComponentName, boolean)}
  */
 public class ProfilePolicyManagementFragment extends PreferenceFragment implements
-        Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
+        Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener,
+        ColorPicker.OnColorSelectListener {
+    // Tag for creating this fragment. This tag can be used to retrieve this fragment.
+    public static final String FRAGMENT_TAG = "ProfilePolicyManagementFragment";
+
     private static final String ADD_CROSS_PROFILE_APP_WIDGETS_KEY = "add_cross_profile_app_widgets";
     private static final String ADD_CROSS_PROFILE_INTENT_FILTER_PREFERENCE_KEY
             = "add_cross_profile_intent_filter";
@@ -66,12 +73,23 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
             = "disable_bluetooth_contact_sharing";
     private static final String DISABLE_CROSS_PROFILE_CALLER_ID_KEY
             = "disable_cross_profile_caller_id";
+    private static final String DISABLE_CROSS_PROFILE_CONTACTS_SEARCH_KEY
+            = "disable_cross_profile_contacts_search";
     private static final String REMOVE_CROSS_PROFILE_APP_WIDGETS_KEY =
             "remove_cross_profile_app_widgets";
     private static final String REMOVE_PROFILE_KEY = "remove_profile";
+    private static final String SET_ORGANIZATION_COLOR_KEY = "set_organization_color";
+    private static final String SET_ORGANIZATION_NAME_KEY = "set_organization_name";
+
+    private static final String ORGANIZATION_COLOR_ID = "organizationColor";
 
     private static String[] MNC_PLUS_PREFERENCES = {
             DISABLE_BLUETOOTH_CONTACT_SHARING_KEY
+    };
+
+    private static String[] NYC_PLUS_PREFERENCES = {
+            DISABLE_CROSS_PROFILE_CONTACTS_SEARCH_KEY, SET_ORGANIZATION_COLOR_KEY,
+            SET_ORGANIZATION_NAME_KEY
     };
 
     private DevicePolicyManager mDevicePolicyManager;
@@ -83,6 +101,9 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
     private Preference mRemoveCrossProfileAppWidgetsPreference;
     private SwitchPreference mDisableBluetoothContactSharingSwitchPreference;
     private SwitchPreference mDisableCrossProfileCallerIdSwitchPreference;
+    private SwitchPreference mDisableCrossProfileContactsSearchSwitchPreference;
+    private Preference mSetOrganizationNamePreference;
+    private Preference mSetOrganizationColorPreference;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -110,6 +131,7 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
 
         disableIncompatibleManagementOptionsByApiLevel();
         initSwitchPreferences();
+        initializeOrganizationInfoPreferences();
     }
 
     @Override
@@ -151,6 +173,18 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
             case REMOVE_CROSS_PROFILE_APP_WIDGETS_KEY:
                 showEnabledAppWidgetList();
                 return true;
+            case SET_ORGANIZATION_COLOR_KEY:
+                int colorValue = getActivity().getResources().getColor(R.color.teal);
+                final CharSequence summary = mSetOrganizationColorPreference.getSummary();
+                if (summary != null) {
+                    try {
+                        colorValue = Color.parseColor(summary.toString());
+                    } catch (IllegalArgumentException e) {
+                        // Ignore
+                    }
+                }
+                ColorPicker.newInstance(colorValue, FRAGMENT_TAG, ORGANIZATION_COLOR_ID)
+                        .show(getFragmentManager(), "colorPicker");
         }
         return false;
     }
@@ -173,8 +207,46 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
                 // Reload UI to verify the state of cross-profile caller Id is set correctly.
                 reloadCrossProfileCallerIdDisableUi();
                 return true;
+            case DISABLE_CROSS_PROFILE_CONTACTS_SEARCH_KEY:
+                boolean disableCrossProfileContactsSearch = (Boolean) newValue;
+                mDevicePolicyManager.setCrossProfileContactsSearchDisabled(mAdminComponentName,
+                        disableCrossProfileContactsSearch);
+                // Reload UI to verify the state of cross-profile contacts search is set correctly.
+                reloadCrossProfileContactsSearchDisableUi();
+                return true;
+            case SET_ORGANIZATION_NAME_KEY:
+                mDevicePolicyManager.setOrganizationName(mAdminComponentName, (String) newValue);
+                mSetOrganizationNamePreference.setSummary((String) newValue);
+                return true;
         }
         return false;
+    }
+
+    @Override
+    public void onColorSelected(int colorValue, String id) {
+        if (ORGANIZATION_COLOR_ID.equals(id)) {
+            mDevicePolicyManager.setOrganizationColor(mAdminComponentName, colorValue);
+            mSetOrganizationColorPreference.setSummary(
+                    String.format(ColorPicker.COLOR_STRING_FORMATTER, colorValue));
+        }
+    }
+
+    private void initializeOrganizationInfoPreferences() {
+        mSetOrganizationColorPreference = findPreference(SET_ORGANIZATION_COLOR_KEY);
+        mSetOrganizationNamePreference = findPreference(SET_ORGANIZATION_NAME_KEY);
+
+        if (mSetOrganizationColorPreference.isEnabled()) {
+            mSetOrganizationColorPreference.setOnPreferenceClickListener(this);
+            final int colorValue = mDevicePolicyManager.getOrganizationColor(mAdminComponentName);
+            mSetOrganizationColorPreference.setSummary(
+                    String.format(ColorPicker.COLOR_STRING_FORMATTER, colorValue));
+        }
+
+        if (mSetOrganizationNamePreference.isEnabled()) {
+            mSetOrganizationNamePreference.setOnPreferenceChangeListener(this);
+            final String name = mDevicePolicyManager.getOrganizationName(mAdminComponentName);
+            mSetOrganizationNamePreference.setSummary(name);
+        }
     }
 
     private void showAddCrossProfileIntentFilterFragment() {
@@ -189,8 +261,11 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
                 DISABLE_BLUETOOTH_CONTACT_SHARING_KEY);
         mDisableCrossProfileCallerIdSwitchPreference = (SwitchPreference) findPreference(
                 DISABLE_CROSS_PROFILE_CALLER_ID_KEY);
+        mDisableCrossProfileContactsSearchSwitchPreference = (SwitchPreference) findPreference(
+                DISABLE_CROSS_PROFILE_CONTACTS_SEARCH_KEY);
         mDisableBluetoothContactSharingSwitchPreference.setOnPreferenceChangeListener(this);
         mDisableCrossProfileCallerIdSwitchPreference.setOnPreferenceChangeListener(this);
+        mDisableCrossProfileContactsSearchSwitchPreference.setOnPreferenceChangeListener(this);
         reloadBluetoothContactSharing();
         reloadCrossProfileCallerIdDisableUi();
     }
@@ -207,9 +282,25 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
     }
 
     private void reloadCrossProfileCallerIdDisableUi() {
+        if (!mDisableCrossProfileCallerIdSwitchPreference.isEnabled()) {
+            return;
+        }
+
         boolean isCrossProfileCallerIdDisabled = mDevicePolicyManager
                 .getCrossProfileCallerIdDisabled(mAdminComponentName);
         mDisableCrossProfileCallerIdSwitchPreference.setChecked(isCrossProfileCallerIdDisabled);
+    }
+
+
+    private void reloadCrossProfileContactsSearchDisableUi() {
+        if (!mDisableCrossProfileContactsSearchSwitchPreference.isEnabled()) {
+            return;
+        }
+
+        boolean isCrossProfileContactsSearchDisabled = mDevicePolicyManager
+                .getCrossProfileContactsSearchDisabled(mAdminComponentName);
+        mDisableCrossProfileContactsSearchSwitchPreference.setChecked(
+                isCrossProfileContactsSearchDisabled);
     }
 
     /**
@@ -296,15 +387,23 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
     }
 
     private void disableIncompatibleManagementOptionsByApiLevel() {
-        if (isBeforeM()) {
+        if (Util.isBeforeM()) {
             // The following options depend on MNC APIs.
             for (String preference : MNC_PLUS_PREFERENCES) {
                 findPreference(preference).setEnabled(false);
             }
         }
+
+        if (Util.isBeforeN()) {
+            // The following options depend on NYC APIs.
+            for (String preference : NYC_PLUS_PREFERENCES) {
+                findPreference(preference).setEnabled(false);
+            }
+        }
     }
 
-    private boolean isBeforeM() {
-        return Build.VERSION.SDK_INT < Build.VERSION_CODES.M;
+    @Override
+    public Context getContext() {
+        return (Context) getActivity();
     }
 }

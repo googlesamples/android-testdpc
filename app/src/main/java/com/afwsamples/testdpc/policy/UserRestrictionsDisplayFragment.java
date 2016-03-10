@@ -32,6 +32,7 @@ import android.widget.Toast;
 
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
+import com.afwsamples.testdpc.common.Util;
 
 import static android.os.UserManager.ALLOW_PARENT_PROFILE_APP_LINKING;
 import static android.os.UserManager.DISALLOW_ADD_USER;
@@ -46,6 +47,7 @@ import static android.os.UserManager.DISALLOW_CONFIG_VPN;
 import static android.os.UserManager.DISALLOW_CONFIG_WIFI;
 import static android.os.UserManager.DISALLOW_CREATE_WINDOWS;
 import static android.os.UserManager.DISALLOW_CROSS_PROFILE_COPY_PASTE;
+import static android.os.UserManager.DISALLOW_DATA_ROAMING;
 import static android.os.UserManager.DISALLOW_DEBUGGING_FEATURES;
 import static android.os.UserManager.DISALLOW_FACTORY_RESET;
 import static android.os.UserManager.DISALLOW_FUN;
@@ -91,6 +93,8 @@ public class UserRestrictionsDisplayFragment extends PreferenceFragment
             new UserRestriction(DISALLOW_CREATE_WINDOWS, R.string.disallow_create_windows),
             new UserRestriction(DISALLOW_CROSS_PROFILE_COPY_PASTE,
                     R.string.disallow_cross_profile_copy_paste),
+            new UserRestriction(DISALLOW_DATA_ROAMING,
+                    R.string.disallow_data_roaming),
             new UserRestriction(DISALLOW_DEBUGGING_FEATURES, R.string.disallow_debugging_features),
             new UserRestriction(DISALLOW_FACTORY_RESET, R.string.disallow_factory_reset),
             new UserRestriction(DISALLOW_FUN, R.string.disallow_fun),
@@ -125,6 +129,7 @@ public class UserRestrictionsDisplayFragment extends PreferenceFragment
             DISALLOW_CONFIG_TETHERING,
             DISALLOW_CONFIG_WIFI,
             DISALLOW_CREATE_WINDOWS,
+            DISALLOW_DATA_ROAMING,
             DISALLOW_FACTORY_RESET,
             DISALLOW_FUN,
             DISALLOW_MOUNT_PHYSICAL_MEDIA,
@@ -151,6 +156,10 @@ public class UserRestrictionsDisplayFragment extends PreferenceFragment
     private static String[] MNC_PLUS_RESTRICTIONS = {
             ALLOW_PARENT_PROFILE_APP_LINKING,
             DISALLOW_SAFE_BOOT
+    };
+
+    private static String[] NYC_PLUS_RESTRICTIONS = {
+            DISALLOW_DATA_ROAMING
     };
 
     public static UserRestrictionsDisplayFragment newInstance() {
@@ -228,8 +237,13 @@ public class UserRestrictionsDisplayFragment extends PreferenceFragment
     }
 
     private void disableIncompatibleRestrictionsByApiLevel() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+        if (Util.isBeforeM()) {
             for (String restriction : MNC_PLUS_RESTRICTIONS) {
+                findPreference(restriction).setEnabled(false);
+            }
+        }
+        if (Util.isBeforeN()) {
+            for (String restriction : NYC_PLUS_RESTRICTIONS) {
                 findPreference(restriction).setEnabled(false);
             }
         }

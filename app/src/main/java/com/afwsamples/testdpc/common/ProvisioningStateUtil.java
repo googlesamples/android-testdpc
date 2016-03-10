@@ -20,9 +20,13 @@ import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.os.Build;
 import android.provider.Settings;
 
 import java.util.List;
+
+import static android.app.admin.DevicePolicyManager.ACTION_PROVISION_MANAGED_DEVICE;
+import static android.app.admin.DevicePolicyManager.ACTION_PROVISION_MANAGED_PROFILE;
 
 /**
  * Common utility functions used for retrieving information about the provisioning state of the
@@ -79,5 +83,34 @@ public class ProvisioningStateUtil {
         }
 
         return false;
+    }
+
+    /**
+     * @param action Action to be checked
+     * @param context Calling activity's context
+     * @return true, if provisioning is allowed for corresponding action
+     */
+    public static boolean isProvisioningAllowed(Context context, String action) {
+        /* TODO: Remove CODENAME check once SDK_INT on device is bumped for N */
+        if (!versionIsAtLeastN()) {
+            if (ACTION_PROVISION_MANAGED_DEVICE.equals(action)) {
+                return (Build.VERSION.SDK_INT == Build.VERSION_CODES.M)
+                        ? isDeviceUnprovisionedAndNoDeviceOwner(context) : false;
+            }
+            if (ACTION_PROVISION_MANAGED_PROFILE.equals(action)) {
+                return true;
+            }
+            return false;
+        }
+        // DevicePolicyManager.isProvisioningAllowed is added in N.
+        DevicePolicyManager dpm = (DevicePolicyManager) context
+                .getSystemService(Context.DEVICE_POLICY_SERVICE);
+        return dpm.isProvisioningAllowed(action);
+    }
+
+    public static boolean versionIsAtLeastN() {
+        // TODO: remove the code name check.
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
+                || Build.VERSION.CODENAME.startsWith("N");
     }
 }

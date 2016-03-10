@@ -18,3 +18,5 @@ bin/
 #Gradle-based build
 .gradle
 build/
+# Android Studio/IntelliJ IDEA related files.
+*.iml
