@@ -14,10 +14,10 @@ Getting Started
 ---------------
 
 This sample uses the Gradle build system. To build this project, use the "gradlew assemble" command or use "Import Project" in Android Studio. 
-Please note that two apks will be generated when building this app: TestDPC-standard-*.apk is the apk targeting devices Android 6.0 and below while TestDPC-N-*.apk is targeting the Android N Developer Preview.
+Please note that two apks will be generated when building this app: TestDPC\-standard\-\*.apk is the apk targeting devices Android 6.0 and below while TestDPC\-N\-\*.apk is targeting the Android N Developer Preview.
 
 Screenshots
------------
+------------
 
 <img src="doc/setup.png" height="400" alt="Setup" title="Setup screen"/>
 <img src="doc/policy_management.png" height="400" alt="Policy Management" title="Home screen once the profile is setup" />
@@ -28,9 +28,9 @@ Screenshots
 Known Issues
 ------------
 
-1. No support for mime type in cross-profile intent filter creation.
-2. No support for PackageInstaller APIs.
-3. Values are not saving correctly under Manage app permissions.
+1. Not saving selected permitted input methods
+2. Not saving "Mute audio" setting
+3. TestDPC thinks it is running inside a managed profile when launched in secondary user
 
 Support
 -------
