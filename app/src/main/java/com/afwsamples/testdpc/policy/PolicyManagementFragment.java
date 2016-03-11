@@ -48,6 +48,7 @@ import android.provider.Settings;
 import android.security.KeyChain;
 import android.security.KeyChainAliasCallback;
 import android.support.v4.content.FileProvider;
+import android.telephony.TelephonyManager;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
@@ -310,6 +311,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     private String mPackageName;
     private ComponentName mAdminComponentName;
     private UserManager mUserManager;
+    private TelephonyManager mTelephonyManager;
 
     private SwitchPreference mDisableCameraSwitchPreference;
     private SwitchPreference mDisableScreenCaptureSwitchPreference;
@@ -336,6 +338,8 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         mDevicePolicyManager = (DevicePolicyManager) getActivity().getSystemService(
                 Context.DEVICE_POLICY_SERVICE);
         mUserManager = (UserManager) getActivity().getSystemService(Context.USER_SERVICE);
+        mTelephonyManager = (TelephonyManager) getActivity()
+                .getSystemService(Context.TELEPHONY_SERVICE);
         mPackageManager = getActivity().getPackageManager();
         mPackageName = getActivity().getPackageName();
 
@@ -2055,6 +2059,10 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     }
 
     private void reboot() {
+        if (mTelephonyManager.getCallState() != TelephonyManager.CALL_STATE_IDLE) {
+            showToast(R.string.reboot_error_msg);
+            return;
+        }
         mDevicePolicyManager.reboot(mAdminComponentName);
     }
 
