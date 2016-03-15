@@ -689,7 +689,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 reloadCameraDisableUi();
                 return true;
             case ENABLE_PROCESS_LOGGING:
-                mDevicePolicyManager.setDeviceLoggingEnabled(mAdminComponentName,
+                mDevicePolicyManager.setSecurityLoggingEnabled(mAdminComponentName,
                         (Boolean) newValue);
                 reloadEnableProcessLoggingUi();
                 return true;
@@ -1319,7 +1319,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
 
     private void reloadEnableProcessLoggingUi() {
         if (mEnableProcessLoggingPreference.isEnabled()) {
-            boolean isProcessLoggingEnabled = mDevicePolicyManager.getDeviceLoggingEnabled(
+            boolean isProcessLoggingEnabled = mDevicePolicyManager.isSecurityLoggingEnabled(
                     mAdminComponentName);
             mEnableProcessLoggingPreference.setChecked(isProcessLoggingEnabled);
             findPreference(REQUEST_PROCESS_LOGS).setEnabled(isProcessLoggingEnabled);
