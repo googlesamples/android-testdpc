@@ -952,7 +952,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
      * Shows a message box with the device wifi mac address.
      */
     private void showWifiMacAddress() {
-        final String macAddress = mDevicePolicyManager.getWifiMacAddress();
+        final String macAddress = mDevicePolicyManager.getWifiMacAddress(mAdminComponentName);
         final String message = macAddress != null ? macAddress
                 : getResources().getString(R.string.show_wifi_mac_address_not_available_msg);
         new AlertDialog.Builder(getActivity())
