@@ -235,6 +235,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     private static final String REQUEST_BUGREPORT_KEY = "request_bugreport";
     private static final String REQUEST_PROCESS_LOGS = "request_process_logs";
     private static final String RESET_PASSWORD_KEY = "reset_password";
+    private static final String LOCK_NOW_KEY = "lock_now";
     private static final String SET_ACCESSIBILITY_SERVICES_KEY = "set_accessibility_services";
     private static final String SET_ALWAYS_ON_VPN_KEY = "set_always_on_vpn";
     private static final String SET_AUTO_TIME_REQUIRED_KEY = "set_auto_time_required";
@@ -371,6 +372,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         findPreference(LOCK_SCREEN_POLICY_KEY).setOnPreferenceClickListener(this);
         findPreference(PASSWORD_CONSTRAINTS_KEY).setOnPreferenceClickListener(this);
         findPreference(RESET_PASSWORD_KEY).setOnPreferenceClickListener(this);
+        findPreference(LOCK_NOW_KEY).setOnPreferenceClickListener(this);
         findPreference(SYSTEM_UPDATE_POLICY_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_ALWAYS_ON_VPN_KEY).setOnPreferenceClickListener(this);
         findPreference(NETWORK_STATS_KEY).setOnPreferenceClickListener(this);
@@ -478,6 +480,9 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             case RESET_PASSWORD_KEY:
                 showResetPasswordPrompt();
                 return false;
+            case LOCK_NOW_KEY:
+                mDevicePolicyManager.lockNow();
+                return true;
             case START_LOCK_TASK:
                 getActivity().startLockTask();
                 return true;

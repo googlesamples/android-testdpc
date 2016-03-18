@@ -159,6 +159,9 @@
                 android:title="@string/reset_password"
                 android:dialogTitle="@string/reset_password"
                 android:inputType="textPassword" />
+        <Preference
+            android:key="lock_now"
+            android:title="@string/lock_now"/>
     </PreferenceCategory>
 
     <PreferenceCategory
