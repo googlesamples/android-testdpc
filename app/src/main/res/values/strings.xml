@@ -551,6 +551,7 @@
     <string name="password_expired_title">Password has expired</string>
     <string name="password_expired_by_self">According to a policy set by TestDPC.</string>
     <string name="password_expired_by_others">According to a policy set by another admin.</string>
+    <string name="password_history_length">Password history length</string>
 
     <plurals name="password_failed_attempts_title">
         <item quantity="one">Password entered incorrectly %d time</item>

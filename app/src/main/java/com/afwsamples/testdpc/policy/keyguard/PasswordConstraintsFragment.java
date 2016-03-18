@@ -52,6 +52,7 @@ import java.util.concurrent.TimeUnit;
  * <li>{@link DevicePolicyManager#setPasswordMinimumUpperCase(ComponentName, String)}</li>
  * <li>{@link DevicePolicyManager#setPasswordMinimumSymbols(ComponentName, String)}</li>
  * <li>{@link DevicePolicyManager#setPasswordMinimumNonLetter(ComponentName, String)}</li>
+ * <li>{@link DevicePolicyManager#setPasswordHistoryLength(ComponentName, int)}</li>
  * </ul>
  */
 public final class PasswordConstraintsFragment extends ProfileOrParentFragment implements
@@ -67,6 +68,7 @@ public final class PasswordConstraintsFragment extends ProfileOrParentFragment i
     abstract static class Keys {
         final static String EXPIRATION_TIME = "password_expiration_time";
         final static String EXPIRATION_BY_ALL = "password_expiration_aggregate";
+        final static String HISTORY_LENGTH = "password_history_length";
 
         final static String QUALITY = "minimum_password_quality";
 
@@ -130,6 +132,7 @@ public final class PasswordConstraintsFragment extends ProfileOrParentFragment i
 
         // Expiration times.
         setup(Keys.EXPIRATION_TIME, null);
+        setup(Keys.HISTORY_LENGTH, getDpm().getPasswordHistoryLength(getAdmin()));
 
         // Minimum quality requirement.
         setup(Keys.QUALITY, PASSWORD_QUALITIES.floorKey(getDpm().getPasswordQuality(getAdmin())));
@@ -175,6 +178,9 @@ public final class PasswordConstraintsFragment extends ProfileOrParentFragment i
                 updateExpirationTimes();
                 return true;
             }
+            case Keys.HISTORY_LENGTH:
+                getDpm().setPasswordHistoryLength(getAdmin(), value);
+                break;
             case Keys.QUALITY: {
                 final ListPreference list = (ListPreference) preference;
                 // Store newValue now so getEntry() can return the new setting
