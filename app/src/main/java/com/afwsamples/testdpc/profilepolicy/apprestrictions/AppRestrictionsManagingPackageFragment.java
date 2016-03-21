@@ -24,6 +24,8 @@ import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.SelectAppFragment;
 
+import java.lang.IllegalArgumentException;
+
 /**
  * This fragment lets the user select an app that can manage application restrictions for the
  * current user. Related APIs:
@@ -49,14 +51,19 @@ public class AppRestrictionsManagingPackageFragment extends SelectAppFragment {
 
     @Override
     protected void setSelectedPackage(String pkgName) {
-        mDpm.setApplicationRestrictionsManagingPackage(
-                DeviceAdminReceiver.getComponentName(getActivity()), pkgName);
+        try {
+            mDpm.setApplicationRestrictionsManagingPackage(
+                    DeviceAdminReceiver.getComponentName(getActivity()), pkgName);
+            // TODO: Catch NameNotFoundException instead when NYC SDK
+            // setApplicationRestrictionsManagingPackage starts to throw NameNotFoundException
+        } catch (Exception nnpe) {
+            throw new IllegalArgumentException(nnpe);
+        }
     }
 
     @Override
     protected void clearSelectedPackage() {
-        mDpm.setApplicationRestrictionsManagingPackage(
-                DeviceAdminReceiver.getComponentName(getActivity()), null);
+        setSelectedPackage(null);
     }
 
     @Override
