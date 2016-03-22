@@ -16,24 +16,6 @@
 
 package com.afwsamples.testdpc.policy;
 
-import android.app.AlertDialog;
-import android.app.admin.DevicePolicyManager;
-import android.content.ComponentName;
-import android.content.Context;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.UserManager;
-import android.preference.Preference;
-import android.preference.PreferenceFragment;
-import android.preference.PreferenceScreen;
-import android.preference.SwitchPreference;
-import android.util.Log;
-import android.widget.Toast;
-
-import com.afwsamples.testdpc.DeviceAdminReceiver;
-import com.afwsamples.testdpc.R;
-import com.afwsamples.testdpc.common.Util;
-
 import static android.os.UserManager.ALLOW_PARENT_PROFILE_APP_LINKING;
 import static android.os.UserManager.DISALLOW_ADD_USER;
 import static android.os.UserManager.DISALLOW_ADJUST_VOLUME;
@@ -60,12 +42,31 @@ import static android.os.UserManager.DISALLOW_OUTGOING_BEAM;
 import static android.os.UserManager.DISALLOW_OUTGOING_CALLS;
 import static android.os.UserManager.DISALLOW_REMOVE_USER;
 import static android.os.UserManager.DISALLOW_SAFE_BOOT;
+import static android.os.UserManager.DISALLOW_SET_USER_ICON;
+import static android.os.UserManager.DISALLOW_SET_WALLPAPER;
 import static android.os.UserManager.DISALLOW_SHARE_LOCATION;
 import static android.os.UserManager.DISALLOW_SMS;
 import static android.os.UserManager.DISALLOW_UNINSTALL_APPS;
 import static android.os.UserManager.DISALLOW_UNMUTE_MICROPHONE;
 import static android.os.UserManager.DISALLOW_USB_FILE_TRANSFER;
 import static android.os.UserManager.ENSURE_VERIFY_APPS;
+
+import android.app.AlertDialog;
+import android.app.admin.DevicePolicyManager;
+import android.content.ComponentName;
+import android.content.Context;
+import android.os.Bundle;
+import android.os.UserManager;
+import android.preference.Preference;
+import android.preference.PreferenceFragment;
+import android.preference.PreferenceScreen;
+import android.preference.SwitchPreference;
+import android.util.Log;
+import android.widget.Toast;
+
+import com.afwsamples.testdpc.DeviceAdminReceiver;
+import com.afwsamples.testdpc.R;
+import com.afwsamples.testdpc.common.Util;
 
 public class UserRestrictionsDisplayFragment extends PreferenceFragment
         implements Preference.OnPreferenceChangeListener {
@@ -109,6 +110,8 @@ public class UserRestrictionsDisplayFragment extends PreferenceFragment
             new UserRestriction(DISALLOW_OUTGOING_CALLS, R.string.disallow_outgoing_calls),
             new UserRestriction(DISALLOW_REMOVE_USER, R.string.disallow_remove_user),
             new UserRestriction(DISALLOW_SAFE_BOOT, R.string.disallow_safe_boot),
+            new UserRestriction(DISALLOW_SET_USER_ICON, R.string.disallow_set_user_icon),
+            new UserRestriction(DISALLOW_SET_WALLPAPER, R.string.disallow_set_wallpaper),
             new UserRestriction(DISALLOW_SHARE_LOCATION, R.string.disallow_share_location),
             new UserRestriction(DISALLOW_SMS, R.string.disallow_sms),
             new UserRestriction(DISALLOW_UNINSTALL_APPS, R.string.disallow_uninstall_apps),
@@ -151,6 +154,13 @@ public class UserRestrictionsDisplayFragment extends PreferenceFragment
     };
 
     /**
+     * These restrictions are not meant to be used with managed profiles.
+     */
+    private static String[] NON_MANAGED_PROFILE_RESTRICTIONS = {
+            DISALLOW_SET_WALLPAPER
+    };
+
+    /**
      * These user restrictions are added in MNC.
      */
     private static String[] MNC_PLUS_RESTRICTIONS = {
@@ -159,7 +169,9 @@ public class UserRestrictionsDisplayFragment extends PreferenceFragment
     };
 
     private static String[] NYC_PLUS_RESTRICTIONS = {
-            DISALLOW_DATA_ROAMING
+            DISALLOW_DATA_ROAMING,
+            DISALLOW_SET_USER_ICON,
+            DISALLOW_SET_WALLPAPER
     };
 
     public static UserRestrictionsDisplayFragment newInstance() {
@@ -262,6 +274,19 @@ public class UserRestrictionsDisplayFragment extends PreferenceFragment
                 findPreference(restriction).setEnabled(false);
             }
         }
+
+        if (isManagedProfile()) {
+            for (String restriction : NON_MANAGED_PROFILE_RESTRICTIONS) {
+                findPreference(restriction).setEnabled(false);
+            }
+        }
+    }
+
+    private boolean isManagedProfile() {
+        // If user has more than one profile, then we deal with managed profile.
+        // Unfortunately there is no public API available to distinguish user profile owner
+        // and managed profile owner. Thus using this hack.
+        return mUserManager.getUserProfiles().size() > 1;
     }
 
     private static class UserRestriction {

@@ -287,6 +287,8 @@
     <string name="disallow_outgoing_calls">Disallow outgoing calls</string>
     <string name="disallow_remove_user">Disallow remove user</string>
     <string name="disallow_safe_boot">Disallow safe boot</string>
+    <string name="disallow_set_user_icon">Disallow set user icon</string>
+    <string name="disallow_set_wallpaper">Disallow set wallpaper</string>
     <string name="disallow_share_location">Disallow share location</string>
     <string name="disallow_sms">Disallow sms</string>
     <string name="disallow_uninstall_apps">Disallow uninstall apps</string>
