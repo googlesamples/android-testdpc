@@ -16,6 +16,7 @@
 
 package com.afwsamples.testdpc.common;
 
+import android.annotation.TargetApi;
 import android.app.Fragment;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
@@ -42,7 +43,10 @@ import com.afwsamples.testdpc.R;
  *
  * If there is no parent user (for example, if the managed user is controlled by a Device Owner),
  * the fragment will be shown directly.
+ *
+ * Please notice that all subclasses of this fragment only support N or above.
  */
+@TargetApi(VERSION_CODES.N)
 public abstract class ProfileOrParentFragment extends PreferenceFragment {
     private static final String LOG_TAG = "ProfileOrParentFragment";
 
@@ -139,11 +143,6 @@ public abstract class ProfileOrParentFragment extends PreferenceFragment {
      */
     protected final boolean isManagedProfileInstance() {
         return mProfileOwner && !isParentProfileInstance();
-    }
-
-    @Override
-    public Context getContext() {
-        return (Context) getActivity();
     }
 
     @Override

@@ -16,8 +16,10 @@
 
 package com.afwsamples.testdpc.policy.certificate;
 
+import android.annotation.TargetApi;
 import android.app.admin.DevicePolicyManager;
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 
 import com.afwsamples.testdpc.DeviceAdminReceiver;
@@ -30,6 +32,7 @@ import com.afwsamples.testdpc.common.SelectAppFragment;
  * 1) {@link DevicePolicyManager#setCertInstallerPackage}
  * 2) {@link DevicePolicyManager#getCertInstallerPackage}
  */
+@TargetApi(Build.VERSION_CODES.M)
 public class DelegatedCertInstallerFragment extends SelectAppFragment {
 
     private DevicePolicyManager mDpm;
