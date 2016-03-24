@@ -16,6 +16,7 @@
 
 package com.afwsamples.testdpc.common;
 
+import android.annotation.TargetApi;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.ContentResolver;
@@ -90,6 +91,7 @@ public class ProvisioningStateUtil {
      * @param context Calling activity's context
      * @return true, if provisioning is allowed for corresponding action
      */
+    @TargetApi(Build.VERSION_CODES.N)
     public static boolean isProvisioningAllowed(Context context, String action) {
         /* TODO: Remove CODENAME check once SDK_INT on device is bumped for N */
         if (!versionIsAtLeastN()) {

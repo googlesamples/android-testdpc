@@ -16,10 +16,12 @@
 
 package com.afwsamples.testdpc.profilepolicy.apprestrictions;
 
+import android.annotation.TargetApi;
 import android.app.admin.DevicePolicyManager;
 import android.content.Context;
 import android.content.RestrictionEntry;
 import android.content.RestrictionsManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.text.TextUtils;
@@ -108,22 +110,34 @@ public abstract class BaseAppRestrictionsFragment extends ManageAppFragment
             } else if (value instanceof String[]) {
                 restrictionEntries.add(new RestrictionEntry(key, (String[]) value));
             } else if (value instanceof Bundle) {
-                restrictionEntries.add(RestrictionEntry.createBundleEntry(
-                        key, convertBundleToRestrictions((Bundle) value)));
+                addBundleEntryToRestrictions(restrictionEntries, key, (Bundle) value);
             } else if (value instanceof Parcelable[]) {
-                Parcelable[] parcelableArray = (Parcelable[]) value;
-                int length = parcelableArray.length;
-                RestrictionEntry[] entriesArray = new RestrictionEntry[length];
-                for (int i = 0; i < entriesArray.length; ++i) {
-                    entriesArray[i] = RestrictionEntry.createBundleEntry(key,
-                            convertBundleToRestrictions((Bundle) parcelableArray[i]));
-                }
-                restrictionEntries.add(RestrictionEntry.createBundleArrayEntry(key, entriesArray));
+                addBundleArrayToRestrictions(restrictionEntries, key, (Bundle[]) value);
             }
         }
         return restrictionEntries.toArray(new RestrictionEntry[0]);
     }
 
+    @TargetApi(Build.VERSION_CODES.M)
+    private void addBundleEntryToRestrictions(List<RestrictionEntry> restrictionEntries,
+            String key, Bundle value) {
+        restrictionEntries.add(RestrictionEntry.createBundleEntry(
+                key, convertBundleToRestrictions(value)));
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    private void addBundleArrayToRestrictions(List<RestrictionEntry> restrictionEntries,
+            String key, Bundle[] value) {
+        int length = value.length;
+        RestrictionEntry[] entriesArray = new RestrictionEntry[length];
+        for (int i = 0; i < entriesArray.length; ++i) {
+            entriesArray[i] = RestrictionEntry.createBundleEntry(key,
+                    convertBundleToRestrictions(value[i]));
+        }
+        restrictionEntries.add(RestrictionEntry.createBundleArrayEntry(key, entriesArray));
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
     public void saveNestedRestrictions(int restrictionPosition,
             List<RestrictionEntry> restrictionEntries) {
         mRestrictionEntries.get(restrictionPosition).setRestrictions(

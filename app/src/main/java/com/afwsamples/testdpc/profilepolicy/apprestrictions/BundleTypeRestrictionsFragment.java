@@ -16,7 +16,9 @@
 
 package com.afwsamples.testdpc.profilepolicy.apprestrictions;
 
+import android.annotation.TargetApi;
 import android.content.RestrictionEntry;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,6 +31,7 @@ import com.afwsamples.testdpc.R;
 /**
  * This fragment shows nested restrictions of Bundle and Bundle array type restrictions.
  */
+@TargetApi(Build.VERSION_CODES.M)
 public class BundleTypeRestrictionsFragment extends BaseAppRestrictionsFragment {
     private static final String ARG_RESTRICTION_ENTRY = "argRestrictionEntry";
     private static final String ARG_RESTRICTION_POSITION = "argRestrictionPosition";
