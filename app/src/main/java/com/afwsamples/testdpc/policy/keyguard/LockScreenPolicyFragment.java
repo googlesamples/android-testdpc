@@ -16,12 +16,12 @@
 
 package com.afwsamples.testdpc.policy.keyguard;
 
-import android.annotation.TargetApi;
+import android.app.Fragment;
 import android.app.admin.DevicePolicyManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
+import android.preference.PreferenceGroup;
 import android.preference.TwoStatePreference;
 import android.util.ArrayMap;
 import android.widget.Toast;
@@ -133,8 +133,16 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getActivity().getActionBar().setTitle(R.string.lock_screen_policy);
+
         addPreferencesFromResource(R.xml.lock_screen_preferences);
-        setupAll();
+
+        setup(Keys.LOCK_SCREEN_MESSAGE,
+                Util.isBeforeN() ? null : getDpm().getDeviceOwnerLockScreenInfo());
+
+        setup(Keys.MAX_FAILS_BEFORE_WIPE, getDpm().getMaximumFailedPasswordsForWipe(getAdmin()));
+        setup(Keys.MAX_TIME_SCREEN_LOCK,
+                TimeUnit.MILLISECONDS.toSeconds(getDpm().getMaximumTimeToLock(getAdmin())));
+
         disableIncompatibleManagementOptionsInCurrentProfile();
         final int disabledFeatures = getDpm().getKeyguardDisabledFeatures(getAdmin());
         for (Map.Entry<String, Integer> flag : KEYGUARD_FEATURES.entrySet()) {
@@ -157,7 +165,8 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
 
         switch (preference.getKey()) {
             case Keys.LOCK_SCREEN_MESSAGE:
-                setLockScreenMessage(preference, (String) newValue);
+                getDpm().setDeviceOwnerLockScreenInfo(getAdmin(), (String) newValue);
+                preference.setSummary((String) newValue);
                 return true;
             case Keys.MAX_FAILS_BEFORE_WIPE:
                 try {
@@ -187,12 +196,6 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
         return true;
     }
 
-    @TargetApi(Build.VERSION_CODES.N)
-    private void setLockScreenMessage(Preference preference, String newValue) {
-        getDpm().setDeviceOwnerLockScreenInfo(getAdmin(), newValue);
-        preference.setSummary(newValue);
-    }
-
     private boolean updateKeyguardFeatures(int flag, boolean newValue) {
         int disabledFeatures = getDpm().getKeyguardDisabledFeatures(getAdmin());
         if (newValue) {
@@ -219,15 +222,6 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
                 maxTimeToLock != 0
                 ? Long.toString(TimeUnit.MILLISECONDS.toSeconds(maxTimeToLock))
                 : null);
-    }
-
-    @TargetApi(Build.VERSION_CODES.N)
-    private void setupAll() {
-        setup(Keys.LOCK_SCREEN_MESSAGE,
-                Util.isBeforeN() ? null : getDpm().getDeviceOwnerLockScreenInfo());
-        setup(Keys.MAX_FAILS_BEFORE_WIPE, getDpm().getMaximumFailedPasswordsForWipe(getAdmin()));
-        setup(Keys.MAX_TIME_SCREEN_LOCK,
-                TimeUnit.MILLISECONDS.toSeconds(getDpm().getMaximumTimeToLock(getAdmin())));
     }
 
     /**
@@ -280,11 +274,11 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
     }
 
     private boolean isDeviceOwner() {
-        return getDpm().isDeviceOwnerApp(getActivity().getPackageName());
+        return getDpm().isDeviceOwnerApp(getContext().getPackageName());
     }
 
     private boolean isProfileOwner() {
-        return getDpm().isProfileOwnerApp(getActivity().getPackageName());
+        return getDpm().isProfileOwnerApp(getContext().getPackageName());
     }
 
     private void showToast(int titleId) {

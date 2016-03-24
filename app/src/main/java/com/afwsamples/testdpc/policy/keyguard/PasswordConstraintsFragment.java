@@ -268,6 +268,6 @@ public final class PasswordConstraintsFragment extends ProfileOrParentFragment i
     private void sendPasswordRequirementsChanged() {
         Intent changedIntent = new Intent(DeviceAdminReceiver.ACTION_PASSWORD_REQUIREMENTS_CHANGED);
         changedIntent.setComponent(getAdmin());
-        getActivity().sendBroadcast(changedIntent);
+        getContext().sendBroadcast(changedIntent);
     }
 }

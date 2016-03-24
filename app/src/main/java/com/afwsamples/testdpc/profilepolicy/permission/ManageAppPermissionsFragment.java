@@ -16,13 +16,11 @@
 
 package com.afwsamples.testdpc.profilepolicy.permission;
 
-import android.annotation.TargetApi;
 import android.app.admin.DevicePolicyManager;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PermissionInfo;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -41,7 +39,6 @@ import java.util.List;
  * This fragment shows all installed apps and allows viewing and editing the dangerous application
  * permissions for those apps.
  */
-@TargetApi(Build.VERSION_CODES.M)
 public class ManageAppPermissionsFragment extends ManageAppFragment {
     private static final String TAG = "ManageAppPermissions";
 

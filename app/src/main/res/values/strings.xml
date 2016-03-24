@@ -612,6 +612,4 @@
     <string name="update_color">Update</string>
     <string name="not_valid_color">Not a valid color</string>
     <string name="color_format">#AARRGGBB</string>
-    <string name="unable_disable_keyguard">Unable to disable keyguard</string>
-    <string name="unable_enable_keyguard">Unable to enable keyguard</string>
 </resources>

@@ -16,10 +16,8 @@
 
 package com.afwsamples.testdpc.policy.networking;
 
-import android.annotation.TargetApi;
 import android.app.admin.DevicePolicyManager;
 import android.content.Context;
-import android.os.Build;
 import android.os.Bundle;
 
 import com.afwsamples.testdpc.DeviceAdminReceiver;
@@ -35,7 +33,6 @@ import com.afwsamples.testdpc.common.SelectAppFragment;
  * <li> {@link DevicePolicyManager#getAlwaysOnVpnPackage} </li>
  * </ul>
  */
-@TargetApi(Build.VERSION_CODES.N)
 public class AlwaysOnVpnFragment extends SelectAppFragment {
 
     private DevicePolicyManager mDpm;

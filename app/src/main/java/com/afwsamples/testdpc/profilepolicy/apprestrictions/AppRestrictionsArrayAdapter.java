@@ -16,7 +16,6 @@
 
 package com.afwsamples.testdpc.profilepolicy.apprestrictions;
 
-import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -304,17 +303,12 @@ public class AppRestrictionsArrayAdapter extends ArrayAdapter<RestrictionEntry>
                 return true;
             case RestrictionEntry.TYPE_BUNDLE:
             case RestrictionEntry.TYPE_BUNDLE_ARRAY:
-                updateBundleAndBundleArrayValueFromDialog(restrictionEntry);
+                if (restrictionEntry.getRestrictions() == null) {
+                    restrictionEntry.setRestrictions(new RestrictionEntry[0]);
+                }
                 return true;
         }
         return false;
-    }
-
-    @TargetApi(Build.VERSION_CODES.N)
-    private void updateBundleAndBundleArrayValueFromDialog(RestrictionEntry restrictionEntry) {
-        if (restrictionEntry.getRestrictions() == null) {
-            restrictionEntry.setRestrictions(new RestrictionEntry[0]);
-        }
     }
 
     private void updateValueVisibilities(View dialogView, int typeIndex) {

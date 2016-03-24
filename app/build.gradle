@@ -31,14 +31,6 @@ android {
         }
     }
 
-    lintOptions {
-        check 'NewApi'
-        abortOnError true
-        xmlReport false
-        textReport true
-        textOutput "stdout"
-    }
-
     signingConfigs {
         debug {
             storeFile file("$projectDir/debug.keystore")
@@ -87,14 +79,6 @@ android {
                }
            }
        }
-
-    // Enable lint checking in all build variants.
-    applicationVariants.all { variant ->
-        variant.outputs.each { output ->
-            def lintTask = tasks["lint${variant.name.capitalize()}"]
-            output.assemble.dependsOn lintTask
-        }
-    }
 }
 
 dependencies {

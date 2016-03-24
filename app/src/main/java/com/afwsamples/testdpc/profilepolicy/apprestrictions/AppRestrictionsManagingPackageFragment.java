@@ -16,10 +16,8 @@
 
 package com.afwsamples.testdpc.profilepolicy.apprestrictions;
 
-import android.annotation.TargetApi;
 import android.app.admin.DevicePolicyManager;
 import android.content.Context;
-import android.os.Build;
 import android.os.Bundle;
 
 import com.afwsamples.testdpc.DeviceAdminReceiver;
@@ -35,10 +33,10 @@ import java.lang.IllegalArgumentException;
  * 2) {@link DevicePolicyManager#getApplicationRestrictionsManagingPackage}
  * 3) {@link DevicePolicyManager#isCallerApplicationRestrictionsManagingPackage}
  */
-@TargetApi(Build.VERSION_CODES.N)
 public class AppRestrictionsManagingPackageFragment extends SelectAppFragment {
 
     private DevicePolicyManager mDpm;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -16,8 +16,6 @@
 
 package com.afwsamples.testdpc.profilepolicy;
 
-import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.FragmentManager;
@@ -192,7 +190,6 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
     }
 
     @Override
-    @SuppressLint("NewApi")
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         String key = preference.getKey();
         switch (key) {
@@ -226,7 +223,6 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
     }
 
     @Override
-    @TargetApi(Build.VERSION_CODES.N)
     public void onColorSelected(int colorValue, String id) {
         if (ORGANIZATION_COLOR_ID.equals(id)) {
             mDevicePolicyManager.setOrganizationColor(mAdminComponentName, colorValue);
@@ -235,7 +231,6 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.N)
     private void initializeOrganizationInfoPreferences() {
         mSetOrganizationColorPreference = findPreference(SET_ORGANIZATION_COLOR_KEY);
         mSetOrganizationNamePreference = findPreference(SET_ORGANIZATION_NAME_KEY);
@@ -275,7 +270,6 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
         reloadCrossProfileCallerIdDisableUi();
     }
 
-    @TargetApi(Build.VERSION_CODES.M)
     private void reloadBluetoothContactSharing() {
         if (!mDisableBluetoothContactSharingSwitchPreference.isEnabled()) {
             return;
@@ -298,7 +292,6 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
     }
 
 
-    @TargetApi(Build.VERSION_CODES.N)
     private void reloadCrossProfileContactsSearchDisableUi() {
         if (!mDisableCrossProfileContactsSearchSwitchPreference.isEnabled()) {
             return;
@@ -407,5 +400,10 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
                 findPreference(preference).setEnabled(false);
             }
         }
+    }
+
+    @Override
+    public Context getContext() {
+        return (Context) getActivity();
     }
 }

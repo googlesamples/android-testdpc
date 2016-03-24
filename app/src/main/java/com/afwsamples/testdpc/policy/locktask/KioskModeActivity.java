@@ -22,7 +22,6 @@ import static android.os.UserManager.DISALLOW_FACTORY_RESET;
 import static android.os.UserManager.DISALLOW_MOUNT_PHYSICAL_MEDIA;
 import static android.os.UserManager.DISALLOW_SAFE_BOOT;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.admin.DevicePolicyManager;
@@ -65,7 +64,6 @@ import java.util.List;
  * home buttons will bring the user back to the app list. The list also contains a row to exit
  * single app mode and finish this activity.
  */
-@TargetApi(Build.VERSION_CODES.M)
 public class KioskModeActivity extends Activity {
     private static final String TAG = "KioskModeActivity";
 

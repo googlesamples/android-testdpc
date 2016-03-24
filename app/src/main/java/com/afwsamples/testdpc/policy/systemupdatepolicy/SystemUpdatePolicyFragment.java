@@ -16,14 +16,12 @@
 
 package com.afwsamples.testdpc.policy.systemupdatepolicy;
 
-import android.annotation.TargetApi;
 import android.app.Fragment;
 import android.app.TimePickerDialog;
 import android.app.TimePickerDialog.OnTimeSetListener;
 import android.app.admin.DevicePolicyManager;
 import android.app.admin.SystemUpdatePolicy;
 import android.content.Context;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -46,7 +44,6 @@ import com.afwsamples.testdpc.R;
  * 2) {@link DevicePolicyManager#getSystemUpdatePolicy}
  * 3) {@link SystemUpdatePolicy}
  */
-@TargetApi(Build.VERSION_CODES.M)
 public class SystemUpdatePolicyFragment extends Fragment implements View.OnClickListener,
         RadioGroup.OnCheckedChangeListener {
 
