@@ -1852,8 +1852,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         if (forUnsuspending) {
             // Find all suspended packages using the GET_UNINSTALLED_PACKAGES flag.
             for (ApplicationInfo applicationInfo : getAllInstalledApplicationsSorted()) {
-                if (mDevicePolicyManager.getPackageSuspended(mAdminComponentName,
-                        applicationInfo.packageName)) {
+                if (isPackageSuspended(applicationInfo.packageName)) {
                     showApps.add(applicationInfo.packageName);
                 }
             }
@@ -1861,8 +1860,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             // Find all non-suspended apps with a launcher icon.
             for (ResolveInfo res : getAllLauncherIntentResolversSorted()) {
                 if (!showApps.contains(res.activityInfo.packageName)
-                        && !mDevicePolicyManager.getPackageSuspended(mAdminComponentName,
-                        res.activityInfo.packageName)) {
+                        && !isPackageSuspended(res.activityInfo.packageName)) {
                     showApps.add(res.activityInfo.packageName);
                 }
             }
@@ -1904,6 +1902,15 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                         }
                     })
                     .show();
+        }
+    }
+
+    private boolean isPackageSuspended(String packageName) {
+        try {
+            return mDevicePolicyManager.isPackageSuspended(mAdminComponentName, packageName);
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.e(TAG, "Unable check if package is suspended", e);
+            return false;
         }
     }
 
