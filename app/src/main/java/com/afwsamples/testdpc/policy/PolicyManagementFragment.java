@@ -1905,6 +1905,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         }
     }
 
+    @TargetApi(Build.VERSION_CODES.N)
     private boolean isPackageSuspended(String packageName) {
         try {
             return mDevicePolicyManager.isPackageSuspended(mAdminComponentName, packageName);
