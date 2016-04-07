@@ -224,7 +224,8 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
     @TargetApi(Build.VERSION_CODES.N)
     private void setupAll() {
         setup(Keys.LOCK_SCREEN_MESSAGE,
-                Util.isBeforeN() ? null : getDpm().getDeviceOwnerLockScreenInfo());
+                Util.isBeforeN() || !isDeviceOwner() ? null :
+                        getDpm().getDeviceOwnerLockScreenInfo());
         setup(Keys.MAX_FAILS_BEFORE_WIPE, getDpm().getMaximumFailedPasswordsForWipe(getAdmin()));
         setup(Keys.MAX_TIME_SCREEN_LOCK,
                 TimeUnit.MILLISECONDS.toSeconds(getDpm().getMaximumTimeToLock(getAdmin())));
@@ -277,14 +278,6 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
 
     private long parseLong(String value) throws NumberFormatException {
         return value.length() != 0 ? Long.parseLong(value) : 0L;
-    }
-
-    private boolean isDeviceOwner() {
-        return getDpm().isDeviceOwnerApp(getActivity().getPackageName());
-    }
-
-    private boolean isProfileOwner() {
-        return getDpm().isProfileOwnerApp(getActivity().getPackageName());
     }
 
     private void showToast(int titleId) {

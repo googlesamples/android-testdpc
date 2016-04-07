@@ -118,6 +118,7 @@ public abstract class ProfileOrParentFragment extends PreferenceFragment {
     private ComponentName mAdminComponent;
     private boolean mParentInstance;
     private boolean mProfileOwner;
+    private boolean mDeviceOwner;
 
     /**
      * @return a {@link DevicePolicyManager} instance for the profile this tab should affect.
@@ -145,6 +146,14 @@ public abstract class ProfileOrParentFragment extends PreferenceFragment {
         return mProfileOwner && !isParentProfileInstance();
     }
 
+    protected boolean isDeviceOwner() {
+        return mDeviceOwner;
+    }
+
+    protected boolean isProfileOwner() {
+        return mProfileOwner;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -161,6 +170,11 @@ public abstract class ProfileOrParentFragment extends PreferenceFragment {
         mDevicePolicyManager = (DevicePolicyManager)
                 getActivity().getSystemService(Context.DEVICE_POLICY_SERVICE);
 
+        // Store whether we are the profile owner for faster lookup.
+        mProfileOwner = mDevicePolicyManager.isProfileOwnerApp(getActivity().getPackageName());
+
+        mDeviceOwner = mDevicePolicyManager.isDeviceOwnerApp(getActivity().getPackageName());
+
         // Switch to parent profile if we are running on their behalf.
         if (mParentInstance) {
             mDevicePolicyManager = mDevicePolicyManager.getParentProfileInstance(mAdminComponent);
@@ -168,8 +182,5 @@ public abstract class ProfileOrParentFragment extends PreferenceFragment {
             final PreferenceManager pm = getPreferenceManager();
             pm.setSharedPreferencesName(pm.getSharedPreferencesName() + TAG_PARENT);
         }
-
-        // Store whether we are the profile owner for faster lookup.
-        mProfileOwner = mDevicePolicyManager.isProfileOwnerApp(getActivity().getPackageName());
     }
 }
