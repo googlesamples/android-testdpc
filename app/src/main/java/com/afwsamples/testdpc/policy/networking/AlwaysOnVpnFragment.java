@@ -19,6 +19,7 @@ package com.afwsamples.testdpc.policy.networking;
 import android.annotation.TargetApi;
 import android.app.admin.DevicePolicyManager;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -53,8 +54,14 @@ public class AlwaysOnVpnFragment extends SelectAppFragment {
     }
 
     @Override
-    protected void setSelectedPackage(String pkgName) {
-        mDpm.setAlwaysOnVpnPackage(DeviceAdminReceiver.getComponentName(getActivity()), pkgName);
+    protected void setSelectedPackage(String pkg) {
+        try {
+            mDpm.setAlwaysOnVpnPackage(DeviceAdminReceiver.getComponentName(getActivity()), pkg);
+        } catch (PackageManager.NameNotFoundException | UnsupportedOperationException e) {
+            if (pkg != null) {
+                clearSelectedPackage();
+            }
+        }
     }
 
     @Override
