@@ -19,6 +19,7 @@ package com.afwsamples.testdpc.profilepolicy.apprestrictions;
 import android.annotation.TargetApi;
 import android.app.admin.DevicePolicyManager;
 import android.content.Context;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -56,9 +57,7 @@ public class AppRestrictionsManagingPackageFragment extends SelectAppFragment {
         try {
             mDpm.setApplicationRestrictionsManagingPackage(
                     DeviceAdminReceiver.getComponentName(getActivity()), pkgName);
-            // TODO: Catch NameNotFoundException instead when NYC SDK
-            // setApplicationRestrictionsManagingPackage starts to throw NameNotFoundException
-        } catch (Exception nnpe) {
+        } catch (NameNotFoundException nnpe) {
             throw new IllegalArgumentException(nnpe);
         }
     }
