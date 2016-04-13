@@ -249,7 +249,9 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
 
         if (mSetOrganizationNamePreference.isEnabled()) {
             mSetOrganizationNamePreference.setOnPreferenceChangeListener(this);
-            final String name = mDevicePolicyManager.getOrganizationName(mAdminComponentName);
+            CharSequence organizationName = mDevicePolicyManager.getOrganizationName(
+                    mAdminComponentName);
+            final String name = organizationName != null ? organizationName.toString() : null;
             mSetOrganizationNamePreference.setSummary(name);
         }
     }
