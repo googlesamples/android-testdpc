@@ -16,13 +16,17 @@
 
 package com.afwsamples.testdpc.profilepolicy.apprestrictions;
 
+import android.annotation.TargetApi;
 import android.app.admin.DevicePolicyManager;
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.SelectAppFragment;
+
+import java.lang.IllegalArgumentException;
 
 /**
  * This fragment lets the user select an app that can manage application restrictions for the
@@ -31,10 +35,10 @@ import com.afwsamples.testdpc.common.SelectAppFragment;
  * 2) {@link DevicePolicyManager#getApplicationRestrictionsManagingPackage}
  * 3) {@link DevicePolicyManager#isCallerApplicationRestrictionsManagingPackage}
  */
+@TargetApi(Build.VERSION_CODES.N)
 public class AppRestrictionsManagingPackageFragment extends SelectAppFragment {
 
     private DevicePolicyManager mDpm;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,14 +53,19 @@ public class AppRestrictionsManagingPackageFragment extends SelectAppFragment {
 
     @Override
     protected void setSelectedPackage(String pkgName) {
-        mDpm.setApplicationRestrictionsManagingPackage(
-                DeviceAdminReceiver.getComponentName(getActivity()), pkgName);
+        try {
+            mDpm.setApplicationRestrictionsManagingPackage(
+                    DeviceAdminReceiver.getComponentName(getActivity()), pkgName);
+            // TODO: Catch NameNotFoundException instead when NYC SDK
+            // setApplicationRestrictionsManagingPackage starts to throw NameNotFoundException
+        } catch (Exception nnpe) {
+            throw new IllegalArgumentException(nnpe);
+        }
     }
 
     @Override
     protected void clearSelectedPackage() {
-        mDpm.setApplicationRestrictionsManagingPackage(
-                DeviceAdminReceiver.getComponentName(getActivity()), null);
+        setSelectedPackage(null);
     }
 
     @Override

@@ -19,6 +19,8 @@ package com.afwsamples.testdpc.policy;
 import static android.os.UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES;
 
 import android.accessibilityservice.AccessibilityServiceInfo;
+import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
@@ -35,6 +37,7 @@ import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.BatteryManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.UserHandle;
 import android.os.UserManager;
@@ -48,6 +51,7 @@ import android.provider.Settings;
 import android.security.KeyChain;
 import android.security.KeyChainAliasCallback;
 import android.support.v4.content.FileProvider;
+import android.telephony.TelephonyManager;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
@@ -234,6 +238,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     private static final String REQUEST_BUGREPORT_KEY = "request_bugreport";
     private static final String REQUEST_PROCESS_LOGS = "request_process_logs";
     private static final String RESET_PASSWORD_KEY = "reset_password";
+    private static final String LOCK_NOW_KEY = "lock_now";
     private static final String SET_ACCESSIBILITY_SERVICES_KEY = "set_accessibility_services";
     private static final String SET_ALWAYS_ON_VPN_KEY = "set_always_on_vpn";
     private static final String SET_AUTO_TIME_REQUIRED_KEY = "set_auto_time_required";
@@ -310,6 +315,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     private String mPackageName;
     private ComponentName mAdminComponentName;
     private UserManager mUserManager;
+    private TelephonyManager mTelephonyManager;
 
     private SwitchPreference mDisableCameraSwitchPreference;
     private SwitchPreference mDisableScreenCaptureSwitchPreference;
@@ -336,6 +342,8 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         mDevicePolicyManager = (DevicePolicyManager) getActivity().getSystemService(
                 Context.DEVICE_POLICY_SERVICE);
         mUserManager = (UserManager) getActivity().getSystemService(Context.USER_SERVICE);
+        mTelephonyManager = (TelephonyManager) getActivity()
+                .getSystemService(Context.TELEPHONY_SERVICE);
         mPackageManager = getActivity().getPackageManager();
         mPackageName = getActivity().getPackageName();
 
@@ -367,6 +375,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         findPreference(LOCK_SCREEN_POLICY_KEY).setOnPreferenceClickListener(this);
         findPreference(PASSWORD_CONSTRAINTS_KEY).setOnPreferenceClickListener(this);
         findPreference(RESET_PASSWORD_KEY).setOnPreferenceClickListener(this);
+        findPreference(LOCK_NOW_KEY).setOnPreferenceClickListener(this);
         findPreference(SYSTEM_UPDATE_POLICY_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_ALWAYS_ON_VPN_KEY).setOnPreferenceClickListener(this);
         findPreference(NETWORK_STATS_KEY).setOnPreferenceClickListener(this);
@@ -474,6 +483,9 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             case RESET_PASSWORD_KEY:
                 showResetPasswordPrompt();
                 return false;
+            case LOCK_NOW_KEY:
+                mDevicePolicyManager.lockNow();
+                return true;
             case START_LOCK_TASK:
                 getActivity().startLockTask();
                 return true;
@@ -491,14 +503,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 showRemoveDeviceOwnerPrompt();
                 return true;
             case REQUEST_BUGREPORT_KEY:
-                boolean startedSuccessfully = mDevicePolicyManager.requestBugreport(
-                        mAdminComponentName);
-                if (!startedSuccessfully) {
-                    Context context = getContext();
-                    Util.showNotification(context, R.string.bugreport_title,
-                            context.getString(R.string.bugreport_failure_throttled),
-                            Util.BUGREPORT_NOTIFICATION_ID);
-                }
+                requestBugReport();
                 return true;
             case REQUEST_PROCESS_LOGS:
                 showFragment(new ProcessLogsFragment());
@@ -610,21 +615,16 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 showFragment(new DelegatedCertInstallerFragment());
                 return true;
             case DISABLE_STATUS_BAR:
-                if (!mDevicePolicyManager.setStatusBarDisabled(mAdminComponentName, true)) {
-                    showToast("Unable to disable status bar when lock password is set.");
-                }
+                setStatusBarDisabled(true);
                 return true;
             case REENABLE_STATUS_BAR:
-                mDevicePolicyManager.setStatusBarDisabled(mAdminComponentName, false);
+                setStatusBarDisabled(false);
                 return true;
             case DISABLE_KEYGUARD:
-                if (!mDevicePolicyManager.setKeyguardDisabled(mAdminComponentName, true)) {
-                    // this should not happen
-                    showToast("Unable to disable keyguard");
-                }
+                setKeyGuardDisabled(true);
                 return true;
             case REENABLE_KEYGUARD:
-                mDevicePolicyManager.setKeyguardDisabled(mAdminComponentName, false);
+                setKeyGuardDisabled(false);
                 return true;
             case START_KIOSK_MODE:
                 showManageLockTaskListPrompt(R.string.kiosk_select_title,
@@ -672,6 +672,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     }
 
     @Override
+    @SuppressLint("NewApi")
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         String key = preference.getKey();
 
@@ -680,18 +681,16 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 preference.setSummary((String) newValue);
                 return true;
             case DISABLE_CAMERA_KEY:
-                mDevicePolicyManager.setCameraDisabled(mAdminComponentName, (Boolean) newValue);
+                setCameraDisabled((Boolean) newValue);
                 // Reload UI to verify the camera is enable / disable correctly.
                 reloadCameraDisableUi();
                 return true;
             case ENABLE_PROCESS_LOGGING:
-                mDevicePolicyManager.setDeviceLoggingEnabled(mAdminComponentName,
-                        (Boolean) newValue);
+                setSecurityLoggingEnabled((Boolean) newValue);
                 reloadEnableProcessLoggingUi();
                 return true;
             case DISABLE_SCREEN_CAPTURE_KEY:
-                mDevicePolicyManager.setScreenCaptureDisabled(mAdminComponentName,
-                        (Boolean) newValue);
+                setScreenCaptureDisabled((Boolean) newValue);
                 // Reload UI to verify that screen capture was enabled / disabled correctly.
                 reloadScreenCaptureDisableUi();
                 return true;
@@ -725,6 +724,58 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 return true;
         }
         return false;
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    private void setCameraDisabled(boolean disabled) {
+        mDevicePolicyManager.setCameraDisabled(mAdminComponentName, disabled);
+    }
+
+    @TargetApi(Build.VERSION_CODES.N)
+    private void setSecurityLoggingEnabled(boolean enabled) {
+        mDevicePolicyManager.setSecurityLoggingEnabled(mAdminComponentName, enabled);
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    private void setKeyGuardDisabled(boolean disabled) {
+        if (!mDevicePolicyManager.setKeyguardDisabled(mAdminComponentName, disabled)) {
+            // this should not happen
+            if (disabled) {
+                showToast(R.string.unable_disable_keyguard);
+            } else {
+                showToast(R.string.unable_enable_keyguard);
+            }
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private void setScreenCaptureDisabled(boolean disabled) {
+        mDevicePolicyManager.setScreenCaptureDisabled(mAdminComponentName, disabled);
+    }
+
+    private void setMasterVolumeMuted(boolean muted) {
+
+    }
+
+    @TargetApi(Build.VERSION_CODES.N)
+    private void requestBugReport() {
+        boolean startedSuccessfully = mDevicePolicyManager.requestBugreport(
+                mAdminComponentName);
+        if (!startedSuccessfully) {
+            Context context = getActivity();
+            Util.showNotification(context, R.string.bugreport_title,
+                    context.getString(R.string.bugreport_failure_throttled),
+                    Util.BUGREPORT_NOTIFICATION_ID);
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    private void setStatusBarDisabled(boolean disable) {
+        if (!mDevicePolicyManager.setStatusBarDisabled(mAdminComponentName, disable)) {
+            if (disable) {
+                showToast("Unable to disable status bar when lock password is set.");
+            }
+        }
     }
 
     /**
@@ -947,8 +998,9 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     /**
      * Shows a message box with the device wifi mac address.
      */
+    @TargetApi(Build.VERSION_CODES.N)
     private void showWifiMacAddress() {
-        final String macAddress = mDevicePolicyManager.getWifiMacAddress();
+        final String macAddress = mDevicePolicyManager.getWifiMacAddress(mAdminComponentName);
         final String message = macAddress != null ? macAddress
                 : getResources().getString(R.string.show_wifi_mac_address_not_available_msg);
         new AlertDialog.Builder(getActivity())
@@ -1059,6 +1111,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
      * Shows the default response for future runtime permission requests by applications, and lets
      * the user change the default value.
      */
+    @TargetApi(Build.VERSION_CODES.M)
     private void showSetPermissionPolicyDialog() {
         if (getActivity() == null || getActivity().isFinishing()) {
             return;
@@ -1181,6 +1234,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
      * Shows a prompt asking for the username of the new user and whether the setup wizard should
      * be skipped.
      */
+    @TargetApi(Build.VERSION_CODES.N)
     private void showCreateAndManageUserPrompt() {
         if (getActivity() == null || getActivity().isFinishing()) {
             return;
@@ -1308,26 +1362,30 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 .show();
     }
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void reloadCameraDisableUi() {
         boolean isCameraDisabled = mDevicePolicyManager.getCameraDisabled(mAdminComponentName);
         mDisableCameraSwitchPreference.setChecked(isCameraDisabled);
     }
 
+    @TargetApi(Build.VERSION_CODES.N)
     private void reloadEnableProcessLoggingUi() {
         if (mEnableProcessLoggingPreference.isEnabled()) {
-            boolean isProcessLoggingEnabled = mDevicePolicyManager.getDeviceLoggingEnabled(
+            boolean isProcessLoggingEnabled = mDevicePolicyManager.isSecurityLoggingEnabled(
                     mAdminComponentName);
             mEnableProcessLoggingPreference.setChecked(isProcessLoggingEnabled);
             findPreference(REQUEST_PROCESS_LOGS).setEnabled(isProcessLoggingEnabled);
         }
     }
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void reloadScreenCaptureDisableUi() {
         boolean isScreenCaptureDisabled = mDevicePolicyManager.getScreenCaptureDisabled(
                 mAdminComponentName);
         mDisableScreenCaptureSwitchPreference.setChecked(isScreenCaptureDisabled);
     }
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void reloadSetAutoTimeRequiredUi() {
         if (mDevicePolicyManager.isDeviceOwnerApp(mPackageName)) {
             boolean isAutoTimeRequired = mDevicePolicyManager.getAutoTimeRequired();
@@ -1335,6 +1393,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         }
     }
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void reloadMuteAudioUi() {
         final boolean isAudioMuted = mDevicePolicyManager.isMasterVolumeMuted(mAdminComponentName);
         mMuteAudioSwitchPreference.setChecked(isAudioMuted);
@@ -1533,6 +1592,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
      *
      * Once the alias is chosen and deleted, a {@link Toast} shows status- success or failure.
      */
+    @TargetApi(Build.VERSION_CODES.N)
     private void choosePrivateKeyForRemoval() {
         KeyChain.choosePrivateKeyAlias(getActivity(), new KeyChainAliasCallback() {
             @Override
@@ -1786,6 +1846,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     /**
      * Shows an alert dialog which displays a list of suspended/non-suspended apps.
      */
+    @TargetApi(Build.VERSION_CODES.N)
     private void showSuspendAppsPrompt(final boolean forUnsuspending) {
         final List<String> showApps = new ArrayList<>();
         if (forUnsuspending) {
@@ -2054,16 +2115,16 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         dialog.show(getFragmentManager(), TAG_WIFI_CONFIG_CREATION);
     }
 
+    @TargetApi(Build.VERSION_CODES.N)
     private void reboot() {
+        if (mTelephonyManager.getCallState() != TelephonyManager.CALL_STATE_IDLE) {
+            showToast(R.string.reboot_error_msg);
+            return;
+        }
         mDevicePolicyManager.reboot(mAdminComponentName);
     }
 
-     abstract class ManageLockTaskListCallback {
+    abstract class ManageLockTaskListCallback {
         public abstract void onPositiveButtonClicked(String[] lockTaskArray);
-    }
-
-    @Override
-    public Context getContext() {
-        return (Context) getActivity();
     }
 }

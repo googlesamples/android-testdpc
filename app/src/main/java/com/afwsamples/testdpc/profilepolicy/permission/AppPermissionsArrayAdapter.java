@@ -16,9 +16,11 @@
 
 package com.afwsamples.testdpc.profilepolicy.permission;
 
+import android.annotation.TargetApi;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,6 +37,7 @@ import java.util.List;
 /**
  * Renders a list app permissions with allow/deny radio buttons.
  */
+@TargetApi(Build.VERSION_CODES.M)
 public class AppPermissionsArrayAdapter
         extends ArrayAdapter<AppPermissionsArrayAdapter.AppPermission>
         implements RadioGroup.OnCheckedChangeListener {

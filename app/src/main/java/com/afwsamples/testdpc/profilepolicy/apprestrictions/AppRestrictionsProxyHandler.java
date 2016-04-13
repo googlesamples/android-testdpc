@@ -78,7 +78,7 @@ public class AppRestrictionsProxyHandler extends Handler {
             }
             case MSG_CAN_SET_APPLICATION_RESTRICTIONS: {
                 String callingPackage = mContext.getPackageManager().getNameForUid(msg.sendingUid);
-                String managingPackage = getApplicationRestrictionsManagingPackage();
+                String managingPackage = getApplicationRestrictionsManagingPackage(mContext);
                 Bundle responseBundle = new Bundle();
                 responseBundle.putBoolean(KEY_CAN_SET_APPLICATION_RESTRICTIONS,
                         callingPackage != null && callingPackage.equals(managingPackage));
@@ -121,17 +121,18 @@ public class AppRestrictionsProxyHandler extends Handler {
      * The supplied application restriction managing package must be installed when calling this
      * API, otherwise an {@link IllegalArgumentException} will be thrown.
      */
-    public void setApplicationRestrictionsManagingPackage(String packageName) {
+    public static void setApplicationRestrictionsManagingPackage(Context context,
+            String packageName) {
         if (packageName == null) {
-            PreferenceManager.getDefaultSharedPreferences(mContext).edit()
-                    .putStringSet(APPLICATION_RESTRICTIONS_MANAGING_PACKAGE_SIGNATURES_KEY, null);
-            PreferenceManager.getDefaultSharedPreferences(mContext).edit()
-                    .putString(APPLICATION_RESTRICTIONS_MANAGING_PACKAGE_KEY, null);
+            PreferenceManager.getDefaultSharedPreferences(context).edit()
+                    .putStringSet(APPLICATION_RESTRICTIONS_MANAGING_PACKAGE_SIGNATURES_KEY, null)
+                    .putString(APPLICATION_RESTRICTIONS_MANAGING_PACKAGE_KEY, null)
+                    .apply();
             return;
         }
         Signature[] signatures;
         try {
-            PackageManager packageManager = mContext.getPackageManager();
+            PackageManager packageManager = context.getPackageManager();
             PackageInfo packageInfo =
                     packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNATURES);
             if (packageInfo == null) {
@@ -152,19 +153,19 @@ public class AppRestrictionsProxyHandler extends Handler {
             signatureSet.add(signature.toCharsString());
         }
 
-        PreferenceManager.getDefaultSharedPreferences(mContext).edit()
+        PreferenceManager.getDefaultSharedPreferences(context).edit()
                 .putStringSet(APPLICATION_RESTRICTIONS_MANAGING_PACKAGE_SIGNATURES_KEY,
-                        signatureSet);
-        PreferenceManager.getDefaultSharedPreferences(mContext).edit()
-                .putString(APPLICATION_RESTRICTIONS_MANAGING_PACKAGE_KEY, packageName);
+                        signatureSet)
+                .putString(APPLICATION_RESTRICTIONS_MANAGING_PACKAGE_KEY, packageName)
+                .apply();
     }
 
     /**
      * Called by a profile owner or device owner to retrieve the application restrictions managing
      * package for the current user, or {@code null} if none is set.
      */
-    public String getApplicationRestrictionsManagingPackage(){
-        return PreferenceManager.getDefaultSharedPreferences(mContext)
+    public static String getApplicationRestrictionsManagingPackage(Context context){
+        return PreferenceManager.getDefaultSharedPreferences(context)
                 .getString(APPLICATION_RESTRICTIONS_MANAGING_PACKAGE_KEY, null);
     }
 
@@ -194,7 +195,7 @@ public class AppRestrictionsProxyHandler extends Handler {
 
     /**
      * Checks that the message sent through the bound service was sent by the same package as
-     * declared in {@link #setApplicationRestrictionsManagingPackage(String)}, and
+     * declared in {@link #setApplicationRestrictionsManagingPackage(Context, String)}, and
      * that its signature has not changed since it was set.
      *
      * @param callerUid the UID of the caller
@@ -204,7 +205,7 @@ public class AppRestrictionsProxyHandler extends Handler {
      * set.
      */
     private void ensureCallerSignature(int callerUid) {
-        String appRestrictionsManagingPackage = getApplicationRestrictionsManagingPackage();
+        String appRestrictionsManagingPackage = getApplicationRestrictionsManagingPackage(mContext);
         if (appRestrictionsManagingPackage == null) {
             throw new SecurityException("Caller is not app restrictions managing package");
         }

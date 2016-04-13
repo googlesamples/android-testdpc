@@ -93,7 +93,10 @@
         owner?
     </string>
     <string name="device_owner_removed">This app is no longer a device owner.</string>
+
+    <!-- Strings for device reboot -->
     <string name="reboot">Reboot device</string>
+    <string name="reboot_error_msg">Cannot reboot device during an ongoing call.</string>
 
     <!-- Strings for cross-profile intent filters -->
     <string name="cross_profile_intents">Cross-profile intents</string>
@@ -548,6 +551,7 @@
     <string name="password_expired_title">Password has expired</string>
     <string name="password_expired_by_self">According to a policy set by TestDPC.</string>
     <string name="password_expired_by_others">According to a policy set by another admin.</string>
+    <string name="password_history_length">Password history length</string>
 
     <plurals name="password_failed_attempts_title">
         <item quantity="one">Password entered incorrectly %d time</item>
@@ -566,6 +570,8 @@
     <string name="require_password_on_boot">Require password to start user</string>
     <string name="password_reset_success">Password has been reset</string>
     <string name="password_reset_failed">Failed to reset password</string>
+
+    <string name="lock_now">Lock now</string>
 
     <!-- Strings for managing Settings -->
     <string name="settings_management_title">Settings management</string>
@@ -606,4 +612,6 @@
     <string name="update_color">Update</string>
     <string name="not_valid_color">Not a valid color</string>
     <string name="color_format">#AARRGGBB</string>
+    <string name="unable_disable_keyguard">Unable to disable keyguard</string>
+    <string name="unable_enable_keyguard">Unable to enable keyguard</string>
 </resources>

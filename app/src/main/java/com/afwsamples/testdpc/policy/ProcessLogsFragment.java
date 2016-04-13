@@ -1,11 +1,13 @@
 package com.afwsamples.testdpc.policy;
 
+import android.annotation.TargetApi;
 import android.app.ListFragment;
 import android.app.admin.DevicePolicyManager;
-import android.auditing.SecurityLog;
-import android.auditing.SecurityLog.SecurityEvent;
+import android.app.admin.SecurityLog;
+import android.app.admin.SecurityLog.SecurityEvent;
 import android.content.ComponentName;
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ArrayAdapter;
@@ -20,6 +22,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+@TargetApi(Build.VERSION_CODES.N)
 public class ProcessLogsFragment extends ListFragment {
 
     private static final String TAG = "ProcessLogsFragment";
@@ -45,7 +48,7 @@ public class ProcessLogsFragment extends ListFragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mAdapter.add(getString(R.string.process_logs_retrieved_message, new Date().toString()));
-        processEvents(mDevicePolicyManager.retrieveDeviceLogs(mAdminName));
+        processEvents(mDevicePolicyManager.retrieveSecurityLogs(mAdminName));
     }
 
     @Override

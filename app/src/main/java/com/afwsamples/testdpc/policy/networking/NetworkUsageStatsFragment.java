@@ -16,6 +16,7 @@
 
 package com.afwsamples.testdpc.policy.networking;
 
+import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.ListFragment;
@@ -28,6 +29,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.text.format.Formatter;
@@ -56,6 +58,7 @@ import java.util.List;
 /**
  * Fragment for checking network usage of apps using {@link android.app.usage.NetworkStatsManager}
  */
+@TargetApi(Build.VERSION_CODES.M)
 public class NetworkUsageStatsFragment extends ListFragment implements View.OnClickListener,
         AdapterView.OnItemSelectedListener {
 
