@@ -40,6 +40,7 @@ public class AvailableComponentsInfoArrayAdapter extends ToggleComponentsArrayAd
             List<ResolveInfo> resolveInfoList, List<String> permittedPackageNames) {
         super(context, R.id.pkg_name, resolveInfoList);
         mPermittedPackageNames = permittedPackageNames;
+        setIsComponentEnabledList(createIsComponentEnabledList());
     }
 
     /**
@@ -96,12 +97,13 @@ public class AvailableComponentsInfoArrayAdapter extends ToggleComponentsArrayAd
         }
     }
 
-    @Override
-    protected void initIsComponentEnabledList() {
+    private List<Boolean> createIsComponentEnabledList() {
+        List<Boolean> isComponentEnabledList = new ArrayList<>();
         int size = getCount();
         for (int i = 0; i < size; i++) {
-            mIsComponentCheckedList.add(isComponentEnabled(getItem(i)));
+            isComponentEnabledList.add(isComponentEnabled(getItem(i)));
         }
+        return isComponentEnabledList;
     }
 
     @Override
