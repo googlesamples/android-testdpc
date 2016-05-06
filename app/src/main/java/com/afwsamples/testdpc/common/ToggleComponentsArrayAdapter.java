@@ -36,6 +36,7 @@ import com.afwsamples.testdpc.R;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -57,6 +58,7 @@ public abstract class ToggleComponentsArrayAdapter extends ArrayAdapter<ResolveI
                 Context.DEVICE_POLICY_SERVICE);
         // Init mIsComponentCheckedList
         mIsComponentCheckedList = new ArrayList<>(Arrays.asList(new Boolean[objects.size()]));
+        Collections.fill(mIsComponentCheckedList, Boolean.FALSE);
     }
 
     /**
