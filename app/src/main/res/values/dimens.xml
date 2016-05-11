@@ -52,4 +52,7 @@
     <dimen name="params_padding_top_bottom">8dp</dimen>
     <dimen name="params_preview_logo_max_height">24dp</dimen>
     <dimen name="params_preview_logo_max_width">48dp</dimen>
+
+    <!-- Dimens used for key value pair dialog -->
+    <dimen name="key_value_pair_dialog_padding">8dp</dimen>
 </resources>

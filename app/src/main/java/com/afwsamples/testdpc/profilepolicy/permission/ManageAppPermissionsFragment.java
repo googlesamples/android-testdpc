@@ -107,6 +107,18 @@ public class ManageAppPermissionsFragment extends ManageAppFragment {
         }
     }
 
+    @Override
+    protected void resetConfig() {}
+
+    @Override
+    protected void saveConfig() {}
+
+    @Override
+    protected void addNewRow() {}
+
+    @Override
+    protected void loadDefault() {}
+
     private void loadAppPermissionsList(
             List<AppPermissionsArrayAdapter.AppPermission> permissions) {
         if (permissions != null) {

@@ -16,6 +16,7 @@
 
 package com.afwsamples.testdpc.policy;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.ResolveInfo;
@@ -86,6 +87,7 @@ public class AvailableComponentsInfoArrayAdapter extends ToggleComponentsArrayAd
     }
 
     @Override
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP_MR1)
     protected Drawable getApplicationIcon(ApplicationInfo applicationInfo) {
         // Input methods refer to the packages in primary profile. so, we
         // need to show them unbadged.

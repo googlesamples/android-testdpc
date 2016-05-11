@@ -26,6 +26,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.afwsamples.testdpc.R;
 
@@ -37,10 +38,11 @@ import java.util.List;
  * This fragment shows a spinner of all allowed apps and a list of properties associated with the
  * currently selected application.
  */
-public abstract class ManageAppFragment extends Fragment {
+public abstract class ManageAppFragment extends Fragment implements View.OnClickListener {
 
     protected PackageManager mPackageManager;
     protected Spinner mManagedAppsSpinner;
+    protected TextView mHeaderView;
     protected ListView mAppListView;
 
     @Override
@@ -65,6 +67,7 @@ public abstract class ManageAppFragment extends Fragment {
                 new ApplicationInfo.DisplayNameComparator(mPackageManager));
         AppInfoSpinnerAdapter appInfoSpinnerAdapter = new AppInfoSpinnerAdapter(getActivity(),
                 R.layout.app_row, R.id.pkg_name, managedAppList);
+        mHeaderView = (TextView) view.findViewById(R.id.header_text);
         mManagedAppsSpinner = (Spinner) view.findViewById(R.id.managed_apps_list);
         mManagedAppsSpinner.setAdapter(appInfoSpinnerAdapter);
         mManagedAppsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -79,6 +82,10 @@ public abstract class ManageAppFragment extends Fragment {
             }
         });
         mAppListView = (ListView) view.findViewById(R.id.app_list_view);
+        view.findViewById(R.id.save_app).setOnClickListener(this);
+        view.findViewById(R.id.reset_app).setOnClickListener(this);
+        view.findViewById(R.id.add_new_row).setOnClickListener(this);
+        view.findViewById(R.id.load_default_button).setOnClickListener(this);
         loadData(((ApplicationInfo) mManagedAppsSpinner.getSelectedItem()).packageName);
         return view;
     }
@@ -101,4 +108,25 @@ public abstract class ManageAppFragment extends Fragment {
      */
     protected abstract void loadData(String pkgName);
 
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.reset_app:
+                resetConfig();
+                break;
+            case R.id.save_app:
+                saveConfig();
+                break;
+            case R.id.add_new_row:
+                addNewRow();
+                break;
+            case R.id.load_default_button:
+                loadDefault();
+        }
+    }
+
+    protected abstract void resetConfig();
+    protected abstract void saveConfig();
+    protected abstract void addNewRow();
+    protected abstract void loadDefault();
 }

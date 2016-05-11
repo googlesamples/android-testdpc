@@ -16,6 +16,7 @@
 
 package com.afwsamples.testdpc.cosu;
 
+import android.annotation.TargetApi;
 import android.app.DownloadManager;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
@@ -151,11 +152,16 @@ import java.util.Set;
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            dpm.setStatusBarDisabled(admin, mDisableStatusBar);
-            dpm.setKeyguardDisabled(admin, mDisableKeyguard);
+            disableKeyGuardAndStatusBar(dpm, admin);
         }
         dpm.setScreenCaptureDisabled(admin, mDisableScreenCapture);
         dpm.setCameraDisabled(admin, mDisableCamera);
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    private void disableKeyGuardAndStatusBar(DevicePolicyManager dpm, ComponentName admin) {
+        dpm.setStatusBarDisabled(admin, mDisableStatusBar);
+        dpm.setKeyguardDisabled(admin, mDisableKeyguard);
     }
 
     public void initiateDownloadAndInstall(Handler handler) {
