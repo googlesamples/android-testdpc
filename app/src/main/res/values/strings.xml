@@ -504,7 +504,6 @@
 
     <!-- Keyguard features -->
     <string name="keyguard_features">Keyguard features</string>
-    <string name="keyguard_disable_widgets">Disable widgets</string>
     <string name="keyguard_disable_secure_camera">Disable secure camera</string>
     <string name="keyguard_disable_secure_notifications">Disable secure notifications</string>
     <string name="keyguard_disable_unredacted_notifications">Disable unredacted notifications</string>

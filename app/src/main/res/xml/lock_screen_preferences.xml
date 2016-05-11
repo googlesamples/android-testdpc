@@ -58,9 +58,6 @@
             android:key="keyguard_features"
             android:title="@string/keyguard_features">
         <SwitchPreference
-                android:key="keyguard_disable_widgets"
-                android:title="@string/keyguard_disable_widgets"/>
-        <SwitchPreference
                 android:key="keyguard_disable_secure_camera"
                 android:title="@string/keyguard_disable_secure_camera"/>
         <SwitchPreference
