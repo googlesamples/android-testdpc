@@ -157,8 +157,8 @@
     <string name="disable_cross_profile_contacts_search">Disable cross-profile contacts search</string>
 
     <!-- Strings for wifi management -->
-    <string name="wifi_management_title">Wifi management</string>
-    <string name="create_wifi_configuration">Create wifi configuration</string>
+    <string name="wifi_management_title">WI-FI management</string>
+    <string name="create_wifi_configuration">Create WI-FI configuration</string>
     <string name="add_network">Add network</string>
     <string name="wifi_ssid">Network name</string>
     <string name="wifi_ssid_hint">Enter the SSID</string>
@@ -177,14 +177,14 @@
     <string name="wifi_unchanged">(unchanged)</string>
     <string name="wifi_save">Save</string>
     <string name="wifi_cancel">Cancel</string>
-    <string name="wifi_config_success">Wifi configuration saved.</string>
-    <string name="wifi_config_fail">Failed to save the wifi configuration.</string>
-    <string name="enable_wifi_config_lockdown">DO created WiFi configs are modifiable only by DO.</string>
-    <string name="modify_wifi_configuration">Modify wifi configuration</string>
+    <string name="wifi_config_success">WI-FI configuration saved.</string>
+    <string name="wifi_config_fail">Failed to save the WI-FI configuration.</string>
+    <string name="enable_wifi_config_lockdown">DO created WI-FI configs are modifiable only by DO.</string>
+    <string name="modify_wifi_configuration">Modify WI-FI configuration</string>
     <string name="show_wifi_mac_address">Show Wi-Fi MAC address</string>
     <string name="show_wifi_mac_address_title">Wi-Fi MAC address</string>
     <string name="show_wifi_mac_address_not_available_msg">Wi-Fi MAC is not available</string>
-    <string name="wifi_configs_header">Saved WiFi configurations</string>
+    <string name="wifi_configs_header">Saved WI-FI configurations</string>
     <string name="wifi_update_config_button">Update selected</string>
     <string name="wifi_remove_config_button">Remove selected</string>
     <string name="wifi_modification_error_title">Error modifying config</string>
