@@ -355,6 +355,8 @@
     <string name="value_not_valid">Restriction value is not valid</string>
     <string name="restriction_save_label">Save</string>
     <string name="restriction_cancel_label">Cancel</string>
+    <!-- Text shown in configure button when bundle/bundle array is chosen -->
+    <string name="configure">Configure</string>
 
     <!-- Remote bugreport -->
     <string name="bugreport_title">Bugreport</string>
