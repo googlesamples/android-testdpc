@@ -28,17 +28,17 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.Toast;
 
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.EditDeleteArrayAdapter;
-import com.afwsamples.testdpc.common.keyvaluepair.KeyValuePairDialogFragment;
 import com.afwsamples.testdpc.common.ManageAppFragment;
+import com.afwsamples.testdpc.common.keyvaluepair.KeyValuePairDialogFragment;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -53,7 +53,7 @@ import static com.afwsamples.testdpc.common.keyvaluepair.KeyValuePairDialogFragm
  */
 public class ManageAppRestrictionsFragment extends ManageAppFragment
         implements EditDeleteArrayAdapter.OnEditButtonClickListener<RestrictionEntry> {
-    private List<RestrictionEntry> mRestrictionEntries;
+    private List<RestrictionEntry> mRestrictionEntries = new ArrayList<>();
     private List<RestrictionEntry> mLastRestrictionEntries;
     private DevicePolicyManager mDevicePolicyManager;
     private RestrictionsManager mRestrictionsManager;
@@ -101,11 +101,8 @@ public class ManageAppRestrictionsFragment extends ManageAppFragment
 
     protected void loadAppRestrictionsList(RestrictionEntry[] restrictionEntries) {
         if (restrictionEntries != null) {
-            mRestrictionEntries =
-                    new ArrayList<>(Arrays.asList(restrictionEntries));
-            mAppRestrictionsArrayAdapter = new RestrictionEntryEditDeleteArrayAdapter(getActivity(),
-                    mRestrictionEntries, this, null);
-            mAppListView.setAdapter(mAppRestrictionsArrayAdapter);
+            mAppRestrictionsArrayAdapter.clear();
+            mAppRestrictionsArrayAdapter.addAll(Arrays.asList(restrictionEntries));
         }
     }
 
@@ -317,12 +314,20 @@ public class ManageAppRestrictionsFragment extends ManageAppFragment
     }
 
     @Override
-    protected void loadData(String pkgName) {
+    protected BaseAdapter createListAdapter() {
+        mAppRestrictionsArrayAdapter = new RestrictionEntryEditDeleteArrayAdapter(getActivity(),
+                mRestrictionEntries, this, null);
+        return mAppRestrictionsArrayAdapter;
+    }
+
+    @Override
+    protected void onSpinnerItemSelected(ApplicationInfo appInfo) {
+        String pkgName = appInfo.packageName;
         if (!TextUtils.isEmpty(pkgName)) {
             Bundle bundle = mDevicePolicyManager.getApplicationRestrictions(
                     DeviceAdminReceiver.getComponentName(getActivity()), pkgName);
             loadAppRestrictionsList(convertBundleToRestrictions(bundle));
-            mLastRestrictionEntries = mRestrictionEntries;
+            mLastRestrictionEntries = new ArrayList<>(mRestrictionEntries);
         }
     }
 

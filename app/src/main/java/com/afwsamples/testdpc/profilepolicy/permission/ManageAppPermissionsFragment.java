@@ -19,6 +19,7 @@ package com.afwsamples.testdpc.profilepolicy.permission;
 import android.annotation.TargetApi;
 import android.app.admin.DevicePolicyManager;
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PermissionInfo;
@@ -29,9 +30,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
+import com.afwsamples.testdpc.common.BaseManageComponentFragment;
 import com.afwsamples.testdpc.common.ManageAppFragment;
 
 import java.util.ArrayList;
@@ -46,6 +49,7 @@ public class ManageAppPermissionsFragment extends ManageAppFragment {
     private static final String TAG = "ManageAppPermissions";
 
     private DevicePolicyManager mDpm;
+    private List<AppPermissionsArrayAdapter.AppPermission> mAppPermissions = new ArrayList<>();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -64,7 +68,8 @@ public class ManageAppPermissionsFragment extends ManageAppFragment {
     }
 
     @Override
-    protected void loadData(String pkgName) {
+    protected void onSpinnerItemSelected(ApplicationInfo appInfo) {
+        String pkgName = appInfo.packageName;
         if (!TextUtils.isEmpty(pkgName)) {
             List<String> permissions = new ArrayList<String>();
 
@@ -119,13 +124,17 @@ public class ManageAppPermissionsFragment extends ManageAppFragment {
     @Override
     protected void loadDefault() {}
 
+    @Override
+    protected BaseAdapter createListAdapter() {
+        return new AppPermissionsArrayAdapter(getActivity(), 0, mAppPermissions);
+    }
+
     private void loadAppPermissionsList(
             List<AppPermissionsArrayAdapter.AppPermission> permissions) {
         if (permissions != null) {
-            AppPermissionsArrayAdapter appPermissionsArrayAdapter =
-                    new AppPermissionsArrayAdapter(getActivity(), 0, permissions);
-            mAppListView.setAdapter(appPermissionsArrayAdapter);
-            appPermissionsArrayAdapter.notifyDataSetChanged();
+            mAppPermissions.clear();
+            mAppPermissions.addAll(permissions);
+            mAdapter.notifyDataSetChanged();
         }
     }
 }

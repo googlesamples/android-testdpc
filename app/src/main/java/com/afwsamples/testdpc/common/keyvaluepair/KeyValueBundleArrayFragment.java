@@ -19,10 +19,12 @@ package com.afwsamples.testdpc.common.keyvaluepair;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.EditDeleteArrayAdapter;
@@ -45,7 +47,6 @@ import static com.afwsamples.testdpc.common.keyvaluepair.KeyValuePairDialogFragm
 
 public class KeyValueBundleArrayFragment extends ManageAppFragment implements
         OnEditButtonClickListener<Bundle>, OnDeleteButtonClickListener<Bundle> {
-    private BundleEditDeleteArrayAdapter mAdapter;
     /**
      * Key of the editing bundle array.
      */
@@ -59,6 +60,7 @@ public class KeyValueBundleArrayFragment extends ManageAppFragment implements
      */
     private List<Bundle> mInitialBundleList;
     private String mAppName;
+    private BundleEditDeleteArrayAdapter mAdapter;
 
     private static final int RESULT_CODE_EDIT_DIALOG = 1;
 
@@ -99,8 +101,6 @@ public class KeyValueBundleArrayFragment extends ManageAppFragment implements
             Bundle savedInstanceState) {
         View view = super.onCreateView(layoutInflater, container, savedInstanceState);
         mManagedAppsSpinner.setVisibility(View.GONE);
-        mAdapter = new BundleEditDeleteArrayAdapter(getActivity(), mBundleList, this, this);
-        mAppListView.setAdapter(mAdapter);
         // header text
         mHeaderView.setVisibility(View.VISIBLE);
         mHeaderView.setText(getActivity().getString(
@@ -109,7 +109,7 @@ public class KeyValueBundleArrayFragment extends ManageAppFragment implements
     }
 
     @Override
-    protected void loadData(String pkgName) {}
+    protected void onSpinnerItemSelected(ApplicationInfo appInfo) {}
 
     @Override
     protected void resetConfig() {
@@ -136,6 +136,12 @@ public class KeyValueBundleArrayFragment extends ManageAppFragment implements
 
     @Override
     protected void loadDefault() {}
+
+    @Override
+    protected BaseAdapter createListAdapter() {
+        mAdapter = new BundleEditDeleteArrayAdapter(getActivity(), mBundleList, this, this);
+        return mAdapter;
+    }
 
     private void showEditDialog(final Bundle bundle) {
         int type = DialogType.BUNDLE_TYPE;

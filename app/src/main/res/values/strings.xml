@@ -512,6 +512,10 @@
     <string name="keyguard_disable_trust_agents">Disable trust agents</string>
     <string name="keyguard_disable_fingerprint">Disable fingerprint</string>
 
+    <!-- Trust agent features -->
+    <string name="trust_agent_features">Trust agent features</string>
+    <string name="set_trust_agent_config">Set trust agent config</string>
+
     <!-- Strings for screen lock policies -->
     <string name="lock_category">Lock screen</string>
 
@@ -573,6 +577,9 @@
     <string name="require_password_on_boot">Require password to start user</string>
     <string name="password_reset_success">Password has been reset</string>
     <string name="password_reset_failed">Failed to reset password</string>
+
+    <!-- Strings for trust agent -->
+    <string name="saved_trust_agent_config">Saved trust agent configuration</string>
 
     <string name="lock_now">Lock now</string>
 

@@ -73,4 +73,11 @@
                 android:key="keyguard_disable_fingerprint"
                 android:title="@string/keyguard_disable_fingerprint"/>
     </PreferenceCategory>
+
+    <PreferenceCategory
+            android:title="@string/trust_agent_features">
+        <Preference
+                android:key="key_set_trust_agent_config"
+                android:title="@string/set_trust_agent_config"/>
+    </PreferenceCategory>
 </PreferenceScreen>

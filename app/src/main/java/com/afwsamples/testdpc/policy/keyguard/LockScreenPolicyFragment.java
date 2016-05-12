@@ -17,12 +17,14 @@
 package com.afwsamples.testdpc.policy.keyguard;
 
 import android.annotation.TargetApi;
+import android.app.Fragment;
 import android.app.admin.DevicePolicyManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.TwoStatePreference;
+import android.support.v4.os.BuildCompat;
 import android.util.ArrayMap;
 import android.widget.Toast;
 
@@ -36,12 +38,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import static com.afwsamples.testdpc.policy.keyguard.SetTrustAgentConfigFragment.Type;
+
 /**
  * This fragment provides functionalities to set policies on keyguard interaction as a profile
  * or device owner.
  */
 public final class LockScreenPolicyFragment extends ProfileOrParentFragment implements
-        Preference.OnPreferenceChangeListener {
+        Preference.OnPreferenceChangeListener, Preference.OnPreferenceClickListener {
 
     public static class Container extends ProfileOrParentFragment.Container {
         @Override
@@ -68,6 +72,8 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
         static final String KEYGUARD_DISABLE_TRUST_AGENTS = "keyguard_disable_trust_agents";
         static final String KEYGUARD_DISABLE_UNREDACTED_NOTIFICATIONS
                 = "keyguard_disable_unredacted_notifications";
+        static final String KEYGUARD_DISABLE_WIDGETS = "keyguard_disable_widgets";
+        static final String SET_TRUST_AGENT_CONFIG = "key_set_trust_agent_config";
 
         static final Set<String> NOT_APPLICABLE_TO_PARENT
                 = new HashSet<>(Arrays.asList(new String[] {
@@ -181,6 +187,30 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
         return true;
     }
 
+    @Override
+    public boolean onPreferenceClick(Preference preference) {
+        switch (preference.getKey()) {
+            case Keys.SET_TRUST_AGENT_CONFIG:
+                showSetTrustAgentFragment();
+                return true;
+        }
+        return false;
+    }
+
+    private void showSetTrustAgentFragment() {
+        int type = isParentProfileInstance() ? Type.PARENT : Type.SELF;
+        SetTrustAgentConfigFragment fragment = SetTrustAgentConfigFragment.newInstance(type);
+        Fragment containerFragment = getParentFragment();
+        if (containerFragment == null) {
+            containerFragment = this;
+        }
+        containerFragment.getFragmentManager().beginTransaction()
+                .addToBackStack(SetTrustAgentConfigFragment.class.getName())
+                .hide(containerFragment)
+                .add(R.id.container, fragment)
+                .commit();
+    }
+
     @TargetApi(Build.VERSION_CODES.N)
     private void setLockScreenMessage(Preference preference, String newValue) {
         getDpm().setDeviceOwnerLockScreenInfo(getAdmin(), newValue);
@@ -223,6 +253,7 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
         setup(Keys.MAX_FAILS_BEFORE_WIPE, getDpm().getMaximumFailedPasswordsForWipe(getAdmin()));
         setup(Keys.MAX_TIME_SCREEN_LOCK,
                 TimeUnit.MILLISECONDS.toSeconds(getDpm().getMaximumTimeToLock(getAdmin())));
+        setup(Keys.SET_TRUST_AGENT_CONFIG, null);
     }
 
     /**
@@ -233,6 +264,11 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
         if (!pref.isEnabled()) {
             return;
         }
+        // We do not allow user to add trust agent config in pre-N devices in managed profile.
+        if (!BuildCompat.isAtLeastN()) {
+            Keys.NOT_APPLICABLE_TO_PROFILE.add(Keys.SET_TRUST_AGENT_CONFIG);
+        }
+
         // If the preference is not applicable, just hide it instead.
         if ((Keys.NOT_APPLICABLE_TO_PARENT.contains(key) && isParentProfileInstance())
                 || (Keys.NOT_APPLICABLE_TO_PROFILE.contains(key) && isManagedProfileInstance())
@@ -256,6 +292,7 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
 
         // Start listening for change events.
         pref.setOnPreferenceChangeListener(this);
+        pref.setOnPreferenceClickListener(this);
     }
 
     private void disableIncompatibleManagementOptionsInCurrentProfile() {

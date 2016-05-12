@@ -19,11 +19,13 @@ package com.afwsamples.testdpc.common.keyvaluepair;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.EditDeleteArrayAdapter;
@@ -109,8 +111,6 @@ public class KeyValueBundleFragment extends ManageAppFragment implements
             Bundle savedInstanceState) {
         View view = super.onCreateView(layoutInflater, container, savedInstanceState);
         mManagedAppsSpinner.setVisibility(View.GONE);
-        mAdapter = new StringEditDeleteArrayAdapter(getActivity(), mKeyList, this, this);
-        mAppListView.setAdapter(mAdapter);
         // header text
         mHeaderView.setVisibility(View.VISIBLE);
         mHeaderView.setText(getActivity().getString(R.string.app_restrictions_info, mAppName,
@@ -119,7 +119,13 @@ public class KeyValueBundleFragment extends ManageAppFragment implements
     }
 
     @Override
-    protected void loadData(String pkgName) {}
+    protected BaseAdapter createListAdapter() {
+        mAdapter = new StringEditDeleteArrayAdapter(getActivity(), mKeyList, this, this);
+        return mAdapter;
+    }
+
+    @Override
+    protected void onSpinnerItemSelected(ApplicationInfo appInfo) {}
 
     @Override
     protected void resetConfig() {
