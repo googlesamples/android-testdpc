@@ -194,8 +194,7 @@
     <string name="apps_management_title">Apps management</string>
     <string name="enable_system_apps_title">Enable system apps</string>
     <string name="enable_system_apps_by_package_name">Enable a system app by package name</string>
-    <string name="enable_system_apps_by_package_name_hints">Enter a system app package name.
-    </string>
+    <string name="enable_system_apps_by_package_name_hints">Package name</string>
     <string name="enable_system_apps_by_package_name_success_msg">%s is enabled.</string>
     <string name="enable_system_apps_by_package_name_error">Package not found.</string>
     <string name="enable_system_apps_by_intent">Enable a system app by intent</string>
