@@ -21,12 +21,14 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.ClipData;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PersistableBundle;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -93,7 +95,11 @@ public class SetupManagementFragment extends Fragment implements
             mCurrentColor = getResources().getColor(R.color.teal);
         }
 
-        View view = inflater.inflate(R.layout.setup_management_fragment, container, false);
+        // Use setupwizard theme
+        final Context contextThemeWrapper =
+                new ContextThemeWrapper(getActivity(), R.style.SetupTheme);
+        LayoutInflater themeInflater = inflater.cloneInContext(contextThemeWrapper);
+        View view = themeInflater.inflate(R.layout.setup_management_fragment, container, false);
         SetupWizardLayout layout = (SetupWizardLayout) view.findViewById(R.id.setup_wizard_layout);
         NavigationBar navigationBar = layout.getNavigationBar();
         navigationBar.setNavigationBarListener(this);

@@ -15,9 +15,11 @@
  limitations under the License.
 -->
 <resources>
-    <color name="teal">#009587</color>
+    <color name="teal">#009688</color>
     <color name="text_black">#333333</color>
     <color name="red">#ff0000</color>
     <color name="green">#00ff00</color>
     <color name="blue">#0000ff</color>
+    <color name="dark_teal">#00796B</color>
+    <color name="pink">#FF4081</color>
 </resources>
