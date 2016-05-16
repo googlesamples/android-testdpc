@@ -302,7 +302,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
      * Preferences that are allowed only in NYC+ if it is profile owner. This does not restrict
      * device owner.
      */
-    private static String[] MANAGED_PROFILE_NYC_PLUS_PREFERENCES = {
+    private static String[] PROFILE_OWNER_NYC_PLUS_PREFERENCES = {
             RESET_PASSWORD_KEY
     };
 
@@ -1075,21 +1075,24 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 findPreference(preference).setEnabled(false);
             }
             if (Util.isBeforeN()) {
-                for (String preference : MANAGED_PROFILE_NYC_PLUS_PREFERENCES) {
+                for (String preference : PROFILE_OWNER_NYC_PLUS_PREFERENCES) {
                     findPreference(preference).setEnabled(false);
                 }
             }
-            deviceOwnerStatusStringId = R.string.this_is_a_managed_profile_owner;
+            deviceOwnerStatusStringId = R.string.this_is_a_profile_owner;
         } else if (isDeviceOwner) {
             // If it's a device owner and running in the primary profile.
             deviceOwnerStatusStringId = R.string.this_is_a_device_owner;
-            for (String managedProfileSpecificOption : MANAGED_PROFILE_SPECIFIC_OPTIONS) {
-                findPreference(managedProfileSpecificOption).setEnabled(false);
-            }
         }
         findPreference(DEVICE_OWNER_STATUS_KEY).setSummary(deviceOwnerStatusStringId);
         if (!isDeviceOwner) {
             findPreference(WIFI_CONFIG_LOCKDOWN_ENABLE_KEY).setEnabled(false);
+        }
+        // Disable managed profile specific options if we are not running in managed profile.
+        if (!Util.isManagedProfile(getActivity(), mAdminComponentName)) {
+            for (String managedProfileSpecificOption : MANAGED_PROFILE_SPECIFIC_OPTIONS) {
+                findPreference(managedProfileSpecificOption).setEnabled(false);
+            }
         }
     }
 

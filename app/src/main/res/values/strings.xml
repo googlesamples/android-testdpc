@@ -77,7 +77,7 @@
     <!-- Strings for device owner management -->
     <string name="this_is_not_a_device_owner">This app is currently not the device owner.</string>
     <string name="this_is_a_device_owner">This app is the device owner.</string>
-    <string name="this_is_a_managed_profile_owner">This app is a managed profile owner.
+    <string name="this_is_a_profile_owner">This app is a profile owner.
         Some of the management options are not available.</string>
     <string name="device_owner_management">Device owner management</string>
     <string name="set_auto_time_required">Set auto (network) time required</string>
