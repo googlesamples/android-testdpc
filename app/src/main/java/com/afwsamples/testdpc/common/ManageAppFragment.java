@@ -28,7 +28,7 @@ import java.util.List;
 public abstract class ManageAppFragment extends BaseManageComponentFragment<ApplicationInfo> {
     @Override
     protected SpinnerAdapter createSpinnerAdapter() {
-        List<ApplicationInfo> managedAppList = getInstalledLaunchableApps();
+        List<ApplicationInfo> managedAppList = getInstalledOrLaunchableApps();
         Collections.sort(managedAppList,
                 new ApplicationInfo.DisplayNameComparator(mPackageManager));
         return new AppInfoSpinnerAdapter(getActivity(), R.layout.app_row, R.id.pkg_name,
@@ -36,15 +36,16 @@ public abstract class ManageAppFragment extends BaseManageComponentFragment<Appl
     }
 
 
-    private List<ApplicationInfo> getInstalledLaunchableApps() {
-        List<ApplicationInfo> managedAppList = mPackageManager.getInstalledApplications(
+    private List<ApplicationInfo> getInstalledOrLaunchableApps() {
+        List<ApplicationInfo> installedApps = mPackageManager.getInstalledApplications(
                 0 /* Default flags */);
-        List<ApplicationInfo> launchableAppList = new ArrayList<ApplicationInfo>();
-        for (ApplicationInfo applicationInfo : managedAppList) {
-            if ((mPackageManager.getLaunchIntentForPackage(applicationInfo.packageName)) != null) {
-                launchableAppList.add(applicationInfo);
+        List<ApplicationInfo> filteredAppList = new ArrayList<>();
+        for (ApplicationInfo applicationInfo : installedApps) {
+            if (mPackageManager.getLaunchIntentForPackage(applicationInfo.packageName) != null
+                    || (applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0) {
+                filteredAppList.add(applicationInfo);
             }
         }
-        return launchableAppList;
+        return filteredAppList;
     }
 }
