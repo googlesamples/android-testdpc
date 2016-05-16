@@ -38,8 +38,13 @@ import com.afwsamples.testdpc.DeviceAdminReceiver;
  */
 public class AppRestrictionsProxy extends Service {
 
-    private final Messenger mMessenger = new Messenger(new AppRestrictionsProxyHandler(this,
-            DeviceAdminReceiver.getComponentName(this)));
+    private Messenger mMessenger;
+
+    @Override
+    public void onCreate() {
+        mMessenger = new Messenger(new AppRestrictionsProxyHandler(this,
+                DeviceAdminReceiver.getComponentName(this)));
+    }
 
     @Override
     public IBinder onBind(Intent intent) {
