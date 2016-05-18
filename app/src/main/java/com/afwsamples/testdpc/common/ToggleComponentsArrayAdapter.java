@@ -35,6 +35,8 @@ import android.widget.TextView;
 import com.afwsamples.testdpc.R;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -47,14 +49,16 @@ public abstract class ToggleComponentsArrayAdapter extends ArrayAdapter<ResolveI
 
     protected PackageManager mPackageManager;
     protected DevicePolicyManager mDevicePolicyManager;
-    protected ArrayList<Boolean> mIsComponentCheckedList = new ArrayList<Boolean>();
+    protected List<Boolean> mIsComponentCheckedList;
 
     public ToggleComponentsArrayAdapter(Context context, int resource, List<ResolveInfo> objects) {
         super(context, resource, objects);
         mPackageManager = context.getPackageManager();
         mDevicePolicyManager = (DevicePolicyManager) context.getSystemService(
                 Context.DEVICE_POLICY_SERVICE);
-        initIsComponentEnabledList();
+        // Init mIsComponentCheckedList
+        mIsComponentCheckedList = new ArrayList<>(Arrays.asList(new Boolean[objects.size()]));
+        Collections.fill(mIsComponentCheckedList, Boolean.FALSE);
     }
 
     /**
@@ -127,9 +131,11 @@ public abstract class ToggleComponentsArrayAdapter extends ArrayAdapter<ResolveI
     protected abstract ApplicationInfo getApplicationInfo(int position);
 
     /**
-     * Initializes the {@link ToggleComponentsArrayAdapter#mIsComponentCheckedList}.
+     * Update {@link ToggleComponentsArrayAdapter#mIsComponentCheckedList}.
      */
-    protected abstract void initIsComponentEnabledList();
+    protected void setIsComponentEnabledList(List<Boolean> isComponentEnabledList) {
+        mIsComponentCheckedList = isComponentEnabledList;
+    }
 
     /**
      * Checks whether an activity or service is enabled.

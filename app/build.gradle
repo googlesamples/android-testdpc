@@ -7,7 +7,7 @@ ext {
     // exactly 1 digit
     versionMinor = 0
     // exactly 2 digits
-    versionBuild = 2
+    versionBuild = 3
 }
 
 android {
@@ -90,7 +90,8 @@ android {
 }
 
 dependencies {
-    compile "com.android.support:support-v4:22.0.0"
-    compile "com.android.support:support-v13:22.0.0"
+    compile 'com.android.support:appcompat-v7:24.+'
+    compile 'com.android.support:recyclerview-v7:24.+'
+    compile "com.android.support:support-v13:24.+"
     compile(name:'setup-wizard-lib-platform-release', ext:'aar')
 }

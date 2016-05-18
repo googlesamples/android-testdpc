@@ -17,14 +17,16 @@
 
 <resources>
     <style name="SetupTheme" parent="SuwThemeMaterial.Light">
-        <item name="android:colorAccent">@color/teal</item>
+        <item name="android:colorAccent">@color/pink</item>
         <item name="suwLayoutTheme">@style/SetupIllustrationTheme</item>
     </style>
 
-    <style name="AppTheme" parent="SetupTheme">
+    <style name="AppTheme" parent="android:Theme.Material.Light.DarkActionBar">
         <item name="android:windowActionBar">true</item>
         <item name="android:windowNoTitle">false</item>
-        <item name="android:colorPrimaryDark">@android:color/black</item>
+        <item name="android:colorPrimary">@color/teal</item>
+        <item name="android:colorPrimaryDark">@color/dark_teal</item>
+        <item name="android:colorAccent">@color/pink</item>
     </style>
 
     <style name="SetupIllustrationTheme">

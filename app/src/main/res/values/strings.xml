@@ -21,9 +21,9 @@
     <string name="cancel">Cancel</string>
     <string name="set_up_managed_profile">Set up managed profile</string>
     <string name="set_up_device_owner">Set up device owner</string>
-    <string name="set_up_management_header">Setup Management</string>
+    <string name="set_up_management_header">Set up management</string>
     <string name="setup_management_message">This app is currently not the owner of this device or
-        profile. Please select an option below and click NEXT to set up appropriate management by this app.</string>
+        profile. Please select an option below and click SET UP to set up appropriate management by this app.</string>
     <string name="provisioning_not_possible">TestDPC isn\'t currently allowed to be set up as the profile or device owner.</string>
     <string name="exit">Exit</string>
     <string name="managed_account_message">Added account that requires management:</string>
@@ -157,8 +157,8 @@
     <string name="disable_cross_profile_contacts_search">Disable cross-profile contacts search</string>
 
     <!-- Strings for wifi management -->
-    <string name="wifi_management_title">Wifi management</string>
-    <string name="create_wifi_configuration">Create wifi configuration</string>
+    <string name="wifi_management_title">WI-FI management</string>
+    <string name="create_wifi_configuration">Create WI-FI configuration</string>
     <string name="add_network">Add network</string>
     <string name="wifi_ssid">Network name</string>
     <string name="wifi_ssid_hint">Enter the SSID</string>
@@ -177,14 +177,14 @@
     <string name="wifi_unchanged">(unchanged)</string>
     <string name="wifi_save">Save</string>
     <string name="wifi_cancel">Cancel</string>
-    <string name="wifi_config_success">Wifi configuration saved.</string>
-    <string name="wifi_config_fail">Failed to save the wifi configuration.</string>
-    <string name="enable_wifi_config_lockdown">DO created WiFi configs are modifiable only by DO.</string>
-    <string name="modify_wifi_configuration">Modify wifi configuration</string>
+    <string name="wifi_config_success">WI-FI configuration saved.</string>
+    <string name="wifi_config_fail">Failed to save the WI-FI configuration.</string>
+    <string name="enable_wifi_config_lockdown">DO created WI-FI configs are modifiable only by DO.</string>
+    <string name="modify_wifi_configuration">Modify WI-FI configuration</string>
     <string name="show_wifi_mac_address">Show Wi-Fi MAC address</string>
     <string name="show_wifi_mac_address_title">Wi-Fi MAC address</string>
     <string name="show_wifi_mac_address_not_available_msg">Wi-Fi MAC is not available</string>
-    <string name="wifi_configs_header">Saved WiFi configurations</string>
+    <string name="wifi_configs_header">Saved WI-FI configurations</string>
     <string name="wifi_update_config_button">Update selected</string>
     <string name="wifi_remove_config_button">Remove selected</string>
     <string name="wifi_modification_error_title">Error modifying config</string>
@@ -194,8 +194,7 @@
     <string name="apps_management_title">Apps management</string>
     <string name="enable_system_apps_title">Enable system apps</string>
     <string name="enable_system_apps_by_package_name">Enable a system app by package name</string>
-    <string name="enable_system_apps_by_package_name_hints">Enter a system app package name.
-    </string>
+    <string name="enable_system_apps_by_package_name_hints">Package name</string>
     <string name="enable_system_apps_by_package_name_success_msg">%s is enabled.</string>
     <string name="enable_system_apps_by_package_name_error">Package not found.</string>
     <string name="enable_system_apps_by_intent">Enable a system app by intent</string>
@@ -287,6 +286,8 @@
     <string name="disallow_outgoing_calls">Disallow outgoing calls</string>
     <string name="disallow_remove_user">Disallow remove user</string>
     <string name="disallow_safe_boot">Disallow safe boot</string>
+    <string name="disallow_set_user_icon">Disallow set user icon</string>
+    <string name="disallow_set_wallpaper">Disallow set wallpaper</string>
     <string name="disallow_share_location">Disallow share location</string>
     <string name="disallow_sms">Disallow sms</string>
     <string name="disallow_uninstall_apps">Disallow uninstall apps</string>
@@ -353,6 +354,8 @@
     <string name="value_not_valid">Restriction value is not valid</string>
     <string name="restriction_save_label">Save</string>
     <string name="restriction_cancel_label">Cancel</string>
+    <!-- Text shown in configure button when bundle/bundle array is chosen -->
+    <string name="configure">Configure</string>
 
     <!-- Remote bugreport -->
     <string name="bugreport_title">Bugreport</string>
@@ -502,12 +505,15 @@
 
     <!-- Keyguard features -->
     <string name="keyguard_features">Keyguard features</string>
-    <string name="keyguard_disable_widgets">Disable widgets</string>
     <string name="keyguard_disable_secure_camera">Disable secure camera</string>
     <string name="keyguard_disable_secure_notifications">Disable secure notifications</string>
     <string name="keyguard_disable_unredacted_notifications">Disable unredacted notifications</string>
     <string name="keyguard_disable_trust_agents">Disable trust agents</string>
     <string name="keyguard_disable_fingerprint">Disable fingerprint</string>
+
+    <!-- Trust agent features -->
+    <string name="trust_agent_features">Trust agent features</string>
+    <string name="set_trust_agent_config">Set trust agent config</string>
 
     <!-- Strings for screen lock policies -->
     <string name="lock_category">Lock screen</string>
@@ -570,6 +576,9 @@
     <string name="require_password_on_boot">Require password to start user</string>
     <string name="password_reset_success">Password has been reset</string>
     <string name="password_reset_failed">Failed to reset password</string>
+
+    <!-- Strings for trust agent -->
+    <string name="saved_trust_agent_config">Saved trust agent configuration</string>
 
     <string name="lock_now">Lock now</string>
 

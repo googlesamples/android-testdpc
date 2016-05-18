@@ -28,6 +28,7 @@ import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.ToggleComponentsArrayAdapter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -38,6 +39,7 @@ public class BlockUninstallationInfoArrayAdapter extends ToggleComponentsArrayAd
     public BlockUninstallationInfoArrayAdapter(Context context, int resource,
             List<ResolveInfo> resolveInfoList) {
         super(context, resource, resolveInfoList);
+        setIsComponentEnabledList(createIsComponentEnabledList());
     }
 
     @Override
@@ -76,12 +78,13 @@ public class BlockUninstallationInfoArrayAdapter extends ToggleComponentsArrayAd
         return null;
     }
 
-    @Override
-    protected void initIsComponentEnabledList() {
+    private List<Boolean> createIsComponentEnabledList() {
+        List<Boolean> isComponentEnabledList = new ArrayList<>();
         int size = getCount();
         for (int i = 0; i < size; i++) {
-            mIsComponentCheckedList.add(isComponentEnabled(getItem(i)));
+            isComponentEnabledList.add(isComponentEnabled(getItem(i)));
         }
+        return isComponentEnabledList;
     }
 
     @Override

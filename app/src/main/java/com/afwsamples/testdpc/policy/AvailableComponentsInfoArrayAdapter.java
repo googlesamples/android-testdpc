@@ -16,6 +16,7 @@
 
 package com.afwsamples.testdpc.policy;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.ResolveInfo;
@@ -40,6 +41,7 @@ public class AvailableComponentsInfoArrayAdapter extends ToggleComponentsArrayAd
             List<ResolveInfo> resolveInfoList, List<String> permittedPackageNames) {
         super(context, R.id.pkg_name, resolveInfoList);
         mPermittedPackageNames = permittedPackageNames;
+        setIsComponentEnabledList(createIsComponentEnabledList());
     }
 
     /**
@@ -85,6 +87,7 @@ public class AvailableComponentsInfoArrayAdapter extends ToggleComponentsArrayAd
     }
 
     @Override
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP_MR1)
     protected Drawable getApplicationIcon(ApplicationInfo applicationInfo) {
         // Input methods refer to the packages in primary profile. so, we
         // need to show them unbadged.
@@ -96,12 +99,13 @@ public class AvailableComponentsInfoArrayAdapter extends ToggleComponentsArrayAd
         }
     }
 
-    @Override
-    protected void initIsComponentEnabledList() {
+    private List<Boolean> createIsComponentEnabledList() {
+        List<Boolean> isComponentEnabledList = new ArrayList<>();
         int size = getCount();
         for (int i = 0; i < size; i++) {
-            mIsComponentCheckedList.add(isComponentEnabled(getItem(i)));
+            isComponentEnabledList.add(isComponentEnabled(getItem(i)));
         }
+        return isComponentEnabledList;
     }
 
     @Override

@@ -58,9 +58,6 @@
             android:key="keyguard_features"
             android:title="@string/keyguard_features">
         <SwitchPreference
-                android:key="keyguard_disable_widgets"
-                android:title="@string/keyguard_disable_widgets"/>
-        <SwitchPreference
                 android:key="keyguard_disable_secure_camera"
                 android:title="@string/keyguard_disable_secure_camera"/>
         <SwitchPreference
@@ -75,5 +72,12 @@
         <SwitchPreference
                 android:key="keyguard_disable_fingerprint"
                 android:title="@string/keyguard_disable_fingerprint"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+            android:title="@string/trust_agent_features">
+        <Preference
+                android:key="key_set_trust_agent_config"
+                android:title="@string/set_trust_agent_config"/>
     </PreferenceCategory>
 </PreferenceScreen>

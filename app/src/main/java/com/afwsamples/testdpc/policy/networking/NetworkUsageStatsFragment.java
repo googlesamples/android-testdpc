@@ -20,8 +20,8 @@ import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.ListFragment;
-import android.app.usage.NetworkStatsManager;
 import android.app.usage.NetworkStats;
+import android.app.usage.NetworkStatsManager;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
@@ -32,6 +32,8 @@ import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.RemoteException;
+import android.text.Html;
+import android.text.Spanned;
 import android.text.format.Formatter;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -49,6 +51,7 @@ import android.widget.TextView;
 import com.afwsamples.testdpc.R;
 
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -85,6 +88,15 @@ public class NetworkUsageStatsFragment extends ListFragment implements View.OnCl
     private ArrayAdapter<List<NetworkStats.Bucket>> mListAdapter;
     private ListView mAppHistoryList;
     private Button mBackToAppsListButton;
+    private DateFormat mDateStringFormat;
+    private DateFormat mHourMinuteDateFormat;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mDateStringFormat = new SimpleDateFormat("*dd/MM/YYYY*");
+        mHourMinuteDateFormat = new SimpleDateFormat("kk:mm");
+    }
 
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container,
@@ -256,22 +268,29 @@ public class NetworkUsageStatsFragment extends ListFragment implements View.OnCl
                             View view = convertView;
                             if (convertView == null) {
                                 view = getActivity().getLayoutInflater().inflate(
-                                        android.R.layout.two_line_list_item, parent, false);
+                                        R.layout.network_usage_app_history_item, parent, false);
                             }
-                            DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT);
                             NetworkStats.Bucket item = getItem(position);
                             Date startDate = new Date(item.getStartTimeStamp());
                             Date endDate = new Date(item.getEndTimeStamp());
-                            TextView text1 = (TextView) view.findViewById(android.R.id.text1);
-                            TextView text2 = (TextView) view.findViewById(android.R.id.text2);
-                            text1.setText(dateFormat.format(startDate) + " - "
-                                    + dateFormat.format(endDate));
+                            TextView text1 = (TextView) view.findViewById(R.id.text1);
+                            TextView text2 = (TextView) view.findViewById(R.id.text2);
+                            text1.setText(getDateString(startDate, endDate));
                             text2.setText(getString(R.string.network_stats_bucket_usage,
                                     formatSize(item.getRxBytes()), item.getRxPackets(),
                                     formatSize(item.getTxBytes()), item.getTxPackets()));
                             return view;
                         }
-                    };
+
+                private Spanned getDateString(Date startDate, Date endDate) {
+                    String startDateString = mDateStringFormat.format(startDate);
+                    String startHourMinuteString = mHourMinuteDateFormat.format(startDate);
+                    String endHourMinuteString = mHourMinuteDateFormat.format(endDate);
+                    String resultString = "<b>" + startDateString + "</b> " +
+                            startHourMinuteString + " - " + endHourMinuteString;
+                    return Html.fromHtml(resultString);
+                }
+            };
             mAppHistoryList.setAdapter(adapter);
         }
     }

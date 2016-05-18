@@ -35,6 +35,7 @@ public class LockTaskAppInfoArrayAdapter extends ToggleComponentsArrayAdapter {
 
     public LockTaskAppInfoArrayAdapter(Context context, int resource, List<ResolveInfo> objects) {
         super(context, resource, objects);
+        setIsComponentEnabledList(createIsComponentEnabledList());
     }
 
     @Override
@@ -66,12 +67,13 @@ public class LockTaskAppInfoArrayAdapter extends ToggleComponentsArrayAdapter {
         return getItem(position).activityInfo.applicationInfo;
     }
 
-    @Override
-    protected void initIsComponentEnabledList() {
+    private List<Boolean> createIsComponentEnabledList() {
+        List<Boolean> isComponentEnabledList = new ArrayList<>();
         int size = getCount();
         for (int i = 0; i < size; i++) {
-            mIsComponentCheckedList.add(isComponentEnabled(getItem(i)));
+            isComponentEnabledList.add(isComponentEnabled(getItem(i)));
         }
+        return isComponentEnabledList;
     }
 
     @Override
