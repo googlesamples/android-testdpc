@@ -128,6 +128,9 @@
         <Preference
                 android:key="create_wifi_configuration"
                 android:title="@string/create_wifi_configuration"/>
+        <Preference
+                android:key="create_eap_tls_wifi_configuration"
+                android:title="@string/create_eap_tls_wifi_configuration"/>
         <SwitchPreference
                 android:key="enable_wifi_config_lockdown"
                 android:title="@string/enable_wifi_config_lockdown"/>

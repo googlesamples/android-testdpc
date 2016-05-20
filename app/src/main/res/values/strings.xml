@@ -189,6 +189,18 @@
     <string name="wifi_remove_config_button">Remove selected</string>
     <string name="wifi_modification_error_title">Error modifying config</string>
     <string name="wifi_remove_config_error">Unable to remove SSID \'<xliff:g id="wifi_ssid">%1$s</xliff:g>\': netId = <xliff:g id="wifi_network_id">%2$d</xliff:g></string>
+    <string name="create_eap_tls_wifi_configuration">Create EAP-TLS WI-FI configuration</string>
+    <string name="wifi_identity">Identity (if any)</string>
+    <string name="wifi_client_cert_password">Client certificate password (if any)</string>
+    <string name="import_ca_certificate">Import CA certificate</string>
+    <string name="import_user_certificate">Import user certificate</string>
+    <string name="selected_certificate">Selected certificate: <xliff:g id="certificate_alias" example="server certificate">%1$s</xliff:g></string>
+    <string name="selected_certificate_none">None</string>
+    <string name="error_missing_ssid">Missing SSID</string>
+    <string name="error_missing_ca_cert">Missing CA cert</string>
+    <string name="error_missing_client_cert">Missing client cert or invalid cert password</string>
+    <string name="wifi_eap_tls_dialog_message">EAP_TLS with X.509 CA certificate and PKCS12 client certificate</string>
+    <string name="wifi_unknown_cert">Unknown cert</string>
 
     <!-- Strings for managing apps -->
     <string name="apps_management_title">Apps management</string>

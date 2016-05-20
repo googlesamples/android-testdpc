@@ -19,6 +19,7 @@ package com.afwsamples.testdpc.common;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,6 +38,7 @@ import java.util.List;
 public class AppInfoArrayAdapter extends ArrayAdapter<String> {
     private PackageManager mPackageManager;
     private int mAppInfoFlags = 0;
+    private static final String TAG = "AppInfoArrayAdapter";
 
     public AppInfoArrayAdapter(Context context, int resource, List<String> pkgNameList,
             boolean includeDisabledApps) {
@@ -66,7 +68,7 @@ public class AppInfoArrayAdapter extends ArrayAdapter<String> {
             TextView pkgNameTextView = (TextView) convertView.findViewById(R.id.pkg_name);
             pkgNameTextView.setText(mPackageManager.getApplicationLabel(applicationInfo));
         } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
+            Log.e(TAG, "Package not found ", e);
             // Returns an empty view in case the package is not found.
             return new View(getContext());
         }

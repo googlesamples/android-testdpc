@@ -17,6 +17,7 @@
 package com.afwsamples.testdpc.policy.wifimanagement;
 
 import android.app.AlertDialog;
+import android.app.DialogFragment;
 import android.app.Fragment;
 import android.content.Context;
 import android.net.wifi.WifiConfiguration;
@@ -35,6 +36,8 @@ import com.afwsamples.testdpc.R;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static android.net.wifi.WifiEnterpriseConfig.Eap;
 
 /**
  * Fragment for WiFi configuration editing.
@@ -130,14 +133,18 @@ public class WifiModificationFragment extends Fragment
                 @Override
                 public void onClick(View v) {
                     WifiConfiguration oldConf = getClickedItem();
-                    if (oldConf != null) {
-                        try {
-                            WifiConfigCreationDialog dialog = WifiConfigCreationDialog.newInstance(
+                    try {
+                        DialogFragment dialog;
+                        if (oldConf.enterpriseConfig == null ||
+                                oldConf.enterpriseConfig.getEapMethod() == Eap.NONE) {
+                            dialog = WifiConfigCreationDialog.newInstance(
                                     oldConf, WifiModificationFragment.this);
-                            dialog.show(getFragmentManager(), TAG_WIFI_CONFIG_MODIFICATION);
-                        } catch (SecurityException e) {
-                            showError(e.getMessage());
+                        } else {
+                            dialog = WifiEapTlsCreateDialogFragment.newInstance(oldConf);
                         }
+                        dialog.show(getFragmentManager(), TAG_WIFI_CONFIG_MODIFICATION);
+                    } catch (SecurityException e) {
+                        showError(e.getMessage());
                     }
                 }
             });

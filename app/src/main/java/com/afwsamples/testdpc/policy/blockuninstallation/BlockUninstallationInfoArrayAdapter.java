@@ -20,6 +20,7 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
@@ -73,7 +74,7 @@ public class BlockUninstallationInfoArrayAdapter extends ToggleComponentsArrayAd
             return mPackageManager.getApplicationInfo(getItem(position).resolvePackageName,
                     0 /* Default flags */);
         } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
+            Log.e(TAG, "getApplicationInfo: ", e);
         }
         return null;
     }
