@@ -22,12 +22,11 @@ import android.content.Context;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.TextUtils;
 
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.SelectAppFragment;
-
-import java.lang.IllegalArgumentException;
 
 /**
  * This fragment lets the user select an app that can manage application restrictions for the
@@ -54,6 +53,10 @@ public class AppRestrictionsManagingPackageFragment extends SelectAppFragment {
 
     @Override
     protected void setSelectedPackage(String pkgName) {
+        // If the input pkgName is an empty string, we clear the app restriction manager.
+        if (TextUtils.isEmpty(pkgName)) {
+            pkgName = null;
+        }
         try {
             mDpm.setApplicationRestrictionsManagingPackage(
                     DeviceAdminReceiver.getComponentName(getActivity()), pkgName);
