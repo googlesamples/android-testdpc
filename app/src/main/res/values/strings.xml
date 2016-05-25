@@ -35,6 +35,7 @@
     <string name="finish_setup">Finish setup</string>
     <string name="setup_finished">Setup finished</string>
     <string name="click_finish_to_complete">Click Finish to complete setup.</string>
+    <string name="waiting_for_first_account_check_in">Putting finishing touches</string>
     <string name="finish_button">Finish</string>
     <string name="all_done">Setup finished successfully</string>
     <string name="all_done_explanation_profile_owner">To manage the new managed profile, visit the

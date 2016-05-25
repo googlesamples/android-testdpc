@@ -32,6 +32,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.RadioGroup;
 
+import com.afwsamples.testdpc.common.LaunchIntentUtil;
 import com.android.setupwizardlib.SetupWizardLayout;
 import com.android.setupwizardlib.view.NavigationBar;
 
@@ -126,6 +127,7 @@ public class AddAccountActivity extends Activity implements NavigationBar.Naviga
                         .show();
                 break;
             case R.id.add_account_skip:
+                mNextActivityIntent.putExtra(EnableProfileActivity.EXTRA_ENABLE_PROFILE_NOW, true);
                 startActivity(mNextActivityIntent);
                 finish();
                 break;

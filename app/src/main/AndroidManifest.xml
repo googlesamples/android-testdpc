@@ -92,6 +92,13 @@
             </intent-filter>
         </receiver>
 
+        <receiver android:name=".FirstAccountReadyBroadcastReceiver"
+                android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.android.work.action.FIRST_ACCOUNT_READY"/>
+            </intent-filter>
+        </receiver>
+
         <provider
                 android:authorities="com.afwsamples.testdpc.fileprovider"
                 android:name="android.support.v4.content.FileProvider"

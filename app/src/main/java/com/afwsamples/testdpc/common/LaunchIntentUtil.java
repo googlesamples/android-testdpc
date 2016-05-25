@@ -26,7 +26,6 @@ import com.afwsamples.testdpc.cosu.EnableCosuActivity;
  * Common utility functions used for retrieving information from the intent that launched TestDPC.
  */
 public class LaunchIntentUtil {
-
     public static final String EXTRA_ACCOUNT_NAME = "account_name";
 
     private static final String EXTRA_IS_SETUP_WIZARD = "is_setup_wizard";
