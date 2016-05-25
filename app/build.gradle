@@ -101,5 +101,6 @@ dependencies {
     compile 'com.android.support:appcompat-v7:24.+'
     compile 'com.android.support:recyclerview-v7:24.+'
     compile "com.android.support:support-v13:24.+"
+    compile 'com.google.android.gms:play-services-safetynet:+'
     compile(name:'setup-wizard-lib-platform-release', ext:'aar')
 }

@@ -90,4 +90,11 @@
         <item name="android:layout_marginStart">4dip</item>
         <item name="android:textSize">18sp</item>
     </style>
+
+    <style name="safety_net_attest_message">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">8dp</item>
+        <item name="android:textSize">16sp</item>
+    </style>
 </resources>

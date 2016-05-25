@@ -91,6 +91,7 @@ import com.afwsamples.testdpc.profilepolicy.addsystemapps.EnableSystemAppsByInte
 import com.afwsamples.testdpc.profilepolicy.apprestrictions.AppRestrictionsManagingPackageFragment;
 import com.afwsamples.testdpc.profilepolicy.apprestrictions.ManageAppRestrictionsFragment;
 import com.afwsamples.testdpc.profilepolicy.permission.ManageAppPermissionsFragment;
+import com.afwsamples.testdpc.safetynet.SafetyNetFragment;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -267,6 +268,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     private static final String TAG_WIFI_CONFIG_CREATION = "wifi_config_creation";
     private static final String WIFI_CONFIG_LOCKDOWN_ON = "1";
     private static final String WIFI_CONFIG_LOCKDOWN_OFF = "0";
+    private static final String SAFETYNET_ATTEST = "safetynet_attest";
 
     private static final long MS_PER_SECOND = 1000;
 
@@ -432,6 +434,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         findPreference(REBOOT_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_SHORT_SUPPORT_MESSAGE_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_LONG_SUPPORT_MESSAGE_KEY).setOnPreferenceClickListener(this);
+        findPreference(SAFETYNET_ATTEST).setOnPreferenceClickListener(this);
         mSetAutoTimeRequiredPreference = (SwitchPreference) findPreference(
                 SET_AUTO_TIME_REQUIRED_KEY);
         mSetAutoTimeRequiredPreference.setOnPreferenceChangeListener(this);
@@ -672,6 +675,10 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             case SET_LONG_SUPPORT_MESSAGE_KEY:
                 showFragment(SetSupportMessageFragment.newInstance(
                         SetSupportMessageFragment.TYPE_LONG));
+                return true;
+            case SAFETYNET_ATTEST:
+                DialogFragment safetynetFragment = new SafetyNetFragment();
+                safetynetFragment.show(getFragmentManager(), SafetyNetFragment.class.getName());
                 return true;
         }
         return false;

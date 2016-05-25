@@ -636,4 +636,19 @@
     <string name="color_format">#AARRGGBB</string>
     <string name="unable_disable_keyguard">Unable to disable keyguard</string>
     <string name="unable_enable_keyguard">Unable to enable keyguard</string>
+
+    <!-- SefetyNet -->
+    <string name="safetynet_preference_title">SafetyNet</string>
+    <string name="attest_preference_title">SafetyNet Attestation</string>
+    <string name="attest_preference_summary">Checking Device Compatibility with SafetyNet</string>
+    <string name="safetynet_dialog_title">SafetyNet Attestation</string>
+    <string name="safetynet_dialog_msg_running">Running...</string>
+    <string name="cancel_safetynet_msg">Cancel SafetyNet Attestation</string>
+    <string name="safetynet_fail_to_run_api">Fail to run SafetyNet Attestation API</string>
+    <string name="safetynet_fail_reason_no_internet">Error: No Internet connecion</string>
+    <string name="safetynet_fail_reason_gmscore_upgrade">Error: Google Play Service is out of date</string>
+    <string name="safetynet_fail_reason_error_code">Error code: %1$d</string>
+    <string name="safetynet_fail_reason_invalid_jws">Invalid JWS response</string>
+    <string name="safetynet_running">Running&#8230; Please wait</string>
+    <string name="safetynet_verify_on_server">You should verify the response in your server.</string>
 </resources>
