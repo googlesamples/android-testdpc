@@ -66,13 +66,13 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
         static final String KEYGUARD_FEATURES_CATEGORY = "keyguard_features";
 
         static final String KEYGUARD_DISABLE_FINGERPRINT = "keyguard_disable_fingerprint";
+        static final String KEYGUARD_DISABLE_REMOTE_INPUT = "keyguard_disable_remote_input";
         static final String KEYGUARD_DISABLE_SECURE_CAMERA = "keyguard_disable_secure_camera";
         static final String KEYGUARD_DISABLE_SECURE_NOTIFICATIONS
                 = "keyguard_disable_secure_notifications";
         static final String KEYGUARD_DISABLE_TRUST_AGENTS = "keyguard_disable_trust_agents";
         static final String KEYGUARD_DISABLE_UNREDACTED_NOTIFICATIONS
                 = "keyguard_disable_unredacted_notifications";
-        static final String KEYGUARD_DISABLE_WIDGETS = "keyguard_disable_widgets";
         static final String SET_TRUST_AGENT_CONFIG = "key_set_trust_agent_config";
 
         static final Set<String> NOT_APPLICABLE_TO_PARENT
@@ -127,6 +127,9 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
 
         KEYGUARD_FEATURES.put(Keys.KEYGUARD_DISABLE_FINGERPRINT,
                 DevicePolicyManager.KEYGUARD_DISABLE_FINGERPRINT);
+
+        KEYGUARD_FEATURES.put(Keys.KEYGUARD_DISABLE_REMOTE_INPUT,
+                DevicePolicyManager.KEYGUARD_DISABLE_REMOTE_INPUT);
     }
 
     @Override

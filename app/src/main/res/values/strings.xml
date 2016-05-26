@@ -523,6 +523,7 @@
     <string name="keyguard_disable_unredacted_notifications">Disable unredacted notifications</string>
     <string name="keyguard_disable_trust_agents">Disable trust agents</string>
     <string name="keyguard_disable_fingerprint">Disable fingerprint</string>
+    <string name="keyguard_disable_remote_input">Disable text entry in secure keyguard screen</string>
 
     <!-- Trust agent features -->
     <string name="trust_agent_features">Trust agent features</string>
