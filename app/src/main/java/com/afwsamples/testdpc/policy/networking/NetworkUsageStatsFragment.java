@@ -94,7 +94,7 @@ public class NetworkUsageStatsFragment extends ListFragment implements View.OnCl
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mDateStringFormat = new SimpleDateFormat("*dd/MM/YYYY*");
+        mDateStringFormat = new SimpleDateFormat("*dd/MM/yyyy*");
         mHourMinuteDateFormat = new SimpleDateFormat("kk:mm");
     }
 
