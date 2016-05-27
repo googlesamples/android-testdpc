@@ -19,7 +19,9 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         style="@style/contentContainer">
+
     <TextView
             android:id="@+id/message_view"
-            style="@style/safety_net_attest_message"/>
+            style="@style/safety_net_attest_message"
+            android:scrollbars = "vertical"/>
 </LinearLayout>

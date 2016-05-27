@@ -27,6 +27,7 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -85,7 +86,8 @@ public class SafetyNetFragment extends DialogFragment implements
         LayoutInflater inflater = LayoutInflater.from(getActivity());
         View rootView = inflater.inflate(R.layout.safety_net_attest_dialog, null);
         mMessageView = (TextView) rootView.findViewById(R.id.message_view);
-
+        // Show scrollbar in textview.
+        mMessageView.setMovementMethod(new ScrollingMovementMethod());
         return new AlertDialog.Builder(getActivity())
                 .setView(rootView)
                 .setTitle(R.string.safetynet_dialog_title)
