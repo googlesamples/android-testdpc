@@ -63,30 +63,10 @@ android {
         }
 
         N {
-            minSdkVersion 'N'
-            targetSdkVersion 'N'
+            minSdkVersion 21
+            targetSdkVersion 24
         }
     }
-
-    /* TODO: Remove once release version of N SDK is released. */
-       applicationVariants.all { variant ->
-           variant.outputs.each { output ->
-               output.processManifest.doLast {
-                   // minSdkVersion and targetSdkVersion are overrided if we build against preview
-                   // SDK, let us override them again here.
-                   minSdkVersion = variant.getMergedFlavor().minSdkVersion.getApiString();
-                   targetSdkVersion = variant.getMergedFlavor().targetSdkVersion.getApiString();
-
-                   def manifestOutFile = output.processManifest.manifestOutputFile
-                   def newFileContents = manifestOutFile.getText('UTF-8').
-                           replace('android:minSdkVersion="N"',
-                                   'android:minSdkVersion="' + minSdkVersion + '"')
-                   newFileContents = newFileContents.replace('android:targetSdkVersion="N"',
-                           'android:targetSdkVersion="' + targetSdkVersion + '"')
-                   manifestOutFile.write(newFileContents, 'UTF-8')
-               }
-           }
-       }
 
     // Enable lint checking in all build variants.
     applicationVariants.all { variant ->
