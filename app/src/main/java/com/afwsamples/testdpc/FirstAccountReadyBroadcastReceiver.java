@@ -16,11 +16,14 @@
 
 package com.afwsamples.testdpc;
 
+import android.app.admin.DevicePolicyManager;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.provision.CheckInState;
 import com.afwsamples.testdpc.provision.ProvisioningUtil;
 
@@ -36,9 +39,15 @@ public class FirstAccountReadyBroadcastReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         Log.d(TAG, "Received: " + intent.getAction());
         if (FIRST_ACCOUNT_READY_ACTION.equals(intent.getAction())) {
-            CheckInState checkInState = new CheckInState(context);
-            checkInState.setFirstAccountReady();
-            ProvisioningUtil.enableProfile(context);
+            ComponentName admin = DeviceAdminReceiver.getComponentName(context);
+            DevicePolicyManager dpm =
+                    (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
+            if (dpm.isProfileOwnerApp(context.getPackageName())
+                    && Util.isManagedProfile(context, admin)) {
+                CheckInState checkInState = new CheckInState(context);
+                checkInState.setFirstAccountReady();
+                ProvisioningUtil.enableProfile(context);
+            }
         }
     }
 }
