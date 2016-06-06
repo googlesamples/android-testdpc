@@ -104,8 +104,7 @@ public class Util {
     }
 
     public static boolean isBeforeN() {
-        // STOPSHIP Change to SDK_INT.
-        return isBeforeM() || !Build.VERSION.CODENAME.startsWith("N");
+        return Build.VERSION.SDK_INT < VERSION_CODES.N;
     }
 
     @TargetApi(VERSION_CODES.N)
