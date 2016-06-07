@@ -270,8 +270,6 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     private static final String WIFI_CONFIG_LOCKDOWN_OFF = "0";
     private static final String SAFETYNET_ATTEST = "safetynet_attest";
 
-    private static final long MS_PER_SECOND = 1000;
-
     private static final String BATTERY_PLUGGED_ANY = Integer.toString(
             BatteryManager.BATTERY_PLUGGED_AC |
             BatteryManager.BATTERY_PLUGGED_USB |
