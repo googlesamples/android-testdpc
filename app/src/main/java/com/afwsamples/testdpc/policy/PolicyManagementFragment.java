@@ -40,15 +40,14 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.UserHandle;
 import android.os.UserManager;
-import android.preference.EditTextPreference;
-import android.preference.Preference;
-import android.preference.PreferenceFragment;
-import android.preference.SwitchPreference;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.security.KeyChain;
 import android.security.KeyChainAliasCallback;
+import android.support.v14.preference.SwitchPreference;
 import android.support.v4.content.FileProvider;
+import android.support.v7.preference.EditTextPreference;
+import android.support.v7.preference.Preference;
 import android.telephony.TelephonyManager;
 import android.text.InputType;
 import android.text.TextUtils;
@@ -71,9 +70,10 @@ import android.widget.Toast;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.AppInfoArrayAdapter;
-import com.afwsamples.testdpc.common.MediaDisplayFragment;
-import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.common.CertificateUtil;
+import com.afwsamples.testdpc.common.MediaDisplayFragment;
+import com.afwsamples.testdpc.common.BaseSearchablePolicyPreferenceFragment;
+import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.policy.blockuninstallation.BlockUninstallationInfoArrayAdapter;
 import com.afwsamples.testdpc.policy.certificate.DelegatedCertInstallerFragment;
 import com.afwsamples.testdpc.policy.keyguard.LockScreenPolicyFragment;
@@ -178,7 +178,7 @@ import static android.os.UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES;
  * <li> {@link UserManager#DISALLOW_CONFIG_WIFI} </li>
  * </ul>
  */
-public class PolicyManagementFragment extends PreferenceFragment implements
+public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFragment implements
         Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
     // Tag for creating this fragment. This tag can be used to retrieve this fragment.
     public static final String FRAGMENT_TAG = "PolicyManagementFragment";
@@ -340,8 +340,6 @@ public class PolicyManagementFragment extends PreferenceFragment implements
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
         mAdminComponentName = DeviceAdminReceiver.getComponentName(getActivity());
         mDevicePolicyManager = (DevicePolicyManager) getActivity().getSystemService(
                 Context.DEVICE_POLICY_SERVICE);
@@ -353,8 +351,12 @@ public class PolicyManagementFragment extends PreferenceFragment implements
 
         mImageUri = getStorageUri("image.jpg");
         mVideoUri = getStorageUri("video.mp4");
+        super.onCreate(savedInstanceState);
+    }
 
-        addPreferencesFromResource(R.xml.device_policy_header);
+    @Override
+    public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+        addPreferencesFromResource(getPreferenceXml());
 
         EditTextPreference overrideKeySelectionPreference =
                 (EditTextPreference) findPreference(OVERRIDE_KEY_SELECTION_KEY);
@@ -450,13 +452,24 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     }
 
     @Override
+    public int getPreferenceXml() {
+        return R.xml.device_policy_header;
+    }
+
+    @Override
+    public boolean isAvailable(Context context) {
+        DevicePolicyManager dpm =
+                (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
+        String packageName = context.getPackageName();
+        return dpm.isProfileOwnerApp(packageName) || dpm.isDeviceOwnerApp(packageName);
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         getActivity().getActionBar().setTitle(R.string.policies_management);
 
-        boolean isDeviceOwner = mDevicePolicyManager.isDeviceOwnerApp(mPackageName);
-        boolean isProfileOwner = mDevicePolicyManager.isProfileOwnerApp(mPackageName);
-        if (!isDeviceOwner && !isProfileOwner) {
+        if (!isAvailable(getActivity())) {
             showToast(R.string.this_is_not_a_device_owner);
             getActivity().finish();
         }

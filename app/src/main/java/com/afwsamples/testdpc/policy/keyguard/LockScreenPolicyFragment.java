@@ -19,12 +19,13 @@ package com.afwsamples.testdpc.policy.keyguard;
 import android.annotation.TargetApi;
 import android.app.Fragment;
 import android.app.admin.DevicePolicyManager;
+import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.EditTextPreference;
-import android.preference.Preference;
-import android.preference.TwoStatePreference;
 import android.support.v4.os.BuildCompat;
+import android.support.v7.preference.EditTextPreference;
+import android.support.v7.preference.Preference;
+import android.support.v7.preference.TwoStatePreference;
 import android.util.ArrayMap;
 import android.widget.Toast;
 
@@ -134,15 +135,29 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         getActivity().getActionBar().setTitle(R.string.lock_screen_policy);
-        addPreferencesFromResource(R.xml.lock_screen_preferences);
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public void onCreatePreferences(Bundle bundle, String rootKey) {
+        addPreferencesFromResource(getPreferenceXml());
         setupAll();
         disableIncompatibleManagementOptionsInCurrentProfile();
         final int disabledFeatures = getDpm().getKeyguardDisabledFeatures(getAdmin());
         for (Map.Entry<String, Integer> flag : KEYGUARD_FEATURES.entrySet()) {
             setup(flag.getKey(), (disabledFeatures & flag.getValue()) != 0 ? true : false);
         }
+    }
+
+    @Override
+    public int getPreferenceXml() {
+        return R.xml.lock_screen_preferences;
+    }
+
+    @Override
+    public boolean isAvailable(Context context) {
+        return true;
     }
 
     @Override

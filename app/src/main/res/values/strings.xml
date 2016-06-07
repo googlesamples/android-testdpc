@@ -74,7 +74,7 @@
         start TestDPC</string>
     <string name="invalid_launch_intent_no_account">No account found on incoming intent.</string>
     <string name="device_admin_receiver_failure">Failed to become device/profile owner.</string>
-
+    <string name="menu_search_title">Search</string>
     <!-- Strings for device owner management -->
     <string name="this_is_not_a_device_owner">This app is currently not the device owner.</string>
     <string name="this_is_a_device_owner">This app is the device owner.</string>

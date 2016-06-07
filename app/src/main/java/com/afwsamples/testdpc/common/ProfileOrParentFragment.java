@@ -21,18 +21,15 @@ import android.app.Fragment;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
-import android.os.Build;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.UserManager;
-import android.preference.PreferenceFragment;
-import android.preference.PreferenceManager;
 import android.support.v13.app.FragmentTabHost;
+import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TabHost;
 
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
@@ -47,7 +44,7 @@ import com.afwsamples.testdpc.R;
  * Please notice that all subclasses of this fragment only support N or above.
  */
 @TargetApi(VERSION_CODES.N)
-public abstract class ProfileOrParentFragment extends PreferenceFragment {
+public abstract class ProfileOrParentFragment extends BaseSearchablePolicyPreferenceFragment {
     private static final String LOG_TAG = "ProfileOrParentFragment";
 
     private static final String EXTRA_PARENT_PROFILE = "com.afwsamples.testdpc.extra.PARENT";
@@ -156,8 +153,6 @@ public abstract class ProfileOrParentFragment extends PreferenceFragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
         // Check arguments- see whether we're supposed to run on behalf of the parent profile.
         final Bundle arguments = getArguments();
         if (arguments != null) {
@@ -172,13 +167,17 @@ public abstract class ProfileOrParentFragment extends PreferenceFragment {
 
         // Store whether we are the profile owner for faster lookup.
         mProfileOwner = mDevicePolicyManager.isProfileOwnerApp(getActivity().getPackageName());
-
         mDeviceOwner = mDevicePolicyManager.isDeviceOwnerApp(getActivity().getPackageName());
 
+        // Put at last to make sure all initializations above are done before subclass's
+        // onCreatePreferences is called.
+        super.onCreate(savedInstanceState);
+
         // Switch to parent profile if we are running on their behalf.
+        // This needs to be called after super.onCreate because preference manager is set up
+        // inside super.onCreate.
         if (mParentInstance) {
             mDevicePolicyManager = mDevicePolicyManager.getParentProfileInstance(mAdminComponent);
-
             final PreferenceManager pm = getPreferenceManager();
             pm.setSharedPreferencesName(pm.getSharedPreferencesName() + TAG_PARENT);
         }

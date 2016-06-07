@@ -16,15 +16,14 @@
 
 package com.afwsamples.testdpc.policy.keyguard;
 
-import android.app.Fragment;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.preference.EditTextPreference;
-import android.preference.ListPreference;
-import android.preference.Preference;
+import android.support.v7.preference.EditTextPreference;
+import android.support.v7.preference.ListPreference;
+import android.support.v7.preference.Preference;
 import android.widget.Toast;
 
 import com.afwsamples.testdpc.DeviceAdminReceiver;
@@ -109,14 +108,27 @@ public final class PasswordConstraintsFragment extends ProfileOrParentFragment i
         for (int i = 0; i < policyIds.length; i++) {
             PASSWORD_QUALITIES.put(policyIds[i], policyNames[i]);
         }
-    };
+    }
+
+    @Override
+    public int getPreferenceXml() {
+        return R.xml.password_constraint_preferences;
+    }
+
+    @Override
+    public boolean isAvailable(Context context) {
+        return true;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         getActivity().getActionBar().setTitle(R.string.password_constraints);
+        super.onCreate(savedInstanceState);
+    }
 
-        addPreferencesFromResource(R.xml.password_constraint_preferences);
+    @Override
+    public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+        addPreferencesFromResource(getPreferenceXml());
 
         // Populate password quality settings - messy because the only API for this requires two
         // separate String[]s.

@@ -17,37 +17,69 @@
 package com.afwsamples.testdpc;
 
 import android.app.Activity;
+import android.app.FragmentManager;
 import android.app.admin.DevicePolicyManager;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.WindowManager.LayoutParams;
 
 import com.afwsamples.testdpc.policy.PolicyManagementFragment;
+import com.afwsamples.testdpc.search.PolicySearchFragment;
 
 /**
  * An entry activity that shows a profile setup fragment if the app is not a profile or device
  * owner. Otherwise, a policy management fragment is shown.
  */
-public class PolicyManagementActivity extends Activity {
+public class PolicyManagementActivity extends Activity implements
+        FragmentManager.OnBackStackChangedListener {
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         if (savedInstanceState == null) {
-            DevicePolicyManager devicePolicyManager = (DevicePolicyManager) getSystemService(
-                    DEVICE_POLICY_SERVICE);
-
-            String packageName = getPackageName();
-            if (devicePolicyManager.isProfileOwnerApp(packageName)
-                    || devicePolicyManager.isDeviceOwnerApp(packageName)) {
-                getFragmentManager().beginTransaction().add(R.id.container,
-                        new PolicyManagementFragment(),
-                        PolicyManagementFragment.FRAGMENT_TAG).commit();
-            } else {
-                getFragmentManager().beginTransaction().add(R.id.container,
-                        new SetupManagementFragment(),
-                        SetupManagementFragment.FRAGMENT_TAG).commit();
-            }
+            getFragmentManager().beginTransaction().add(R.id.container,
+                    new PolicyManagementFragment(),
+                    PolicyManagementFragment.FRAGMENT_TAG).commit();
         }
+        getFragmentManager().addOnBackStackChangedListener(this);
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.policy_management_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onMenuItemSelected(int featureId, MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_show_search:
+                getFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.container, PolicySearchFragment.newInstance())
+                        .addToBackStack("search")
+                        .commit();
+                break;
+            case android.R.id.home:
+                getFragmentManager().popBackStack();
+                break;
+        }
+        return false;
+    }
+
+    @Override
+    public void onBackStackChanged() {
+        // Show the up button in actionbar if back stack has any entry.
+        getActionBar().setDisplayHomeAsUpEnabled(
+                getFragmentManager().getBackStackEntryCount() > 0);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        getFragmentManager().removeOnBackStackChangedListener(this);
+    }
+
 }

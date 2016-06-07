@@ -27,6 +27,7 @@
         <item name="android:colorPrimary">@color/teal</item>
         <item name="android:colorPrimaryDark">@color/dark_teal</item>
         <item name="android:colorAccent">@color/pink</item>
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
     </style>
 
     <style name="SetupIllustrationTheme">
