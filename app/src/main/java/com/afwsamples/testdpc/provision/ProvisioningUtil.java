@@ -21,6 +21,7 @@ import android.content.ComponentName;
 import android.content.Context;
 
 import com.afwsamples.testdpc.DeviceAdminReceiver;
+import com.afwsamples.testdpc.FirstAccountReadyBroadcastReceiver;
 import com.afwsamples.testdpc.R;
 
 public class ProvisioningUtil {
@@ -32,5 +33,7 @@ public class ProvisioningUtil {
         manager.setProfileName(componentName, context.getString(R.string.profile_name));
         // We enable the profile here.
         manager.setProfileEnabled(componentName);
+        // Just enabled the profile, not necessary to wait for first account ready anymore.
+        FirstAccountReadyBroadcastReceiver.setEnabled(context, false);
     }
 }

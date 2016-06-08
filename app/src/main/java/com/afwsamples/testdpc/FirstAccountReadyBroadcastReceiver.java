@@ -21,11 +21,15 @@ import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.util.Log;
 
-import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.provision.CheckInState;
 import com.afwsamples.testdpc.provision.ProvisioningUtil;
+
+import static android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
+import static android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_ENABLED;
+import static android.content.pm.PackageManager.DONT_KILL_APP;
 
 /**
  * Receiver for FIRST_ACCOUNT_READY_ACTION from Google Play Service.
@@ -39,15 +43,20 @@ public class FirstAccountReadyBroadcastReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         Log.d(TAG, "Received: " + intent.getAction());
         if (FIRST_ACCOUNT_READY_ACTION.equals(intent.getAction())) {
-            ComponentName admin = DeviceAdminReceiver.getComponentName(context);
-            DevicePolicyManager dpm =
-                    (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
-            if (dpm.isProfileOwnerApp(context.getPackageName())
-                    && Util.isManagedProfile(context, admin)) {
-                CheckInState checkInState = new CheckInState(context);
-                checkInState.setFirstAccountReady();
-                ProvisioningUtil.enableProfile(context);
-            }
+            CheckInState checkInState = new CheckInState(context);
+            checkInState.setFirstAccountReady();
+            ProvisioningUtil.enableProfile(context);
+            // This receiver is disabled in ProvisioningUtil.enableProfile, no more code should
+            // be put after it.
         }
+    }
+
+    public static void setEnabled(Context context, boolean enabled) {
+        PackageManager pm = context.getPackageManager();
+        pm.setComponentEnabledSetting(
+                new ComponentName(context, FirstAccountReadyBroadcastReceiver.class),
+                (enabled) ? COMPONENT_ENABLED_STATE_ENABLED : COMPONENT_ENABLED_STATE_DISABLED,
+                DONT_KILL_APP
+        );
     }
 }

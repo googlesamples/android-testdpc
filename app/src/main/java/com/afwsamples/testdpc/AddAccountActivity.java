@@ -23,6 +23,8 @@ import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.admin.DevicePolicyManager;
+import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -33,6 +35,7 @@ import android.widget.EditText;
 import android.widget.RadioGroup;
 
 import com.afwsamples.testdpc.common.LaunchIntentUtil;
+import com.afwsamples.testdpc.common.Util;
 import com.android.setupwizardlib.SetupWizardLayout;
 import com.android.setupwizardlib.view.NavigationBar;
 
@@ -71,6 +74,15 @@ public class AddAccountActivity extends Activity implements NavigationBar.Naviga
     }
 
     private void addAccount(String accountName) {
+        // Enable first account ready receiver for PO flow. On pre-N devices, the only supported
+        // PO flow is managed profile. On N+ devices we need to check whether we're running in a
+        // managed profile.
+        DevicePolicyManager dpm = (DevicePolicyManager) getSystemService(DEVICE_POLICY_SERVICE);
+        ComponentName adminComponent = DeviceAdminReceiver.getComponentName(this);
+        if (dpm.isProfileOwnerApp(getPackageName())
+                && (Util.isBeforeN() || Util.isManagedProfile(this, adminComponent))) {
+            FirstAccountReadyBroadcastReceiver.setEnabled(this, true);
+        }
         AccountManager accountManager = AccountManager.get(this);
         Bundle bundle = new Bundle();
         if (!TextUtils.isEmpty(accountName)) {
