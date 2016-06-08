@@ -9,7 +9,7 @@ ext {
     // exactly 1 digit
     versionMinor = 0
     // exactly 2 digits
-    versionBuild = 5
+    versionBuild = 6
 }
 
 android {
@@ -19,7 +19,7 @@ android {
     defaultConfig {
         applicationId "com.afwsamples.testdpc"
         minSdkVersion 21
-        targetSdkVersion 23
+        targetSdkVersion 24
         versionCode versionMajor * 1000 + versionMinor * 100 + versionBuild
         versionName "${versionMajor}.${versionMinor}.${versionBuild}"
     }
@@ -53,18 +53,6 @@ android {
     repositories {
         flatDir {
             dirs 'libs'
-        }
-    }
-
-    productFlavors {
-        standard {
-            minSdkVersion 21
-            targetSdkVersion 23
-        }
-
-        N {
-            minSdkVersion 21
-            targetSdkVersion 24
         }
     }
 
