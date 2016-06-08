@@ -59,13 +59,21 @@ public class EnableProfileActivity extends Activity implements NavigationBar.Nav
     public static final String EXTRA_ENABLE_PROFILE_NOW = "enable_profile_now";
     private static final IntentFilter sIntentFilter =
             new IntentFilter(FIRST_ACCOUNT_READY_PROCESSED_ACTION);
+    private static final long WAIT_FOR_FIRST_ACCOUNT_READY_TIMEOUT = 60 * 1000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mEnableProfileNow = getIntent().getBooleanExtra(EXTRA_ENABLE_PROFILE_NOW, false);
-        if (savedInstanceState == null && mEnableProfileNow) {
-            ProvisioningUtil.enableProfile(this);
+        if (savedInstanceState == null) {
+            if (mEnableProfileNow) {
+                ProvisioningUtil.enableProfile(this);
+            } else {
+                // Set up an alarm to enable profile in case we do not receive first account
+                // broadcast for whatever reason.
+                FirstAccountReadyBroadcastReceiver.scheduleFirstAccountReadyTimeoutAlarm(
+                        this, WAIT_FOR_FIRST_ACCOUNT_READY_TIMEOUT);
+            }
         }
         setContentView(R.layout.enable_profile_activity);
         mSetupWizardLayout = (SetupWizardLayout) findViewById(R.id.setup_wizard_layout);

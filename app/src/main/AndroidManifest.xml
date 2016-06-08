@@ -103,6 +103,9 @@
             <intent-filter>
                 <action android:name="com.google.android.work.action.FIRST_ACCOUNT_READY"/>
             </intent-filter>
+            <intent-filter>
+                <action android:name="com.afwsamples.testdpc.FIRST_ACCOUNT_READY_TIMEOUT"/>
+            </intent-filter>
         </receiver>
 
         <provider

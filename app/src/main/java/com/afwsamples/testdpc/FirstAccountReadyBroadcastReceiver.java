@@ -16,12 +16,14 @@
 
 package com.afwsamples.testdpc;
 
-import android.app.admin.DevicePolicyManager;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.SystemClock;
 import android.util.Log;
 
 import com.afwsamples.testdpc.provision.CheckInState;
@@ -40,12 +42,19 @@ public class FirstAccountReadyBroadcastReceiver extends BroadcastReceiver {
     private static final String FIRST_ACCOUNT_READY_ACTION =
             "com.google.android.work.action.FIRST_ACCOUNT_READY";
 
+    public static final String FIRST_ACCOUNT_READY_TIMEOUT_ACTION =
+            "com.afwsamples.testdpc.FIRST_ACCOUNT_READY_TIMEOUT";
+
     public void onReceive(Context context, Intent intent) {
-        Log.d(TAG, "Received: " + intent.getAction());
-        if (FIRST_ACCOUNT_READY_ACTION.equals(intent.getAction())) {
+        final String action = intent.getAction();
+        Log.d(TAG, "Received: " + action);
+        if (FIRST_ACCOUNT_READY_ACTION.equals(action) ||
+                FIRST_ACCOUNT_READY_TIMEOUT_ACTION.equals(action)) {
             CheckInState checkInState = new CheckInState(context);
-            checkInState.setFirstAccountReady();
-            ProvisioningUtil.enableProfile(context);
+            if (!checkInState.isFirstAccountReady()) {
+                checkInState.setFirstAccountReady();
+                ProvisioningUtil.enableProfile(context);
+            }
             // This receiver is disabled in ProvisioningUtil.enableProfile, no more code should
             // be put after it.
         }
@@ -58,5 +67,27 @@ public class FirstAccountReadyBroadcastReceiver extends BroadcastReceiver {
                 (enabled) ? COMPONENT_ENABLED_STATE_ENABLED : COMPONENT_ENABLED_STATE_DISABLED,
                 DONT_KILL_APP
         );
+    }
+
+    /**
+     * Enable profile anyway if we cannot receive the broadcast after certain amount time.
+     */
+    public static void scheduleFirstAccountReadyTimeoutAlarm(Context context, long timeout) {
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                SystemClock.elapsedRealtime() + timeout,
+                createFirstAccountReadyTimeoutPendingIntent(context));
+    }
+
+    public static void cancelFirstAccountReadyTimeoutAlarm(Context context) {
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        alarmManager.cancel(createFirstAccountReadyTimeoutPendingIntent(context));
+    }
+
+    private static PendingIntent createFirstAccountReadyTimeoutPendingIntent(Context context) {
+        Intent intent = new Intent(context, FirstAccountReadyBroadcastReceiver.class);
+        intent.setAction(FirstAccountReadyBroadcastReceiver.FIRST_ACCOUNT_READY_TIMEOUT_ACTION);
+        return PendingIntent.getBroadcast(
+                context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 }
