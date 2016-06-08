@@ -207,12 +207,14 @@ public class AppRestrictionsProxyHandler extends Handler {
     private void ensureCallerSignature(int callerUid) {
         String appRestrictionsManagingPackage = getApplicationRestrictionsManagingPackage(mContext);
         if (appRestrictionsManagingPackage == null) {
-            throw new SecurityException("Caller is not app restrictions managing package");
+            Log.e(TAG, "There is no app restrictions managing package");
+            return;
         }
         PackageManager packageManager = mContext.getPackageManager();
         String callingPackageName = packageManager.getNameForUid(callerUid);
         if (!appRestrictionsManagingPackage.equals(callingPackageName)) {
-            throw new SecurityException("Caller is not app restrictions managing package");
+            Log.e(TAG, "Caller is not app restrictions managing package");
+            return;
         }
 
         Set<String> storedSignatures = PreferenceManager.getDefaultSharedPreferences(mContext)
