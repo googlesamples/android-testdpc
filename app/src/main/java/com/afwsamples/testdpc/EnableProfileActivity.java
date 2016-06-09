@@ -69,7 +69,7 @@ public class EnableProfileActivity extends Activity implements NavigationBar.Nav
             if (mEnableProfileNow) {
                 ProvisioningUtil.enableProfile(this);
             } else {
-                // Set up an alarm to enable profile in case we do not receive first account
+                // Set up an alarm to enable profile in case we do not receive first account ready
                 // broadcast for whatever reason.
                 FirstAccountReadyBroadcastReceiver.scheduleFirstAccountReadyTimeoutAlarm(
                         this, WAIT_FOR_FIRST_ACCOUNT_READY_TIMEOUT);
