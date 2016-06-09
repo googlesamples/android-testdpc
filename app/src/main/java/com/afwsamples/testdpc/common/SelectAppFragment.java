@@ -45,8 +45,8 @@ public abstract class SelectAppFragment extends Fragment implements View.OnClick
 
     private EditText mCurrentSelectedPackage;
     private EditText mNewSelectedPackage;
-    private ListView mAppList;
-    private ArrayList<String> mAppPackages;
+    private ListView mAppListView;
+    private List<String> mAppPackages;
 
     @Override
     public void onResume() {
@@ -57,7 +57,7 @@ public abstract class SelectAppFragment extends Fragment implements View.OnClick
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mAppPackages = new ArrayList<String>();
+        mAppPackages = createAppList();
     }
 
     @Override
@@ -67,31 +67,31 @@ public abstract class SelectAppFragment extends Fragment implements View.OnClick
 
         mCurrentSelectedPackage = (EditText) view.findViewById(R.id.selected_package_current);
         mNewSelectedPackage = (EditText) view.findViewById(R.id.selected_package_new);
-        mAppList = (ListView) view.findViewById(R.id.select_app_list);
-        populateApps();
-
+        mAppListView = (ListView) view.findViewById(R.id.select_app_list);
+        AppInfoArrayAdapter appInfoArrayAdapter = new AppInfoArrayAdapter(getActivity(),
+                R.id.pkg_name, mAppPackages, true);
+        mAppListView.setAdapter(appInfoArrayAdapter);
         view.findViewById(R.id.selected_package_set).setOnClickListener(this);
         view.findViewById(R.id.selected_package_clear).setOnClickListener(this);
-        mAppList.setOnItemClickListener(this);
-
+        mAppListView.setOnItemClickListener(this);
         return view;
     }
 
-    private void populateApps() {
+    /**
+     * @return a list of apps that users are allowed to select from.
+     */
+    protected List<String> createAppList() {
+        List<String> appList = new ArrayList<>();
         PackageManager pm = getActivity().getPackageManager();
         List<ApplicationInfo> allApps = pm.getInstalledApplications(0 /* No flag */);
         Collections.sort(allApps, new ApplicationInfo.DisplayNameComparator(pm));
-        mAppPackages.clear();
         for(ApplicationInfo info : allApps) {
             if ((pm.getLaunchIntentForPackage(info.packageName)) != null) {
-                mAppPackages.add(info.packageName);
+                appList.add(info.packageName);
             }
         }
-        AppInfoArrayAdapter appInfoArrayAdapter = new AppInfoArrayAdapter(getActivity(),
-                R.id.pkg_name, mAppPackages, true);
-        mAppList.setAdapter(appInfoArrayAdapter);
+        return appList;
     }
-
 
     @Override
     public void onClick(View v) {

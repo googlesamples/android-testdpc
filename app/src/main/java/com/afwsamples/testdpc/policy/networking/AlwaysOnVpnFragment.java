@@ -20,13 +20,21 @@ import android.annotation.TargetApi;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.net.VpnService;
 import android.os.Build;
 import android.os.Bundle;
 
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.SelectAppFragment;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * This fragment provides a setting for always-on VPN apps.
@@ -42,6 +50,8 @@ public class AlwaysOnVpnFragment extends SelectAppFragment {
 
     private DevicePolicyManager mDpm;
 
+    private static final Intent VPN_INTENT = new Intent(VpnService.SERVICE_INTERFACE);
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,6 +62,20 @@ public class AlwaysOnVpnFragment extends SelectAppFragment {
     public void onResume() {
         super.onResume();
         getActivity().getActionBar().setTitle(R.string.set_always_on_vpn);
+    }
+
+    @Override
+    protected List<String> createAppList() {
+        Set<String> apps = new HashSet<>();
+        PackageManager pm = getActivity().getPackageManager();
+        List<ResolveInfo> serviceInfos = pm.queryIntentServices(VPN_INTENT, 0);
+        for (ResolveInfo serviceInfo : serviceInfos) {
+            if (serviceInfo.serviceInfo == null) {
+                continue;
+            }
+            apps.add(serviceInfo.serviceInfo.packageName);
+        }
+        return new ArrayList<>(apps);
     }
 
     @Override
