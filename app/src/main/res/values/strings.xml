@@ -35,6 +35,7 @@
     <string name="finish_setup">Finish setup</string>
     <string name="setup_finished">Setup finished</string>
     <string name="click_finish_to_complete">Click Finish to complete setup.</string>
+    <string name="waiting_for_first_account_check_in">Putting finishing touches</string>
     <string name="finish_button">Finish</string>
     <string name="all_done">Setup finished successfully</string>
     <string name="all_done_explanation_profile_owner">To manage the new managed profile, visit the
@@ -73,11 +74,11 @@
         start TestDPC</string>
     <string name="invalid_launch_intent_no_account">No account found on incoming intent.</string>
     <string name="device_admin_receiver_failure">Failed to become device/profile owner.</string>
-
+    <string name="menu_search_title">Search</string>
     <!-- Strings for device owner management -->
     <string name="this_is_not_a_device_owner">This app is currently not the device owner.</string>
     <string name="this_is_a_device_owner">This app is the device owner.</string>
-    <string name="this_is_a_managed_profile_owner">This app is a managed profile owner.
+    <string name="this_is_a_profile_owner">This app is a profile owner.
         Some of the management options are not available.</string>
     <string name="device_owner_management">Device owner management</string>
     <string name="set_auto_time_required">Set auto (network) time required</string>
@@ -189,6 +190,18 @@
     <string name="wifi_remove_config_button">Remove selected</string>
     <string name="wifi_modification_error_title">Error modifying config</string>
     <string name="wifi_remove_config_error">Unable to remove SSID \'<xliff:g id="wifi_ssid">%1$s</xliff:g>\': netId = <xliff:g id="wifi_network_id">%2$d</xliff:g></string>
+    <string name="create_eap_tls_wifi_configuration">Create EAP-TLS WI-FI configuration</string>
+    <string name="wifi_identity">Identity (if any)</string>
+    <string name="wifi_client_cert_password">Client certificate password (if any)</string>
+    <string name="import_ca_certificate">Import CA certificate</string>
+    <string name="import_user_certificate">Import user certificate</string>
+    <string name="selected_certificate">Selected certificate: <xliff:g id="certificate_alias" example="server certificate">%1$s</xliff:g></string>
+    <string name="selected_certificate_none">None</string>
+    <string name="error_missing_ssid">Missing SSID</string>
+    <string name="error_missing_ca_cert">Missing CA cert</string>
+    <string name="error_missing_client_cert">Missing client cert or invalid cert password</string>
+    <string name="wifi_eap_tls_dialog_message">EAP_TLS with X.509 CA certificate and PKCS12 client certificate</string>
+    <string name="wifi_unknown_cert">Unknown cert</string>
 
     <!-- Strings for managing apps -->
     <string name="apps_management_title">Apps management</string>
@@ -510,6 +523,7 @@
     <string name="keyguard_disable_unredacted_notifications">Disable unredacted notifications</string>
     <string name="keyguard_disable_trust_agents">Disable trust agents</string>
     <string name="keyguard_disable_fingerprint">Disable fingerprint</string>
+    <string name="keyguard_disable_remote_input">Disable text entry in secure keyguard screen</string>
 
     <!-- Trust agent features -->
     <string name="trust_agent_features">Trust agent features</string>
@@ -623,4 +637,19 @@
     <string name="color_format">#AARRGGBB</string>
     <string name="unable_disable_keyguard">Unable to disable keyguard</string>
     <string name="unable_enable_keyguard">Unable to enable keyguard</string>
+
+    <!-- SefetyNet -->
+    <string name="safetynet_preference_title">SafetyNet</string>
+    <string name="attest_preference_title">SafetyNet Attestation</string>
+    <string name="attest_preference_summary">Checking Device Compatibility with SafetyNet</string>
+    <string name="safetynet_dialog_title">SafetyNet Attestation</string>
+    <string name="safetynet_dialog_msg_running">Running...</string>
+    <string name="cancel_safetynet_msg">Cancel SafetyNet Attestation</string>
+    <string name="safetynet_fail_to_run_api">Fail to run SafetyNet Attestation API</string>
+    <string name="safetynet_fail_reason_no_internet">Error: No Internet connecion</string>
+    <string name="safetynet_fail_reason_gmscore_upgrade">Error: Google Play Service is out of date</string>
+    <string name="safetynet_fail_reason_error_code">Error code: %1$d</string>
+    <string name="safetynet_fail_reason_invalid_jws">Invalid JWS response</string>
+    <string name="safetynet_running">Running&#8230; Please wait</string>
+    <string name="safetynet_verify_on_server">You should verify the response in your server.</string>
 </resources>

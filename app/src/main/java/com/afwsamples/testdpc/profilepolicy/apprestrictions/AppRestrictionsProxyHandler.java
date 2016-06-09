@@ -70,18 +70,18 @@ public class AppRestrictionsProxyHandler extends Handler {
     public void handleMessage(Message msg) {
         switch (msg.what) {
             case MSG_SET_APPLICATION_RESTRICTIONS: {
-                ensureCallerSignature(msg.sendingUid);
+                if (!isCallerAuthorized(msg.sendingUid)) {
+                    return;
+                }
                 String packageName = msg.getData().getString(KEY_PACKAGE_NAME);
                 Bundle appRestrictions = msg.getData().getBundle(KEY_APPLICATION_RESTRICTIONS);
                 setApplicationRestrictions(packageName, appRestrictions);
                 break;
             }
             case MSG_CAN_SET_APPLICATION_RESTRICTIONS: {
-                String callingPackage = mContext.getPackageManager().getNameForUid(msg.sendingUid);
-                String managingPackage = getApplicationRestrictionsManagingPackage(mContext);
                 Bundle responseBundle = new Bundle();
                 responseBundle.putBoolean(KEY_CAN_SET_APPLICATION_RESTRICTIONS,
-                        callingPackage != null && callingPackage.equals(managingPackage));
+                        isCallerAuthorized(msg.sendingUid));
                 Message response = Message.obtain();
                 response.setData(responseBundle);
                 try {
@@ -92,7 +92,9 @@ public class AppRestrictionsProxyHandler extends Handler {
                 break;
             }
             case MSG_GET_APPLICATION_RESTRICTIONS: {
-                ensureCallerSignature(msg.sendingUid);
+                if (!isCallerAuthorized(msg.sendingUid)) {
+                    return;
+                }
                 String packageName = msg.getData().getString(KEY_PACKAGE_NAME);
                 Bundle appRestrictions = getApplicationRestrictions(packageName);
                 Bundle responseBundle = new Bundle();
@@ -199,20 +201,19 @@ public class AppRestrictionsProxyHandler extends Handler {
      * that its signature has not changed since it was set.
      *
      * @param callerUid the UID of the caller
-     *
-     * @throws SecurityException if the DPC hasn't given permission to the caller to manage
-     * application restrictions, or if the calling package's signature has changed since it was
-     * set.
+     * @return whether the caller is the application restictions managing package
      */
-    private void ensureCallerSignature(int callerUid) {
+    private boolean isCallerAuthorized(int callerUid) {
         String appRestrictionsManagingPackage = getApplicationRestrictionsManagingPackage(mContext);
         if (appRestrictionsManagingPackage == null) {
-            throw new SecurityException("Caller is not app restrictions managing package");
+            Log.e(TAG, "There is no app restrictions managing package");
+            return false;
         }
         PackageManager packageManager = mContext.getPackageManager();
         String callingPackageName = packageManager.getNameForUid(callerUid);
         if (!appRestrictionsManagingPackage.equals(callingPackageName)) {
-            throw new SecurityException("Caller is not app restrictions managing package");
+            Log.e(TAG, "Caller is not app restrictions managing package");
+            return false;
         }
 
         Set<String> storedSignatures = PreferenceManager.getDefaultSharedPreferences(mContext)
@@ -235,7 +236,7 @@ public class AppRestrictionsProxyHandler extends Handler {
                         "for package " + callingPackageName + ".");
             }
         } catch (NameNotFoundException e) {
-            throw new SecurityException(e);
+            throw new IllegalArgumentException(e);
         }
         List<Signature> expectedSignatures = new ArrayList<>(storedSignatures.size());
         for (String signatureString : storedSignatures) {
@@ -244,10 +245,11 @@ public class AppRestrictionsProxyHandler extends Handler {
         for (Signature callingSignature : callingPackageSignatures) {
             for (Signature expectedSignature : expectedSignatures) {
                 if (expectedSignature.equals(callingSignature)) {
-                    return;
+                    return true;
                 }
             }
         }
-        throw new SecurityException("Calling package signature doesn't match");
+        Log.e(TAG, "Calling package signature doesn't match");
+        return false;
     }
 }

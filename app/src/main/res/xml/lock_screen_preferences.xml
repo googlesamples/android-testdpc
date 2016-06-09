@@ -72,6 +72,9 @@
         <SwitchPreference
                 android:key="keyguard_disable_fingerprint"
                 android:title="@string/keyguard_disable_fingerprint"/>
+        <SwitchPreference
+                android:key="keyguard_disable_remote_input"
+                android:title="@string/keyguard_disable_remote_input"/>
     </PreferenceCategory>
 
     <PreferenceCategory

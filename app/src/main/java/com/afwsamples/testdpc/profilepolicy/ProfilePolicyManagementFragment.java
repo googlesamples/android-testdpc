@@ -28,19 +28,20 @@ import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.UserManager;
-import android.preference.Preference;
-import android.preference.PreferenceFragment;
-import android.preference.SwitchPreference;
+import android.support.v14.preference.SwitchPreference;
+import android.support.v7.preference.Preference;
 import android.widget.Toast;
 
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.AppInfoArrayAdapter;
 import com.afwsamples.testdpc.common.ColorPicker;
+import com.afwsamples.testdpc.common.BaseSearchablePolicyPreferenceFragment;
 import com.afwsamples.testdpc.common.Util;
-import com.afwsamples.testdpc.profilepolicy.crossprofileintentfilter.AddCrossProfileIntentFilterFragment;
-import com.afwsamples.testdpc.profilepolicy.crossprofilewidgetprovider.ManageCrossProfileWidgetProviderUtil;
+import com.afwsamples.testdpc.profilepolicy.crossprofileintentfilter
+        .AddCrossProfileIntentFilterFragment;
+import com.afwsamples.testdpc.profilepolicy.crossprofilewidgetprovider
+        .ManageCrossProfileWidgetProviderUtil;
 
 import java.util.List;
 
@@ -60,7 +61,7 @@ import java.util.List;
  * String)}
  * 8) {@link DevicePolicyManager#setBluetoothContactSharingDisabled(ComponentName, boolean)}
  */
-public class ProfilePolicyManagementFragment extends PreferenceFragment implements
+public class ProfilePolicyManagementFragment extends BaseSearchablePolicyPreferenceFragment implements
         Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener,
         ColorPicker.OnColorSelectListener {
     // Tag for creating this fragment. This tag can be used to retrieve this fragment.
@@ -109,14 +110,15 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
         mAdminComponentName = DeviceAdminReceiver.getComponentName(getActivity());
         mDevicePolicyManager = (DevicePolicyManager) getActivity().getSystemService(
                 Context.DEVICE_POLICY_SERVICE);
+        super.onCreate(savedInstanceState);
+    }
 
-        addPreferencesFromResource(R.xml.profile_policy_header);
-
+    @Override
+    public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+        addPreferencesFromResource(getPreferenceXml());
         mAddCrossProfileIntentFilterPreference = findPreference(
                 ADD_CROSS_PROFILE_INTENT_FILTER_PREFERENCE_KEY);
         mAddCrossProfileIntentFilterPreference.setOnPreferenceClickListener(this);
@@ -137,14 +139,20 @@ public class ProfilePolicyManagementFragment extends PreferenceFragment implemen
     }
 
     @Override
+    public int getPreferenceXml() {
+        return R.xml.profile_policy_header;
+    }
+
+    @Override
+    public boolean isAvailable(Context context) {
+        return Util.isManagedProfile(context, DeviceAdminReceiver.getComponentName(context));
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         getActivity().getActionBar().setTitle(R.string.profile_management_title);
-
-        String packageName = getActivity().getPackageName();
-        boolean isProfileOwner = mDevicePolicyManager.isProfileOwnerApp(packageName);
-
-        if (!isProfileOwner) {
+        if (!isAvailable(getActivity())) {
             // Safe net: should never happen.
             showToast(R.string.setup_management_message);
             getActivity().finish();

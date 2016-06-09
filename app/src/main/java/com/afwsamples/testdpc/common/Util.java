@@ -16,13 +16,17 @@
 
 package com.afwsamples.testdpc.common;
 
+import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.admin.DevicePolicyManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Build.VERSION_CODES;
+import android.os.UserManager;
 import android.text.format.DateUtils;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -100,7 +104,21 @@ public class Util {
     }
 
     public static boolean isBeforeN() {
-        // STOPSHIP Change to SDK_INT.
-        return isBeforeM() || !Build.VERSION.CODENAME.startsWith("N");
+        return Build.VERSION.SDK_INT < VERSION_CODES.N;
+    }
+
+    @TargetApi(VERSION_CODES.N)
+    public static boolean isManagedProfile(Context context, ComponentName admin) {
+        if (isBeforeN()) {
+            // If user has more than one profile, then we deal with managed profile.
+            // Unfortunately there is no public API available to distinguish user profile owner
+            // and managed profile owner. Thus using this hack.
+            UserManager userManager = (UserManager) context.getSystemService(Context.USER_SERVICE);
+            return userManager.getUserProfiles().size() > 1;
+        } else {
+            DevicePolicyManager devicePolicyManager =
+                    (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
+            return devicePolicyManager.isManagedProfile(admin);
+        }
     }
 }

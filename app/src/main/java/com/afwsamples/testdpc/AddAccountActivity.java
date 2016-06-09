@@ -126,6 +126,7 @@ public class AddAccountActivity extends Activity implements NavigationBar.Naviga
                         .show();
                 break;
             case R.id.add_account_skip:
+                mNextActivityIntent.putExtra(EnableProfileActivity.EXTRA_ENABLE_PROFILE_NOW, true);
                 startActivity(mNextActivityIntent);
                 finish();
                 break;

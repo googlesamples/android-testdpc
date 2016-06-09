@@ -52,9 +52,9 @@ public class LaunchActivity extends Activity {
             return;
         }
 
-        Intent intent = new Intent(this, PolicyManagementActivity.class);
         if (ProvisioningStateUtil.isManagedByTestDPC(this)) {
             // Device or profile owner is enforced, allow the user to modify management policies.
+            Intent intent = new Intent(this, PolicyManagementActivity.class);
             startActivity(intent);
             finish();
         } else if (ProvisioningStateUtil.isManaged(this)) {
@@ -65,6 +65,7 @@ public class LaunchActivity extends Activity {
             finish();
         } else if (LaunchIntentUtil.isSynchronousAuthLaunch(getIntent())) {
             // Forward all extras from original launch intent.
+            Intent intent = new Intent(this, SetupManagementActivity.class);
             intent.putExtras(getIntent().getExtras());
 
             // For synchronous auth either Setup Wizard or Add Account will launch this activity
@@ -76,6 +77,7 @@ public class LaunchActivity extends Activity {
         } else {
             // Either a user launched us, or we're triggered from an NFC provisioning bump - go to
             // pre-M setup options.
+            Intent intent = new Intent(this, SetupManagementActivity.class);
             startActivity(intent);
             finish();
         }

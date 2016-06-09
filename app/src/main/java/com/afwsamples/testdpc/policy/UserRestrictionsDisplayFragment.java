@@ -275,18 +275,11 @@ public class UserRestrictionsDisplayFragment extends PreferenceFragment
             }
         }
 
-        if (isManagedProfile()) {
+        if (Util.isManagedProfile(getActivity(), mAdminComponentName)) {
             for (String restriction : NON_MANAGED_PROFILE_RESTRICTIONS) {
                 findPreference(restriction).setEnabled(false);
             }
         }
-    }
-
-    private boolean isManagedProfile() {
-        // If user has more than one profile, then we deal with managed profile.
-        // Unfortunately there is no public API available to distinguish user profile owner
-        // and managed profile owner. Thus using this hack.
-        return mUserManager.getUserProfiles().size() > 1;
     }
 
     private static class UserRestriction {

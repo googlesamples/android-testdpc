@@ -7,17 +7,17 @@ ext {
     // exactly 1 digit
     versionMinor = 0
     // exactly 2 digits
-    versionBuild = 3
+    versionBuild = 8
 }
 
 android {
-    compileSdkVersion 'android-N'
-    buildToolsVersion '23.0.2'
+    compileSdkVersion 24
+    buildToolsVersion '24.0.0'
 
     defaultConfig {
         applicationId "com.afwsamples.testdpc"
         minSdkVersion 21
-        targetSdkVersion 23
+        targetSdkVersion 24
         versionCode versionMajor * 1000 + versionMinor * 100 + versionBuild
         versionName "${versionMajor}.${versionMinor}.${versionBuild}"
     }
@@ -48,38 +48,6 @@ android {
         }
     }
 
-    productFlavors {
-        standard {
-            minSdkVersion 21
-            targetSdkVersion 23
-        }
-
-        N {
-            minSdkVersion 'N'
-            targetSdkVersion 'N'
-        }
-    }
-
-    /* TODO: Remove once release version of N SDK is released. */
-       applicationVariants.all { variant ->
-           variant.outputs.each { output ->
-               output.processManifest.doLast {
-                   // minSdkVersion and targetSdkVersion are overrided if we build against preview
-                   // SDK, let us override them again here.
-                   minSdkVersion = variant.getMergedFlavor().minSdkVersion.getApiString();
-                   targetSdkVersion = variant.getMergedFlavor().targetSdkVersion.getApiString();
-
-                   def manifestOutFile = output.processManifest.manifestOutputFile
-                   def newFileContents = manifestOutFile.getText('UTF-8').
-                           replace('android:minSdkVersion="N"',
-                                   'android:minSdkVersion="' + minSdkVersion + '"')
-                   newFileContents = newFileContents.replace('android:targetSdkVersion="N"',
-                           'android:targetSdkVersion="' + targetSdkVersion + '"')
-                   manifestOutFile.write(newFileContents, 'UTF-8')
-               }
-           }
-       }
-
     // Enable lint checking in all build variants.
     applicationVariants.all { variant ->
         variant.outputs.each { output ->
@@ -90,8 +58,9 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:24.+'
+    compile 'com.android.support:preference-v14:24+'
     compile 'com.android.support:recyclerview-v7:24.+'
     compile "com.android.support:support-v13:24.+"
+    compile 'com.google.android.gms:play-services-safetynet:+'
     compile(name:'setup-wizard-lib-platform-release', ext:'aar')
 }

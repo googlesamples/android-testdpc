@@ -135,17 +135,10 @@ public class WifiConfigCreationDialog extends DialogFragment implements
             WifiConfiguration config = new WifiConfiguration();
             config.SSID = getQuotedString(mSsidText.getText().toString());
             updateConfigurationSecurity(config);
-            WifiManager wifiManager = (WifiManager) getActivity().getSystemService(
-                    Context.WIFI_SERVICE);
-            boolean success = false;
-            if (mOldConfig == null) {
-                success = ((wifiManager.addNetwork(config) != -1) &&
-                        wifiManager.saveConfiguration());
-            } else {
+            if (mOldConfig != null) {
                 config.networkId = mOldConfig.networkId;
-                success = ((wifiManager.updateNetwork(config) != -1) &&
-                        wifiManager.saveConfiguration());
             }
+            boolean success = WifiConfigUtil.saveWifiConfiguration(getActivity(), config);
             showToast(success ? R.string.wifi_config_success : R.string.wifi_config_fail);
         }
         dismiss();

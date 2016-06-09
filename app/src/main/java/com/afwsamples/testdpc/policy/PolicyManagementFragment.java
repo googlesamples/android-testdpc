@@ -16,13 +16,12 @@
 
 package com.afwsamples.testdpc.policy;
 
-import static android.os.UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES;
-
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.admin.DevicePolicyManager;
@@ -41,16 +40,14 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.UserHandle;
 import android.os.UserManager;
-import android.preference.EditTextPreference;
-import android.preference.Preference;
-import android.preference.PreferenceCategory;
-import android.preference.PreferenceFragment;
-import android.preference.SwitchPreference;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.security.KeyChain;
 import android.security.KeyChainAliasCallback;
+import android.support.v14.preference.SwitchPreference;
 import android.support.v4.content.FileProvider;
+import android.support.v7.preference.EditTextPreference;
+import android.support.v7.preference.Preference;
 import android.telephony.TelephonyManager;
 import android.text.InputType;
 import android.text.TextUtils;
@@ -73,7 +70,9 @@ import android.widget.Toast;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.AppInfoArrayAdapter;
+import com.afwsamples.testdpc.common.CertificateUtil;
 import com.afwsamples.testdpc.common.MediaDisplayFragment;
+import com.afwsamples.testdpc.common.BaseSearchablePolicyPreferenceFragment;
 import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.policy.blockuninstallation.BlockUninstallationInfoArrayAdapter;
 import com.afwsamples.testdpc.policy.certificate.DelegatedCertInstallerFragment;
@@ -85,12 +84,14 @@ import com.afwsamples.testdpc.policy.networking.AlwaysOnVpnFragment;
 import com.afwsamples.testdpc.policy.networking.NetworkUsageStatsFragment;
 import com.afwsamples.testdpc.policy.systemupdatepolicy.SystemUpdatePolicyFragment;
 import com.afwsamples.testdpc.policy.wifimanagement.WifiConfigCreationDialog;
+import com.afwsamples.testdpc.policy.wifimanagement.WifiEapTlsCreateDialogFragment;
 import com.afwsamples.testdpc.policy.wifimanagement.WifiModificationFragment;
 import com.afwsamples.testdpc.profilepolicy.ProfilePolicyManagementFragment;
 import com.afwsamples.testdpc.profilepolicy.addsystemapps.EnableSystemAppsByIntentFragment;
 import com.afwsamples.testdpc.profilepolicy.apprestrictions.AppRestrictionsManagingPackageFragment;
 import com.afwsamples.testdpc.profilepolicy.apprestrictions.ManageAppRestrictionsFragment;
 import com.afwsamples.testdpc.profilepolicy.permission.ManageAppPermissionsFragment;
+import com.afwsamples.testdpc.safetynet.SafetyNetFragment;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -98,7 +99,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -110,10 +110,11 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static android.os.UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES;
 
 /**
  * Provides several device management functions.
@@ -177,7 +178,7 @@ import java.util.Set;
  * <li> {@link UserManager#DISALLOW_CONFIG_WIFI} </li>
  * </ul>
  */
-public class PolicyManagementFragment extends PreferenceFragment implements
+public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFragment implements
         Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
     // Tag for creating this fragment. This tag can be used to retrieve this fragment.
     public static final String FRAGMENT_TAG = "PolicyManagementFragment";
@@ -189,7 +190,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
 
     public static final int DEFAULT_BUFFER_SIZE = 4096;
     public static final String X509_CERT_TYPE = "X.509";
-    public static final String TAG = "PolicyManagementFragment";
+    public static final String TAG = "PolicyManagement";
 
     public static final String OVERRIDE_KEY_SELECTION_KEY = "override_key_selection";
 
@@ -260,13 +261,14 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     private static final String UNSUSPEND_APPS_KEY = "unsuspend_apps";
     private static final String WIPE_DATA_KEY = "wipe_data";
     private static final String CREATE_WIFI_CONFIGURATION_KEY = "create_wifi_configuration";
+    private static final String CREATE_EAP_TLS_WIFI_CONFIGURATION_KEY
+            = "create_eap_tls_wifi_configuration";
     private static final String WIFI_CONFIG_LOCKDOWN_ENABLE_KEY = "enable_wifi_config_lockdown";
     private static final String MODIFY_WIFI_CONFIGURATION_KEY = "modify_wifi_configuration";
     private static final String TAG_WIFI_CONFIG_CREATION = "wifi_config_creation";
     private static final String WIFI_CONFIG_LOCKDOWN_ON = "1";
     private static final String WIFI_CONFIG_LOCKDOWN_OFF = "0";
-
-    private static final long MS_PER_SECOND = 1000;
+    private static final String SAFETYNET_ATTEST = "safetynet_attest";
 
     private static final String BATTERY_PLUGGED_ANY = Integer.toString(
             BatteryManager.BATTERY_PLUGGED_AC |
@@ -302,7 +304,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
      * Preferences that are allowed only in NYC+ if it is profile owner. This does not restrict
      * device owner.
      */
-    private static String[] MANAGED_PROFILE_NYC_PLUS_PREFERENCES = {
+    private static String[] PROFILE_OWNER_NYC_PLUS_PREFERENCES = {
             RESET_PASSWORD_KEY
     };
 
@@ -336,8 +338,6 @@ public class PolicyManagementFragment extends PreferenceFragment implements
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
         mAdminComponentName = DeviceAdminReceiver.getComponentName(getActivity());
         mDevicePolicyManager = (DevicePolicyManager) getActivity().getSystemService(
                 Context.DEVICE_POLICY_SERVICE);
@@ -349,8 +349,12 @@ public class PolicyManagementFragment extends PreferenceFragment implements
 
         mImageUri = getStorageUri("image.jpg");
         mVideoUri = getStorageUri("video.mp4");
+        super.onCreate(savedInstanceState);
+    }
 
-        addPreferencesFromResource(R.xml.device_policy_header);
+    @Override
+    public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+        addPreferencesFromResource(getPreferenceXml());
 
         EditTextPreference overrideKeySelectionPreference =
                 (EditTextPreference) findPreference(OVERRIDE_KEY_SELECTION_KEY);
@@ -419,6 +423,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         findPreference(SET_PERMISSION_POLICY_KEY).setOnPreferenceClickListener(this);
         findPreference(MANAGE_APP_PERMISSIONS_KEY).setOnPreferenceClickListener(this);
         findPreference(CREATE_WIFI_CONFIGURATION_KEY).setOnPreferenceClickListener(this);
+        findPreference(CREATE_EAP_TLS_WIFI_CONFIGURATION_KEY).setOnPreferenceClickListener(this);
         findPreference(WIFI_CONFIG_LOCKDOWN_ENABLE_KEY).setOnPreferenceChangeListener(this);
         findPreference(MODIFY_WIFI_CONFIGURATION_KEY).setOnPreferenceClickListener(this);
         findPreference(SHOW_WIFI_MAC_ADDRESS_KEY).setOnPreferenceClickListener(this);
@@ -429,6 +434,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         findPreference(REBOOT_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_SHORT_SUPPORT_MESSAGE_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_LONG_SUPPORT_MESSAGE_KEY).setOnPreferenceClickListener(this);
+        findPreference(SAFETYNET_ATTEST).setOnPreferenceClickListener(this);
         mSetAutoTimeRequiredPreference = (SwitchPreference) findPreference(
                 SET_AUTO_TIME_REQUIRED_KEY);
         mSetAutoTimeRequiredPreference.setOnPreferenceChangeListener(this);
@@ -444,13 +450,24 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     }
 
     @Override
+    public int getPreferenceXml() {
+        return R.xml.device_policy_header;
+    }
+
+    @Override
+    public boolean isAvailable(Context context) {
+        DevicePolicyManager dpm =
+                (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
+        String packageName = context.getPackageName();
+        return dpm.isProfileOwnerApp(packageName) || dpm.isDeviceOwnerApp(packageName);
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         getActivity().getActionBar().setTitle(R.string.policies_management);
 
-        boolean isDeviceOwner = mDevicePolicyManager.isDeviceOwnerApp(mPackageName);
-        boolean isProfileOwner = mDevicePolicyManager.isProfileOwnerApp(mPackageName);
-        if (!isDeviceOwner && !isProfileOwner) {
+        if (!isAvailable(getActivity())) {
             showToast(R.string.this_is_not_a_device_owner);
             getActivity().finish();
         }
@@ -647,6 +664,9 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             case CREATE_WIFI_CONFIGURATION_KEY:
                 showWifiConfigCreationDialog();
                 return true;
+            case CREATE_EAP_TLS_WIFI_CONFIGURATION_KEY:
+                showEapTlsWifiConfigCreationDialog();
+                return true;
             case MODIFY_WIFI_CONFIGURATION_KEY:
                 showFragment(new WifiModificationFragment());
                 return true;
@@ -666,6 +686,10 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             case SET_LONG_SUPPORT_MESSAGE_KEY:
                 showFragment(SetSupportMessageFragment.newInstance(
                         SetSupportMessageFragment.TYPE_LONG));
+                return true;
+            case SAFETYNET_ATTEST:
+                DialogFragment safetynetFragment = new SafetyNetFragment();
+                safetynetFragment.show(getFragmentManager(), SafetyNetFragment.class.getName());
                 return true;
         }
         return false;
@@ -1075,21 +1099,24 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                 findPreference(preference).setEnabled(false);
             }
             if (Util.isBeforeN()) {
-                for (String preference : MANAGED_PROFILE_NYC_PLUS_PREFERENCES) {
+                for (String preference : PROFILE_OWNER_NYC_PLUS_PREFERENCES) {
                     findPreference(preference).setEnabled(false);
                 }
             }
-            deviceOwnerStatusStringId = R.string.this_is_a_managed_profile_owner;
+            deviceOwnerStatusStringId = R.string.this_is_a_profile_owner;
         } else if (isDeviceOwner) {
             // If it's a device owner and running in the primary profile.
             deviceOwnerStatusStringId = R.string.this_is_a_device_owner;
-            for (String managedProfileSpecificOption : MANAGED_PROFILE_SPECIFIC_OPTIONS) {
-                findPreference(managedProfileSpecificOption).setEnabled(false);
-            }
         }
         findPreference(DEVICE_OWNER_STATUS_KEY).setSummary(deviceOwnerStatusStringId);
         if (!isDeviceOwner) {
             findPreference(WIFI_CONFIG_LOCKDOWN_ENABLE_KEY).setEnabled(false);
+        }
+        // Disable managed profile specific options if we are not running in managed profile.
+        if (!Util.isManagedProfile(getActivity(), mAdminComponentName)) {
+            for (String managedProfileSpecificOption : MANAGED_PROFILE_SPECIFIC_OPTIONS) {
+                findPreference(managedProfileSpecificOption).setEnabled(false);
+            }
         }
     }
 
@@ -1442,7 +1469,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
         try {
             startActivityForResult(certIntent, requestCode);
         } catch (ActivityNotFoundException e) {
-            e.printStackTrace();
+            Log.e(TAG, "showFileViewerForImportingCertificate: ", e);
         }
     }
 
@@ -1476,23 +1503,13 @@ public class PolicyManagementFragment extends PreferenceFragment implements
             if (password == null) {
                 password = "";
             }
-            InputStream certificateInputStream;
             try {
-                certificateInputStream = getActivity().getContentResolver().openInputStream(data);
-                KeyStore keyStore = KeyStore.getInstance(KeyChain.EXTRA_PKCS12);
-                keyStore.load(certificateInputStream, password.toCharArray());
-                Enumeration<String> aliases = keyStore.aliases();
-                while (aliases.hasMoreElements()) {
-                    String alias = aliases.nextElement();
-                    if (!TextUtils.isEmpty(alias)) {
-                        Certificate certificate = keyStore.getCertificate(alias);
-                        PrivateKey privateKey = (PrivateKey) keyStore
-                                .getKey(alias, "".toCharArray());
-                        showPromptForKeyCertificateAlias(privateKey, certificate, alias);
-                    }
-                }
-            } catch (KeyStoreException | FileNotFoundException | CertificateException
-                    | UnrecoverableKeyException | NoSuchAlgorithmException e) {
+                CertificateUtil.PKCS12ParseInfo parseInfo = CertificateUtil
+                        .parsePKCS12Certificate(getActivity().getContentResolver(), data, password);
+                showPromptForKeyCertificateAlias(parseInfo.privateKey, parseInfo.certificate,
+                        parseInfo.alias);
+            } catch (KeyStoreException | FileNotFoundException | CertificateException |
+                    UnrecoverableKeyException | NoSuchAlgorithmException e) {
                 Log.e(TAG, "Unable to load key", e);
             } catch (IOException e) {
                 showPromptForCertificatePassword(intent, ++attempts);
@@ -1644,10 +1661,8 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                     isCaInstalled = mDevicePolicyManager.installCaCert(mAdminComponentName,
                             byteBuffer.toByteArray());
                 }
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
             } catch (IOException e) {
-                e.printStackTrace();
+                Log.e(TAG, "importCaCertificateFromIntent: ", e);
             }
             showToast(isCaInstalled ? R.string.install_ca_successfully : R.string.install_ca_fail);
         }
@@ -2085,7 +2100,7 @@ public class PolicyManagementFragment extends PreferenceFragment implements
                                         new ByteArrayInputStream(installedCaCert));
                         caSubjectDnList[i++] = certificate.getSubjectDN().getName();
                     } catch (CertificateException e) {
-                        e.printStackTrace();
+                        Log.e(TAG, "getCaCertificateSubjectDnList: ", e);
                     }
                 }
             }
@@ -2121,6 +2136,11 @@ public class PolicyManagementFragment extends PreferenceFragment implements
     private void showWifiConfigCreationDialog() {
         WifiConfigCreationDialog dialog = WifiConfigCreationDialog.newInstance();
         dialog.show(getFragmentManager(), TAG_WIFI_CONFIG_CREATION);
+    }
+
+    private void showEapTlsWifiConfigCreationDialog() {
+        DialogFragment fragment = WifiEapTlsCreateDialogFragment.newInstance(null);
+        fragment.show(getFragmentManager(), WifiEapTlsCreateDialogFragment.class.getName());
     }
 
     @TargetApi(Build.VERSION_CODES.N)
