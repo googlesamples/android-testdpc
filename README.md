@@ -1,20 +1,19 @@
 Test Device Policy Control (Test DPC) App
 =========================================
 
-Test DPC is an app designed to help EMMs, ISVs, and OEMs to test their applications and platforms in a Android for Work managed profile (i.e. work profile). It serves as both a sample Device Policy Controller and a testing application to flex the APIs available for Android for Work. It supports devices running Android 5.0 Lollipop or later. As of May 18, 2016, it also supports devices running the Android N Developer Preview 3. If you are running Developer Preview 1 or 2, update your device so that it's running Developer Preview 3.
+Test DPC is an app designed to help EMMs, ISVs, and OEMs to test their applications and platforms in a Android for Work managed profile (i.e. work profile). It serves as both a sample Device Policy Controller and a testing application to flex the APIs available for Android for Work. It supports devices running Android 5.0 Lollipop or later. As of June 8, 2016, it also includes support for devices running API level 24.
 
 Pre-requisites
 --------------
 
-- Android N Preview SDK
-- Android Build Tools v23.0.2
+- Android N SDK
+- Android Build Tools v24.0.0
 - Android Support Repository
 
 Getting Started
 ---------------
 
 This sample uses the Gradle build system. To build this project, use the "gradlew assemble" command or use "Import Project" in Android Studio.
-Please note that two apks will be generated when building this app: TestDPC\-standard\-\*.apk is the apk targeting devices Android 6.0 and below while TestDPC\-N\-\*.apk is targeting the Android N Developer Preview.
 
 Screenshots
 ------------
@@ -28,9 +27,8 @@ Screenshots
 Known Issues
 ------------
 
-1. Not saving selected permitted input methods
+1. Not displaying the toast when suspending an app
 2. Not saving "Mute audio" setting
-3. TestDPC thinks it is running inside a managed profile when launched in secondary user
 
 Support
 -------
