@@ -501,7 +501,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 showResetPasswordPrompt();
                 return false;
             case LOCK_NOW_KEY:
-                mDevicePolicyManager.lockNow();
+                lockNow();
                 return true;
             case START_LOCK_TASK:
                 getActivity().startLockTask();
@@ -693,6 +693,19 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 return true;
         }
         return false;
+    }
+
+    @TargetApi(Build.VERSION_CODES.N)
+    private void lockNow() {
+        if (Util.isBeforeN() || !Util.isManagedProfile(getActivity(), mAdminComponentName)) {
+            mDevicePolicyManager.lockNow();
+        } else {
+            // In N for work profiles we should call lockNow on the parent instance to
+            // lock the device.
+            DevicePolicyManager parentDpm
+                    = mDevicePolicyManager.getParentProfileInstance(mAdminComponentName);
+            parentDpm.lockNow();
+        }
     }
 
     @Override
