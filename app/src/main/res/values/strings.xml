@@ -50,6 +50,7 @@
     <string name="add_account_with_name">Add account with name</string>
     <string name="add_account_skip">Skip</string>
     <string name="add_account_dialog_title">Account name:</string>
+    <string name="fail_to_add_account">Fail to add account</string>
     <string name="icon">Icon</string>
     <string name="manage_apps">Manage applications</string>
     <string name="reset">Reset</string>
