@@ -26,6 +26,7 @@ import android.content.pm.ResolveInfo;
 import android.net.VpnService;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
@@ -47,7 +48,7 @@ import java.util.Set;
  */
 @TargetApi(Build.VERSION_CODES.N)
 public class AlwaysOnVpnFragment extends SelectAppFragment {
-
+    private static final String TAG = "AlwaysOnVpnFragment";
     private DevicePolicyManager mDpm;
 
     private static final Intent VPN_INTENT = new Intent(VpnService.SERVICE_INTERFACE);
@@ -84,9 +85,7 @@ public class AlwaysOnVpnFragment extends SelectAppFragment {
             final ComponentName who = DeviceAdminReceiver.getComponentName(getActivity());
             mDpm.setAlwaysOnVpnPackage(who, pkg, /* lockdownEnabled */ true);
         } catch (PackageManager.NameNotFoundException | UnsupportedOperationException e) {
-            if (pkg != null) {
-                clearSelectedPackage();
-            }
+            Log.e(TAG, "setAlwaysOnVpnPackage:", e);
         }
     }
 
