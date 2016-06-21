@@ -38,6 +38,7 @@ import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.EditDeleteArrayAdapter;
 import com.afwsamples.testdpc.common.ManageAppFragment;
+import com.afwsamples.testdpc.common.RestrictionManagerCompat;
 import com.afwsamples.testdpc.common.keyvaluepair.KeyValuePairDialogFragment;
 
 import java.util.ArrayList;
@@ -180,7 +181,7 @@ public class ManageAppRestrictionsFragment extends ManageAppFragment
                     value = restrictionEntry.getAllSelectedStrings();
                     break;
                 case RestrictionEntry.TYPE_BUNDLE:
-                    value = convertRestrictionsToBundle(Arrays.asList(
+                    value = RestrictionManagerCompat.convertRestrictionsToBundle(Arrays.asList(
                             getRestrictionEntries(restrictionEntry)));
                     break;
                 case RestrictionEntry.TYPE_BUNDLE_ARRAY:
@@ -188,7 +189,7 @@ public class ManageAppRestrictionsFragment extends ManageAppFragment
                     Bundle[] bundles = new Bundle[restrictionEntries.length];
                     for (int i = 0; i < restrictionEntries.length; i++) {
                         bundles[i] =
-                                convertRestrictionsToBundle(Arrays.asList(
+                                RestrictionManagerCompat.convertRestrictionsToBundle(Arrays.asList(
                                         getRestrictionEntries(restrictionEntries[i])));
                     }
                     value = bundles;
@@ -374,7 +375,7 @@ public class ManageAppRestrictionsFragment extends ManageAppFragment
                 ((ApplicationInfo) mManagedAppsSpinner.getSelectedItem()).packageName;
         mDevicePolicyManager.setApplicationRestrictions(
                 DeviceAdminReceiver.getComponentName(getActivity()), pkgName,
-                convertRestrictionsToBundle(mRestrictionEntries));
+                RestrictionManagerCompat.convertRestrictionsToBundle(mRestrictionEntries));
         mLastRestrictionEntries = new ArrayList<>(mRestrictionEntries);
         showToast(getString(R.string.set_app_restrictions_success, pkgName));
     }
@@ -389,44 +390,6 @@ public class ManageAppRestrictionsFragment extends ManageAppFragment
     protected void loadDefault() {
         loadManifestAppRestrictions(
                 ((ApplicationInfo) mManagedAppsSpinner.getSelectedItem()).packageName);
-    }
-
-    /**
-     * Wrapper for RestrictionsManager.convertRestrictionsToBundle, with a fallback implementation
-     * for versions before M where this was introduced.
-     * The fallback recognises only the restriction types available on L.
-     */
-    @TargetApi(Build.VERSION_CODES.M)
-    private Bundle convertRestrictionsToBundle(List<RestrictionEntry> restrictionEntries) {
-        if (restrictionEntries == null) {
-            return null;
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            return RestrictionsManager.convertRestrictionsToBundle(restrictionEntries);
-        }
-        Bundle bundle = new Bundle();
-        for (RestrictionEntry entry : restrictionEntries) {
-            switch (entry.getType()) {
-                case RestrictionEntry.TYPE_BOOLEAN:
-                    bundle.putBoolean(entry.getKey(), entry.getSelectedState());
-                    break;
-                case RestrictionEntry.TYPE_INTEGER:
-                    bundle.putInt(entry.getKey(), entry.getIntValue());
-                    break;
-                case RestrictionEntry.TYPE_STRING:
-                case RestrictionEntry.TYPE_NULL:
-                    bundle.putString(entry.getKey(), entry.getSelectedString());
-                    break;
-                case RestrictionEntry.TYPE_CHOICE:
-                case RestrictionEntry.TYPE_MULTI_SELECT:
-                    bundle.putStringArray(entry.getKey(), entry.getAllSelectedStrings());
-                    break;
-                default:
-                    throw new IllegalArgumentException(
-                            "Unsupported restrictionEntry type: " + entry.getType());
-            }
-        }
-        return bundle;
     }
 
     @TargetApi(Build.VERSION_CODES.M)
