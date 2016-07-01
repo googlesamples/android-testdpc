@@ -30,19 +30,22 @@ import com.afwsamples.testdpc.common.SelectAppFragment;
 
 /**
  * This fragment lets the user select an app that can manage application restrictions for the
- * current user. Related APIs:
- * 1) {@link DevicePolicyManager#setApplicationRestrictionsManagingPackage}
- * 2) {@link DevicePolicyManager#getApplicationRestrictionsManagingPackage}
- * 3) {@link DevicePolicyManager#isCallerApplicationRestrictionsManagingPackage}
+ * current user.
+ *
+ * <p>On Android N and after, it allows the selected app to call the DevicePolicyManager APIs using:
+ * {@link DevicePolicyManager#setApplicationRestrictionsManagingPackage}
+ * {@link DevicePolicyManager#getApplicationRestrictionsManagingPackage}
+ *
+ * <p>On Android M and before, it allows the selected app to proxy API calls to DevicePolicyManager
+ * via TestDPC, see {@link AppRestrictionsProxyHandler}.
  */
-@TargetApi(Build.VERSION_CODES.N)
 public class AppRestrictionsManagingPackageFragment extends SelectAppFragment {
 
     private DevicePolicyManager mDpm;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mDpm = (DevicePolicyManager) getContext().getSystemService(Context.DEVICE_POLICY_SERVICE);
+        mDpm = (DevicePolicyManager) getActivity().getSystemService(Context.DEVICE_POLICY_SERVICE);
     }
 
     @Override
@@ -57,11 +60,10 @@ public class AppRestrictionsManagingPackageFragment extends SelectAppFragment {
         if (TextUtils.isEmpty(pkgName)) {
             pkgName = null;
         }
-        try {
-            mDpm.setApplicationRestrictionsManagingPackage(
-                    DeviceAdminReceiver.getComponentName(getActivity()), pkgName);
-        } catch (NameNotFoundException nnpe) {
-            throw new IllegalArgumentException(nnpe);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            setApplicationRestrictionsManagingPackage(pkgName);
+        } else {
+            setApplicationRestrictionsManagingPackageWithProxy(pkgName);
         }
     }
 
@@ -72,7 +74,35 @@ public class AppRestrictionsManagingPackageFragment extends SelectAppFragment {
 
     @Override
     protected String getSelectedPackage() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            return getApplicationRestrictionsManagingPackage();
+        } else {
+            return getApplicationRestrictionsManagingPackageWithProxy();
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.N)
+    private void setApplicationRestrictionsManagingPackage(String pkgName) {
+        try {
+            mDpm.setApplicationRestrictionsManagingPackage(
+                DeviceAdminReceiver.getComponentName(getActivity()), pkgName);
+        } catch (NameNotFoundException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
+    private void setApplicationRestrictionsManagingPackageWithProxy(String pkgName) {
+        AppRestrictionsProxyHandler.setApplicationRestrictionsManagingPackage(
+            getActivity(), pkgName);
+    }
+
+    @TargetApi(Build.VERSION_CODES.N)
+    private String getApplicationRestrictionsManagingPackage() {
         return mDpm.getApplicationRestrictionsManagingPackage(
-                DeviceAdminReceiver.getComponentName(getActivity()));
+            DeviceAdminReceiver.getComponentName(getActivity()));
+    }
+
+    private String getApplicationRestrictionsManagingPackageWithProxy() {
+        return AppRestrictionsProxyHandler.getApplicationRestrictionsManagingPackage(getActivity());
     }
 }
