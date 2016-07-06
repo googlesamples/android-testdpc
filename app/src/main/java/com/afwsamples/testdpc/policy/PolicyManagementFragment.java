@@ -107,9 +107,13 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -204,6 +208,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String CREATE_AND_MANAGE_USER_KEY = "create_and_manage_user";
     private static final String DELEGATED_CERT_INSTALLER_KEY = "manage_cert_installer";
     private static final String DEVICE_OWNER_STATUS_KEY = "device_owner_status";
+    private static final String SECURITY_PATCH_KEY = "security_patch";
     private static final String DISABLE_CAMERA_KEY = "disable_camera";
     private static final String DISABLE_KEYGUARD = "disable_keyguard";
     private static final String DISABLE_SCREEN_CAPTURE_KEY = "disable_screen_capture";
@@ -269,6 +274,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String WIFI_CONFIG_LOCKDOWN_ON = "1";
     private static final String WIFI_CONFIG_LOCKDOWN_OFF = "0";
     private static final String SAFETYNET_ATTEST = "safetynet_attest";
+    private static final String SECURITY_PATCH_FORMAT = "yyyy-MM-dd";
 
     private static final String BATTERY_PLUGGED_ANY = Integer.toString(
             BatteryManager.BATTERY_PLUGGED_AC |
@@ -290,7 +296,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             NETWORK_STATS_KEY, DELEGATED_CERT_INSTALLER_KEY, DISABLE_STATUS_BAR,
             REENABLE_STATUS_BAR, DISABLE_KEYGUARD, REENABLE_KEYGUARD, START_KIOSK_MODE,
             SET_PERMISSION_POLICY_KEY, MANAGE_APP_PERMISSIONS_KEY,STAY_ON_WHILE_PLUGGED_IN,
-            WIFI_CONFIG_LOCKDOWN_ENABLE_KEY
+            WIFI_CONFIG_LOCKDOWN_ENABLE_KEY, SECURITY_PATCH_KEY
     };
 
     private static String[] NYC_PLUS_PREFERENCES = {
@@ -442,6 +448,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         disableIncompatibleManagementOptionsInCurrentProfile();
         disableIncompatibleManagementOptionsByApiLevel();
 
+        loadSecurityPatch();
         reloadCameraDisableUi();
         reloadScreenCaptureDisableUi();
         reloadMuteAudioUi();
@@ -1400,6 +1407,26 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 })
                 .setNegativeButton(android.R.string.cancel, null)
                 .show();
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    private void loadSecurityPatch() {
+        Preference securityPatchPreference = findPreference(SECURITY_PATCH_KEY);
+        if (!securityPatchPreference.isEnabled()) {
+            return;
+        }
+
+        String buildSecurityPatch = Build.VERSION.SECURITY_PATCH;
+        final Date date;
+        try {
+            date = new SimpleDateFormat(SECURITY_PATCH_FORMAT).parse(buildSecurityPatch);
+        } catch (ParseException e) {
+            securityPatchPreference.setSummary(
+                    getString(R.string.invalid_security_patch, buildSecurityPatch));
+            return;
+        }
+        String display = DateFormat.getDateInstance(DateFormat.MEDIUM).format(date);
+        securityPatchPreference.setSummary(display);
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)

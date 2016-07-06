@@ -20,6 +20,10 @@
     <Preference
             android:key="device_owner_status"
             android:selectable="false"/>
+    <Preference
+        android:key="security_patch"
+        android:title="@string/security_patch"
+        android:selectable="false"/>
 
     <PreferenceCategory
             android:title="@string/accessibility_title">

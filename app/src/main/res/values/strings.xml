@@ -119,6 +119,11 @@
     <string name="add">Add</string>
     <string name="clear">Clear</string>
 
+    <!-- Strings for system information -->
+    <string name="invalid_security_patch">Invalid security patch format:
+        <xliff:g id="security_patch">%s</xliff:g></string>
+    <string name="security_patch">Security patch</string>
+
     <!-- Strings for camera and screen capture -->
     <string name="camera_title">Camera, screen capture and audio</string>
     <string name="display_media">Display Media</string>
