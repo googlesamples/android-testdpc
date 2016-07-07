@@ -76,6 +76,19 @@
     <string name="invalid_launch_intent_no_account">No account found on incoming intent.</string>
     <string name="device_admin_receiver_failure">Failed to become device/profile owner.</string>
     <string name="menu_search_title">Search</string>
+
+    <!-- Reasons for disabling preferences -->
+    <string name="requires_android_m">Requires API level 23</string>
+    <string name="requires_android_n">Requires API level 24</string>
+    <string name="primary_user_only">Primary user only</string>
+    <string name="not_for_parent_profile">Not applicable to parent profile</string>
+    <string name="managed_profile_only">Managed profile only</string>
+    <string name="non_managed_profile_only">Non-managed profile only</string>
+    <string name="device_owner_only">Device owner only</string>
+    <string name="profile_owner_only">Profile owner only</string>
+    <string name="user_restricted">Disallowed by user restriction</string>
+    <string name="requires_process_logs">Requires process logging to be enabled</string>
+
     <!-- Strings for device owner management -->
     <string name="this_is_not_a_device_owner">This app is currently not the device owner.</string>
     <string name="this_is_a_device_owner">This app is the device owner.</string>

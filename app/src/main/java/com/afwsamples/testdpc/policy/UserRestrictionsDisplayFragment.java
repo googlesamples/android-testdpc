@@ -254,12 +254,12 @@ public class UserRestrictionsDisplayFragment extends PreferenceFragment
     private void disableIncompatibleRestrictionsByApiLevel() {
         if (Util.isBeforeM()) {
             for (String restriction : MNC_PLUS_RESTRICTIONS) {
-                findPreference(restriction).setEnabled(false);
+                Util.disablePreference(findPreference(restriction), R.string.requires_android_m);
             }
         }
         if (Util.isBeforeN()) {
             for (String restriction : NYC_PLUS_RESTRICTIONS) {
-                findPreference(restriction).setEnabled(false);
+                Util.disablePreference(findPreference(restriction), R.string.requires_android_n);
             }
         }
     }
@@ -270,17 +270,18 @@ public class UserRestrictionsDisplayFragment extends PreferenceFragment
         boolean isDeviceOwner = mDevicePolicyManager.isDeviceOwnerApp(pkgName);
         if (isProfileOwner) {
             for (String restriction : PRIMARY_USER_ONLY_RESTRICTIONS) {
-                findPreference(restriction).setEnabled(false);
+                Util.disablePreference(findPreference(restriction), R.string.primary_user_only);
             }
         } else if (isDeviceOwner) {
             for (String restriction : MANAGED_PROFILE_ONLY_RESTRICTIONS) {
-                findPreference(restriction).setEnabled(false);
+                Util.disablePreference(findPreference(restriction), R.string.managed_profile_only);
             }
         }
 
         if (Util.isManagedProfile(getActivity(), mAdminComponentName)) {
             for (String restriction : NON_MANAGED_PROFILE_RESTRICTIONS) {
-                findPreference(restriction).setEnabled(false);
+                Util.disablePreference(findPreference(restriction),
+                        R.string.non_managed_profile_only);
             }
         }
     }
