@@ -70,9 +70,9 @@ import android.widget.Toast;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.AppInfoArrayAdapter;
+import com.afwsamples.testdpc.common.BaseSearchablePolicyPreferenceFragment;
 import com.afwsamples.testdpc.common.CertificateUtil;
 import com.afwsamples.testdpc.common.MediaDisplayFragment;
-import com.afwsamples.testdpc.common.BaseSearchablePolicyPreferenceFragment;
 import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.policy.blockuninstallation.BlockUninstallationInfoArrayAdapter;
 import com.afwsamples.testdpc.policy.certificate.DelegatedCertInstallerFragment;
@@ -1097,8 +1097,12 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
      * </p>
      */
     public void updateInstallNonMarketAppsPreference() {
-        mInstallNonMarketAppsPreference.setEnabled(
-                mUserManager.hasUserRestriction(DISALLOW_INSTALL_UNKNOWN_SOURCES) ? false : true);
+        if (mUserManager.hasUserRestriction(DISALLOW_INSTALL_UNKNOWN_SOURCES)) {
+            Util.disablePreference(mInstallNonMarketAppsPreference, R.string.user_restricted);
+        } else {
+            mInstallNonMarketAppsPreference.setEnabled(true);
+            mInstallNonMarketAppsPreference.setSummary(null);
+        }
         int isInstallNonMarketAppsAllowed = Settings.Secure.getInt(
                 getActivity().getContentResolver(), Settings.Secure.INSTALL_NON_MARKET_APPS, 0);
         mInstallNonMarketAppsPreference.setChecked(
@@ -1116,11 +1120,11 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         if (isProfileOwner) {
             // Some of the management options can only be applied in a primary profile.
             for (String preference : PRIMARY_USER_ONLY_PREFERENCES) {
-                findPreference(preference).setEnabled(false);
+                Util.disablePreference(findPreference(preference), R.string.primary_user_only);
             }
             if (Util.isBeforeN()) {
                 for (String preference : PROFILE_OWNER_NYC_PLUS_PREFERENCES) {
-                    findPreference(preference).setEnabled(false);
+                    Util.disablePreference(findPreference(preference), R.string.requires_android_n);
                 }
             }
             deviceOwnerStatusStringId = R.string.this_is_a_profile_owner;
@@ -1130,26 +1134,27 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         }
         findPreference(DEVICE_OWNER_STATUS_KEY).setSummary(deviceOwnerStatusStringId);
         if (!isDeviceOwner) {
-            findPreference(WIFI_CONFIG_LOCKDOWN_ENABLE_KEY).setEnabled(false);
+            Util.disablePreference(findPreference(WIFI_CONFIG_LOCKDOWN_ENABLE_KEY),
+                    R.string.device_owner_only);
         }
         // Disable managed profile specific options if we are not running in managed profile.
         if (!Util.isManagedProfile(getActivity(), mAdminComponentName)) {
             for (String managedProfileSpecificOption : MANAGED_PROFILE_SPECIFIC_OPTIONS) {
-                findPreference(managedProfileSpecificOption).setEnabled(false);
+                Util.disablePreference(findPreference(managedProfileSpecificOption),
+                        R.string.managed_profile_only);
             }
         }
     }
 
     private void disableIncompatibleManagementOptionsByApiLevel() {
         if (Util.isBeforeM()) {
-            // The following options depend on MNC APIs.
             for (String preference : MNC_PLUS_PREFERENCES) {
-                findPreference(preference).setEnabled(false);
+                Util.disablePreference(findPreference(preference), R.string.requires_android_m);
             }
         }
         if (Util.isBeforeN()) {
             for (String preference : NYC_PLUS_PREFERENCES) {
-                findPreference(preference).setEnabled(false);
+                Util.disablePreference(findPreference(preference), R.string.requires_android_n);
             }
         }
     }
@@ -1441,7 +1446,13 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             boolean isProcessLoggingEnabled = mDevicePolicyManager.isSecurityLoggingEnabled(
                     mAdminComponentName);
             mEnableProcessLoggingPreference.setChecked(isProcessLoggingEnabled);
-            findPreference(REQUEST_PROCESS_LOGS).setEnabled(isProcessLoggingEnabled);
+            Preference requestLogsPreference = findPreference((REQUEST_PROCESS_LOGS));
+            if (isProcessLoggingEnabled) {
+                requestLogsPreference.setEnabled(true);
+                requestLogsPreference.setSummary(null);
+            } else {
+                Util.disablePreference(requestLogsPreference, R.string.requires_process_logs);
+            }
         }
     }
 
