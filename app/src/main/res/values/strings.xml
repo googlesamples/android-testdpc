@@ -78,14 +78,20 @@
     <string name="menu_search_title">Search</string>
 
     <!-- Reasons for disabling preferences -->
+    <string name="requires_android_api_level">Requires API level
+        <xliff:g id="api level">%d</xliff:g></string>
+    <string name="not_for_device_owner">Not applicable to device owner</string>
+    <string name="not_for_primary_user">Not applicable to primary user</string>
+    <string name="not_for_profile_owner">Not applicable to profile owner</string>
+    <string name="not_for_managed_profile">Not applicable to managed profile</string>
+
+    <string name="not_for_parent_profile">Not applicable to parent profile</string>
+    <string name="device_owner_only">Device owner only</string>
+    <string name="primary_user_only">Primary user only</string>
+    <string name="profile_owner_only">Profile owner only</string>
+    <string name="managed_profile_only">Managed profile only</string>
     <string name="requires_android_m">Requires API level 23</string>
     <string name="requires_android_n">Requires API level 24</string>
-    <string name="primary_user_only">Primary user only</string>
-    <string name="not_for_parent_profile">Not applicable to parent profile</string>
-    <string name="managed_profile_only">Managed profile only</string>
-    <string name="non_managed_profile_only">Non-managed profile only</string>
-    <string name="device_owner_only">Device owner only</string>
-    <string name="profile_owner_only">Profile owner only</string>
     <string name="user_restricted">Disallowed by user restriction</string>
     <string name="requires_process_logs">Requires process logging to be enabled</string>
     <string name="not_for_password_quality">Not applicable to current password quality</string>

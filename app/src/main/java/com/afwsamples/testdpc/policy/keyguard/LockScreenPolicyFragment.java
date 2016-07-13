@@ -293,7 +293,7 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
             return;
         }
         if (Keys.NOT_APPLICABLE_TO_PROFILE.contains(key) && isManagedProfileInstance()) {
-            Util.disablePreference(pref, R.string.non_managed_profile_only);
+            Util.disablePreference(pref, R.string.not_for_managed_profile);
             return;
         }
         if (Keys.DEVICE_OWNER_ONLY.contains(key) && !isDeviceOwner()) {

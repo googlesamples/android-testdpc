@@ -281,7 +281,7 @@ public class UserRestrictionsDisplayFragment extends PreferenceFragment
         if (Util.isManagedProfile(getActivity(), mAdminComponentName)) {
             for (String restriction : NON_MANAGED_PROFILE_RESTRICTIONS) {
                 Util.disablePreference(findPreference(restriction),
-                        R.string.non_managed_profile_only);
+                        R.string.not_for_managed_profile);
             }
         }
     }
