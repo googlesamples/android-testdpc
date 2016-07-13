@@ -970,9 +970,10 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 boolean ok = false;
                 try {
                     ok = mDevicePolicyManager.resetPassword(password, flags);
-                } catch (IllegalArgumentException iae) {
-                    // Bad password, eg. 2 characters where system minimum length is 4.
-                    Log.w(TAG, "Failed to reset password", iae);
+                } catch (IllegalArgumentException | IllegalStateException | SecurityException e) {
+                    // Not allowed to set password or trying to set a bad password, eg. 2 characters
+                    // where system minimum length is 4.
+                    Log.w(TAG, "Failed to reset password", e);
                 }
                 showToast(ok ? R.string.password_reset_success : R.string.password_reset_failed);
             }
