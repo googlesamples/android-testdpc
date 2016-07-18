@@ -88,6 +88,7 @@
     <string name="profile_owner_only">Profile owner only</string>
     <string name="user_restricted">Disallowed by user restriction</string>
     <string name="requires_process_logs">Requires process logging to be enabled</string>
+    <string name="not_for_password_quality">Not applicable to current password quality</string>
 
     <!-- Strings for device owner management -->
     <string name="this_is_not_a_device_owner">This app is currently not the device owner.</string>
