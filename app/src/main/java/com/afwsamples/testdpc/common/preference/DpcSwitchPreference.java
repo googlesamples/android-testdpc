@@ -28,7 +28,7 @@ import android.util.AttributeSet;
  *
  * See {@link DpcPreferenceHelper} for details about constraints.
  */
-public class DpcSwitchPreference extends SwitchPreference {
+public class DpcSwitchPreference extends SwitchPreference implements DpcPreferenceBase {
     private DpcPreferenceHelper mHelper;
 
     public DpcSwitchPreference(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
@@ -68,34 +68,42 @@ public class DpcSwitchPreference extends SwitchPreference {
         super.setEnabled(enabled);
     }
 
+    @Override
     public void setAdminConstraint(int adminConstraint) {
         mHelper.setAdminConstraint(adminConstraint);
     }
 
+    @Override
     public void clearAdminConstraint() {
         mHelper.clearAdminConstraint();
     }
 
+    @Override
     public void setUserConstraint(int userConstraints) {
         mHelper.setUserConstraint(userConstraints);
     }
 
+    @Override
     public void clearUserConstraint() {
         mHelper.clearUserConstraint();
     }
 
+    @Override
     public void clearNonCustomConstraints() {
         mHelper.clearNonCustomConstraints();
     }
 
+    @Override
     public void setCustomConstraint(CharSequence constraintSummary) {
         mHelper.setCustomConstraint(constraintSummary);
     }
 
+    @Override
     public void setCustomConstraint(@StringRes int constraintSummaryRes) {
         mHelper.setCustomConstraint(getContext().getString(constraintSummaryRes));
     }
 
+    @Override
     public void clearCustomConstraint() {
         mHelper.clearCustomConstraint();
     }
