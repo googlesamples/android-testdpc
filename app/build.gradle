@@ -66,7 +66,7 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:preference-v14:24+'
+    compile 'com.android.support:preference-v14:24.0.0'
     compile 'com.android.support:recyclerview-v7:24.+'
     compile "com.android.support:support-v13:24.+"
     compile 'com.google.android.gms:play-services-safetynet:+'
