@@ -16,6 +16,10 @@
 
 package com.afwsamples.testdpc;
 
+import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE;
+import static android.app.admin.DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED;
+import static com.afwsamples.testdpc.policy.PolicyManagementFragment.OVERRIDE_KEY_SELECTION_KEY;
+
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.annotation.TargetApi;
@@ -60,10 +64,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-
-import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE;
-import static android.app.admin.DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED;
-import static com.afwsamples.testdpc.policy.PolicyManagementFragment.OVERRIDE_KEY_SELECTION_KEY;
 
 /**
  * Handles events related to the managed profile.
@@ -309,8 +309,14 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
     @TargetApi(Build.VERSION_CODES.M)
     @Override
     public void onSystemUpdatePending(Context context, Intent intent, long receivedTime) {
-        Toast.makeText(context, "System update received at: " + receivedTime,
-                Toast.LENGTH_LONG).show();
+        if (receivedTime != -1) {
+            DateFormat sdf = new SimpleDateFormat("hh:mm:ss dd/MM/yyyy");
+            String timeString = sdf.format(new Date(receivedTime));
+            Toast.makeText(context, "System update received at: " + timeString,
+                    Toast.LENGTH_LONG).show();
+        } else {
+            // No system update is currently available on this device.
+        }
     }
 
     @TargetApi(Build.VERSION_CODES.M)
