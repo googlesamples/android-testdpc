@@ -288,11 +288,20 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
         }
 
         // If the preference is not applicable, just hide it instead.
-        if ((Keys.NOT_APPLICABLE_TO_PARENT.contains(key) && isParentProfileInstance())
-                || (Keys.NOT_APPLICABLE_TO_PROFILE.contains(key) && isManagedProfileInstance())
-                || (Keys.DEVICE_OWNER_ONLY.contains(key) && !isDeviceOwner())
-                || (Keys.NYC_PLUS.contains(key) && Util.isBeforeN())) {
-            pref.setEnabled(false);
+        if (Keys.NOT_APPLICABLE_TO_PARENT.contains(key) && isParentProfileInstance()) {
+            Util.disablePreference(pref, R.string.not_for_parent_profile);
+            return;
+        }
+        if (Keys.NOT_APPLICABLE_TO_PROFILE.contains(key) && isManagedProfileInstance()) {
+            Util.disablePreference(pref, R.string.non_managed_profile_only);
+            return;
+        }
+        if (Keys.DEVICE_OWNER_ONLY.contains(key) && !isDeviceOwner()) {
+            Util.disablePreference(pref, R.string.device_owner_only);
+            return;
+        }
+        if (Keys.NYC_PLUS.contains(key) && Util.isBeforeN()) {
+            Util.disablePreference(pref, R.string.requires_android_n);
             return;
         }
 
@@ -316,7 +325,7 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
     private void disableIncompatibleManagementOptionsInCurrentProfile() {
         if (isProfileOwner() && Util.isBeforeM()) {
             for (String preference : Keys.PROFILE_OWNER_ONLY_MNC_PLUS) {
-                findPreference(preference).setEnabled(false);
+                Util.disablePreference(findPreference(preference), R.string.profile_owner_only);
             }
         }
     }

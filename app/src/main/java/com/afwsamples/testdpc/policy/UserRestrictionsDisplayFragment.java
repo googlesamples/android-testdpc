@@ -57,10 +57,10 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.UserManager;
-import android.preference.Preference;
-import android.preference.PreferenceFragment;
-import android.preference.PreferenceScreen;
-import android.preference.SwitchPreference;
+import android.support.v14.preference.PreferenceFragment;
+import android.support.v14.preference.SwitchPreference;
+import android.support.v7.preference.Preference;
+import android.support.v7.preference.PreferenceScreen;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -181,12 +181,16 @@ public class UserRestrictionsDisplayFragment extends PreferenceFragment
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         mDevicePolicyManager = (DevicePolicyManager) getActivity().getSystemService(
                 Context.DEVICE_POLICY_SERVICE);
         mUserManager = (UserManager) getActivity().getSystemService(Context.USER_SERVICE);
         mAdminComponentName = DeviceAdminReceiver.getComponentName(getActivity());
+        super.onCreate(savedInstanceState);
+        getActivity().getActionBar().setTitle(R.string.user_restrictions_management_title);
+    }
 
+    @Override
+    public void onCreatePreferences(Bundle bundle, String rootkey) {
         PreferenceScreen preferenceScreen = getPreferenceManager().createPreferenceScreen(
                 getActivity());
         setPreferenceScreen(preferenceScreen);
@@ -208,7 +212,6 @@ public class UserRestrictionsDisplayFragment extends PreferenceFragment
     public void onResume() {
         super.onResume();
         updateAllUserRestrictions();
-        getActivity().getActionBar().setTitle(R.string.user_restrictions_management_title);
     }
 
     @Override
@@ -251,12 +254,12 @@ public class UserRestrictionsDisplayFragment extends PreferenceFragment
     private void disableIncompatibleRestrictionsByApiLevel() {
         if (Util.isBeforeM()) {
             for (String restriction : MNC_PLUS_RESTRICTIONS) {
-                findPreference(restriction).setEnabled(false);
+                Util.disablePreference(findPreference(restriction), R.string.requires_android_m);
             }
         }
         if (Util.isBeforeN()) {
             for (String restriction : NYC_PLUS_RESTRICTIONS) {
-                findPreference(restriction).setEnabled(false);
+                Util.disablePreference(findPreference(restriction), R.string.requires_android_n);
             }
         }
     }
@@ -267,17 +270,18 @@ public class UserRestrictionsDisplayFragment extends PreferenceFragment
         boolean isDeviceOwner = mDevicePolicyManager.isDeviceOwnerApp(pkgName);
         if (isProfileOwner) {
             for (String restriction : PRIMARY_USER_ONLY_RESTRICTIONS) {
-                findPreference(restriction).setEnabled(false);
+                Util.disablePreference(findPreference(restriction), R.string.primary_user_only);
             }
         } else if (isDeviceOwner) {
             for (String restriction : MANAGED_PROFILE_ONLY_RESTRICTIONS) {
-                findPreference(restriction).setEnabled(false);
+                Util.disablePreference(findPreference(restriction), R.string.managed_profile_only);
             }
         }
 
         if (Util.isManagedProfile(getActivity(), mAdminComponentName)) {
             for (String restriction : NON_MANAGED_PROFILE_RESTRICTIONS) {
-                findPreference(restriction).setEnabled(false);
+                Util.disablePreference(findPreference(restriction),
+                        R.string.non_managed_profile_only);
             }
         }
     }

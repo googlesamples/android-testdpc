@@ -157,6 +157,8 @@ public final class PasswordConstraintsFragment extends ProfileOrParentFragment i
         setup(Keys.MIN_UPPERCASE, getDpm().getPasswordMinimumUpperCase(getAdmin()));
         setup(Keys.MIN_SYMBOLS, getDpm().getPasswordMinimumSymbols(getAdmin()));
         setup(Keys.MIN_NONLETTER, getDpm().getPasswordMinimumNonLetter(getAdmin()));
+
+        enableMinimumsForQuality();
     }
 
     @Override
@@ -199,6 +201,7 @@ public final class PasswordConstraintsFragment extends ProfileOrParentFragment i
                 list.setValue((String) newValue);
                 summary = list.getEntry();
                 getDpm().setPasswordQuality(getAdmin(), value);
+                enableMinimumsForQuality();
                 break;
             }
             case Keys.MIN_LENGTH:
@@ -229,6 +232,55 @@ public final class PasswordConstraintsFragment extends ProfileOrParentFragment i
         preference.setSummary(summary);
         sendPasswordRequirementsChanged();
         return true;
+    }
+
+    /**
+     * Enable and disable password constraint preferences based on the current password quality.
+     */
+    private void enableMinimumsForQuality() {
+        final int currentQuality = getDpm().getPasswordQuality(getAdmin());
+
+        // Minimum length can be set for most qualities
+        final EditTextPreference minLength = (EditTextPreference) findPreference(Keys.MIN_LENGTH);
+        if (currentQuality >= DevicePolicyManager.PASSWORD_QUALITY_NUMERIC) {
+            minLength.setEnabled(true);
+            enableEditTextPreference(minLength);
+        } else {
+            Util.disablePreference(minLength, R.string.not_for_password_quality);
+        }
+
+        // Other minimums are only active for the highest quality
+        final EditTextPreference minLetters = (EditTextPreference) findPreference(Keys.MIN_LETTERS);
+        final EditTextPreference minNumeric = (EditTextPreference) findPreference(Keys.MIN_NUMERIC);
+        final EditTextPreference minLower = (EditTextPreference) findPreference(Keys.MIN_LOWERCASE);
+        final EditTextPreference minUpper = (EditTextPreference) findPreference(Keys.MIN_UPPERCASE);
+        final EditTextPreference minSymbols = (EditTextPreference) findPreference(Keys.MIN_SYMBOLS);
+        final EditTextPreference minNonLetter =
+                (EditTextPreference) findPreference(Keys.MIN_NONLETTER);
+
+        if (currentQuality == DevicePolicyManager.PASSWORD_QUALITY_COMPLEX) {
+            enableEditTextPreference(minLetters);
+            enableEditTextPreference(minNumeric);
+            enableEditTextPreference(minLower);
+            enableEditTextPreference(minUpper);
+            enableEditTextPreference(minSymbols);
+            enableEditTextPreference(minNonLetter);
+        } else {
+            Util.disablePreference(minLetters, R.string.not_for_password_quality);
+            Util.disablePreference(minNumeric, R.string.not_for_password_quality);
+            Util.disablePreference(minLower, R.string.not_for_password_quality);
+            Util.disablePreference(minUpper, R.string.not_for_password_quality);
+            Util.disablePreference(minSymbols, R.string.not_for_password_quality);
+            Util.disablePreference(minNonLetter, R.string.not_for_password_quality);
+        }
+    }
+
+    /**
+     * Enable the preference and display the value in the summary.
+     */
+    private void enableEditTextPreference(EditTextPreference preference) {
+        preference.setEnabled(true);
+        preference.setSummary(preference.getText());
     }
 
     /**

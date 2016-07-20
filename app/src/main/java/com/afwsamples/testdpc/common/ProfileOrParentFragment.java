@@ -169,6 +169,10 @@ public abstract class ProfileOrParentFragment extends BaseSearchablePolicyPrefer
         mProfileOwner = mDevicePolicyManager.isProfileOwnerApp(getActivity().getPackageName());
         mDeviceOwner = mDevicePolicyManager.isDeviceOwnerApp(getActivity().getPackageName());
 
+        if (mParentInstance) {
+            mDevicePolicyManager = mDevicePolicyManager.getParentProfileInstance(mAdminComponent);
+        }
+
         // Put at last to make sure all initializations above are done before subclass's
         // onCreatePreferences is called.
         super.onCreate(savedInstanceState);
@@ -177,7 +181,6 @@ public abstract class ProfileOrParentFragment extends BaseSearchablePolicyPrefer
         // This needs to be called after super.onCreate because preference manager is set up
         // inside super.onCreate.
         if (mParentInstance) {
-            mDevicePolicyManager = mDevicePolicyManager.getParentProfileInstance(mAdminComponent);
             final PreferenceManager pm = getPreferenceManager();
             pm.setSharedPreferencesName(pm.getSharedPreferencesName() + TAG_PARENT);
         }

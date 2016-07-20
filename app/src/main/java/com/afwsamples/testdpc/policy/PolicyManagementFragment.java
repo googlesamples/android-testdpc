@@ -70,9 +70,9 @@ import android.widget.Toast;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.AppInfoArrayAdapter;
+import com.afwsamples.testdpc.common.BaseSearchablePolicyPreferenceFragment;
 import com.afwsamples.testdpc.common.CertificateUtil;
 import com.afwsamples.testdpc.common.MediaDisplayFragment;
-import com.afwsamples.testdpc.common.BaseSearchablePolicyPreferenceFragment;
 import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.policy.blockuninstallation.BlockUninstallationInfoArrayAdapter;
 import com.afwsamples.testdpc.policy.certificate.DelegatedCertInstallerFragment;
@@ -107,9 +107,13 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -204,6 +208,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String CREATE_AND_MANAGE_USER_KEY = "create_and_manage_user";
     private static final String DELEGATED_CERT_INSTALLER_KEY = "manage_cert_installer";
     private static final String DEVICE_OWNER_STATUS_KEY = "device_owner_status";
+    private static final String SECURITY_PATCH_KEY = "security_patch";
     private static final String DISABLE_CAMERA_KEY = "disable_camera";
     private static final String DISABLE_KEYGUARD = "disable_keyguard";
     private static final String DISABLE_SCREEN_CAPTURE_KEY = "disable_screen_capture";
@@ -269,6 +274,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String WIFI_CONFIG_LOCKDOWN_ON = "1";
     private static final String WIFI_CONFIG_LOCKDOWN_OFF = "0";
     private static final String SAFETYNET_ATTEST = "safetynet_attest";
+    private static final String SECURITY_PATCH_FORMAT = "yyyy-MM-dd";
 
     private static final String BATTERY_PLUGGED_ANY = Integer.toString(
             BatteryManager.BATTERY_PLUGGED_AC |
@@ -290,12 +296,12 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             NETWORK_STATS_KEY, DELEGATED_CERT_INSTALLER_KEY, DISABLE_STATUS_BAR,
             REENABLE_STATUS_BAR, DISABLE_KEYGUARD, REENABLE_KEYGUARD, START_KIOSK_MODE,
             SET_PERMISSION_POLICY_KEY, MANAGE_APP_PERMISSIONS_KEY,STAY_ON_WHILE_PLUGGED_IN,
-            WIFI_CONFIG_LOCKDOWN_ENABLE_KEY
+            WIFI_CONFIG_LOCKDOWN_ENABLE_KEY, SECURITY_PATCH_KEY
     };
 
     private static String[] NYC_PLUS_PREFERENCES = {
-            APP_RESTRICTIONS_MANAGING_PACKAGE_KEY, REBOOT_KEY, REMOVE_KEY_CERTIFICATE_KEY,
-            SET_ALWAYS_ON_VPN_KEY, SHOW_WIFI_MAC_ADDRESS_KEY, SUSPEND_APPS_KEY, UNSUSPEND_APPS_KEY,
+            REBOOT_KEY, REMOVE_KEY_CERTIFICATE_KEY, SET_ALWAYS_ON_VPN_KEY,
+            SHOW_WIFI_MAC_ADDRESS_KEY, SUSPEND_APPS_KEY, UNSUSPEND_APPS_KEY,
             SET_SHORT_SUPPORT_MESSAGE_KEY, SET_LONG_SUPPORT_MESSAGE_KEY, REQUEST_BUGREPORT_KEY,
             ENABLE_PROCESS_LOGGING, REQUEST_PROCESS_LOGS, CREATE_AND_MANAGE_USER_KEY
     };
@@ -442,6 +448,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         disableIncompatibleManagementOptionsInCurrentProfile();
         disableIncompatibleManagementOptionsByApiLevel();
 
+        loadSecurityPatch();
         reloadCameraDisableUi();
         reloadScreenCaptureDisableUi();
         reloadMuteAudioUi();
@@ -501,7 +508,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 showResetPasswordPrompt();
                 return false;
             case LOCK_NOW_KEY:
-                mDevicePolicyManager.lockNow();
+                lockNow();
                 return true;
             case START_LOCK_TASK:
                 getActivity().startLockTask();
@@ -693,6 +700,19 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 return true;
         }
         return false;
+    }
+
+    @TargetApi(Build.VERSION_CODES.N)
+    private void lockNow() {
+        if (Util.isBeforeN() || !Util.isManagedProfile(getActivity(), mAdminComponentName)) {
+            mDevicePolicyManager.lockNow();
+        } else {
+            // In N for work profiles we should call lockNow on the parent instance to
+            // lock the device.
+            DevicePolicyManager parentDpm
+                    = mDevicePolicyManager.getParentProfileInstance(mAdminComponentName);
+            parentDpm.lockNow();
+        }
     }
 
     @Override
@@ -950,9 +970,10 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 boolean ok = false;
                 try {
                     ok = mDevicePolicyManager.resetPassword(password, flags);
-                } catch (IllegalArgumentException iae) {
-                    // Bad password, eg. 2 characters where system minimum length is 4.
-                    Log.w(TAG, "Failed to reset password", iae);
+                } catch (IllegalArgumentException | IllegalStateException | SecurityException e) {
+                    // Not allowed to set password or trying to set a bad password, eg. 2 characters
+                    // where system minimum length is 4.
+                    Log.w(TAG, "Failed to reset password", e);
                 }
                 showToast(ok ? R.string.password_reset_success : R.string.password_reset_failed);
             }
@@ -1077,8 +1098,12 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
      * </p>
      */
     public void updateInstallNonMarketAppsPreference() {
-        mInstallNonMarketAppsPreference.setEnabled(
-                mUserManager.hasUserRestriction(DISALLOW_INSTALL_UNKNOWN_SOURCES) ? false : true);
+        if (mUserManager.hasUserRestriction(DISALLOW_INSTALL_UNKNOWN_SOURCES)) {
+            Util.disablePreference(mInstallNonMarketAppsPreference, R.string.user_restricted);
+        } else {
+            mInstallNonMarketAppsPreference.setEnabled(true);
+            mInstallNonMarketAppsPreference.setSummary(null);
+        }
         int isInstallNonMarketAppsAllowed = Settings.Secure.getInt(
                 getActivity().getContentResolver(), Settings.Secure.INSTALL_NON_MARKET_APPS, 0);
         mInstallNonMarketAppsPreference.setChecked(
@@ -1096,11 +1121,11 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         if (isProfileOwner) {
             // Some of the management options can only be applied in a primary profile.
             for (String preference : PRIMARY_USER_ONLY_PREFERENCES) {
-                findPreference(preference).setEnabled(false);
+                Util.disablePreference(findPreference(preference), R.string.primary_user_only);
             }
             if (Util.isBeforeN()) {
                 for (String preference : PROFILE_OWNER_NYC_PLUS_PREFERENCES) {
-                    findPreference(preference).setEnabled(false);
+                    Util.disablePreference(findPreference(preference), R.string.requires_android_n);
                 }
             }
             deviceOwnerStatusStringId = R.string.this_is_a_profile_owner;
@@ -1110,26 +1135,27 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         }
         findPreference(DEVICE_OWNER_STATUS_KEY).setSummary(deviceOwnerStatusStringId);
         if (!isDeviceOwner) {
-            findPreference(WIFI_CONFIG_LOCKDOWN_ENABLE_KEY).setEnabled(false);
+            Util.disablePreference(findPreference(WIFI_CONFIG_LOCKDOWN_ENABLE_KEY),
+                    R.string.device_owner_only);
         }
         // Disable managed profile specific options if we are not running in managed profile.
         if (!Util.isManagedProfile(getActivity(), mAdminComponentName)) {
             for (String managedProfileSpecificOption : MANAGED_PROFILE_SPECIFIC_OPTIONS) {
-                findPreference(managedProfileSpecificOption).setEnabled(false);
+                Util.disablePreference(findPreference(managedProfileSpecificOption),
+                        R.string.managed_profile_only);
             }
         }
     }
 
     private void disableIncompatibleManagementOptionsByApiLevel() {
         if (Util.isBeforeM()) {
-            // The following options depend on MNC APIs.
             for (String preference : MNC_PLUS_PREFERENCES) {
-                findPreference(preference).setEnabled(false);
+                Util.disablePreference(findPreference(preference), R.string.requires_android_m);
             }
         }
         if (Util.isBeforeN()) {
             for (String preference : NYC_PLUS_PREFERENCES) {
-                findPreference(preference).setEnabled(false);
+                Util.disablePreference(findPreference(preference), R.string.requires_android_n);
             }
         }
     }
@@ -1389,6 +1415,26 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 .show();
     }
 
+    @TargetApi(Build.VERSION_CODES.M)
+    private void loadSecurityPatch() {
+        Preference securityPatchPreference = findPreference(SECURITY_PATCH_KEY);
+        if (!securityPatchPreference.isEnabled()) {
+            return;
+        }
+
+        String buildSecurityPatch = Build.VERSION.SECURITY_PATCH;
+        final Date date;
+        try {
+            date = new SimpleDateFormat(SECURITY_PATCH_FORMAT).parse(buildSecurityPatch);
+        } catch (ParseException e) {
+            securityPatchPreference.setSummary(
+                    getString(R.string.invalid_security_patch, buildSecurityPatch));
+            return;
+        }
+        String display = DateFormat.getDateInstance(DateFormat.MEDIUM).format(date);
+        securityPatchPreference.setSummary(display);
+    }
+
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void reloadCameraDisableUi() {
         boolean isCameraDisabled = mDevicePolicyManager.getCameraDisabled(mAdminComponentName);
@@ -1401,7 +1447,13 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             boolean isProcessLoggingEnabled = mDevicePolicyManager.isSecurityLoggingEnabled(
                     mAdminComponentName);
             mEnableProcessLoggingPreference.setChecked(isProcessLoggingEnabled);
-            findPreference(REQUEST_PROCESS_LOGS).setEnabled(isProcessLoggingEnabled);
+            Preference requestLogsPreference = findPreference((REQUEST_PROCESS_LOGS));
+            if (isProcessLoggingEnabled) {
+                requestLogsPreference.setEnabled(true);
+                requestLogsPreference.setSummary(null);
+            } else {
+                Util.disablePreference(requestLogsPreference, R.string.requires_process_logs);
+            }
         }
     }
 

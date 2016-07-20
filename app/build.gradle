@@ -7,7 +7,7 @@ ext {
     // exactly 1 digit
     versionMinor = 0
     // exactly 2 digits
-    versionBuild = 8
+    versionBuild = 9
 }
 
 android {
@@ -58,7 +58,7 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:preference-v14:24+'
+    compile 'com.android.support:preference-v14:24.0.0'
     compile 'com.android.support:recyclerview-v7:24.+'
     compile "com.android.support:support-v13:24.+"
     compile 'com.google.android.gms:play-services-safetynet:+'

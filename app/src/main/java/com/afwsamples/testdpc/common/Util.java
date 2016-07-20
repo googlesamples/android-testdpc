@@ -27,6 +27,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Build.VERSION_CODES;
 import android.os.UserManager;
+import android.support.v7.preference.Preference;
 import android.text.format.DateUtils;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -120,5 +121,10 @@ public class Util {
                     (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
             return devicePolicyManager.isManagedProfile(admin);
         }
+    }
+
+    public static void disablePreference(Preference preference, int whyResId) {
+        preference.setEnabled(false);
+        preference.setSummary(whyResId);
     }
 }

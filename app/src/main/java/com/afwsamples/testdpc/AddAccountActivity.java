@@ -31,6 +31,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.RadioGroup;
+import android.widget.Toast;
 
 import com.android.setupwizardlib.SetupWizardLayout;
 import com.android.setupwizardlib.view.NavigationBar;
@@ -58,6 +59,8 @@ public class AddAccountActivity extends Activity implements NavigationBar.Naviga
         setContentView(R.layout.activity_add_account);
         SetupWizardLayout layout = (SetupWizardLayout) findViewById(R.id.setup_wizard_layout);
         layout.getNavigationBar().setNavigationBarListener(this);
+        NavigationBar navigationBar = layout.getNavigationBar();
+        navigationBar.getBackButton().setEnabled(false);
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
@@ -92,6 +95,9 @@ public class AddAccountActivity extends Activity implements NavigationBar.Naviga
                         } catch (OperationCanceledException | AuthenticatorException
                                 | IOException e) {
                             Log.e(TAG, "addAccount - failed", e);
+                            Toast.makeText(AddAccountActivity.this,
+                                    R.string.fail_to_add_account, Toast.LENGTH_LONG).show();
+                            return;
                         }
                         Log.d(TAG, "addAccount - isAccountAdded: " + isAccountAdded
                                 + ", accountNameAdded: " + accountNameAdded);
@@ -134,7 +140,5 @@ public class AddAccountActivity extends Activity implements NavigationBar.Naviga
     }
 
     @Override
-    public void onNavigateBack() {
-        onBackPressed();
-    }
+    public void onNavigateBack() {}
 }

@@ -50,6 +50,7 @@
     <string name="add_account_with_name">Add account with name</string>
     <string name="add_account_skip">Skip</string>
     <string name="add_account_dialog_title">Account name:</string>
+    <string name="fail_to_add_account">Fail to add account</string>
     <string name="icon">Icon</string>
     <string name="manage_apps">Manage applications</string>
     <string name="reset">Reset</string>
@@ -75,6 +76,20 @@
     <string name="invalid_launch_intent_no_account">No account found on incoming intent.</string>
     <string name="device_admin_receiver_failure">Failed to become device/profile owner.</string>
     <string name="menu_search_title">Search</string>
+
+    <!-- Reasons for disabling preferences -->
+    <string name="requires_android_m">Requires API level 23</string>
+    <string name="requires_android_n">Requires API level 24</string>
+    <string name="primary_user_only">Primary user only</string>
+    <string name="not_for_parent_profile">Not applicable to parent profile</string>
+    <string name="managed_profile_only">Managed profile only</string>
+    <string name="non_managed_profile_only">Non-managed profile only</string>
+    <string name="device_owner_only">Device owner only</string>
+    <string name="profile_owner_only">Profile owner only</string>
+    <string name="user_restricted">Disallowed by user restriction</string>
+    <string name="requires_process_logs">Requires process logging to be enabled</string>
+    <string name="not_for_password_quality">Not applicable to current password quality</string>
+
     <!-- Strings for device owner management -->
     <string name="this_is_not_a_device_owner">This app is currently not the device owner.</string>
     <string name="this_is_a_device_owner">This app is the device owner.</string>
@@ -117,6 +132,11 @@
     <string name="cross_profile_intent_filters_flags">Flags:</string>
     <string name="add">Add</string>
     <string name="clear">Clear</string>
+
+    <!-- Strings for system information -->
+    <string name="invalid_security_patch">Invalid security patch format:
+        <xliff:g id="security_patch">%s</xliff:g></string>
+    <string name="security_patch">Security patch</string>
 
     <!-- Strings for camera and screen capture -->
     <string name="camera_title">Camera, screen capture and audio</string>
