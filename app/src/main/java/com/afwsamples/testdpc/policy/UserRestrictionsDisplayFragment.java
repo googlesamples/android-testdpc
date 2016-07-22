@@ -192,11 +192,11 @@ public class UserRestrictionsDisplayFragment extends PreferenceFragment
     @Override
     public void onCreatePreferences(Bundle bundle, String rootkey) {
         PreferenceScreen preferenceScreen = getPreferenceManager().createPreferenceScreen(
-                getActivity());
+                getPreferenceManager().getContext());
         setPreferenceScreen(preferenceScreen);
 
         for (UserRestriction restriction : ALL_USER_RESTRICTIONS) {
-            SwitchPreference preference = new SwitchPreference(getActivity());
+            SwitchPreference preference = new SwitchPreference(getPreferenceManager().getContext());
             preference.setTitle(restriction.titleResId);
             preference.setKey(restriction.key);
             preference.setOnPreferenceChangeListener(this);
