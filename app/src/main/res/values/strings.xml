@@ -50,19 +50,19 @@
     <string name="add_account_with_name">Add account with name</string>
     <string name="add_account_skip">Skip</string>
     <string name="add_account_dialog_title">Account name:</string>
-    <string name="fail_to_add_account">Fail to add account</string>
+    <string name="fail_to_add_account">Failed to add account</string>
     <string name="icon">Icon</string>
     <string name="manage_apps">Manage applications</string>
     <string name="reset">Reset</string>
     <string name="save">Save</string>
-    <string name="migration_not_supported">Unable to migrate account into profile, please add manually.</string>
-    <string name="provisioning_not_supported">Device provisioning is not enabled. Stopping.</string>
-    <string name="provisioning_failed_or_cancelled">Provisioning failed or cancelled.</string>
+    <string name="migration_not_supported">Unable to migrate account into profile</string>
+    <string name="provisioning_not_supported">Device provisioning is not enabled</string>
+    <string name="provisioning_failed_or_cancelled">Provisioning failed or cancelled</string>
     <string name="provisioning_params_title">Select provisioning parameters</string>
     <string name="provisioning_params_color">Color: </string>
     <string name="provisioning_params_logo">Logo: </string>
     <string name="provisioning_params_select">Select</string>
-    <string name="error_opening_image_file">Error occured while opening image file</string>
+    <string name="error_opening_image_file">Error opening image file</string>
 
     <string name="work_profile">Work profile</string>
     <string name="personal_profile">Personal profile</string>
@@ -73,8 +73,8 @@
     <string name="policies_management">Policy management</string>
     <string name="other_owner_already_setup_error">There is already a device/profile owner, cannot
         start TestDPC</string>
-    <string name="invalid_launch_intent_no_account">No account found on incoming intent.</string>
-    <string name="device_admin_receiver_failure">Failed to become device/profile owner.</string>
+    <string name="invalid_launch_intent_no_account">No account found on incoming intent</string>
+    <string name="device_admin_receiver_failure">Failed to become device/profile owner</string>
     <string name="menu_search_title">Search</string>
 
     <!-- Reasons for disabling preferences -->
@@ -122,11 +122,10 @@
     <string name="categories_title">Categories:</string>
     <string name="data_schemes_title">Schemes:</string>
     <string name="data_types_title">Data types:</string>
-    <string name="add_cross_profile_intent_success_msg">Cross-profile intent filter has been added.
+    <string name="add_cross_profile_intent_success_msg">Cross-profile intent filter has been added
     </string>
-    <string name="add_cross_profile_intent_failed_msg">Failed to add cross-profile intent filter.
-        Add at least one action, category, or scheme.
-    </string>
+    <string name="add_cross_profile_intent_failed_msg">Cross-profile intent requires at least one
+        action, category or scheme</string>
     <string name="cross_profile_intent_filters_cleared">All cross-profile intent filters have been
         removed.</string>
     <string name="cross_profile_intent_filters_flags">Flags:</string>
@@ -232,13 +231,13 @@
     <string name="enable_system_apps_by_package_name_error">Package not found.</string>
     <string name="enable_system_apps_by_intent">Enable a system app by intent</string>
     <string name="enable_system_apps_failure_msg">Failed to enable system apps that receive the
-        given intent.
+        given intent
     </string>
-    <string name="enable_system_apps_attempt_msg">Enabled system apps that receive the given intent.
+    <string name="enable_system_apps_attempt_msg">Enabled system apps that receive the given intent
     </string>
     <string name ="no_disabled_system_apps">All system apps have been enabled.</string>
     <string name="enable">Enable</string>
-    <string name="invalid_system_apps_action">Invalid action.</string>
+    <string name="invalid_system_apps_action">Invalid action</string>
     <string name="hide_apps_title">Hide apps</string>
     <string name="hide_apps_empty">All apps are hidden.</string>
     <string name="hide_apps_success">%s is now hidden.</string>
@@ -371,7 +370,7 @@
     <string name="define_bundle">Define bundle</string>
     <string name="define_bundle_array">Define bundle array</string>
     <string name="load_manifest_restrictions">Load manifest restrictions</string>
-    <string name="set_app_restrictions_success">Successfully set app restrictions for %s.</string>
+    <string name="set_app_restrictions_success">Successfully set app restrictions for %s</string>
     <string name="app_restrictions_info">%1$s - %2$s</string>
     <string name="plus">+</string>
     <string name="app_restrictions_managing_package">App restrictions manager</string>
@@ -415,7 +414,7 @@
         enabled
     </string>
     <string name="set_accessibility_services_fail">Cannot disallow accessibility services enabled by the primary user</string>
-    <string name="all_accessibility_services_enabled">All accessibility services are enabled.
+    <string name="all_accessibility_services_enabled">All accessibility services are enabled
     </string>
 
     <!-- Input method -->
