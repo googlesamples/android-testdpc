@@ -416,6 +416,11 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
         nm.notify(PASSWORD_FAILED_NOTIFICATION_ID, warn.getNotification());
     }
 
+    @Override
+    public void onPasswordSucceeded(Context context, Intent intent) {
+        logFile(context).delete();
+    }
+
     private static File logFile(Context context) {
         File parent = context.getDir(LOGS_DIR, Context.MODE_PRIVATE);
         return new File(parent, FAILED_PASSWORD_LOG_FILE);
