@@ -49,7 +49,7 @@ public class DpcPreferenceHelper {
 
     private CharSequence mConstraintViolationSummary = null;
     private CharSequence mCustomConstraintSummary = null;
-    private final int mMinSdkVersion;
+    private int mMinSdkVersion;
     private int mAdminConstraint;
     private int mUserConstraint;
 
@@ -73,6 +73,10 @@ public class DpcPreferenceHelper {
         final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.DpcPreference);
 
         mMinSdkVersion = a.getInt(R.styleable.DpcPreference_minSdkVersion, 0);
+        if (attrs == null) {
+            // Be more lenient when creating the preference from code
+            mMinSdkVersion = Build.VERSION_CODES.LOLLIPOP;
+        }
         if (mMinSdkVersion == 0) {
             throw new RuntimeException("testdpc:minSdkVersion must be specified.");
         }
@@ -97,6 +101,16 @@ public class DpcPreferenceHelper {
     }
 
     public void onAttachedToHierarchy() {
+        disableIfConstraintsNotMet();
+    }
+
+    /**
+     * Set the minimum required API level constraint.
+     *
+     * @param version The minimum required version.
+     */
+    public void setMinSdkVersion(int version) {
+        mMinSdkVersion = version;
         disableIfConstraintsNotMet();
     }
 

@@ -22,6 +22,7 @@ import android.support.annotation.StringRes;
  * Common base class for the DpcPreference family of classes.
  */
 public interface DpcPreferenceBase {
+    void setMinSdkVersion(int version);
     void setAdminConstraint(int adminConstraint);
     void clearAdminConstraint();
     void setUserConstraint(int userConstraints);

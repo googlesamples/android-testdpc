@@ -69,6 +69,11 @@ public class DpcEditTextPreference extends EditTextPreference implements DpcPref
     }
 
     @Override
+    public void setMinSdkVersion(int version) {
+        mHelper.setMinSdkVersion(version);
+    }
+
+    @Override
     public void setAdminConstraint(int adminConstraint) {
         mHelper.setAdminConstraint(adminConstraint);
     }

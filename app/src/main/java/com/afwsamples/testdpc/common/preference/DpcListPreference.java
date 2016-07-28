@@ -69,6 +69,11 @@ public class DpcListPreference extends ListPreference implements DpcPreferenceBa
     }
 
     @Override
+    public void setMinSdkVersion(int version) {
+        mHelper.setMinSdkVersion(version);
+    }
+
+    @Override
     public void setAdminConstraint(int adminConstraint) {
         mHelper.setAdminConstraint(adminConstraint);
     }

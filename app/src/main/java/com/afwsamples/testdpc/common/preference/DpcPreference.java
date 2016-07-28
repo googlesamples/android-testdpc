@@ -69,6 +69,11 @@ public class DpcPreference extends Preference implements DpcPreferenceBase {
     }
 
     @Override
+    public void setMinSdkVersion(int version) {
+        mHelper.setMinSdkVersion(version);
+    }
+
+    @Override
     public void setAdminConstraint(int adminConstraint) {
         mHelper.setAdminConstraint(adminConstraint);
     }
