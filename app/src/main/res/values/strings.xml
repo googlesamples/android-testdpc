@@ -67,8 +67,8 @@
     <string name="work_profile">Work profile</string>
     <string name="personal_profile">Personal profile</string>
 
-    <string name="managed_profile_specific_policy_category_title">Managed profile policy</string>
-    <string name="managed_profile_specific_policy_title">Manage work profile specific policy
+    <string name="managed_profile_specific_policy_category_title">Managed profile policies</string>
+    <string name="managed_profile_specific_policy_title">Managed work profile specific policies
     </string>
     <string name="policies_management">Policy management</string>
     <string name="other_owner_already_setup_error">There is already a device/profile owner, cannot
@@ -152,6 +152,7 @@
 
     <!-- Stings for work profile management -->
     <string name="profile_management_title">Work profile management</string>
+    <string name="remove_managed_profile">Remove work profile</string>
     <string name="removing_managed_profile">Removing work profile</string>
 
     <!-- Strings for cross-profile widget provider -->

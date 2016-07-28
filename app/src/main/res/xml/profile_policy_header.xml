@@ -64,7 +64,7 @@
             android:title="@string/profile_management_title">
         <Preference
                 android:key="remove_profile"
-                android:title="@string/removing_managed_profile"/>
+                android:title="@string/remove_managed_profile"/>
     </PreferenceCategory>
 
 </PreferenceScreen>
