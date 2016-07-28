@@ -136,9 +136,4 @@ public class Util {
             return userManager.isSystemUser();
         }
     }
-
-    public static void disablePreference(Preference preference, int whyResId) {
-        preference.setEnabled(false);
-        preference.setSummary(whyResId);
-    }
 }

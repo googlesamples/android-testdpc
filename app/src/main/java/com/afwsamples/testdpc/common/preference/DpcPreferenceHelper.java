@@ -53,18 +53,20 @@ public class DpcPreferenceHelper {
     private int mAdminConstraint;
     private int mUserConstraint;
 
+    private static final int NUM_ADMIN_KINDS = 2;
     public static final int ADMIN_DEVICE_OWNER = 0x1;
     public static final int ADMIN_PROFILE_OWNER = 0x2;
     public static final int ADMIN_ANY = ADMIN_DEVICE_OWNER | ADMIN_PROFILE_OWNER;
 
+    private static final int NUM_USER_KINDS = 3;
     public static final int USER_PRIMARY_USER = 0x1;
     public static final int USER_SECONDARY_USER = 0x2;
     public static final int USER_MANAGED_PROFILE = 0x4;
     public static final int USER_ANY =
             USER_PRIMARY_USER | USER_SECONDARY_USER | USER_MANAGED_PROFILE;
-    public static final int NOT_USER_PRIMARY_USER = USER_ANY & ~USER_PRIMARY_USER;
-    public static final int NOT_USER_SECONDARY_USER = USER_ANY & ~USER_SECONDARY_USER;
-    public static final int NOT_USER_MANAGED_PROFILE = USER_ANY & ~USER_MANAGED_PROFILE;
+    public static final int USER_NOT_PRIMARY_USER = USER_ANY & ~USER_PRIMARY_USER;
+    public static final int USER_NOT_SECONDARY_USER = USER_ANY & ~USER_SECONDARY_USER;
+    public static final int USER_NOT_MANAGED_PROFILE = USER_ANY & ~USER_MANAGED_PROFILE;
 
     public DpcPreferenceHelper(Context context, Preference preference, AttributeSet attrs) {
         mContext = context;
@@ -252,7 +254,7 @@ public class DpcPreferenceHelper {
     }
 
     private String getAdminConstraintSummary() {
-        final List<String> admins = new ArrayList<>(3);
+        final List<String> admins = new ArrayList<>(NUM_ADMIN_KINDS);
 
         if (isEnabledForAdmin(ADMIN_DEVICE_OWNER)) {
             admins.add(mContext.getString(R.string.device_owner));
@@ -265,7 +267,7 @@ public class DpcPreferenceHelper {
     }
 
     private String getUserConstraintSummary() {
-        final List<String> users = new ArrayList<>(3);
+        final List<String> users = new ArrayList<>(NUM_USER_KINDS);
 
         if (isEnabledForUser(USER_PRIMARY_USER)) {
             users.add(mContext.getString(R.string.primary_user));
