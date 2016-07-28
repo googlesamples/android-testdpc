@@ -20,7 +20,6 @@ import android.app.admin.DevicePolicyManager;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Build;
-import android.os.UserManager;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceViewHolder;
 import android.text.TextUtils;
@@ -31,6 +30,9 @@ import android.widget.TextView;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.Util;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Helper class to check preference constraints declared in the XML file and disable the preference
@@ -56,8 +58,13 @@ public class DpcPreferenceHelper {
     public static final int ADMIN_ANY = ADMIN_DEVICE_OWNER | ADMIN_PROFILE_OWNER;
 
     public static final int USER_PRIMARY_USER = 0x1;
-    public static final int USER_MANAGED_PROFILE = 0x2;
-    public static final int USER_ANY = USER_PRIMARY_USER | USER_MANAGED_PROFILE;
+    public static final int USER_SECONDARY_USER = 0x2;
+    public static final int USER_MANAGED_PROFILE = 0x4;
+    public static final int USER_ANY =
+            USER_PRIMARY_USER | USER_SECONDARY_USER | USER_MANAGED_PROFILE;
+    public static final int NOT_USER_PRIMARY_USER = USER_ANY & ~USER_PRIMARY_USER;
+    public static final int NOT_USER_SECONDARY_USER = USER_ANY & ~USER_SECONDARY_USER;
+    public static final int NOT_USER_MANAGED_PROFILE = USER_ANY & ~USER_MANAGED_PROFILE;
 
     public DpcPreferenceHelper(Context context, Preference preference, AttributeSet attrs) {
         mContext = context;
@@ -163,20 +170,17 @@ public class DpcPreferenceHelper {
     }
 
     private void disableIfConstraintsNotMet() {
-        mConstraintViolationSummary = findContraintViolation();
+        mConstraintViolationSummary = findConstraintViolation();
         mPreference.setEnabled(constraintsMet());
     }
 
     /**
      * Check for constraint violations.
      *
-     * TODO(ascull): change message to say when the preference will be enabled rather than explain
-     * why it is currently disabled.
-     *
      * @return A string describing the constraint violation or {@code null} if no violations were
      * found.
      */
-    private CharSequence findContraintViolation() {
+    private CharSequence findConstraintViolation() {
         if (Build.VERSION.SDK_INT < mMinSdkVersion) {
             return mContext.getString(R.string.requires_android_api_level, mMinSdkVersion);
         }
@@ -186,38 +190,91 @@ public class DpcPreferenceHelper {
             return mCustomConstraintSummary;
         }
 
-        // Admin constraints
-        final DevicePolicyManager dpm =
-                (DevicePolicyManager) mContext.getSystemService(Context.DEVICE_POLICY_SERVICE);
-        final String packageName = mContext.getPackageName();
-
-        if (isDisabledForAdmin(ADMIN_DEVICE_OWNER) && dpm.isDeviceOwnerApp(packageName)) {
-            return mContext.getString(R.string.not_for_device_owner);
+        if (!isEnabledForAdmin(getCurrentAdmin())) {
+            return getAdminConstraintSummary();
         }
 
-        if (isDisabledForAdmin(ADMIN_PROFILE_OWNER) && dpm.isProfileOwnerApp(packageName)) {
-            return mContext.getString(R.string.not_for_profile_owner);
-        }
-
-        // User constraints
-        if (isDisabledForUser(USER_PRIMARY_USER) && Util.isPrimaryUser(mContext)) {
-            return mContext.getString(R.string.not_for_primary_user);
-        }
-
-        if (isDisabledForUser(USER_MANAGED_PROFILE) && Util.isManagedProfile(
-                mContext, DeviceAdminReceiver.getComponentName(mContext))) {
-            return mContext.getString(R.string.not_for_managed_profile);
+        if (!isEnabledForUser(getCurrentUser())) {
+            return getUserConstraintSummary();
         }
 
         return null;
     }
 
-    private boolean isDisabledForAdmin(int admin) {
-        return (mAdminConstraint & admin) != admin;
+    private int getCurrentAdmin() {
+        final DevicePolicyManager dpm =
+                (DevicePolicyManager) mContext.getSystemService(Context.DEVICE_POLICY_SERVICE);
+        final String packageName = mContext.getPackageName();
+
+        if (dpm.isDeviceOwnerApp(packageName)) {
+            return ADMIN_DEVICE_OWNER;
+        }
+        if (dpm.isProfileOwnerApp(packageName)) {
+            return ADMIN_PROFILE_OWNER;
+        }
+
+        throw new RuntimeException("Invalid admin for TestDPC");
     }
 
-    private boolean isDisabledForUser(int user) {
-        return (mUserConstraint & user) != user;
+    private int getCurrentUser() {
+        if (Util.isPrimaryUser(mContext)) {
+            return USER_PRIMARY_USER;
+        }
+
+        if (Util.isManagedProfile(
+                mContext, DeviceAdminReceiver.getComponentName(mContext))) {
+            return USER_MANAGED_PROFILE;
+        }
+
+        return USER_SECONDARY_USER;
+    }
+
+    private boolean isEnabledForAdmin(int admin) {
+        return (mAdminConstraint & admin) == admin;
+    }
+
+    private boolean isEnabledForUser(int user) {
+        return (mUserConstraint & user) == user;
+    }
+
+    private String getAdminConstraintSummary() {
+        final List<String> admins = new ArrayList<>(3);
+
+        if (isEnabledForAdmin(ADMIN_DEVICE_OWNER)) {
+            admins.add(mContext.getString(R.string.device_owner));
+        }
+        if (isEnabledForAdmin(ADMIN_PROFILE_OWNER)) {
+            admins.add(mContext.getString(R.string.profile_owner));
+        }
+
+        return joinRequirementList(admins);
+    }
+
+    private String getUserConstraintSummary() {
+        final List<String> users = new ArrayList<>(3);
+
+        if (isEnabledForUser(USER_PRIMARY_USER)) {
+            users.add(mContext.getString(R.string.primary_user));
+        }
+        if (isEnabledForUser(USER_SECONDARY_USER)) {
+            users.add(mContext.getString(R.string.secondary_user));
+        }
+        if (isEnabledForUser(USER_MANAGED_PROFILE)) {
+            users.add(mContext.getString(R.string.managed_profile));
+        }
+
+        return joinRequirementList(users);
+    }
+
+    private String joinRequirementList(List<String> items) {
+        final StringBuilder sb = new StringBuilder(mContext.getString(R.string.requires));
+        final String lastItem = items.remove(items.size() - 1);
+        sb.append(TextUtils.join(mContext.getString(R.string.requires_delimiter), items));
+        if (!items.isEmpty()) {
+            sb.append(mContext.getString(R.string.requires_or));
+        }
+        sb.append(lastItem);
+        return sb.toString();
     }
 
     /**

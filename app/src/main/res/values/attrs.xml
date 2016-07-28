@@ -35,7 +35,12 @@
         <!-- Constrain a preference to certain users. -->
         <attr name="user">
             <flag name="primaryUser" value="0x1" />
-            <flag name="managedProfile" value="0x2" />
+            <flag name="secondaryUser" value="0x2" />
+            <flag name="managedProfile" value="0x4" />
+
+            <flag name="notPrimaryUser" value="0x6" />
+            <flag name="notSecondaryUser" value="0x5" />
+            <flag name="notManagedProfile" value="0x3" />
         </attr>
     </declare-styleable>
 </resources>
