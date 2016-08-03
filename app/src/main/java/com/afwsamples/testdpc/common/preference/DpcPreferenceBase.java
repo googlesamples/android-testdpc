@@ -23,9 +23,9 @@ import android.support.annotation.StringRes;
  */
 public interface DpcPreferenceBase {
     void setMinSdkVersion(int version);
-    void setAdminConstraint(int adminConstraint);
+    void setAdminConstraint(@DpcPreferenceHelper.AdminKind int adminConstraint);
     void clearAdminConstraint();
-    void setUserConstraint(int userConstraints);
+    void setUserConstraint(@DpcPreferenceHelper.UserKind int userConstraints);
     void clearUserConstraint();
     void clearNonCustomConstraints();
     void setCustomConstraint(CharSequence constraintSummary);

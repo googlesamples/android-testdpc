@@ -74,7 +74,7 @@ public class DpcPreference extends Preference implements DpcPreferenceBase {
     }
 
     @Override
-    public void setAdminConstraint(int adminConstraint) {
+    public void setAdminConstraint(@DpcPreferenceHelper.AdminKind int adminConstraint) {
         mHelper.setAdminConstraint(adminConstraint);
     }
 
@@ -84,7 +84,7 @@ public class DpcPreference extends Preference implements DpcPreferenceBase {
     }
 
     @Override
-    public void setUserConstraint(int userConstraints) {
+    public void setUserConstraint(@DpcPreferenceHelper.UserKind int userConstraints) {
         mHelper.setUserConstraint(userConstraints);
     }
 

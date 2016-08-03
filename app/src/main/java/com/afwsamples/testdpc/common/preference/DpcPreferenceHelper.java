@@ -20,6 +20,7 @@ import android.app.admin.DevicePolicyManager;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Build;
+import android.support.annotation.IntDef;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceViewHolder;
 import android.text.TextUtils;
@@ -31,6 +32,8 @@ import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.Util;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,15 +53,21 @@ public class DpcPreferenceHelper {
     private CharSequence mConstraintViolationSummary = null;
     private CharSequence mCustomConstraintSummary = null;
     private int mMinSdkVersion;
-    private int mAdminConstraint;
-    private int mUserConstraint;
+    private @AdminKind int mAdminConstraint;
+    private @UserKind int mUserConstraint;
 
     private static final int NUM_ADMIN_KINDS = 2;
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef(flag = true, value = {ADMIN_DEVICE_OWNER, ADMIN_PROFILE_OWNER})
+    public @interface AdminKind {}
     public static final int ADMIN_DEVICE_OWNER = 0x1;
     public static final int ADMIN_PROFILE_OWNER = 0x2;
     public static final int ADMIN_ANY = ADMIN_DEVICE_OWNER | ADMIN_PROFILE_OWNER;
 
     private static final int NUM_USER_KINDS = 3;
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef(flag = true, value = {USER_PRIMARY_USER, USER_SECONDARY_USER, USER_MANAGED_PROFILE})
+    public @interface UserKind {}
     public static final int USER_PRIMARY_USER = 0x1;
     public static final int USER_SECONDARY_USER = 0x2;
     public static final int USER_MANAGED_PROFILE = 0x4;
@@ -83,7 +92,9 @@ public class DpcPreferenceHelper {
             throw new RuntimeException("testdpc:minSdkVersion must be specified.");
         }
 
+        // noinspection ResourceType
         mAdminConstraint = a.getInt(R.styleable.DpcPreference_admin, ADMIN_ANY);
+        // noinspection ResourceType
         mUserConstraint = a.getInt(R.styleable.DpcPreference_user, USER_ANY);
 
         a.recycle();
@@ -121,7 +132,7 @@ public class DpcPreferenceHelper {
      *
      * @param adminConstraint The admins for which the preference is enabled.
      */
-    public void setAdminConstraint(int adminConstraint) {
+    public void setAdminConstraint(@AdminKind int adminConstraint) {
         mAdminConstraint = adminConstraint;
         disableIfConstraintsNotMet();
     }
@@ -138,7 +149,7 @@ public class DpcPreferenceHelper {
      *
      * @param userConstraint The users for which the preference is enabled.
      */
-    public void setUserConstraint(int userConstraint) {
+    public void setUserConstraint(@UserKind int userConstraint) {
         mUserConstraint = userConstraint;
         disableIfConstraintsNotMet();
     }
@@ -245,11 +256,11 @@ public class DpcPreferenceHelper {
         return USER_SECONDARY_USER;
     }
 
-    private boolean isEnabledForAdmin(int admin) {
+    private boolean isEnabledForAdmin(@AdminKind int admin) {
         return (mAdminConstraint & admin) == admin;
     }
 
-    private boolean isEnabledForUser(int user) {
+    private boolean isEnabledForUser(@UserKind int user) {
         return (mUserConstraint & user) == user;
     }
 
