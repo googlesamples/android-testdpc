@@ -33,6 +33,7 @@
     <string name="setup_label">Set up</string>
     <string name="profile_name">Sample Managed Profile</string>
     <string name="finish_setup">Finish setup</string>
+    <string name="finish_setup_account_not_ready">Finish setup but account might not be ready</string>
     <string name="setup_finished">Setup finished</string>
     <string name="click_finish_to_complete">Click Finish to complete setup.</string>
     <string name="waiting_for_first_account_check_in">Putting finishing touches</string>
