@@ -33,6 +33,7 @@
     <string name="setup_label">Set up</string>
     <string name="profile_name">Sample Managed Profile</string>
     <string name="finish_setup">Finish setup</string>
+    <string name="finish_setup_account_not_ready">Finish setup but account might not be ready</string>
     <string name="setup_finished">Setup finished</string>
     <string name="click_finish_to_complete">Click Finish to complete setup.</string>
     <string name="waiting_for_first_account_check_in">Putting finishing touches</string>
@@ -50,42 +51,57 @@
     <string name="add_account_with_name">Add account with name</string>
     <string name="add_account_skip">Skip</string>
     <string name="add_account_dialog_title">Account name:</string>
-    <string name="fail_to_add_account">Fail to add account</string>
+    <string name="fail_to_add_account">Failed to add account</string>
     <string name="icon">Icon</string>
     <string name="manage_apps">Manage applications</string>
     <string name="reset">Reset</string>
     <string name="save">Save</string>
-    <string name="migration_not_supported">Unable to migrate account into profile, please add manually.</string>
-    <string name="provisioning_not_supported">Device provisioning is not enabled. Stopping.</string>
-    <string name="provisioning_failed_or_cancelled">Provisioning failed or cancelled.</string>
+    <string name="migration_not_supported">Unable to migrate account into profile</string>
+    <string name="provisioning_not_supported">Device provisioning is not enabled</string>
+    <string name="provisioning_failed_or_cancelled">Provisioning failed or cancelled</string>
     <string name="provisioning_params_title">Select provisioning parameters</string>
     <string name="provisioning_params_color">Color: </string>
     <string name="provisioning_params_logo">Logo: </string>
     <string name="provisioning_params_select">Select</string>
-    <string name="error_opening_image_file">Error occured while opening image file</string>
+    <string name="error_opening_image_file">Error opening image file</string>
 
     <string name="work_profile">Work profile</string>
     <string name="personal_profile">Personal profile</string>
 
-    <string name="managed_profile_specific_policy_category_title">Managed profile policy</string>
-    <string name="managed_profile_specific_policy_title">Manage work profile specific policy
+    <string name="managed_profile_specific_policy_category_title">Managed profile policies</string>
+    <string name="managed_profile_specific_policy_title">Managed work profile specific policies
     </string>
     <string name="policies_management">Policy management</string>
     <string name="other_owner_already_setup_error">There is already a device/profile owner, cannot
         start TestDPC</string>
-    <string name="invalid_launch_intent_no_account">No account found on incoming intent.</string>
-    <string name="device_admin_receiver_failure">Failed to become device/profile owner.</string>
+    <string name="invalid_launch_intent_no_account">No account found on incoming intent</string>
+    <string name="device_admin_receiver_failure">Failed to become device/profile owner</string>
     <string name="menu_search_title">Search</string>
 
     <!-- Reasons for disabling preferences -->
+    <string name="requires_android_api_level">Requires API level
+        <xliff:g id="api level">%d</xliff:g></string>
+    <string name="requires">Requires\u0020</string>
+    <string name="requires_delimiter">,\u0020</string>
+    <string name="requires_or">\u0020or\u0020</string>
+    <string name="device_owner">device owner</string>
+    <string name="profile_owner">profile owner</string>
+    <string name="primary_user">primary user</string>
+    <string name="secondary_user">secondary user</string>
+    <string name="managed_profile">managed profile</string>
+
+    <string name="not_for_device_owner">Not applicable to device owner</string>
+    <string name="not_for_primary_user">Not applicable to primary user</string>
+    <string name="not_for_profile_owner">Not applicable to profile owner</string>
+    <string name="not_for_managed_profile">Not applicable to managed profile</string>
+
+    <string name="not_for_parent_profile">Not applicable to parent profile</string>
+    <string name="device_owner_only">Device owner only</string>
+    <string name="primary_user_only">Primary user only</string>
+    <string name="profile_owner_only">Profile owner only</string>
+    <string name="managed_profile_only">Managed profile only</string>
     <string name="requires_android_m">Requires API level 23</string>
     <string name="requires_android_n">Requires API level 24</string>
-    <string name="primary_user_only">Primary user only</string>
-    <string name="not_for_parent_profile">Not applicable to parent profile</string>
-    <string name="managed_profile_only">Managed profile only</string>
-    <string name="non_managed_profile_only">Non-managed profile only</string>
-    <string name="device_owner_only">Device owner only</string>
-    <string name="profile_owner_only">Profile owner only</string>
     <string name="user_restricted">Disallowed by user restriction</string>
     <string name="requires_process_logs">Requires process logging to be enabled</string>
     <string name="not_for_password_quality">Not applicable to current password quality</string>
@@ -122,11 +138,10 @@
     <string name="categories_title">Categories:</string>
     <string name="data_schemes_title">Schemes:</string>
     <string name="data_types_title">Data types:</string>
-    <string name="add_cross_profile_intent_success_msg">Cross-profile intent filter has been added.
+    <string name="add_cross_profile_intent_success_msg">Cross-profile intent filter has been added
     </string>
-    <string name="add_cross_profile_intent_failed_msg">Failed to add cross-profile intent filter.
-        Add at least one action, category, or scheme.
-    </string>
+    <string name="add_cross_profile_intent_failed_msg">Cross-profile intent requires at least one
+        action, category or scheme</string>
     <string name="cross_profile_intent_filters_cleared">All cross-profile intent filters have been
         removed.</string>
     <string name="cross_profile_intent_filters_flags">Flags:</string>
@@ -153,6 +168,7 @@
 
     <!-- Stings for work profile management -->
     <string name="profile_management_title">Work profile management</string>
+    <string name="remove_managed_profile">Remove work profile</string>
     <string name="removing_managed_profile">Removing work profile</string>
 
     <!-- Strings for cross-profile widget provider -->
@@ -232,13 +248,13 @@
     <string name="enable_system_apps_by_package_name_error">Package not found.</string>
     <string name="enable_system_apps_by_intent">Enable a system app by intent</string>
     <string name="enable_system_apps_failure_msg">Failed to enable system apps that receive the
-        given intent.
+        given intent
     </string>
-    <string name="enable_system_apps_attempt_msg">Enabled system apps that receive the given intent.
+    <string name="enable_system_apps_attempt_msg">Enabled system apps that receive the given intent
     </string>
     <string name ="no_disabled_system_apps">All system apps have been enabled.</string>
     <string name="enable">Enable</string>
-    <string name="invalid_system_apps_action">Invalid action.</string>
+    <string name="invalid_system_apps_action">Invalid action</string>
     <string name="hide_apps_title">Hide apps</string>
     <string name="hide_apps_empty">All apps are hidden.</string>
     <string name="hide_apps_success">%s is now hidden.</string>
@@ -371,7 +387,7 @@
     <string name="define_bundle">Define bundle</string>
     <string name="define_bundle_array">Define bundle array</string>
     <string name="load_manifest_restrictions">Load manifest restrictions</string>
-    <string name="set_app_restrictions_success">Successfully set app restrictions for %s.</string>
+    <string name="set_app_restrictions_success">Successfully set app restrictions for %s</string>
     <string name="app_restrictions_info">%1$s - %2$s</string>
     <string name="plus">+</string>
     <string name="app_restrictions_managing_package">App restrictions manager</string>
@@ -415,7 +431,7 @@
         enabled
     </string>
     <string name="set_accessibility_services_fail">Cannot disallow accessibility services enabled by the primary user</string>
-    <string name="all_accessibility_services_enabled">All accessibility services are enabled.
+    <string name="all_accessibility_services_enabled">All accessibility services are enabled
     </string>
 
     <!-- Input method -->

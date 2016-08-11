@@ -123,8 +123,17 @@ public class Util {
         }
     }
 
-    public static void disablePreference(Preference preference, int whyResId) {
-        preference.setEnabled(false);
-        preference.setSummary(whyResId);
+    @TargetApi(VERSION_CODES.M)
+    public static boolean isPrimaryUser(Context context) {
+        if (isBeforeM()) {
+            // Assume only DO can be primary user. This is not perfect but the cases in which it is
+            // wrong are uncommon and require adb to set up.
+            final DevicePolicyManager dpm =
+                    (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
+            return dpm.isDeviceOwnerApp(context.getPackageName());
+        } else {
+            UserManager userManager = (UserManager) context.getSystemService(Context.USER_SERVICE);
+            return userManager.isSystemUser();
+        }
     }
 }

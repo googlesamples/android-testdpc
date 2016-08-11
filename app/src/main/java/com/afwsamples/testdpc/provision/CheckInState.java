@@ -26,7 +26,12 @@ public class CheckInState {
     private SharedPreferences mSharedPreferences;
     private Context mContext;
 
-    private static final String KEY_FIRST_ACCOUNT_READY = "first_account_ready";
+    public static final int FIRST_ACCOUNT_STATE_PENDING = 0;
+    public static final int FIRST_ACCOUNT_STATE_READY = 1;
+    public static final int FIRST_ACCOUNT_STATE_TIMEOUT = 2;
+
+    private static final String KEY_FIRST_ACCOUNT_STATE = "first_account_state";
+
     /**
      * Broadcast Action: FIRST_ACCOUNT_READY broadcast is processed.
      */
@@ -38,13 +43,15 @@ public class CheckInState {
         mContext = context.getApplicationContext();
     }
 
-    public boolean isFirstAccountReady() {
-        return mSharedPreferences.getBoolean(KEY_FIRST_ACCOUNT_READY, false);
+    public int getFirstAccountState() {
+        return mSharedPreferences.getInt(KEY_FIRST_ACCOUNT_STATE, FIRST_ACCOUNT_STATE_PENDING);
     }
 
-    public void setFirstAccountReady() {
-        mSharedPreferences.edit().putBoolean(KEY_FIRST_ACCOUNT_READY, true).apply();
-        LocalBroadcastManager.getInstance(mContext).sendBroadcast(
-                new Intent(FIRST_ACCOUNT_READY_PROCESSED_ACTION));
+    public void setFirstAccountState(int state) {
+        mSharedPreferences.edit().putInt(KEY_FIRST_ACCOUNT_STATE, state).apply();
+        if (state != FIRST_ACCOUNT_STATE_PENDING) {
+            LocalBroadcastManager.getInstance(mContext).sendBroadcast(
+                    new Intent(FIRST_ACCOUNT_READY_PROCESSED_ACTION));
+        }
     }
 }

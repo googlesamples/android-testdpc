@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
  Copyright (C) 2016 The Android Open Source Project
 
  Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,6 +15,32 @@
 -->
 <resources>
     <declare-styleable name="paramsState">
-        <attr name="state_expanded" format="boolean"/>
+        <attr name="state_expanded" format="boolean" />
+    </declare-styleable>
+
+    <declare-styleable name="DpcPreference">
+        <!-- The minimum SDK version required for the preference to work. -->
+        <attr name="minSdkVersion">
+            <enum name="L" value="21" />
+            <enum name="M" value="23" />
+            <enum name="N" value="24" />
+        </attr>
+
+        <!-- Constrain a preference to DO or PO admins. -->
+        <attr name="admin">
+            <flag name="deviceOwner" value="0x1" />
+            <flag name="profileOwner" value="0x2" />
+        </attr>
+
+        <!-- Constrain a preference to certain users. -->
+        <attr name="user">
+            <flag name="primaryUser" value="0x1" />
+            <flag name="secondaryUser" value="0x2" />
+            <flag name="managedProfile" value="0x4" />
+
+            <flag name="notPrimaryUser" value="0x6" />
+            <flag name="notSecondaryUser" value="0x5" />
+            <flag name="notManagedProfile" value="0x3" />
+        </attr>
     </declare-styleable>
 </resources>

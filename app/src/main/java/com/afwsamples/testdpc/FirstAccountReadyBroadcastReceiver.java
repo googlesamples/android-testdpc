@@ -51,8 +51,14 @@ public class FirstAccountReadyBroadcastReceiver extends BroadcastReceiver {
         if (FIRST_ACCOUNT_READY_ACTION.equals(action) ||
                 FIRST_ACCOUNT_READY_TIMEOUT_ACTION.equals(action)) {
             CheckInState checkInState = new CheckInState(context);
-            if (!checkInState.isFirstAccountReady()) {
-                checkInState.setFirstAccountReady();
+            if (checkInState.getFirstAccountState() == CheckInState.FIRST_ACCOUNT_STATE_PENDING) {
+                int nextState;
+                if (FIRST_ACCOUNT_READY_ACTION.equals(action)) {
+                    nextState = CheckInState.FIRST_ACCOUNT_STATE_READY;
+                } else {
+                    nextState = CheckInState.FIRST_ACCOUNT_STATE_TIMEOUT;
+                }
+                checkInState.setFirstAccountState(nextState);
                 ProvisioningUtil.enableProfile(context);
             }
             // This receiver is disabled in ProvisioningUtil.enableProfile, no more code should

@@ -26,6 +26,7 @@ import android.content.IntentFilter;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.annotation.StringRes;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.View;
@@ -54,7 +55,7 @@ public class EnableProfileActivity extends Activity implements NavigationBar.Nav
     private Button mFinishButton;
     private SetupWizardLayout mSetupWizardLayout;
 
-    private boolean mEnableProfileNow;
+    private CheckInState mCheckinState;
 
     public static final String EXTRA_ENABLE_PROFILE_NOW = "enable_profile_now";
     private static final IntentFilter sIntentFilter =
@@ -64,9 +65,11 @@ public class EnableProfileActivity extends Activity implements NavigationBar.Nav
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mEnableProfileNow = getIntent().getBooleanExtra(EXTRA_ENABLE_PROFILE_NOW, false);
+
+        mCheckinState = new CheckInState(this);
         if (savedInstanceState == null) {
-            if (mEnableProfileNow) {
+            if (getIntent().getBooleanExtra(EXTRA_ENABLE_PROFILE_NOW, false)) {
+                mCheckinState.setFirstAccountState(CheckInState.FIRST_ACCOUNT_STATE_READY);
                 ProvisioningUtil.enableProfile(this);
             } else {
                 // Set up an alarm to enable profile in case we do not receive first account ready
@@ -120,8 +123,7 @@ public class EnableProfileActivity extends Activity implements NavigationBar.Nav
         LocalBroadcastManager.getInstance(this).registerReceiver(mCheckInStateReceiver,
                 sIntentFilter);
         // In case the broadcast is sent before we register the receiver.
-        CheckInState checkInState = new CheckInState(this);
-        refreshUi(mEnableProfileNow || checkInState.isFirstAccountReady() /* enableFinish */);
+        refreshUi();
     }
 
     @Override
@@ -140,16 +142,30 @@ public class EnableProfileActivity extends Activity implements NavigationBar.Nav
         return false;
     }
 
-    private void refreshUi(boolean enableFinish) {
+    private void refreshUi() {
+        boolean enableFinish;
+        @StringRes int headerTextResId;
+        switch (mCheckinState.getFirstAccountState()) {
+            case CheckInState.FIRST_ACCOUNT_STATE_READY:
+                enableFinish = true;
+                headerTextResId = R.string.finish_setup;
+                break;
+            case CheckInState.FIRST_ACCOUNT_STATE_TIMEOUT:
+                enableFinish = true;
+                headerTextResId = R.string.finish_setup_account_not_ready;
+                break;
+            case CheckInState.FIRST_ACCOUNT_STATE_PENDING:
+            default:
+                enableFinish = false;
+                headerTextResId = R.string.waiting_for_first_account_check_in;
+                break;
+        }
         if (enableFinish) {
             mSetupWizardLayout.hideProgressBar();
         } else {
             mSetupWizardLayout.showProgressBar();
         }
-        mSetupWizardLayout.setHeaderText(
-                (enableFinish)
-                        ? R.string.finish_setup
-                        : R.string.waiting_for_first_account_check_in);
+        mSetupWizardLayout.setHeaderText(headerTextResId);
         mFinishButton.setEnabled(enableFinish);
     }
 
@@ -167,7 +183,7 @@ public class EnableProfileActivity extends Activity implements NavigationBar.Nav
         @Override
         public void onReceive(Context context, Intent intent) {
             // Processed the first check-in broadcast, allow user to tap the finish button.
-            refreshUi(true);
+            refreshUi();
         }
     }
 }

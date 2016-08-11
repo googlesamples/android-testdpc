@@ -55,10 +55,10 @@ import android.app.AlertDialog;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.UserManager;
 import android.support.v14.preference.PreferenceFragment;
-import android.support.v14.preference.SwitchPreference;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceScreen;
 import android.util.Log;
@@ -66,7 +66,9 @@ import android.widget.Toast;
 
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
-import com.afwsamples.testdpc.common.Util;
+import com.afwsamples.testdpc.common.preference.DpcPreferenceBase;
+import com.afwsamples.testdpc.common.preference.DpcPreferenceHelper;
+import com.afwsamples.testdpc.common.preference.DpcSwitchPreference;
 
 public class UserRestrictionsDisplayFragment extends PreferenceFragment
         implements Preference.OnPreferenceChangeListener {
@@ -195,8 +197,9 @@ public class UserRestrictionsDisplayFragment extends PreferenceFragment
                 getPreferenceManager().getContext());
         setPreferenceScreen(preferenceScreen);
 
+        final Context preferenceContext = getPreferenceManager().getContext();
         for (UserRestriction restriction : ALL_USER_RESTRICTIONS) {
-            SwitchPreference preference = new SwitchPreference(getPreferenceManager().getContext());
+            DpcSwitchPreference preference = new DpcSwitchPreference(preferenceContext);
             preference.setTitle(restriction.titleResId);
             preference.setKey(restriction.key);
             preference.setOnPreferenceChangeListener(this);
@@ -204,8 +207,7 @@ public class UserRestrictionsDisplayFragment extends PreferenceFragment
         }
 
         updateAllUserRestrictions();
-        disableIncompatibleRestrictionsByApiLevel();
-        disableIncompatibleRestrictionsByUserType();
+        constrainPerferences();
     }
 
     @Override
@@ -246,43 +248,31 @@ public class UserRestrictionsDisplayFragment extends PreferenceFragment
     }
 
     private void updateUserRestriction(String userRestriction) {
-        SwitchPreference preference = (SwitchPreference) findPreference(userRestriction);
+        DpcSwitchPreference preference = (DpcSwitchPreference) findPreference(userRestriction);
         boolean disallowed = mUserManager.hasUserRestriction(userRestriction);
         preference.setChecked(disallowed);
     }
 
-    private void disableIncompatibleRestrictionsByApiLevel() {
-        if (Util.isBeforeM()) {
-            for (String restriction : MNC_PLUS_RESTRICTIONS) {
-                Util.disablePreference(findPreference(restriction), R.string.requires_android_m);
-            }
+    private void constrainPerferences() {
+        for (String restriction : MNC_PLUS_RESTRICTIONS) {
+            DpcPreferenceBase pref = (DpcPreferenceBase) findPreference(restriction);
+            pref.setMinSdkVersion(Build.VERSION_CODES.M);
         }
-        if (Util.isBeforeN()) {
-            for (String restriction : NYC_PLUS_RESTRICTIONS) {
-                Util.disablePreference(findPreference(restriction), R.string.requires_android_n);
-            }
+        for (String restriction : NYC_PLUS_RESTRICTIONS) {
+            DpcPreferenceBase pref = (DpcPreferenceBase) findPreference(restriction);
+            pref.setMinSdkVersion(Build.VERSION_CODES.N);
         }
-    }
-
-    private void disableIncompatibleRestrictionsByUserType() {
-        String pkgName = getActivity().getPackageName();
-        boolean isProfileOwner = mDevicePolicyManager.isProfileOwnerApp(pkgName);
-        boolean isDeviceOwner = mDevicePolicyManager.isDeviceOwnerApp(pkgName);
-        if (isProfileOwner) {
-            for (String restriction : PRIMARY_USER_ONLY_RESTRICTIONS) {
-                Util.disablePreference(findPreference(restriction), R.string.primary_user_only);
-            }
-        } else if (isDeviceOwner) {
-            for (String restriction : MANAGED_PROFILE_ONLY_RESTRICTIONS) {
-                Util.disablePreference(findPreference(restriction), R.string.managed_profile_only);
-            }
+        for (String restriction : PRIMARY_USER_ONLY_RESTRICTIONS) {
+            DpcPreferenceBase pref = (DpcPreferenceBase) findPreference(restriction);
+            pref.setUserConstraint(DpcPreferenceHelper.USER_PRIMARY_USER);
         }
-
-        if (Util.isManagedProfile(getActivity(), mAdminComponentName)) {
-            for (String restriction : NON_MANAGED_PROFILE_RESTRICTIONS) {
-                Util.disablePreference(findPreference(restriction),
-                        R.string.non_managed_profile_only);
-            }
+        for (String restriction : MANAGED_PROFILE_ONLY_RESTRICTIONS) {
+            DpcPreferenceBase pref = (DpcPreferenceBase) findPreference(restriction);
+            pref.setUserConstraint(DpcPreferenceHelper.USER_MANAGED_PROFILE);
+        }
+        for (String restriction : NON_MANAGED_PROFILE_RESTRICTIONS) {
+            DpcPreferenceBase pref = (DpcPreferenceBase) findPreference(restriction);
+            pref.setUserConstraint(DpcPreferenceHelper.USER_NOT_MANAGED_PROFILE);
         }
     }
 

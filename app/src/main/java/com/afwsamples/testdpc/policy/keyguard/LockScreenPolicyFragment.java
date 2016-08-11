@@ -32,6 +32,8 @@ import android.widget.Toast;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.ProfileOrParentFragment;
 import com.afwsamples.testdpc.common.Util;
+import com.afwsamples.testdpc.common.preference.DpcPreferenceBase;
+import com.afwsamples.testdpc.common.preference.DpcPreferenceHelper;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -64,8 +66,6 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
         static final String MAX_TIME_SCREEN_LOCK = "key_max_time_screen_lock";
         static final String MAX_TIME_SCREEN_LOCK_ALL = "key_max_time_screen_lock_aggregate";
 
-        static final String KEYGUARD_FEATURES_CATEGORY = "keyguard_features";
-
         static final String KEYGUARD_DISABLE_FINGERPRINT = "keyguard_disable_fingerprint";
         static final String KEYGUARD_DISABLE_REMOTE_INPUT = "keyguard_disable_remote_input";
         static final String KEYGUARD_DISABLE_SECURE_CAMERA = "keyguard_disable_secure_camera";
@@ -82,38 +82,10 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
             KEYGUARD_DISABLE_SECURE_NOTIFICATIONS,
             KEYGUARD_DISABLE_UNREDACTED_NOTIFICATIONS,
         }));
-
-        static final Set<String> NOT_APPLICABLE_TO_PROFILE
-                = new HashSet<>(Arrays.asList(new String[] {
-            KEYGUARD_DISABLE_SECURE_CAMERA,
-            KEYGUARD_DISABLE_SECURE_NOTIFICATIONS,
-        }));
-
-        static final Set<String> DEVICE_OWNER_ONLY
-                = new HashSet<>(Arrays.asList(new String[] {
-            LOCK_SCREEN_MESSAGE
-        }));
-
-        /**
-         * Preferences that are allowed only in MNC+ if it is profile owner. This does not restrict
-         * device owner.
-         */
-        static final Set<String> PROFILE_OWNER_ONLY_MNC_PLUS
-                = new HashSet<>(Arrays.asList(new String[] {
-            KEYGUARD_FEATURES_CATEGORY
-        }));
-
-        static final Set<String> NYC_PLUS
-                = new HashSet<>(Arrays.asList(new String[] {
-            LOCK_SCREEN_MESSAGE
-        }));
     }
 
     private static final Map<String, Integer> KEYGUARD_FEATURES = new ArrayMap<>();
     static {
-        KEYGUARD_FEATURES.put(Keys.KEYGUARD_DISABLE_FINGERPRINT,
-                DevicePolicyManager.KEYGUARD_DISABLE_FINGERPRINT);
-
         KEYGUARD_FEATURES.put(Keys.KEYGUARD_DISABLE_SECURE_CAMERA,
                 DevicePolicyManager.KEYGUARD_DISABLE_SECURE_CAMERA);
 
@@ -278,30 +250,18 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
      * Set an initial value. Updates the summary to match.
      */
     private void setup(String key, Object adminSetting) {
-        Preference pref = findPreference(key);
-        if (!pref.isEnabled()) {
+        final Preference pref = findPreference(key);
+        final DpcPreferenceBase dpcPref = (DpcPreferenceBase) pref;
+
+        // Disable preferences that don't apply to the parent profile
+        if (Keys.NOT_APPLICABLE_TO_PARENT.contains(key) && isParentProfileInstance()) {
+            dpcPref.setCustomConstraint(R.string.not_for_parent_profile);
             return;
-        }
-        // We do not allow user to add trust agent config in pre-N devices in managed profile.
-        if (!BuildCompat.isAtLeastN()) {
-            Keys.NOT_APPLICABLE_TO_PROFILE.add(Keys.SET_TRUST_AGENT_CONFIG);
         }
 
-        // If the preference is not applicable, just hide it instead.
-        if (Keys.NOT_APPLICABLE_TO_PARENT.contains(key) && isParentProfileInstance()) {
-            Util.disablePreference(pref, R.string.not_for_parent_profile);
-            return;
-        }
-        if (Keys.NOT_APPLICABLE_TO_PROFILE.contains(key) && isManagedProfileInstance()) {
-            Util.disablePreference(pref, R.string.non_managed_profile_only);
-            return;
-        }
-        if (Keys.DEVICE_OWNER_ONLY.contains(key) && !isDeviceOwner()) {
-            Util.disablePreference(pref, R.string.device_owner_only);
-            return;
-        }
-        if (Keys.NYC_PLUS.contains(key) && Util.isBeforeN()) {
-            Util.disablePreference(pref, R.string.requires_android_n);
+        // We do not allow user to add trust agent config in pre-N devices in managed profile.
+        if (!BuildCompat.isAtLeastN() && key.equals(Keys.SET_TRUST_AGENT_CONFIG)) {
+            dpcPref.setAdminConstraint(DpcPreferenceHelper.ADMIN_DEVICE_OWNER);
             return;
         }
 
@@ -323,9 +283,10 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
     }
 
     private void disableIncompatibleManagementOptionsInCurrentProfile() {
-        if (isProfileOwner() && Util.isBeforeM()) {
-            for (String preference : Keys.PROFILE_OWNER_ONLY_MNC_PLUS) {
-                Util.disablePreference(findPreference(preference), R.string.profile_owner_only);
+        if (Util.isBeforeM()) {
+            for (String preference : KEYGUARD_FEATURES.keySet()) {
+                ((DpcPreferenceBase) findPreference(preference))
+                        .setAdminConstraint(DpcPreferenceHelper.ADMIN_DEVICE_OWNER);
             }
         }
     }

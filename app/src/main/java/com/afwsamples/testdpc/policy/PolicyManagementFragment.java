@@ -46,6 +46,7 @@ import android.security.KeyChain;
 import android.security.KeyChainAliasCallback;
 import android.support.v14.preference.SwitchPreference;
 import android.support.v4.content.FileProvider;
+import android.support.v4.os.BuildCompat;
 import android.support.v7.preference.EditTextPreference;
 import android.support.v7.preference.Preference;
 import android.telephony.TelephonyManager;
@@ -74,6 +75,8 @@ import com.afwsamples.testdpc.common.BaseSearchablePolicyPreferenceFragment;
 import com.afwsamples.testdpc.common.CertificateUtil;
 import com.afwsamples.testdpc.common.MediaDisplayFragment;
 import com.afwsamples.testdpc.common.Util;
+import com.afwsamples.testdpc.common.preference.DpcPreference;
+import com.afwsamples.testdpc.common.preference.DpcSwitchPreference;
 import com.afwsamples.testdpc.policy.blockuninstallation.BlockUninstallationInfoArrayAdapter;
 import com.afwsamples.testdpc.policy.certificate.DelegatedCertInstallerFragment;
 import com.afwsamples.testdpc.policy.keyguard.LockScreenPolicyFragment;
@@ -282,42 +285,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             BatteryManager.BATTERY_PLUGGED_WIRELESS);
     private static final String DONT_STAY_ON = "0";
 
-    private static final String[] PRIMARY_USER_ONLY_PREFERENCES = {
-            WIPE_DATA_KEY, REMOVE_DEVICE_OWNER_KEY, REMOVE_USER_KEY,
-            MANAGE_LOCK_TASK_LIST_KEY, CHECK_LOCK_TASK_PERMITTED_KEY, START_LOCK_TASK,
-            STOP_LOCK_TASK, DISABLE_STATUS_BAR, REENABLE_STATUS_BAR, DISABLE_KEYGUARD,
-            REENABLE_KEYGUARD, START_KIOSK_MODE, SYSTEM_UPDATE_POLICY_KEY, STAY_ON_WHILE_PLUGGED_IN,
-            SHOW_WIFI_MAC_ADDRESS_KEY, REBOOT_KEY, REQUEST_BUGREPORT_KEY, ENABLE_PROCESS_LOGGING,
-            REQUEST_PROCESS_LOGS, SET_AUTO_TIME_REQUIRED_KEY, CREATE_AND_MANAGE_USER_KEY
-    };
-
-    private static String[] MNC_PLUS_PREFERENCES = {
-            OVERRIDE_KEY_SELECTION_KEY, START_LOCK_TASK, STOP_LOCK_TASK, SYSTEM_UPDATE_POLICY_KEY,
-            NETWORK_STATS_KEY, DELEGATED_CERT_INSTALLER_KEY, DISABLE_STATUS_BAR,
-            REENABLE_STATUS_BAR, DISABLE_KEYGUARD, REENABLE_KEYGUARD, START_KIOSK_MODE,
-            SET_PERMISSION_POLICY_KEY, MANAGE_APP_PERMISSIONS_KEY,STAY_ON_WHILE_PLUGGED_IN,
-            WIFI_CONFIG_LOCKDOWN_ENABLE_KEY, SECURITY_PATCH_KEY
-    };
-
-    private static String[] NYC_PLUS_PREFERENCES = {
-            REBOOT_KEY, REMOVE_KEY_CERTIFICATE_KEY, SET_ALWAYS_ON_VPN_KEY,
-            SHOW_WIFI_MAC_ADDRESS_KEY, SUSPEND_APPS_KEY, UNSUSPEND_APPS_KEY,
-            SET_SHORT_SUPPORT_MESSAGE_KEY, SET_LONG_SUPPORT_MESSAGE_KEY, REQUEST_BUGREPORT_KEY,
-            ENABLE_PROCESS_LOGGING, REQUEST_PROCESS_LOGS, CREATE_AND_MANAGE_USER_KEY
-    };
-
-    /**
-     * Preferences that are allowed only in NYC+ if it is profile owner. This does not restrict
-     * device owner.
-     */
-    private static String[] PROFILE_OWNER_NYC_PLUS_PREFERENCES = {
-            RESET_PASSWORD_KEY
-    };
-
-    private static final String[] MANAGED_PROFILE_SPECIFIC_OPTIONS = {
-            MANAGED_PROFILE_SPECIFIC_POLICIES_KEY
-    };
-
     private DevicePolicyManager mDevicePolicyManager;
     private PackageManager mPackageManager;
     private String mPackageName;
@@ -330,7 +297,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private SwitchPreference mMuteAudioSwitchPreference;
 
     private SwitchPreference mStayOnWhilePluggedInSwitchPreference;
-    private SwitchPreference mInstallNonMarketAppsPreference;
+    private DpcSwitchPreference mInstallNonMarketAppsPreference;
 
     private SwitchPreference mEnableProcessLoggingPreference;
     private SwitchPreference mSetAutoTimeRequiredPreference;
@@ -433,7 +400,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(WIFI_CONFIG_LOCKDOWN_ENABLE_KEY).setOnPreferenceChangeListener(this);
         findPreference(MODIFY_WIFI_CONFIGURATION_KEY).setOnPreferenceClickListener(this);
         findPreference(SHOW_WIFI_MAC_ADDRESS_KEY).setOnPreferenceClickListener(this);
-        mInstallNonMarketAppsPreference = (SwitchPreference) findPreference(
+        mInstallNonMarketAppsPreference = (DpcSwitchPreference) findPreference(
                 INSTALL_NONMARKET_APPS_KEY);
         mInstallNonMarketAppsPreference.setOnPreferenceChangeListener(this);
         findPreference(SET_USER_RESTRICTIONS_KEY).setOnPreferenceClickListener(this);
@@ -445,15 +412,22 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 SET_AUTO_TIME_REQUIRED_KEY);
         mSetAutoTimeRequiredPreference.setOnPreferenceChangeListener(this);
 
-        disableIncompatibleManagementOptionsInCurrentProfile();
-        disableIncompatibleManagementOptionsByApiLevel();
+        constrainSpecialCasePreferences();
 
+        loadAppStatus();
         loadSecurityPatch();
         reloadCameraDisableUi();
         reloadScreenCaptureDisableUi();
         reloadMuteAudioUi();
         reloadEnableProcessLoggingUi();
         reloadSetAutoTimeRequiredUi();
+    }
+
+    private void constrainSpecialCasePreferences() {
+        // Reset password can be used in all contexts since N
+        if (BuildCompat.isAtLeastN()) {
+            ((DpcPreference) findPreference(RESET_PASSWORD_KEY)).clearNonCustomConstraints();
+        }
     }
 
     @Override
@@ -1099,65 +1073,14 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
      */
     public void updateInstallNonMarketAppsPreference() {
         if (mUserManager.hasUserRestriction(DISALLOW_INSTALL_UNKNOWN_SOURCES)) {
-            Util.disablePreference(mInstallNonMarketAppsPreference, R.string.user_restricted);
+            mInstallNonMarketAppsPreference.setCustomConstraint(R.string.user_restricted);
         } else {
-            mInstallNonMarketAppsPreference.setEnabled(true);
-            mInstallNonMarketAppsPreference.setSummary(null);
+            mInstallNonMarketAppsPreference.clearCustomConstraint();
         }
         int isInstallNonMarketAppsAllowed = Settings.Secure.getInt(
                 getActivity().getContentResolver(), Settings.Secure.INSTALL_NON_MARKET_APPS, 0);
         mInstallNonMarketAppsPreference.setChecked(
                 isInstallNonMarketAppsAllowed == 0 ? false : true);
-    }
-
-    /**
-     * Some functionality only works if this app is device owner. Disable their UIs to avoid
-     * confusion.
-     */
-    private void disableIncompatibleManagementOptionsInCurrentProfile() {
-        boolean isProfileOwner = mDevicePolicyManager.isProfileOwnerApp(mPackageName);
-        boolean isDeviceOwner = mDevicePolicyManager.isDeviceOwnerApp(mPackageName);
-        int deviceOwnerStatusStringId = R.string.this_is_not_a_device_owner;
-        if (isProfileOwner) {
-            // Some of the management options can only be applied in a primary profile.
-            for (String preference : PRIMARY_USER_ONLY_PREFERENCES) {
-                Util.disablePreference(findPreference(preference), R.string.primary_user_only);
-            }
-            if (Util.isBeforeN()) {
-                for (String preference : PROFILE_OWNER_NYC_PLUS_PREFERENCES) {
-                    Util.disablePreference(findPreference(preference), R.string.requires_android_n);
-                }
-            }
-            deviceOwnerStatusStringId = R.string.this_is_a_profile_owner;
-        } else if (isDeviceOwner) {
-            // If it's a device owner and running in the primary profile.
-            deviceOwnerStatusStringId = R.string.this_is_a_device_owner;
-        }
-        findPreference(DEVICE_OWNER_STATUS_KEY).setSummary(deviceOwnerStatusStringId);
-        if (!isDeviceOwner) {
-            Util.disablePreference(findPreference(WIFI_CONFIG_LOCKDOWN_ENABLE_KEY),
-                    R.string.device_owner_only);
-        }
-        // Disable managed profile specific options if we are not running in managed profile.
-        if (!Util.isManagedProfile(getActivity(), mAdminComponentName)) {
-            for (String managedProfileSpecificOption : MANAGED_PROFILE_SPECIFIC_OPTIONS) {
-                Util.disablePreference(findPreference(managedProfileSpecificOption),
-                        R.string.managed_profile_only);
-            }
-        }
-    }
-
-    private void disableIncompatibleManagementOptionsByApiLevel() {
-        if (Util.isBeforeM()) {
-            for (String preference : MNC_PLUS_PREFERENCES) {
-                Util.disablePreference(findPreference(preference), R.string.requires_android_m);
-            }
-        }
-        if (Util.isBeforeN()) {
-            for (String preference : NYC_PLUS_PREFERENCES) {
-                Util.disablePreference(findPreference(preference), R.string.requires_android_n);
-            }
-        }
     }
 
     /**
@@ -1415,6 +1338,18 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 .show();
     }
 
+    private void loadAppStatus() {
+        boolean isProfileOwner = mDevicePolicyManager.isProfileOwnerApp(mPackageName);
+        boolean isDeviceOwner = mDevicePolicyManager.isDeviceOwnerApp(mPackageName);
+        int deviceOwnerStatusStringId = R.string.this_is_not_a_device_owner;
+        if (isProfileOwner) {
+            deviceOwnerStatusStringId = R.string.this_is_a_profile_owner;
+        } else if (isDeviceOwner) {
+            deviceOwnerStatusStringId = R.string.this_is_a_device_owner;
+        }
+        findPreference(DEVICE_OWNER_STATUS_KEY).setSummary(deviceOwnerStatusStringId);
+    }
+
     @TargetApi(Build.VERSION_CODES.M)
     private void loadSecurityPatch() {
         Preference securityPatchPreference = findPreference(SECURITY_PATCH_KEY);
@@ -1447,12 +1382,11 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             boolean isProcessLoggingEnabled = mDevicePolicyManager.isSecurityLoggingEnabled(
                     mAdminComponentName);
             mEnableProcessLoggingPreference.setChecked(isProcessLoggingEnabled);
-            Preference requestLogsPreference = findPreference((REQUEST_PROCESS_LOGS));
+            DpcPreference requestLogs = (DpcPreference) findPreference((REQUEST_PROCESS_LOGS));
             if (isProcessLoggingEnabled) {
-                requestLogsPreference.setEnabled(true);
-                requestLogsPreference.setSummary(null);
+                requestLogs.clearCustomConstraint();
             } else {
-                Util.disablePreference(requestLogsPreference, R.string.requires_process_logs);
+                requestLogs.setCustomConstraint(R.string.requires_process_logs);
             }
         }
     }

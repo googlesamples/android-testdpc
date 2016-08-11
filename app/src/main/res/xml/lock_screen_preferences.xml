@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
  Copyright (C) 2016 The Android Open Source Project
 
  Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,72 +14,82 @@
  limitations under the License.
 -->
 
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceCategory
-            android:title="@string/lock_screen_message">
-        <EditTextPreference
-                android:key="key_lock_screen_message"
-                android:title="@string/lock_screen_message"
-                android:dialogTitle="@string/lock_screen_message"
-                android:inputType="text"
-                android:defaultValue="" />
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:testdpc="http://schemas.android.com/apk/res/com.afwsamples.testdpc">
+    <PreferenceCategory android:title="@string/lock_screen_message">
+        <com.afwsamples.testdpc.common.preference.DpcEditTextPreference
+            android:defaultValue=""
+            android:dialogTitle="@string/lock_screen_message"
+            android:inputType="text"
+            android:key="key_lock_screen_message"
+            android:title="@string/lock_screen_message"
+            testdpc:admin="deviceOwner"
+            testdpc:minSdkVersion="N" />
     </PreferenceCategory>
 
-    <PreferenceCategory
-            android:title="@string/maximum_lock_time_category" >
-        <EditTextPreference
-                android:key="key_max_time_screen_lock"
-                android:title="@string/maximum_lock_time_seconds"
-                android:dialogTitle="@string/maximum_lock_time_seconds"
-                android:inputType="number"
-                android:defaultValue="0" />
-        <Preference
-                android:key="key_max_time_screen_lock_aggregate"
-                android:title="@string/maximum_lock_time_all_admins"
-                android:selectable="false" />
+    <PreferenceCategory android:title="@string/maximum_lock_time_category">
+        <com.afwsamples.testdpc.common.preference.DpcEditTextPreference
+            android:defaultValue="0"
+            android:dialogTitle="@string/maximum_lock_time_seconds"
+            android:inputType="number"
+            android:key="key_max_time_screen_lock"
+            android:title="@string/maximum_lock_time_seconds"
+            testdpc:minSdkVersion="L" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="key_max_time_screen_lock_aggregate"
+            android:selectable="false"
+            android:title="@string/maximum_lock_time_all_admins"
+            testdpc:minSdkVersion="L" />
     </PreferenceCategory>
 
-    <PreferenceCategory
-            android:title="@string/maximum_password_fails" >
-        <EditTextPreference
-                android:key="key_max_fails_before_wipe"
-                android:title="@string/maximum_password_fails"
-                android:dialogTitle="@string/maximum_password_fails"
-                android:inputType="number"
-                android:defaultValue="0" />
-        <Preference
-                android:key="key_max_fails_before_wipe_aggregate"
-                android:title="@string/maximum_password_fails_all_admins"
-                android:selectable="false" />
+    <PreferenceCategory android:title="@string/maximum_password_fails">
+        <com.afwsamples.testdpc.common.preference.DpcEditTextPreference
+            android:defaultValue="0"
+            android:dialogTitle="@string/maximum_password_fails"
+            android:inputType="number"
+            android:key="key_max_fails_before_wipe"
+            android:title="@string/maximum_password_fails"
+            testdpc:minSdkVersion="L" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="key_max_fails_before_wipe_aggregate"
+            android:selectable="false"
+            android:title="@string/maximum_password_fails_all_admins"
+            testdpc:minSdkVersion="L" />
     </PreferenceCategory>
 
-    <PreferenceCategory
-            android:key="keyguard_features"
-            android:title="@string/keyguard_features">
-        <SwitchPreference
-                android:key="keyguard_disable_secure_camera"
-                android:title="@string/keyguard_disable_secure_camera"/>
-        <SwitchPreference
-                android:key="keyguard_disable_secure_notifications"
-                android:title="@string/keyguard_disable_secure_notifications"/>
-        <SwitchPreference
-                android:key="keyguard_disable_unredacted_notifications"
-                android:title="@string/keyguard_disable_unredacted_notifications"/>
-        <SwitchPreference
-                android:key="keyguard_disable_trust_agents"
-                android:title="@string/keyguard_disable_trust_agents"/>
-        <SwitchPreference
-                android:key="keyguard_disable_fingerprint"
-                android:title="@string/keyguard_disable_fingerprint"/>
-        <SwitchPreference
-                android:key="keyguard_disable_remote_input"
-                android:title="@string/keyguard_disable_remote_input"/>
+    <PreferenceCategory android:title="@string/keyguard_features">
+        <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
+            android:key="keyguard_disable_secure_camera"
+            android:title="@string/keyguard_disable_secure_camera"
+            testdpc:admin="deviceOwner"
+            testdpc:minSdkVersion="L" />
+        <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
+            android:key="keyguard_disable_secure_notifications"
+            android:title="@string/keyguard_disable_secure_notifications"
+            testdpc:admin="deviceOwner"
+            testdpc:minSdkVersion="L" />
+        <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
+            android:key="keyguard_disable_unredacted_notifications"
+            android:title="@string/keyguard_disable_unredacted_notifications"
+            testdpc:minSdkVersion="L" />
+        <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
+            android:key="keyguard_disable_trust_agents"
+            android:title="@string/keyguard_disable_trust_agents"
+            testdpc:minSdkVersion="L" />
+        <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
+            android:key="keyguard_disable_fingerprint"
+            android:title="@string/keyguard_disable_fingerprint"
+            testdpc:minSdkVersion="L" />
+        <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
+            android:key="keyguard_disable_remote_input"
+            android:title="@string/keyguard_disable_remote_input"
+            testdpc:minSdkVersion="L" />
     </PreferenceCategory>
 
-    <PreferenceCategory
-            android:title="@string/trust_agent_features">
-        <Preference
-                android:key="key_set_trust_agent_config"
-                android:title="@string/set_trust_agent_config"/>
+    <PreferenceCategory android:title="@string/trust_agent_features">
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="key_set_trust_agent_config"
+            android:title="@string/set_trust_agent_config"
+            testdpc:minSdkVersion="L" />
     </PreferenceCategory>
 </PreferenceScreen>

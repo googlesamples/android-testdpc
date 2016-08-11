@@ -86,15 +86,6 @@ public class ProfilePolicyManagementFragment extends BaseSearchablePolicyPrefere
 
     private static final String ORGANIZATION_COLOR_ID = "organizationColor";
 
-    private static String[] MNC_PLUS_PREFERENCES = {
-            DISABLE_BLUETOOTH_CONTACT_SHARING_KEY
-    };
-
-    private static String[] NYC_PLUS_PREFERENCES = {
-            DISABLE_CROSS_PROFILE_CONTACTS_SEARCH_KEY, SET_ORGANIZATION_COLOR_KEY,
-            SET_ORGANIZATION_NAME_KEY
-    };
-
     private DevicePolicyManager mDevicePolicyManager;
     private ComponentName mAdminComponentName;
     private Preference mAddCrossProfileIntentFilterPreference;
@@ -133,7 +124,6 @@ public class ProfilePolicyManagementFragment extends BaseSearchablePolicyPrefere
                 REMOVE_CROSS_PROFILE_APP_WIDGETS_KEY);
         mRemoveCrossProfileAppWidgetsPreference.setOnPreferenceClickListener(this);
 
-        disableIncompatibleManagementOptionsByApiLevel();
         initSwitchPreferences();
         initializeOrganizationInfoPreferences();
     }
@@ -401,21 +391,5 @@ public class ProfilePolicyManagementFragment extends BaseSearchablePolicyPrefere
             return;
         }
         Toast.makeText(activity, msg, Toast.LENGTH_SHORT).show();
-    }
-
-    private void disableIncompatibleManagementOptionsByApiLevel() {
-        if (Util.isBeforeM()) {
-            // The following options depend on MNC APIs.
-            for (String preference : MNC_PLUS_PREFERENCES) {
-                findPreference(preference).setEnabled(false);
-            }
-        }
-
-        if (Util.isBeforeN()) {
-            // The following options depend on NYC APIs.
-            for (String preference : NYC_PLUS_PREFERENCES) {
-                findPreference(preference).setEnabled(false);
-            }
-        }
     }
 }
