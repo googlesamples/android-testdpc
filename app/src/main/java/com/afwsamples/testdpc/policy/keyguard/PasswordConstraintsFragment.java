@@ -34,6 +34,7 @@ import com.afwsamples.testdpc.common.preference.DpcPreferenceBase;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
@@ -135,7 +136,7 @@ public final class PasswordConstraintsFragment extends ProfileOrParentFragment i
         // separate String[]s.
         List<CharSequence> entries = new ArrayList<>();
         List<CharSequence> values = new ArrayList<>();
-        for (TreeMap.Entry<Integer, Integer> entry : PASSWORD_QUALITIES.entrySet()) {
+        for (Map.Entry<Integer, Integer> entry : PASSWORD_QUALITIES.entrySet()) {
             values.add(Integer.toString(entry.getKey()));
             entries.add(getString(entry.getValue()));
         }

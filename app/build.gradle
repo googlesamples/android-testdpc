@@ -13,13 +13,13 @@ ext {
 }
 
 android {
-    compileSdkVersion 24
+    compileSdkVersion 25
     buildToolsVersion '24.0.0'
 
     defaultConfig {
         applicationId "com.afwsamples.testdpc"
         minSdkVersion 21
-        targetSdkVersion 24
+        targetSdkVersion 25
         versionCode versionMajor * 1000 + versionMinor * 100 + versionBuild
         versionName "${versionMajor}.${versionMinor}.${versionBuild}"
     }
@@ -66,9 +66,9 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:preference-v14:24.0.0'
-    compile 'com.android.support:recyclerview-v7:24.+'
-    compile "com.android.support:support-v13:24.+"
+    compile 'com.android.support:preference-v14:25.+'
+    compile 'com.android.support:recyclerview-v7:25.+'
+    compile "com.android.support:support-v13:25.+"
     compile 'com.google.android.gms:play-services-safetynet:+'
     compile(name:'setup-wizard-lib-platform-release', ext:'aar')
 }
