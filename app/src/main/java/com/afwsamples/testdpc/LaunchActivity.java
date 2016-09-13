@@ -52,12 +52,8 @@ public class LaunchActivity extends Activity {
             return;
         }
 
-        if (ProvisioningStateUtil.isManagedByTestDPC(this)) {
-            // Device or profile owner is enforced, allow the user to modify management policies.
-            Intent intent = new Intent(this, PolicyManagementActivity.class);
-            startActivity(intent);
-            finish();
-        } else if (ProvisioningStateUtil.isManaged(this)) {
+        if (ProvisioningStateUtil.isManaged(this)
+                && !ProvisioningStateUtil.isManagedByTestDPC(this)) {
             // Device or profile owner is a different app to TestDPC - abort.
             Toast.makeText(this, getString(R.string.other_owner_already_setup_error),
                     Toast.LENGTH_LONG).show();
@@ -75,9 +71,8 @@ public class LaunchActivity extends Activity {
             // launched us.
             startActivityForResult(intent, REQUEST_CODE_SYNC_AUTH);
         } else {
-            // Either a user launched us, or we're triggered from an NFC provisioning bump - go to
-            // pre-M setup options.
-            Intent intent = new Intent(this, SetupManagementActivity.class);
+            // The default is to display policy management options
+            Intent intent = new Intent(this, PolicyManagementActivity.class);
             startActivity(intent);
             finish();
         }

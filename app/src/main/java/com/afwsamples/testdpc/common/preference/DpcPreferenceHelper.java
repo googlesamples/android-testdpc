@@ -47,24 +47,18 @@ import java.util.List;
  * @attr ref android.R.styleable#DpcPreference_user
  */
 public class DpcPreferenceHelper {
-    private Context mContext;
-    private Preference mPreference;
-
-    private CharSequence mConstraintViolationSummary = null;
-    private CharSequence mCustomConstraintSummary = null;
-    private int mMinSdkVersion;
-    private @AdminKind int mAdminConstraint;
-    private @UserKind int mUserConstraint;
-
-    private static final int NUM_ADMIN_KINDS = 2;
     @Retention(RetentionPolicy.SOURCE)
-    @IntDef(flag = true, value = {ADMIN_DEVICE_OWNER, ADMIN_PROFILE_OWNER})
+    @IntDef(flag = true, value = {ADMIN_NONE, ADMIN_DEVICE_OWNER, ADMIN_PROFILE_OWNER})
     public @interface AdminKind {}
-    public static final int ADMIN_DEVICE_OWNER = 0x1;
-    public static final int ADMIN_PROFILE_OWNER = 0x2;
-    public static final int ADMIN_ANY = ADMIN_DEVICE_OWNER | ADMIN_PROFILE_OWNER;
+    public static final int ADMIN_NONE = 0x1;
+    public static final int ADMIN_DEVICE_OWNER = 0x2;
+    public static final int ADMIN_PROFILE_OWNER = 0x4;
+    public static final int ADMIN_ANY = ADMIN_NONE | ADMIN_DEVICE_OWNER | ADMIN_PROFILE_OWNER;
+    public static final int ADMIN_NOT_NONE = ADMIN_ANY & ~ADMIN_NONE;
+    public static final int ADMIN_NOT_DEVICE_OWNER = ADMIN_ANY & ~ADMIN_DEVICE_OWNER;
+    public static final int ADMIN_NOT_PROFILE_OWNER = ADMIN_ANY & ~ADMIN_PROFILE_OWNER;
+    public static final @AdminKind int ADMIN_DEFAULT = ADMIN_NOT_NONE;
 
-    private static final int NUM_USER_KINDS = 3;
     @Retention(RetentionPolicy.SOURCE)
     @IntDef(flag = true, value = {USER_PRIMARY_USER, USER_SECONDARY_USER, USER_MANAGED_PROFILE})
     public @interface UserKind {}
@@ -76,6 +70,19 @@ public class DpcPreferenceHelper {
     public static final int USER_NOT_PRIMARY_USER = USER_ANY & ~USER_PRIMARY_USER;
     public static final int USER_NOT_SECONDARY_USER = USER_ANY & ~USER_SECONDARY_USER;
     public static final int USER_NOT_MANAGED_PROFILE = USER_ANY & ~USER_MANAGED_PROFILE;
+    public static final @UserKind int USER_DEFAULT = USER_ANY;
+
+    private static final int NUM_ADMIN_KINDS = Integer.bitCount(ADMIN_ANY);
+    private static final int NUM_USER_KINDS = Integer.bitCount(USER_ANY);
+
+    private Context mContext;
+    private Preference mPreference;
+
+    private CharSequence mConstraintViolationSummary = null;
+    private CharSequence mCustomConstraintSummary = null;
+    private int mMinSdkVersion;
+    private @AdminKind int mAdminConstraint;
+    private @UserKind int mUserConstraint;
 
     public DpcPreferenceHelper(Context context, Preference preference, AttributeSet attrs) {
         mContext = context;
@@ -93,9 +100,9 @@ public class DpcPreferenceHelper {
         }
 
         // noinspection ResourceType
-        mAdminConstraint = a.getInt(R.styleable.DpcPreference_admin, ADMIN_ANY);
+        mAdminConstraint = a.getInt(R.styleable.DpcPreference_admin, ADMIN_DEFAULT);
         // noinspection ResourceType
-        mUserConstraint = a.getInt(R.styleable.DpcPreference_user, USER_ANY);
+        mUserConstraint = a.getInt(R.styleable.DpcPreference_user, USER_DEFAULT);
 
         a.recycle();
     }
@@ -141,7 +148,7 @@ public class DpcPreferenceHelper {
      * Clear constraints on the admin.
      */
     public void clearAdminConstraint() {
-        setAdminConstraint(ADMIN_ANY);
+        setAdminConstraint(ADMIN_DEFAULT);
     }
 
     /**
@@ -158,7 +165,7 @@ public class DpcPreferenceHelper {
      * Clear constraints on the user.
      */
     public void clearUserConstraint() {
-        setUserConstraint(USER_ANY);
+        setUserConstraint(USER_DEFAULT);
     }
 
     /**
@@ -239,8 +246,7 @@ public class DpcPreferenceHelper {
         if (dpm.isProfileOwnerApp(packageName)) {
             return ADMIN_PROFILE_OWNER;
         }
-
-        throw new RuntimeException("Invalid admin for TestDPC");
+        return ADMIN_NONE;
     }
 
     private int getCurrentUser() {

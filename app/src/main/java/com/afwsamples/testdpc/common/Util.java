@@ -119,7 +119,12 @@ public class Util {
         } else {
             DevicePolicyManager devicePolicyManager =
                     (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
-            return devicePolicyManager.isManagedProfile(admin);
+            try {
+                return devicePolicyManager.isManagedProfile(admin);
+            } catch (SecurityException e) {
+                // This is thrown if there is no active admin so not the managed profile
+                return false;
+            }
         }
     }
 

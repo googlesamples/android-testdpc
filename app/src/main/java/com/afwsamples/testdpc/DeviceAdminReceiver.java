@@ -129,6 +129,11 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
             autoGrantRequestedPermissionsToSelf(context);
         }
 
+        // Hide the setup launcher when this app is the admin
+        context.getPackageManager().setComponentEnabledSetting(
+                new ComponentName(context, SetupManagementActivity.class),
+                PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
+
         if (isProfileOwner) {
             launch = new Intent(context, EnableProfileActivity.class);
         } else if (cosuLaunch) {
