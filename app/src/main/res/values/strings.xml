@@ -461,6 +461,7 @@
     <string name="user_management">User management</string>
     <string name="create_and_initialize_user">Create and initialize user</string>
     <string name="create_and_manage_user">Create and manage user</string>
+    <string name="create_managed_profile">Create managed profile</string>
     <string name="skip_setup_wizard">Skip setup wizard</string>
     <string name="remove_user">Remove user</string>
     <string name="user_created">Successfully created user with serial number %1$d.</string>

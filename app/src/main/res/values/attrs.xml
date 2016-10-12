@@ -24,6 +24,8 @@
             <enum name="L" value="21" />
             <enum name="M" value="23" />
             <enum name="N" value="24" />
+            <!-- Fill in the sdk int once it is finalized -->
+            <enum name="O" value="9999" />
         </attr>
 
         <!-- Constrain a preference to DO or PO admins. -->

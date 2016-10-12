@@ -70,6 +70,7 @@ import android.widget.Toast;
 
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
+import com.afwsamples.testdpc.SetupManagementActivity;
 import com.afwsamples.testdpc.common.AppInfoArrayAdapter;
 import com.afwsamples.testdpc.common.BaseSearchablePolicyPreferenceFragment;
 import com.afwsamples.testdpc.common.CertificateUtil;
@@ -208,6 +209,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String CAPTURE_IMAGE_KEY = "capture_image";
     private static final String CAPTURE_VIDEO_KEY = "capture_video";
     private static final String CHECK_LOCK_TASK_PERMITTED_KEY = "check_lock_task_permitted";
+    private static final String CREATE_MANAGED_PROFILE_KEY = "create_managed_profile";
     private static final String CREATE_AND_MANAGE_USER_KEY = "create_and_manage_user";
     private static final String DELEGATED_CERT_INSTALLER_KEY = "manage_cert_installer";
     private static final String DEVICE_OWNER_STATUS_KEY = "device_owner_status";
@@ -337,6 +339,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(CHECK_LOCK_TASK_PERMITTED_KEY).setOnPreferenceClickListener(this);
         findPreference(START_LOCK_TASK).setOnPreferenceClickListener(this);
         findPreference(STOP_LOCK_TASK).setOnPreferenceClickListener(this);
+        findPreference(CREATE_MANAGED_PROFILE_KEY).setOnPreferenceClickListener(this);
         findPreference(CREATE_AND_MANAGE_USER_KEY).setOnPreferenceClickListener(this);
         findPreference(REMOVE_USER_KEY).setOnPreferenceClickListener(this);
         mDisableCameraSwitchPreference = (SwitchPreference) findPreference(DISABLE_CAMERA_KEY);
@@ -528,6 +531,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 return true;
             case GET_DISABLE_ACCOUNT_MANAGEMENT_KEY:
                 showDisableAccountTypeList();
+                return true;
+            case CREATE_MANAGED_PROFILE_KEY:
+                showSetupManagement();
                 return true;
             case CREATE_AND_MANAGE_USER_KEY:
                 showCreateAndManageUserPrompt();
@@ -2136,6 +2142,11 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             return;
         }
         mDevicePolicyManager.reboot(mAdminComponentName);
+    }
+
+    private void showSetupManagement() {
+        Intent intent = new Intent(getActivity(), SetupManagementActivity.class);
+        getActivity().startActivity(intent);
     }
 
     abstract class ManageLockTaskListCallback {

@@ -294,6 +294,11 @@
 
     <PreferenceCategory android:title="@string/user_management">
         <com.afwsamples.testdpc.common.preference.DpcPreference
+                android:key="create_managed_profile"
+                android:title="@string/create_managed_profile"
+                testdpc:admin="deviceOwner"
+                testdpc:minSdkVersion="O" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="create_and_manage_user"
             android:title="@string/create_and_manage_user"
             testdpc:user="primaryUser"

@@ -77,6 +77,12 @@ public class DpcPreferenceHelper {
     public static final int USER_NOT_SECONDARY_USER = USER_ANY & ~USER_SECONDARY_USER;
     public static final int USER_NOT_MANAGED_PROFILE = USER_ANY & ~USER_MANAGED_PROFILE;
 
+    /**
+     * Magic number to represent SDK int of O.
+     * TODO: Remove it once we have it finalized.
+     */
+    private static final int O_SDK_INT = 9999;
+
     public DpcPreferenceHelper(Context context, Preference preference, AttributeSet attrs) {
         mContext = context;
         mPreference = preference;
@@ -208,7 +214,7 @@ public class DpcPreferenceHelper {
      * found.
      */
     private CharSequence findConstraintViolation() {
-        if (Build.VERSION.SDK_INT < mMinSdkVersion) {
+        if (getDeviceSdkInt() < mMinSdkVersion) {
             return mContext.getString(R.string.requires_android_api_level, mMinSdkVersion);
         }
 
@@ -311,5 +317,15 @@ public class DpcPreferenceHelper {
      */
     public boolean constraintsMet() {
         return TextUtils.isEmpty(mConstraintViolationSummary);
+    }
+
+    /**
+     * TODO: Update this function once O SDK int is finalized.
+     */
+    private int getDeviceSdkInt() {
+        if (Util.isAtLeastO()) {
+            return O_SDK_INT;
+        }
+        return Build.VERSION.SDK_INT;
     }
 }

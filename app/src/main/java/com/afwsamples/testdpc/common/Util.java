@@ -136,4 +136,14 @@ public class Util {
             return userManager.isSystemUser();
         }
     }
+
+    /**
+     * Check if the device is running on the Android O release or newer.
+     *
+     * @return {@code true} if O APIs are available for use
+     */
+    public static boolean isAtLeastO() {
+        return !"REL".equals(Build.VERSION.CODENAME)
+                && "O".compareTo(Build.VERSION.CODENAME) <= 0;
+    }
 }
