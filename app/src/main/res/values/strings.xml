@@ -81,6 +81,7 @@
     <!-- Reasons for disabling preferences -->
     <string name="requires_android_api_level">Requires API level
         <xliff:g id="api level">%d</xliff:g></string>
+    <string name="requires_preview_release">Requires the Android O preview release</string>
     <string name="requires">Requires\u0020</string>
     <string name="requires_delimiter">,\u0020</string>
     <string name="requires_or">\u0020or\u0020</string>

@@ -27,6 +27,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Build.VERSION_CODES;
 import android.os.UserManager;
+import android.support.v4.os.BuildCompat;
 import android.support.v7.preference.Preference;
 import android.text.format.DateUtils;
 import android.widget.ImageView;
@@ -100,41 +101,37 @@ public class Util {
         }
     }
 
-    public static boolean isBeforeM() {
-        return Build.VERSION.SDK_INT < VERSION_CODES.M;
-    }
-
-    public static boolean isBeforeN() {
-        return Build.VERSION.SDK_INT < VERSION_CODES.N;
-    }
-
     @TargetApi(VERSION_CODES.N)
     public static boolean isManagedProfile(Context context, ComponentName admin) {
-        if (isBeforeN()) {
+        if (BuildCompat.isAtLeastN()) {
+            DevicePolicyManager devicePolicyManager =
+                    (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
+            return devicePolicyManager.isManagedProfile(admin);
+        } else {
             // If user has more than one profile, then we deal with managed profile.
             // Unfortunately there is no public API available to distinguish user profile owner
             // and managed profile owner. Thus using this hack.
             UserManager userManager = (UserManager) context.getSystemService(Context.USER_SERVICE);
             return userManager.getUserProfiles().size() > 1;
-        } else {
-            DevicePolicyManager devicePolicyManager =
-                    (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
-            return devicePolicyManager.isManagedProfile(admin);
         }
     }
 
     @TargetApi(VERSION_CODES.M)
     public static boolean isPrimaryUser(Context context) {
-        if (isBeforeM()) {
+        if (isAtLeastM()) {
+            UserManager userManager = (UserManager) context.getSystemService(Context.USER_SERVICE);
+            return userManager.isSystemUser();
+        } else {
             // Assume only DO can be primary user. This is not perfect but the cases in which it is
             // wrong are uncommon and require adb to set up.
             final DevicePolicyManager dpm =
                     (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
             return dpm.isDeviceOwnerApp(context.getPackageName());
-        } else {
-            UserManager userManager = (UserManager) context.getSystemService(Context.USER_SERVICE);
-            return userManager.isSystemUser();
         }
+    }
+
+    public static boolean isAtLeastM() {
+        return Build.VERSION.SDK_INT >= VERSION_CODES.M;
     }
 
     /**

@@ -78,10 +78,25 @@ public class DpcPreferenceHelper {
     public static final int USER_NOT_MANAGED_PROFILE = USER_ANY & ~USER_MANAGED_PROFILE;
 
     /**
-     * Magic number to represent SDK int of O.
-     * TODO: Remove it once we have it finalized.
+     * Magic number to represent the SDK int of the next release before it has been added to
+     * {@link Build.VERSION_CODES}.
+     *
+     * This value can be used in attrs.xml as a value for minSdkVersion if the version has not yet
+     * been assigned an SDK version.
      */
-    private static final int O_SDK_INT = 9999;
+    public static final int PREVIEW_SDK_INT = 9999;
+
+    /**
+     * Update this method as {@link Build.VERSION_CODES} and Android releases are updated.
+     *
+     * @return The version SDK int or {@link #PREVIEW_SDK_INT} if the SDK int is not yet assigned.
+     */
+    private int getDeviceSdkInt() {
+        if (Util.isAtLeastO()) {
+            return PREVIEW_SDK_INT;
+        }
+        return Build.VERSION.SDK_INT;
+    }
 
     public DpcPreferenceHelper(Context context, Preference preference, AttributeSet attrs) {
         mContext = context;
@@ -215,6 +230,9 @@ public class DpcPreferenceHelper {
      */
     private CharSequence findConstraintViolation() {
         if (getDeviceSdkInt() < mMinSdkVersion) {
+            if (mMinSdkVersion == PREVIEW_SDK_INT) {
+                return mContext.getString(R.string.requires_preview_release);
+            }
             return mContext.getString(R.string.requires_android_api_level, mMinSdkVersion);
         }
 
@@ -317,15 +335,5 @@ public class DpcPreferenceHelper {
      */
     public boolean constraintsMet() {
         return TextUtils.isEmpty(mConstraintViolationSummary);
-    }
-
-    /**
-     * TODO: Update this function once O SDK int is finalized.
-     */
-    private int getDeviceSdkInt() {
-        if (Util.isAtLeastO()) {
-            return O_SDK_INT;
-        }
-        return Build.VERSION.SDK_INT;
     }
 }

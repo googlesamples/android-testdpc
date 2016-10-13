@@ -238,8 +238,8 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
     @TargetApi(Build.VERSION_CODES.N)
     private void setupAll() {
         setup(Keys.LOCK_SCREEN_MESSAGE,
-                Util.isBeforeN() || !isDeviceOwner() ? null :
-                        getDpm().getDeviceOwnerLockScreenInfo());
+                BuildCompat.isAtLeastN() && isDeviceOwner()
+                        ? getDpm().getDeviceOwnerLockScreenInfo() : null);
         setup(Keys.MAX_FAILS_BEFORE_WIPE, getDpm().getMaximumFailedPasswordsForWipe(getAdmin()));
         setup(Keys.MAX_TIME_SCREEN_LOCK,
                 TimeUnit.MILLISECONDS.toSeconds(getDpm().getMaximumTimeToLock(getAdmin())));
@@ -283,7 +283,7 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
     }
 
     private void disableIncompatibleManagementOptionsInCurrentProfile() {
-        if (Util.isBeforeM()) {
+        if (!Util.isAtLeastM()) {
             for (String preference : KEYGUARD_FEATURES.keySet()) {
                 ((DpcPreferenceBase) findPreference(preference))
                         .setAdminConstraint(DpcPreferenceHelper.ADMIN_DEVICE_OWNER);

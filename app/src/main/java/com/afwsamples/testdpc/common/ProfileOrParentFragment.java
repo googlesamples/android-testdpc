@@ -25,6 +25,7 @@ import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.UserManager;
 import android.support.v13.app.FragmentTabHost;
+import android.support.v4.os.BuildCompat;
 import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -60,7 +61,7 @@ public abstract class ProfileOrParentFragment extends BaseSearchablePolicyPrefer
             final UserManager userManager = (UserManager)
                     getActivity().getSystemService(Context.USER_SERVICE);
 
-            if (userManager.getUserProfiles().size() == 1 || Util.isBeforeN()) {
+            if (userManager.getUserProfiles().size() == 1 || !BuildCompat.isAtLeastN()) {
                 // No need for a tabbed view if there's just one item, or if the OS we are running
                 // under does not support parent policies.
                 try {

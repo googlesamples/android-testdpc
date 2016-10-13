@@ -16,10 +16,6 @@
 
 package com.afwsamples.testdpc;
 
-import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE;
-import static android.app.admin.DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED;
-import static com.afwsamples.testdpc.policy.PolicyManagementFragment.OVERRIDE_KEY_SELECTION_KEY;
-
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.annotation.TargetApi;
@@ -40,6 +36,7 @@ import android.os.ParcelFileDescriptor;
 import android.os.PersistableBundle;
 import android.os.Process;
 import android.preference.PreferenceManager;
+import android.support.v4.os.BuildCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
@@ -64,6 +61,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+
+import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE;
+import static android.app.admin.DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED;
+import static com.afwsamples.testdpc.policy.PolicyManagementFragment.OVERRIDE_KEY_SELECTION_KEY;
 
 /**
  * Handles events related to the managed profile.
@@ -150,7 +151,7 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
         // managed profile.
         ComponentName adminComponent = DeviceAdminReceiver.getComponentName(context);
         if (devicePolicyManager.isProfileOwnerApp(context.getPackageName())
-                && (Util.isBeforeN() || Util.isManagedProfile(context, adminComponent))) {
+                && (!BuildCompat.isAtLeastN() || Util.isManagedProfile(context, adminComponent))) {
             FirstAccountReadyBroadcastReceiver.setEnabled(context, true);
         }
 
