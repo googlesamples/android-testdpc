@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="utf-8"?>
+<!--
  Copyright (C) 2016 The Android Open Source Project
 
  Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,8 +31,15 @@
 
         <!-- Constrain a preference to DO or PO admins. -->
         <attr name="admin">
-            <flag name="deviceOwner" value="0x1" />
-            <flag name="profileOwner" value="0x2" />
+            <flag name="none" value="0x1" />
+            <flag name="deviceOwner" value="0x2" />
+            <flag name="profileOwner" value="0x4" />
+
+            <flag name="notNone" value="0x6" /> <!-- default -->
+            <flag name="notDeviceOwner" value="0x5" />
+            <flag name="notProfileOwner" value="0x3" />
+
+            <flag name="any" value="0x7" />
         </attr>
 
         <!-- Constrain a preference to certain users. -->
@@ -43,6 +51,8 @@
             <flag name="notPrimaryUser" value="0x6" />
             <flag name="notSecondaryUser" value="0x5" />
             <flag name="notManagedProfile" value="0x3" />
+
+            <flag name="any" value="0x7" /> <!-- default -->
         </attr>
     </declare-styleable>
 </resources>

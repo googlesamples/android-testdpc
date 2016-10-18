@@ -106,7 +106,12 @@ public class Util {
         if (BuildCompat.isAtLeastN()) {
             DevicePolicyManager devicePolicyManager =
                     (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
-            return devicePolicyManager.isManagedProfile(admin);
+            try {
+                return devicePolicyManager.isManagedProfile(admin);
+            } catch (SecurityException e) {
+                // This is thrown if there is no active admin so not the managed profile
+                return false;
+            }
         } else {
             // If user has more than one profile, then we deal with managed profile.
             // Unfortunately there is no public API available to distinguish user profile owner

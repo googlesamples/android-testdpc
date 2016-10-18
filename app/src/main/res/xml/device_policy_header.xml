@@ -18,13 +18,15 @@
     xmlns:testdpc="http://schemas.android.com/apk/res/com.afwsamples.testdpc">
 
     <com.afwsamples.testdpc.common.preference.DpcPreference
-        android:key="device_owner_status"
+        android:key="app_status"
         android:selectable="false"
+        testdpc:admin="any"
         testdpc:minSdkVersion="L" />
     <com.afwsamples.testdpc.common.preference.DpcPreference
         android:key="security_patch"
         android:selectable="false"
         android:title="@string/security_patch"
+        testdpc:admin="any"
         testdpc:minSdkVersion="M" />
 
     <PreferenceCategory android:title="@string/accessibility_title">
@@ -103,10 +105,12 @@
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="capture_image"
             android:title="@string/capture_image"
+            testdpc:admin="any"
             testdpc:minSdkVersion="L" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="capture_video"
             android:title="@string/capture_video"
+            testdpc:admin="any"
             testdpc:minSdkVersion="L" />
         <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
             android:key="disable_screen_capture"
@@ -153,10 +157,12 @@
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="create_wifi_configuration"
             android:title="@string/create_wifi_configuration"
+            testdpc:admin="any"
             testdpc:minSdkVersion="L" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="create_eap_tls_wifi_configuration"
             android:title="@string/create_eap_tls_wifi_configuration"
+            testdpc:admin="any"
             testdpc:minSdkVersion="L" />
         <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
             android:key="enable_wifi_config_lockdown"
@@ -166,6 +172,7 @@
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="modify_wifi_configuration"
             android:title="@string/modify_wifi_configuration"
+            testdpc:admin="any"
             testdpc:minSdkVersion="L" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="show_wifi_mac_address"
@@ -238,6 +245,7 @@
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="network_stats"
             android:title="@string/network_stats"
+            testdpc:admin="any"
             testdpc:minSdkVersion="M" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="set_always_on_vpn"

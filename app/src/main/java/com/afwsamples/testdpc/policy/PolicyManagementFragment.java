@@ -44,6 +44,7 @@ import android.provider.MediaStore;
 import android.provider.Settings;
 import android.security.KeyChain;
 import android.security.KeyChainAliasCallback;
+import android.support.annotation.StringRes;
 import android.support.v14.preference.SwitchPreference;
 import android.support.v4.content.FileProvider;
 import android.support.v4.os.BuildCompat;
@@ -212,7 +213,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String CREATE_MANAGED_PROFILE_KEY = "create_managed_profile";
     private static final String CREATE_AND_MANAGE_USER_KEY = "create_and_manage_user";
     private static final String DELEGATED_CERT_INSTALLER_KEY = "manage_cert_installer";
-    private static final String DEVICE_OWNER_STATUS_KEY = "device_owner_status";
+    private static final String APP_STATUS_KEY = "app_status";
     private static final String SECURITY_PATCH_KEY = "security_patch";
     private static final String DISABLE_CAMERA_KEY = "disable_camera";
     private static final String DISABLE_KEYGUARD = "disable_keyguard";
@@ -440,21 +441,13 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     @Override
     public boolean isAvailable(Context context) {
-        DevicePolicyManager dpm =
-                (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
-        String packageName = context.getPackageName();
-        return dpm.isProfileOwnerApp(packageName) || dpm.isDeviceOwnerApp(packageName);
+        return true;
     }
 
     @Override
     public void onResume() {
         super.onResume();
         getActivity().getActionBar().setTitle(R.string.policies_management);
-
-        if (!isAvailable(getActivity())) {
-            showToast(R.string.this_is_not_a_device_owner);
-            getActivity().finish();
-        }
 
         // The settings might get changed outside the device policy app,
         // so, we need to make sure the preference gets updated accordingly.
@@ -1345,15 +1338,15 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     }
 
     private void loadAppStatus() {
-        boolean isProfileOwner = mDevicePolicyManager.isProfileOwnerApp(mPackageName);
-        boolean isDeviceOwner = mDevicePolicyManager.isDeviceOwnerApp(mPackageName);
-        int deviceOwnerStatusStringId = R.string.this_is_not_a_device_owner;
-        if (isProfileOwner) {
-            deviceOwnerStatusStringId = R.string.this_is_a_profile_owner;
-        } else if (isDeviceOwner) {
-            deviceOwnerStatusStringId = R.string.this_is_a_device_owner;
+        final @StringRes int appStatusStringId;
+        if (mDevicePolicyManager.isProfileOwnerApp(mPackageName)) {
+            appStatusStringId = R.string.this_is_a_profile_owner;
+        } else if (mDevicePolicyManager.isDeviceOwnerApp(mPackageName)) {
+            appStatusStringId = R.string.this_is_a_device_owner;
+        } else {
+            appStatusStringId = R.string.this_is_not_an_admin;
         }
-        findPreference(DEVICE_OWNER_STATUS_KEY).setSummary(deviceOwnerStatusStringId);
+        findPreference(APP_STATUS_KEY).setSummary(appStatusStringId);
     }
 
     @TargetApi(Build.VERSION_CODES.M)
@@ -1414,8 +1407,10 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void reloadMuteAudioUi() {
-        final boolean isAudioMuted = mDevicePolicyManager.isMasterVolumeMuted(mAdminComponentName);
-        mMuteAudioSwitchPreference.setChecked(isAudioMuted);
+        if (mMuteAudioSwitchPreference.isEnabled()) {
+            final boolean isAudioMuted = mDevicePolicyManager.isMasterVolumeMuted(mAdminComponentName);
+            mMuteAudioSwitchPreference.setChecked(isAudioMuted);
+        }
     }
 
     /**

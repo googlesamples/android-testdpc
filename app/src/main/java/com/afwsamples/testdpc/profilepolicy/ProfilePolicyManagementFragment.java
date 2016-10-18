@@ -35,13 +35,11 @@ import android.widget.Toast;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.AppInfoArrayAdapter;
-import com.afwsamples.testdpc.common.ColorPicker;
 import com.afwsamples.testdpc.common.BaseSearchablePolicyPreferenceFragment;
+import com.afwsamples.testdpc.common.ColorPicker;
 import com.afwsamples.testdpc.common.Util;
-import com.afwsamples.testdpc.profilepolicy.crossprofileintentfilter
-        .AddCrossProfileIntentFilterFragment;
-import com.afwsamples.testdpc.profilepolicy.crossprofilewidgetprovider
-        .ManageCrossProfileWidgetProviderUtil;
+import com.afwsamples.testdpc.profilepolicy.crossprofileintentfilter.AddCrossProfileIntentFilterFragment;
+import com.afwsamples.testdpc.profilepolicy.crossprofilewidgetprovider.ManageCrossProfileWidgetProviderUtil;
 
 import java.util.List;
 
