@@ -28,6 +28,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PersistableBundle;
+import android.support.v4.os.BuildCompat;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -152,7 +153,7 @@ public class SetupManagementFragment extends Fragment implements
         getActivity().getActionBar().hide();
         if (setProvisioningMethodsVisibility()) {
             // The extra logo uri and color are supported only from N
-            if (ProvisioningStateUtil.versionIsAtLeastN()) {
+            if (BuildCompat.isAtLeastN()) {
                 getView().findViewById(R.id.params_title).setVisibility(View.VISIBLE);
                 if (canAnAppHandleGetContent()) {
                     getView().findViewById(
@@ -225,7 +226,7 @@ public class SetupManagementFragment extends Fragment implements
      * @return true if we can launch the intent
      */
     private boolean maybeSpecifyNExtras(Intent intent) {
-        if (ProvisioningStateUtil.versionIsAtLeastN()) {
+        if (BuildCompat.isAtLeastN()) {
             specifyLogoUri(intent);
             specifyColor(intent);
         }

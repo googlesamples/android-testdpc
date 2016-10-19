@@ -23,6 +23,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.os.Build;
 import android.provider.Settings;
+import android.support.v4.os.BuildCompat;
 
 import java.util.List;
 
@@ -93,8 +94,11 @@ public class ProvisioningStateUtil {
      */
     @TargetApi(Build.VERSION_CODES.N)
     public static boolean isProvisioningAllowed(Context context, String action) {
-        /* TODO: Remove CODENAME check once SDK_INT on device is bumped for N */
-        if (!versionIsAtLeastN()) {
+        if (BuildCompat.isAtLeastN()) {
+            DevicePolicyManager dpm = (DevicePolicyManager) context
+                    .getSystemService(Context.DEVICE_POLICY_SERVICE);
+            return dpm.isProvisioningAllowed(action);
+        } else {
             if (ACTION_PROVISION_MANAGED_DEVICE.equals(action)) {
                 return (Build.VERSION.SDK_INT == Build.VERSION_CODES.M)
                         ? isDeviceUnprovisionedAndNoDeviceOwner(context) : false;
@@ -104,15 +108,5 @@ public class ProvisioningStateUtil {
             }
             return false;
         }
-        // DevicePolicyManager.isProvisioningAllowed is added in N.
-        DevicePolicyManager dpm = (DevicePolicyManager) context
-                .getSystemService(Context.DEVICE_POLICY_SERVICE);
-        return dpm.isProvisioningAllowed(action);
-    }
-
-    public static boolean versionIsAtLeastN() {
-        // TODO: remove the code name check.
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
-                || Build.VERSION.CODENAME.startsWith("N");
     }
 }
