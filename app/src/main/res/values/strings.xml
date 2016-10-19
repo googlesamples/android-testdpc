@@ -110,10 +110,9 @@
     <string name="external_storage">External storage</string>
     <string name="reset_protection_data">Factory reset protection</string>
     <string name="remove_device_owner">Remove this device owner</string>
-    <string name="remove_device_owner_title">Device owner removal</string>
-    <string name="remove_device_owner_confirmation">Are you sure you want to remove this device
-        owner?
-    </string>
+    <string name="remove_device_owner_title">Remove device owner?</string>
+    <string name="remove_device_owner_confirmation">Policies and restrictions will continue to be
+        active and may require a factory reset to clear.</string>
     <string name="device_owner_removed">This app is no longer a device owner.</string>
 
     <!-- Strings for device reboot -->
