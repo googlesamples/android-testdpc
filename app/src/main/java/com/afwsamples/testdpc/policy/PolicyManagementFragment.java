@@ -224,6 +224,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String DISABLE_STATUS_BAR = "disable_status_bar";
     private static final String ENABLE_BACKUP_SERVICE = "enable_backup_service";
     private static final String ENABLE_PROCESS_LOGGING = "enable_process_logging";
+    private static final String ENABLE_NETWORK_LOGGING = "enable_network_logging";
     private static final String ENABLE_SYSTEM_APPS_BY_INTENT_KEY = "enable_system_apps_by_intent";
     private static final String ENABLE_SYSTEM_APPS_BY_PACKAGE_NAME_KEY
             = "enable_system_apps_by_package_name";
@@ -312,6 +313,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     private SwitchPreference mEnableBackupServicePreference;
     private SwitchPreference mEnableProcessLoggingPreference;
+    private SwitchPreference mEnableNetworkLoggingPreference;
     private SwitchPreference mSetAutoTimeRequiredPreference;
     private DpcPreference mRequestLogsPreference;
     private Preference mSetDeviceOrganizationNamePreference;
@@ -385,8 +387,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         mEnableBackupServicePreference = (SwitchPreference) findPreference(ENABLE_BACKUP_SERVICE);
         mEnableBackupServicePreference.setOnPreferenceChangeListener(this);
         findPreference(REQUEST_BUGREPORT_KEY).setOnPreferenceClickListener(this);
-        mEnableProcessLoggingPreference = (SwitchPreference) findPreference(
-                ENABLE_PROCESS_LOGGING);
+        mEnableProcessLoggingPreference = (SwitchPreference) findPreference(ENABLE_PROCESS_LOGGING);
         mEnableProcessLoggingPreference.setOnPreferenceChangeListener(this);
         mRequestLogsPreference = (DpcPreference) findPreference(REQUEST_PROCESS_LOGS);
         mRequestLogsPreference.setOnPreferenceClickListener(this);
@@ -394,6 +395,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 () -> mDevicePolicyManager.isSecurityLoggingEnabled(mAdminComponentName)
                         ? NO_CUSTOM_CONSTRIANT
                         : R.string.requires_process_logs);
+        mEnableNetworkLoggingPreference = (SwitchPreference) findPreference(ENABLE_NETWORK_LOGGING);
+        mEnableNetworkLoggingPreference.setOnPreferenceChangeListener(this);
         findPreference(SET_ACCESSIBILITY_SERVICES_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_INPUT_METHODS_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_DISABLE_ACCOUNT_MANAGEMENT_KEY).setOnPreferenceClickListener(this);
@@ -458,6 +461,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         reloadMuteAudioUi();
         reloadEnableBackupServiceUi();
         reloadEnableProcessLoggingUi();
+        reloadEnableNetworkLoggingUi();
         reloadSetAutoTimeRequiredUi();
     }
 
@@ -755,6 +759,11 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             case ENABLE_PROCESS_LOGGING:
                 setSecurityLoggingEnabled((Boolean) newValue);
                 reloadEnableProcessLoggingUi();
+                return true;
+            case ENABLE_NETWORK_LOGGING:
+                mDevicePolicyManager.setNetworkLoggingEnabled(mAdminComponentName,
+                        (Boolean) newValue);
+                reloadEnableNetworkLoggingUi();
                 return true;
             case DISABLE_SCREEN_CAPTURE_KEY:
                 setScreenCaptureDisabled((Boolean) newValue);
@@ -1471,6 +1480,14 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private void reloadCameraDisableUi() {
         boolean isCameraDisabled = mDevicePolicyManager.getCameraDisabled(mAdminComponentName);
         mDisableCameraSwitchPreference.setChecked(isCameraDisabled);
+    }
+
+    @TargetApi(Build.VERSION_CODES.O)
+    private void reloadEnableNetworkLoggingUi() {
+        if (mEnableNetworkLoggingPreference.isEnabled()) {
+            mEnableNetworkLoggingPreference.setChecked(
+                mDevicePolicyManager.isNetworkLoggingEnabled(mAdminComponentName));
+        }
     }
 
     @TargetApi(Build.VERSION_CODES.N)

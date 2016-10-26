@@ -386,6 +386,11 @@
             android:title="@string/request_process_logs"
             testdpc:admin="deviceOwner"
             testdpc:minSdkVersion="N" />
+        <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
+            android:key="enable_network_logging"
+            android:title="@string/enable_network_logging"
+            testdpc:admin="deviceOwner"
+            testdpc:minSdkVersion="O" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="request_bugreport"
             android:title="@string/request_bugreport"
