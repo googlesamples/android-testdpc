@@ -563,6 +563,8 @@
     <string name="maximum_lock_time_category">Max time to screen lock</string>
     <string name="maximum_lock_time_seconds">Max time to screen lock (seconds)</string>
     <string name="maximum_lock_time_all_admins">Max time as set by all/other admins</string>
+    <string name="strong_auth_timeout_category">Timeout after which strong auth will be required again</string>
+    <string name="strong_auth_timeout_seconds">Timeout for strong auth (seconds)</string>
     <string name="maximum_password_fails">Max password failures for local wipe</string>
     <string name="maximum_password_fails_all_admins">Max failures as set by all/other admins</string>
     <string name="not_valid_input">Failed to update: Not a valid input</string>
