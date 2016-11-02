@@ -407,6 +407,9 @@
     <string name="bugreport_failure_failed_completing">Bugreport collection operation failed</string>
     <string name="bugreport_failure_file_no_longer_available">Bugreport file is no longer available for collection</string>
 
+    <!-- Backup and Restore for Device Owner -->
+    <string name="enable_backup_service">Enable backup service</string>
+
     <!-- Enterprise process logging -->
     <string name="enable_process_logging">Enable process logging</string>
     <string name="request_process_logs">Request process logs</string>
