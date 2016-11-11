@@ -154,9 +154,8 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
         // Enable first account ready receiver for PO flow. On pre-N devices, the only supported
         // PO flow is managed profile. On N+ devices we need to check whether we're running in a
         // managed profile.
-        ComponentName adminComponent = DeviceAdminReceiver.getComponentName(context);
         if (devicePolicyManager.isProfileOwnerApp(context.getPackageName())
-                && (!BuildCompat.isAtLeastN() || Util.isManagedProfile(context, adminComponent))) {
+                && (!BuildCompat.isAtLeastN() || Util.isManagedProfile(context))) {
             FirstAccountReadyBroadcastReceiver.setEnabled(context, true);
         }
 

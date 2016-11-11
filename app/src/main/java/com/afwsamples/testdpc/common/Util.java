@@ -33,6 +33,7 @@ import android.text.format.DateUtils;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 
 import java.io.FileNotFoundException;
@@ -102,12 +103,13 @@ public class Util {
     }
 
     @TargetApi(VERSION_CODES.N)
-    public static boolean isManagedProfile(Context context, ComponentName admin) {
+    public static boolean isManagedProfile(Context context) {
         if (BuildCompat.isAtLeastN()) {
             DevicePolicyManager devicePolicyManager =
                     (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
             try {
-                return devicePolicyManager.isManagedProfile(admin);
+                return devicePolicyManager.isManagedProfile(
+                        DeviceAdminReceiver.getComponentName(context));
             } catch (SecurityException e) {
                 // This is thrown if there is no active admin so not the managed profile
                 return false;

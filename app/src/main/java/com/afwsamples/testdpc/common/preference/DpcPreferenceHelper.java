@@ -278,8 +278,8 @@ public class DpcPreferenceHelper {
             return USER_PRIMARY_USER;
         }
 
-        if (Util.isManagedProfile(
-                mContext, DeviceAdminReceiver.getComponentName(mContext))) {
+        if (Util.isManagedProfile(mContext)) {
+
             return USER_MANAGED_PROFILE;
         }
 

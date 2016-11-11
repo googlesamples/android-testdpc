@@ -133,7 +133,7 @@ public class ProfilePolicyManagementFragment extends BaseSearchablePolicyPrefere
 
     @Override
     public boolean isAvailable(Context context) {
-        return Util.isManagedProfile(context, DeviceAdminReceiver.getComponentName(context));
+        return Util.isManagedProfile(context);
     }
 
     @Override

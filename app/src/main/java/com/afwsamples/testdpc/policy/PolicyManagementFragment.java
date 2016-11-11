@@ -683,7 +683,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     @TargetApi(Build.VERSION_CODES.N)
     private void lockNow() {
-        if (BuildCompat.isAtLeastN() && Util.isManagedProfile(getActivity(), mAdminComponentName)) {
+        if (BuildCompat.isAtLeastN() && Util.isManagedProfile(getActivity())) {
             // In N for work profiles we should call lockNow on the parent instance to
             // lock the device.
             DevicePolicyManager parentDpm
