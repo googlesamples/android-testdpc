@@ -279,6 +279,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String WIFI_CONFIG_LOCKDOWN_OFF = "0";
     private static final String SAFETYNET_ATTEST = "safetynet_attest";
     private static final String SECURITY_PATCH_FORMAT = "yyyy-MM-dd";
+    private static final String SET_NEW_PASSWORD = "set_new_password";
+    private static final String SET_PROFILE_PARENT_NEW_PASSWORD ="set_profile_parent_new_password";
+
 
     private static final String BATTERY_PLUGGED_ANY = Integer.toString(
             BatteryManager.BATTERY_PLUGGED_AC |
@@ -409,6 +412,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(SET_SHORT_SUPPORT_MESSAGE_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_LONG_SUPPORT_MESSAGE_KEY).setOnPreferenceClickListener(this);
         findPreference(SAFETYNET_ATTEST).setOnPreferenceClickListener(this);
+        findPreference(SET_NEW_PASSWORD).setOnPreferenceClickListener(this);
+        findPreference(SET_PROFILE_PARENT_NEW_PASSWORD).setOnPreferenceClickListener(this);
         mSetAutoTimeRequiredPreference = (SwitchPreference) findPreference(
                 SET_AUTO_TIME_REQUIRED_KEY);
         mSetAutoTimeRequiredPreference.setOnPreferenceChangeListener(this);
@@ -664,6 +669,13 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             case SAFETYNET_ATTEST:
                 DialogFragment safetynetFragment = new SafetyNetFragment();
                 safetynetFragment.show(getFragmentManager(), SafetyNetFragment.class.getName());
+                return true;
+            case SET_NEW_PASSWORD:
+                startActivity(new Intent(DevicePolicyManager.ACTION_SET_NEW_PASSWORD));
+                return true;
+            case SET_PROFILE_PARENT_NEW_PASSWORD:
+                startActivity(
+                        new Intent(DevicePolicyManager.ACTION_SET_NEW_PARENT_PROFILE_PASSWORD));
                 return true;
         }
         return false;

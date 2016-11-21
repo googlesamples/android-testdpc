@@ -208,6 +208,15 @@
             android:key="lock_now"
             android:title="@string/lock_now"
             testdpc:minSdkVersion="L" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+                android:key="set_new_password"
+                android:title="@string/request_to_set_new_password"
+                testdpc:minSdkVersion="L" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+                android:key="set_profile_parent_new_password"
+                android:title="@string/request_to_set_profile_parent_new_password"
+                testdpc:user="managedProfile"
+                testdpc:minSdkVersion="N" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/lock_task_title">

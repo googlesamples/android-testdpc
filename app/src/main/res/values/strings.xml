@@ -677,4 +677,8 @@
     <string name="safetynet_fail_reason_invalid_jws">Invalid JWS response</string>
     <string name="safetynet_running">Running&#8230; Please wait</string>
     <string name="safetynet_verify_on_server">You should verify the response in your server.</string>
+
+    <string name="request_to_set_new_password">Request user to set new password</string>
+    <string name="request_to_set_profile_parent_new_password">Request user to set profile parent new password</string>
+
 </resources>
