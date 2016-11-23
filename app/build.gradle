@@ -13,8 +13,8 @@ ext {
 }
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion '24.0.0'
+    compileSdkVersion 'android-O'
+    buildToolsVersion "26.0.0"
 
     defaultConfig {
         applicationId "com.afwsamples.testdpc"
