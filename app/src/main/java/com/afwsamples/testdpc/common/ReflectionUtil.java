@@ -66,7 +66,7 @@ public class ReflectionUtil {
         for (int i = 0; i < args.length; ++i) {
             parameterTypes[i] = args[i].getClass();
         }
-        return invoke(clazz, null, methodName, parameterTypes, args);
+        return invoke(clazz, obj, methodName, parameterTypes, args);
     }
 
     /** Resolve the method and invoke it. */
