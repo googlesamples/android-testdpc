@@ -276,10 +276,11 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
         final DpcPreferenceBase dpcPref = (DpcPreferenceBase) pref;
 
         // Disable preferences that don't apply to the parent profile
-        if (Keys.NOT_APPLICABLE_TO_PARENT.contains(key) && isParentProfileInstance()) {
-            dpcPref.setCustomConstraint(R.string.not_for_parent_profile);
-            return;
-        }
+        dpcPref.setCustomConstraint(
+                () -> Keys.NOT_APPLICABLE_TO_PARENT.contains(key) && isParentProfileInstance()
+                        ? R.string.not_for_parent_profile
+                        : 0
+        );
 
         // We do not allow user to add trust agent config in pre-N devices in managed profile.
         if (!BuildCompat.isAtLeastN() && key.equals(Keys.SET_TRUST_AGENT_CONFIG)) {

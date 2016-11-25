@@ -31,12 +31,21 @@ import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.ProfileOrParentFragment;
 import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.common.preference.DpcPreferenceBase;
+import com.afwsamples.testdpc.common.preference.CustomConstraint;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
+
+import static android.app.admin.DevicePolicyManager.PASSWORD_QUALITY_ALPHABETIC;
+import static android.app.admin.DevicePolicyManager.PASSWORD_QUALITY_ALPHANUMERIC;
+import static android.app.admin.DevicePolicyManager.PASSWORD_QUALITY_COMPLEX;
+import static android.app.admin.DevicePolicyManager.PASSWORD_QUALITY_NUMERIC;
+import static android.app.admin.DevicePolicyManager.PASSWORD_QUALITY_NUMERIC_COMPLEX;
+import static android.app.admin.DevicePolicyManager.PASSWORD_QUALITY_SOMETHING;
+import static android.app.admin.DevicePolicyManager.PASSWORD_QUALITY_UNSPECIFIED;
 
 /**
  * This fragment provides functionalities to set password constraint policies as a profile
@@ -46,18 +55,26 @@ import java.util.concurrent.TimeUnit;
  * <p>These include:
  * <ul>
  * <li>{@link DevicePolicyManager#setPasswordQuality(ComponentName, int)}</li>
- * <li>{@link DevicePolicyManager#setPasswordMinimumLength(ComponentName, String)}</li>
- * <li>{@link DevicePolicyManager#setPasswordMinimumLetters(ComponentName, String)}</li>
- * <li>{@link DevicePolicyManager#setPasswordMinimumNumeric(ComponentName, String)}</li>
- * <li>{@link DevicePolicyManager#setPasswordMinimumLowerCase(ComponentName, String)}</li>
- * <li>{@link DevicePolicyManager#setPasswordMinimumUpperCase(ComponentName, String)}</li>
- * <li>{@link DevicePolicyManager#setPasswordMinimumSymbols(ComponentName, String)}</li>
- * <li>{@link DevicePolicyManager#setPasswordMinimumNonLetter(ComponentName, String)}</li>
+ * <li>{@link DevicePolicyManager#setPasswordMinimumLength(ComponentName, int)}</li>
+ * <li>{@link DevicePolicyManager#setPasswordMinimumLetters(ComponentName, int)}</li>
+ * <li>{@link DevicePolicyManager#setPasswordMinimumNumeric(ComponentName, int)}</li>
+ * <li>{@link DevicePolicyManager#setPasswordMinimumLowerCase(ComponentName, int)}</li>
+ * <li>{@link DevicePolicyManager#setPasswordMinimumUpperCase(ComponentName, int)}</li>
+ * <li>{@link DevicePolicyManager#setPasswordMinimumSymbols(ComponentName, int)}</li>
+ * <li>{@link DevicePolicyManager#setPasswordMinimumNonLetter(ComponentName, int)}</li>
  * <li>{@link DevicePolicyManager#setPasswordHistoryLength(ComponentName, int)}</li>
  * </ul>
  */
 public final class PasswordConstraintsFragment extends ProfileOrParentFragment implements
         Preference.OnPreferenceChangeListener {
+
+    private DpcPreferenceBase mMinLength;
+    private DpcPreferenceBase mMinLetters;
+    private DpcPreferenceBase mMinNumeric;
+    private DpcPreferenceBase mMinLower;
+    private DpcPreferenceBase mMinUpper;
+    private DpcPreferenceBase mMinSymbols;
+    private DpcPreferenceBase mMinNonLetter;
 
     public static class Container extends ProfileOrParentFragment.Container {
         @Override
@@ -86,13 +103,13 @@ public final class PasswordConstraintsFragment extends ProfileOrParentFragment i
     static {
         // IDs of settings for {@link DevicePolicyManager#setPasswordQuality(ComponentName, int)}.
         final int[] policyIds = new int[] {
-            DevicePolicyManager.PASSWORD_QUALITY_UNSPECIFIED,
-            DevicePolicyManager.PASSWORD_QUALITY_SOMETHING,
-            DevicePolicyManager.PASSWORD_QUALITY_NUMERIC,
-            DevicePolicyManager.PASSWORD_QUALITY_NUMERIC_COMPLEX,
-            DevicePolicyManager.PASSWORD_QUALITY_ALPHABETIC,
-            DevicePolicyManager.PASSWORD_QUALITY_ALPHANUMERIC,
-            DevicePolicyManager.PASSWORD_QUALITY_COMPLEX
+            PASSWORD_QUALITY_UNSPECIFIED,
+            PASSWORD_QUALITY_SOMETHING,
+            PASSWORD_QUALITY_NUMERIC,
+            PASSWORD_QUALITY_NUMERIC_COMPLEX,
+            PASSWORD_QUALITY_ALPHABETIC,
+            PASSWORD_QUALITY_ALPHANUMERIC,
+            PASSWORD_QUALITY_COMPLEX
         };
         // Strings to show for each password quality setting.
         final int[] policyNames = new int[] {
@@ -132,6 +149,14 @@ public final class PasswordConstraintsFragment extends ProfileOrParentFragment i
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(getPreferenceXml());
 
+        mMinLength = (DpcPreferenceBase) findPreference(Keys.MIN_LENGTH);
+        mMinLetters = (DpcPreferenceBase) findPreference(Keys.MIN_LETTERS);
+        mMinNumeric = (DpcPreferenceBase) findPreference(Keys.MIN_NUMERIC);
+        mMinLower = (DpcPreferenceBase) findPreference(Keys.MIN_LOWERCASE);
+        mMinUpper = (DpcPreferenceBase) findPreference(Keys.MIN_UPPERCASE);
+        mMinSymbols = (DpcPreferenceBase) findPreference(Keys.MIN_SYMBOLS);
+        mMinNonLetter = (DpcPreferenceBase) findPreference(Keys.MIN_NONLETTER);
+
         // Populate password quality settings - messy because the only API for this requires two
         // separate String[]s.
         List<CharSequence> entries = new ArrayList<>();
@@ -160,7 +185,7 @@ public final class PasswordConstraintsFragment extends ProfileOrParentFragment i
         setup(Keys.MIN_SYMBOLS, getDpm().getPasswordMinimumSymbols(getAdmin()));
         setup(Keys.MIN_NONLETTER, getDpm().getPasswordMinimumNonLetter(getAdmin()));
 
-        enableMinimumsForQuality();
+        setPreferencesConstraint();
     }
 
     @Override
@@ -203,7 +228,7 @@ public final class PasswordConstraintsFragment extends ProfileOrParentFragment i
                 list.setValue((String) newValue);
                 summary = list.getEntry();
                 getDpm().setPasswordQuality(getAdmin(), value);
-                enableMinimumsForQuality();
+                refreshPreferences();
                 break;
             }
             case Keys.MIN_LENGTH:
@@ -239,42 +264,36 @@ public final class PasswordConstraintsFragment extends ProfileOrParentFragment i
     /**
      * Enable and disable password constraint preferences based on the current password quality.
      */
-    private void enableMinimumsForQuality() {
-        final int currentQuality = getDpm().getPasswordQuality(getAdmin());
-
+    private void setPreferencesConstraint() {
         // Minimum length can be set for most qualities
-        final DpcPreferenceBase minLength = (DpcPreferenceBase) findPreference(Keys.MIN_LENGTH);
-        if (currentQuality >= DevicePolicyManager.PASSWORD_QUALITY_NUMERIC) {
-            minLength.clearCustomConstraint();
-        } else {
-            minLength.setCustomConstraint(R.string.not_for_password_quality);
-        }
+        mMinLength.setCustomConstraint(
+                () -> getDpm().getPasswordQuality(getAdmin()) >= PASSWORD_QUALITY_NUMERIC
+                        ? 0
+                        : R.string.not_for_password_quality);
 
         // Other minimums are only active for the highest quality
-        final DpcPreferenceBase minLetters = (DpcPreferenceBase) findPreference(Keys.MIN_LETTERS);
-        final DpcPreferenceBase minNumeric = (DpcPreferenceBase) findPreference(Keys.MIN_NUMERIC);
-        final DpcPreferenceBase minLower = (DpcPreferenceBase) findPreference(Keys.MIN_LOWERCASE);
-        final DpcPreferenceBase minUpper = (DpcPreferenceBase) findPreference(Keys.MIN_UPPERCASE);
-        final DpcPreferenceBase minSymbols = (DpcPreferenceBase) findPreference(Keys.MIN_SYMBOLS);
-        final DpcPreferenceBase minNonLetter =
-                (DpcPreferenceBase) findPreference(Keys.MIN_NONLETTER);
-
-        if (currentQuality == DevicePolicyManager.PASSWORD_QUALITY_COMPLEX) {
-            minLetters.clearCustomConstraint();
-            minNumeric.clearCustomConstraint();
-            minLower.clearCustomConstraint();
-            minUpper.clearCustomConstraint();
-            minSymbols.clearCustomConstraint();
-            minNonLetter.clearCustomConstraint();
-        } else {
-            minLetters.setCustomConstraint(R.string.not_for_password_quality);
-            minNumeric.setCustomConstraint(R.string.not_for_password_quality);
-            minLower.setCustomConstraint(R.string.not_for_password_quality);
-            minUpper.setCustomConstraint(R.string.not_for_password_quality);
-            minSymbols.setCustomConstraint(R.string.not_for_password_quality);
-            minNonLetter.setCustomConstraint(R.string.not_for_password_quality);
-        }
+        CustomConstraint constraint =
+                () -> getDpm().getPasswordQuality(getAdmin()) == PASSWORD_QUALITY_COMPLEX
+                        ? 0
+                        : R.string.not_for_password_quality;
+        mMinLetters.setCustomConstraint(constraint);
+        mMinNumeric.setCustomConstraint(constraint);
+        mMinLower.setCustomConstraint(constraint);
+        mMinUpper.setCustomConstraint(constraint);
+        mMinSymbols.setCustomConstraint(constraint);
+        mMinNonLetter.setCustomConstraint(constraint);
     }
+
+    private void refreshPreferences() {
+        mMinLength.refreshEnabledState();
+        mMinLetters.refreshEnabledState();
+        mMinNumeric.refreshEnabledState();
+        mMinLower.refreshEnabledState();
+        mMinUpper.refreshEnabledState();
+        mMinSymbols.refreshEnabledState();
+        mMinNonLetter.refreshEnabledState();
+    }
+
 
     /**
      * Set an initial value. Updates the summary to match.

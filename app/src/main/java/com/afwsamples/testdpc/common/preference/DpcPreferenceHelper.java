@@ -21,6 +21,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Build;
 import android.support.annotation.IntDef;
+import android.support.annotation.StringRes;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceViewHolder;
 import android.text.TextUtils;
@@ -28,7 +29,6 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.TextView;
 
-import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.Util;
 
@@ -79,7 +79,7 @@ public class DpcPreferenceHelper {
     private Preference mPreference;
 
     private CharSequence mConstraintViolationSummary = null;
-    private CharSequence mCustomConstraintSummary = null;
+    private CustomConstraint mCustomConstraint = null;
     private int mMinSdkVersion;
     private @AdminKind int mAdminConstraint;
     private @UserKind int mUserConstraint;
@@ -141,10 +141,6 @@ public class DpcPreferenceHelper {
         }
     }
 
-    public void onAttachedToHierarchy() {
-        disableIfConstraintsNotMet();
-    }
-
     /**
      * Set the minimum required API level constraint.
      *
@@ -200,23 +196,16 @@ public class DpcPreferenceHelper {
     }
 
     /**
-     * Disable the preference for a custom reason.
-     * <p/>
-     * The custom constraint will have higher priority than all other constraints other than the
-     * minimum SDK version constraint. Setting multiple custom constraints is not possible and only
-     * the most recent will be used.
-     * <p/>
-     * Use {@link #clearCustomConstraint()} to remove the custom constraint.
-     *
-     * @param constraintSummary Brief explanation of the constraint violation.
+     * Specify a custom constraint by setting a {{@link CustomConstraint}} object. The enabled
+     * state of the preference will be updated accordingly.
      */
-    public void setCustomConstraint(CharSequence constraintSummary) {
-        mCustomConstraintSummary = constraintSummary;
+    public void setCustomConstraint(CustomConstraint customConstraint) {
+        mCustomConstraint = customConstraint;
         disableIfConstraintsNotMet();
     }
 
     /**
-     * Remove any custom constraints set by {@link #setCustomConstraint(CharSequence)}.
+     * Remove any custom constraints set by {@link #setCustomConstraint(CustomConstraint)}.
      * <p/>
      * This method is safe to call if there is no current custom constraint.
      */
@@ -224,7 +213,7 @@ public class DpcPreferenceHelper {
         setCustomConstraint(null);
     }
 
-    private void disableIfConstraintsNotMet() {
+    public void disableIfConstraintsNotMet() {
         mConstraintViolationSummary = findConstraintViolation();
         mPreference.setEnabled(constraintsMet());
     }
@@ -243,11 +232,6 @@ public class DpcPreferenceHelper {
             return mContext.getString(R.string.requires_android_api_level, mMinSdkVersion);
         }
 
-        // Custom constraints have high priority
-        if (mCustomConstraintSummary != null) {
-            return mCustomConstraintSummary;
-        }
-
         if (!isEnabledForAdmin(getCurrentAdmin())) {
             return getAdminConstraintSummary();
         }
@@ -256,6 +240,12 @@ public class DpcPreferenceHelper {
             return getUserConstraintSummary();
         }
 
+        if (mCustomConstraint != null) {
+            @StringRes int strRes = mCustomConstraint.validateConstraint();
+            if (strRes != 0) {
+                return mContext.getString(strRes);
+            }
+        }
         return null;
     }
 

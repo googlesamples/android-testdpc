@@ -311,6 +311,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private SwitchPreference mEnableBackupServicePreference;
     private SwitchPreference mEnableProcessLoggingPreference;
     private SwitchPreference mSetAutoTimeRequiredPreference;
+    private DpcPreference mRequestLogsPreference;
 
     private GetAccessibilityServicesTask mGetAccessibilityServicesTask = null;
     private GetInputMethodsTask mGetInputMethodsTask = null;
@@ -384,7 +385,12 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         mEnableProcessLoggingPreference = (SwitchPreference) findPreference(
                 ENABLE_PROCESS_LOGGING);
         mEnableProcessLoggingPreference.setOnPreferenceChangeListener(this);
-        findPreference(REQUEST_PROCESS_LOGS).setOnPreferenceClickListener(this);
+        mRequestLogsPreference = (DpcPreference) findPreference(REQUEST_PROCESS_LOGS);
+        mRequestLogsPreference.setOnPreferenceClickListener(this);
+        mRequestLogsPreference.setCustomConstraint(
+                () -> mDevicePolicyManager.isSecurityLoggingEnabled(mAdminComponentName)
+                        ? 0
+                        : R.string.requires_process_logs);
         findPreference(SET_ACCESSIBILITY_SERVICES_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_INPUT_METHODS_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_DISABLE_ACCOUNT_MANAGEMENT_KEY).setOnPreferenceClickListener(this);
@@ -415,6 +421,10 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(SHOW_WIFI_MAC_ADDRESS_KEY).setOnPreferenceClickListener(this);
         mInstallNonMarketAppsPreference = (DpcSwitchPreference) findPreference(
                 INSTALL_NONMARKET_APPS_KEY);
+        mInstallNonMarketAppsPreference.setCustomConstraint(
+                () -> mUserManager.hasUserRestriction(DISALLOW_INSTALL_UNKNOWN_SOURCES)
+                        ? R.string.user_restricted
+                        : 0);
         mInstallNonMarketAppsPreference.setOnPreferenceChangeListener(this);
         findPreference(SET_USER_RESTRICTIONS_KEY).setOnPreferenceClickListener(this);
         findPreference(REBOOT_KEY).setOnPreferenceClickListener(this);
@@ -425,11 +435,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(SET_PROFILE_PARENT_NEW_PASSWORD).setOnPreferenceClickListener(this);
 
         DpcPreference compPreference = (DpcPreference) findPreference(COMP_POLICIES);
-        if (compPreference.isEnabled()) {
-            if (!Util.isInCompMode(getActivity())) {
-                compPreference.setCustomConstraint(R.string.require_comp);
-            }
-        }
+        compPreference.setCustomConstraint(
+                () -> Util.isInCompMode(getActivity()) ? 0 : R.string.require_comp);
         compPreference.setOnPreferenceClickListener(this);
 
         mSetAutoTimeRequiredPreference = (SwitchPreference) findPreference(
@@ -1136,11 +1143,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
      * </p>
      */
     public void updateInstallNonMarketAppsPreference() {
-        if (mUserManager.hasUserRestriction(DISALLOW_INSTALL_UNKNOWN_SOURCES)) {
-            mInstallNonMarketAppsPreference.setCustomConstraint(R.string.user_restricted);
-        } else {
-            mInstallNonMarketAppsPreference.clearCustomConstraint();
-        }
         int isInstallNonMarketAppsAllowed = Settings.Secure.getInt(
                 getActivity().getContentResolver(), Settings.Secure.INSTALL_NON_MARKET_APPS, 0);
         mInstallNonMarketAppsPreference.setChecked(
@@ -1446,12 +1448,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             boolean isProcessLoggingEnabled = mDevicePolicyManager.isSecurityLoggingEnabled(
                     mAdminComponentName);
             mEnableProcessLoggingPreference.setChecked(isProcessLoggingEnabled);
-            DpcPreference requestLogs = (DpcPreference) findPreference((REQUEST_PROCESS_LOGS));
-            if (isProcessLoggingEnabled) {
-                requestLogs.clearCustomConstraint();
-            } else {
-                requestLogs.setCustomConstraint(R.string.requires_process_logs);
-            }
+            mRequestLogsPreference.refreshEnabledState();
         }
     }
 
