@@ -250,6 +250,14 @@
             testdpc:minSdkVersion="L" />
     </PreferenceCategory>
 
+    <PreferenceCategory android:title="@string/comp_specific_policy_category_title">
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+                android:key="comp_policies"
+                android:title="@string/comp_specific_policy_title"
+                testdpc:admin="deviceOwner"
+                testdpc:minSdkVersion="O" />
+    </PreferenceCategory>
+
     <PreferenceCategory android:title="@string/networking_management_title">
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="network_stats"

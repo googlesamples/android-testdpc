@@ -20,15 +20,14 @@ import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.admin.DevicePolicyManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Build.VERSION_CODES;
+import android.os.UserHandle;
 import android.os.UserManager;
 import android.support.v4.os.BuildCompat;
-import android.support.v7.preference.Preference;
 import android.text.format.DateUtils;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -38,6 +37,7 @@ import com.afwsamples.testdpc.R;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.List;
 
 /**
  * Common utility functions.
@@ -149,5 +149,20 @@ public class Util {
     public static boolean isAtLeastO() {
         return !"REL".equals(Build.VERSION.CODENAME)
                 && "O".compareTo(Build.VERSION.CODENAME) <= 0;
+    }
+
+    /**
+     * TODO: Replace the reflection once the API is in the O SDK.
+     */
+    public static List<UserHandle> getBindDeviceAdminTargetUsers(Context context) {
+        final DevicePolicyManager dpm =
+                (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
+        return (List<UserHandle>) ReflectionUtil.invoke(dpm,
+                "getBindDeviceAdminTargetUsers",
+                DeviceAdminReceiver.getComponentName(context));
+    }
+
+    public static boolean isInCompMode(Context context) {
+        return getBindDeviceAdminTargetUsers(context).size() > 0;
     }
 }

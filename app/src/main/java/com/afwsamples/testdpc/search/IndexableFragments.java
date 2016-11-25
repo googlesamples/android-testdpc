@@ -2,6 +2,7 @@ package com.afwsamples.testdpc.search;
 
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.BaseSearchablePolicyPreferenceFragment;
+import com.afwsamples.testdpc.comp.CompSpecificFragment;
 import com.afwsamples.testdpc.policy.PolicyManagementFragment;
 import com.afwsamples.testdpc.policy.keyguard.LockScreenPolicyFragment;
 import com.afwsamples.testdpc.policy.keyguard.PasswordConstraintsFragment;
@@ -32,6 +33,8 @@ public class IndexableFragments {
                 R.xml.lock_screen_preferences));
         sIndexableFragments.add(new IndexableFragment(PasswordConstraintsFragment.class,
                 R.xml.password_constraint_preferences));
+        sIndexableFragments.add(new IndexableFragment(CompSpecificFragment.class,
+                R.xml.comp_policies));
     }
 
     public static List<IndexableFragment> values() {

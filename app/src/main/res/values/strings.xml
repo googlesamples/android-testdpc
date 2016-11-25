@@ -688,4 +688,12 @@
     <string name="request_to_set_new_password">Request user to set new password</string>
     <string name="request_to_set_profile_parent_new_password">Request user to set profile parent new password</string>
 
+    <string name="comp_specific_policy_category_title">Corp owned managed profile (COMP) policies</string>
+    <string name="comp_specific_policy_title">COMP specific policies</string>
+
+    <string name="profile_status">Managed profile status</string>
+    <string name="profile_is_not_running">Managed profile is not running</string>
+    <string name="profile_is_running_but_locked">Managed profile is running but locked</string>
+    <string name="profile_is_unlocked">Managed profile is unlocked</string>
+    <string name="require_comp">Requires a corp owned managed profile</string>
 </resources>

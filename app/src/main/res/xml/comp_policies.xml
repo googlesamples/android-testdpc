@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:testdpc="http://schemas.android.com/apk/res/com.afwsamples.testdpc">
+
+    <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="profile_status"
+            android:selectable="false"
+            android:title="@string/profile_status"
+            testdpc:admin="deviceOwner"
+            testdpc:minSdkVersion="O"/>
+</PreferenceScreen>
