@@ -256,6 +256,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String LOCK_NOW_KEY = "lock_now";
     private static final String SET_ACCESSIBILITY_SERVICES_KEY = "set_accessibility_services";
     private static final String SET_ALWAYS_ON_VPN_KEY = "set_always_on_vpn";
+    private static final String SET_DEVICE_ORGANIZATION_NAME_KEY = "set_device_organization_name";
     private static final String SET_AUTO_TIME_REQUIRED_KEY = "set_auto_time_required";
     private static final String SET_DISABLE_ACCOUNT_MANAGEMENT_KEY
             = "set_disable_account_management";
@@ -312,6 +313,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private SwitchPreference mEnableProcessLoggingPreference;
     private SwitchPreference mSetAutoTimeRequiredPreference;
     private DpcPreference mRequestLogsPreference;
+    private Preference mSetDeviceOrganizationNamePreference;
 
     private GetAccessibilityServicesTask mGetAccessibilityServicesTask = null;
     private GetInputMethodsTask mGetInputMethodsTask = null;
@@ -447,6 +449,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
         loadAppStatus();
         loadSecurityPatch();
+        loadDeviceOrganizationName();
         reloadCameraDisableUi();
         reloadScreenCaptureDisableUi();
         reloadMuteAudioUi();
@@ -780,6 +783,10 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 mDevicePolicyManager.setAutoTimeRequired(mAdminComponentName,
                         newValue.equals(true));
                 reloadSetAutoTimeRequiredUi();
+                return true;
+            case SET_DEVICE_ORGANIZATION_NAME_KEY:
+                mDevicePolicyManager.setOrganizationName(mAdminComponentName, (String) newValue);
+                mSetDeviceOrganizationNamePreference.setSummary((String) newValue);
                 return true;
         }
         return false;
@@ -1434,6 +1441,20 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         }
         String display = DateFormat.getDateInstance(DateFormat.MEDIUM).format(date);
         securityPatchPreference.setSummary(display);
+    }
+
+    // TODO: Uncomment once O's API level is decided
+    // @TargetApi(Build.VERSION_CODES.O)
+    private void loadDeviceOrganizationName() {
+        mSetDeviceOrganizationNamePreference = findPreference(SET_DEVICE_ORGANIZATION_NAME_KEY);
+
+        if (mSetDeviceOrganizationNamePreference.isEnabled()) {
+            mSetDeviceOrganizationNamePreference.setOnPreferenceChangeListener(this);
+            final CharSequence organizationName = (CharSequence) ReflectionUtil.invoke(
+                    mDevicePolicyManager, "getDeviceOwnerOrganizationName");
+            final String name = organizationName != null ? organizationName.toString() : null;
+            mSetDeviceOrganizationNamePreference.setSummary(name);
+        }
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)

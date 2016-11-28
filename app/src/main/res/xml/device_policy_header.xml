@@ -366,6 +366,11 @@
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/device_owner_management">
+        <com.afwsamples.testdpc.common.preference.DpcEditTextPreference
+            android:key="set_device_organization_name"
+            android:title="@string/set_organization_name"
+            testdpc:admin="deviceOwner"
+            testdpc:minSdkVersion="O" />
         <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
             android:key="set_auto_time_required"
             android:title="@string/set_auto_time_required"
