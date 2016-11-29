@@ -1450,10 +1450,15 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
         if (mSetDeviceOrganizationNamePreference.isEnabled()) {
             mSetDeviceOrganizationNamePreference.setOnPreferenceChangeListener(this);
-            final CharSequence organizationName = (CharSequence) ReflectionUtil.invoke(
-                    mDevicePolicyManager, "getDeviceOwnerOrganizationName");
-            final String name = organizationName != null ? organizationName.toString() : null;
-            mSetDeviceOrganizationNamePreference.setSummary(name);
+            try {
+                final CharSequence organizationName = (CharSequence) ReflectionUtil.invoke(
+                        mDevicePolicyManager, "getDeviceOwnerOrganizationName");
+                final String name = organizationName != null ? organizationName.toString() : null;
+                mSetDeviceOrganizationNamePreference.setSummary(name);
+            } catch (RuntimeException e) {
+                // TODO: Remove this exception handler once O's API is final.
+                // Method not implemented yet.
+            }
         }
     }
 
