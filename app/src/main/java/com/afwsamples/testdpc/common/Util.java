@@ -131,10 +131,15 @@ public class Util {
         } else {
             // Assume only DO can be primary user. This is not perfect but the cases in which it is
             // wrong are uncommon and require adb to set up.
-            final DevicePolicyManager dpm =
-                    (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
-            return dpm.isDeviceOwnerApp(context.getPackageName());
+            return isDeviceOwner(context);
         }
+    }
+
+    @TargetApi(VERSION_CODES.M)
+    public static boolean isDeviceOwner(Context context) {
+        final DevicePolicyManager dpm =
+                (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
+        return dpm.isDeviceOwnerApp(context.getPackageName());
     }
 
     public static boolean isAtLeastM() {

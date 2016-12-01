@@ -34,6 +34,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RadioGroup;
@@ -62,7 +63,7 @@ import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_MAIN_COLO
  */
 public class SetupManagementFragment extends Fragment implements
         NavigationBar.NavigationBarListener, View.OnClickListener,
-        ColorPicker.OnColorSelectListener {
+        ColorPicker.OnColorSelectListener, RadioGroup.OnCheckedChangeListener {
     // Tag for creating this fragment. This tag can be used to retrieve this fragment.
     public static final String FRAGMENT_TAG = "SetupManagementFragment";
 
@@ -70,7 +71,10 @@ public class SetupManagementFragment extends Fragment implements
     private static final int REQUEST_PROVISION_DEVICE_OWNER = 2;
     private static final int REQUEST_GET_LOGO = 3;
 
+    private RadioGroup mSetupOptions;
     private Button mNavigationNextButton;
+    private CheckBox mSkipUserConsent;
+    private CheckBox mKeepAccountMigrated;
     private ImageButton mParamsIndicator;
     private View mParamsView;
     private static final int[] STATE_EXPANDED = new int[] {R.attr.state_expanded};
@@ -107,6 +111,11 @@ public class SetupManagementFragment extends Fragment implements
         navigationBar.getBackButton().setText(R.string.exit);
         mNavigationNextButton = navigationBar.getNextButton();
         mNavigationNextButton.setText(R.string.setup_label);
+
+        mSetupOptions = (RadioGroup) view.findViewById(R.id.setup_options);
+        mSetupOptions.setOnCheckedChangeListener(this);
+        mSkipUserConsent = (CheckBox) view.findViewById(R.id.skip_user_consent);
+        mKeepAccountMigrated = (CheckBox) view.findViewById(R.id.keep_account_migrated);
 
         mParamsView = view.findViewById(R.id.params);
         mParamsIndicator = (ImageButton) view.findViewById(R.id.params_indicator);
@@ -162,10 +171,31 @@ public class SetupManagementFragment extends Fragment implements
                     mLogoValue = (TextView) getView().findViewById(R.id.selected_logo_value);
                     mLogoPreviewView = (ImageView) getView().findViewById(R.id.preview_logo);
                 }
+                setProvisioningModeSpecificUI();
             }
         } else {
             showNoProvisioningPossibleUI();
         }
+    }
+
+    /**
+     * On R.id.setup_options are changed
+     */
+    @Override
+    public void onCheckedChanged(RadioGroup radioGroup, int i) {
+        setProvisioningModeSpecificUI();
+    }
+
+    private void setProvisioningModeSpecificUI() {
+        final int setUpOptionId = mSetupOptions.getCheckedRadioButtonId();
+        final boolean isManagedProfileAction = setUpOptionId == R.id.setup_managed_profile;
+        mSkipUserConsent.setVisibility(Util.isAtLeastO() && isManagedProfileAction &&
+                Util.isDeviceOwner(getActivity())
+                ? View.VISIBLE
+                : View.GONE);
+        mKeepAccountMigrated.setVisibility(Util.isAtLeastO() && isManagedProfileAction
+                ? View.VISIBLE
+                : View.GONE);
     }
 
     private void maybeLaunchProvisioning(String intentAction, int requestCode) {
@@ -185,6 +215,8 @@ public class SetupManagementFragment extends Fragment implements
             return;
         }
         maybeSpecifySyncAuthExtras(intent);
+        specifySkipUserConsent(intent);
+        specifyKeepAccountMigrated(intent);
 
         if (intent.resolveActivity(activity.getPackageManager()) != null) {
             startActivityForResult(intent, requestCode);
@@ -231,6 +263,24 @@ public class SetupManagementFragment extends Fragment implements
             specifyColor(intent);
         }
         return true;
+    }
+
+    private void specifySkipUserConsent(Intent intent) {
+        if (Util.isAtLeastO() && ACTION_PROVISION_MANAGED_PROFILE.equals(intent.getAction())
+                && mSkipUserConsent.getVisibility() == View.VISIBLE) {
+            // TODO: use action string in Android SDK
+            intent.putExtra("android.app.extra.PROVISIONING_SKIP_USER_CONSENT",
+                    mSkipUserConsent.isChecked());
+        }
+    }
+
+    private void specifyKeepAccountMigrated(Intent intent) {
+        if (Util.isAtLeastO() && ACTION_PROVISION_MANAGED_PROFILE.equals(intent.getAction())
+                && mKeepAccountMigrated.getVisibility() == View.VISIBLE) {
+            // TODO: use action string in Android SDK
+            intent.putExtra("android.app.extra.PROVISIONING_KEEP_ACCOUNT_ON_MIGRATION",
+                    mKeepAccountMigrated.isChecked());
+        }
     }
 
     private void specifyLogoUri(Intent intent) {
@@ -338,8 +388,7 @@ public class SetupManagementFragment extends Fragment implements
 
     @Override
     public void onNavigateNext() {
-        RadioGroup setupOptions = (RadioGroup) getView().findViewById(R.id.setup_options);
-        if (setupOptions.getCheckedRadioButtonId() == R.id.setup_managed_profile) {
+        if (mSetupOptions.getCheckedRadioButtonId() == R.id.setup_managed_profile) {
             maybeLaunchProvisioning(ACTION_PROVISION_MANAGED_PROFILE,
                     REQUEST_PROVISION_MANAGED_PROFILE);
         } else {
