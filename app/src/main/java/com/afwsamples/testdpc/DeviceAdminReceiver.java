@@ -80,6 +80,9 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
     private static final String FAILED_PASSWORD_LOG_FILE =
             "failed_pw_attempts_timestamps.log";
 
+    private static final String SETUP_MANAGEMENT_LAUNCH_ACTIVITY =
+            "com.afwsamples.testdpc.SetupManagementLaunchActivity";
+
     private static final int CHANGE_PASSWORD_NOTIFICATION_ID = 101;
     private static final int PASSWORD_FAILED_NOTIFICATION_ID = 102;
 
@@ -132,7 +135,7 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
 
         // Hide the setup launcher when this app is the admin
         context.getPackageManager().setComponentEnabledSetting(
-                new ComponentName(context, SetupManagementActivity.class),
+                new ComponentName(context, SETUP_MANAGEMENT_LAUNCH_ACTIVITY),
                 PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
 
         if (isProfileOwner) {

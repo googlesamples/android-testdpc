@@ -45,11 +45,16 @@
                 android:name=".SetupManagementActivity"
                 android:label="@string/setup_app_name"
                 android:taskAffinity="">
+        </activity>
+
+        <activity-alias
+                android:name=".SetupManagementLaunchActivity"
+                android:targetActivity=".SetupManagementActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-        </activity>
+        </activity-alias>
 
         <activity
                 android:name=".PolicyManagementActivity"
@@ -114,6 +119,13 @@
             </intent-filter>
         </receiver>
 
+        <receiver android:name=".BootReceiver"
+                android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
+
         <provider
                 android:authorities="com.afwsamples.testdpc.fileprovider"
                 android:name="android.support.v4.content.FileProvider"
@@ -129,6 +141,14 @@
                 <action android:name="com.android.vending.dpc.APPLICATION_RESTRICTIONS_PROXY" />
             </intent-filter>
         </service>
+
+        <service
+                android:name=".comp.ProfileOwnerService"
+                android:exported="false"/>
+
+        <service
+                android:name=".comp.DeviceOwnerService"
+                android:exported="false"/>
 
     </application>
 

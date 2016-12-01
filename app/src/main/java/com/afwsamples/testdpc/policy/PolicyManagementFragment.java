@@ -126,6 +126,7 @@ import java.util.List;
 import java.util.Set;
 
 import static android.os.UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES;
+import static com.afwsamples.testdpc.common.preference.DpcPreferenceHelper.NO_CUSTOM_CONSTRIANT;
 
 /**
  * Provides several device management functions.
@@ -391,7 +392,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         mRequestLogsPreference.setOnPreferenceClickListener(this);
         mRequestLogsPreference.setCustomConstraint(
                 () -> mDevicePolicyManager.isSecurityLoggingEnabled(mAdminComponentName)
-                        ? 0
+                        ? NO_CUSTOM_CONSTRIANT
                         : R.string.requires_process_logs);
         findPreference(SET_ACCESSIBILITY_SERVICES_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_INPUT_METHODS_KEY).setOnPreferenceClickListener(this);
@@ -426,7 +427,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         mInstallNonMarketAppsPreference.setCustomConstraint(
                 () -> mUserManager.hasUserRestriction(DISALLOW_INSTALL_UNKNOWN_SOURCES)
                         ? R.string.user_restricted
-                        : 0);
+                        : NO_CUSTOM_CONSTRIANT);
         mInstallNonMarketAppsPreference.setOnPreferenceChangeListener(this);
         findPreference(SET_USER_RESTRICTIONS_KEY).setOnPreferenceClickListener(this);
         findPreference(REBOOT_KEY).setOnPreferenceClickListener(this);
@@ -438,7 +439,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
         DpcPreference compPreference = (DpcPreference) findPreference(COMP_POLICIES);
         compPreference.setCustomConstraint(
-                () -> Util.isInCompMode(getActivity()) ? 0 : R.string.require_comp);
+                () -> Util.isInCompMode(getActivity())
+                        ? NO_CUSTOM_CONSTRIANT
+                        : R.string.require_comp);
         compPreference.setOnPreferenceClickListener(this);
 
         mSetAutoTimeRequiredPreference = (SwitchPreference) findPreference(

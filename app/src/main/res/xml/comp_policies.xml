@@ -8,4 +8,10 @@
             android:title="@string/profile_status"
             testdpc:admin="deviceOwner"
             testdpc:minSdkVersion="O"/>
+
+    <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
+            android:key="hide_profile_launcher_icon"
+            android:title="@string/hide_profile_launcher_icon"
+            testdpc:admin="deviceOwner"
+            testdpc:minSdkVersion="O"/>
 </PreferenceScreen>

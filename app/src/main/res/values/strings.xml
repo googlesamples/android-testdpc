@@ -691,9 +691,11 @@
     <string name="comp_specific_policy_category_title">Corp owned managed profile (COMP) policies</string>
     <string name="comp_specific_policy_title">COMP specific policies</string>
 
-    <string name="profile_status">Managed profile status</string>
-    <string name="profile_is_not_running">Managed profile is not running</string>
-    <string name="profile_is_running_but_locked">Managed profile is running but locked</string>
-    <string name="profile_is_unlocked">Managed profile is unlocked</string>
+    <string name="profile_status">Work profile status</string>
+    <string name="profile_is_not_running">Work profile is not running</string>
+    <string name="profile_is_running_but_locked">Work profile is running but locked</string>
+    <string name="profile_is_unlocked">Work profile is unlocked</string>
     <string name="require_comp">Requires a corp owned managed profile</string>
+    <string name="hide_profile_launcher_icon">Hide the launcher icon in profile</string>
+    <string name="profile_user_status_is_changed">Work profile user status is changed</string>
 </resources>

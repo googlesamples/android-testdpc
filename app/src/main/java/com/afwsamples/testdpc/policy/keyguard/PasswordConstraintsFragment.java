@@ -46,6 +46,7 @@ import static android.app.admin.DevicePolicyManager.PASSWORD_QUALITY_NUMERIC;
 import static android.app.admin.DevicePolicyManager.PASSWORD_QUALITY_NUMERIC_COMPLEX;
 import static android.app.admin.DevicePolicyManager.PASSWORD_QUALITY_SOMETHING;
 import static android.app.admin.DevicePolicyManager.PASSWORD_QUALITY_UNSPECIFIED;
+import static com.afwsamples.testdpc.common.preference.DpcPreferenceHelper.NO_CUSTOM_CONSTRIANT;
 
 /**
  * This fragment provides functionalities to set password constraint policies as a profile
@@ -268,13 +269,13 @@ public final class PasswordConstraintsFragment extends ProfileOrParentFragment i
         // Minimum length can be set for most qualities
         mMinLength.setCustomConstraint(
                 () -> getDpm().getPasswordQuality(getAdmin()) >= PASSWORD_QUALITY_NUMERIC
-                        ? 0
+                        ? NO_CUSTOM_CONSTRIANT
                         : R.string.not_for_password_quality);
 
         // Other minimums are only active for the highest quality
         CustomConstraint constraint =
                 () -> getDpm().getPasswordQuality(getAdmin()) == PASSWORD_QUALITY_COMPLEX
-                        ? 0
+                        ? NO_CUSTOM_CONSTRIANT
                         : R.string.not_for_password_quality;
         mMinLetters.setCustomConstraint(constraint);
         mMinNumeric.setCustomConstraint(constraint);
