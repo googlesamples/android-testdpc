@@ -20,22 +20,28 @@ import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.admin.DevicePolicyManager;
+import android.content.ActivityNotFoundException;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Build.VERSION_CODES;
 import android.os.UserHandle;
 import android.os.UserManager;
+import android.support.v14.preference.PreferenceFragment;
 import android.support.v4.os.BuildCompat;
 import android.text.format.DateUtils;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
-
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
@@ -43,7 +49,8 @@ import java.util.List;
  * Common utility functions.
  */
 public class Util {
-
+    private static final String TAG = "Util";
+    private  static final int DEFAULT_BUFFER_SIZE = 4096;
     public static final int BUGREPORT_NOTIFICATION_ID = 1;
     public static final int PASSWORD_EXPIRATION_NOTIFICATION_ID = 2;
 
@@ -169,5 +176,38 @@ public class Util {
 
     public static boolean isInCompMode(Context context) {
         return getBindDeviceAdminTargetUsers(context).size() > 0;
+    }
+
+    public static void showFileViewerForImportingCertificate(PreferenceFragment fragment,
+            int requestCode) {
+        Intent certIntent = new Intent(Intent.ACTION_GET_CONTENT);
+        certIntent.setTypeAndNormalize("*/*");
+        try {
+            fragment.startActivityForResult(certIntent, requestCode);
+        } catch (ActivityNotFoundException e) {
+            Log.e(TAG, "showFileViewerForImportingCertificate: ", e);
+        }
+    }
+
+    /**
+     * @return If the certificate was successfully installed.
+     */
+    public static boolean installCaCertificate(InputStream certificateInputStream,
+            DevicePolicyManager dpm, ComponentName admin) {
+        try {
+            if (certificateInputStream != null) {
+                ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
+                byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
+                int len = 0;
+                while ((len = certificateInputStream.read(buffer)) > 0) {
+                    byteBuffer.write(buffer, 0, len);
+                }
+                return dpm.installCaCert(admin,
+                        byteBuffer.toByteArray());
+            }
+        } catch (IOException e) {
+            Log.e(TAG, "installCaCertificate: ", e);
+        }
+        return false;
     }
 }
