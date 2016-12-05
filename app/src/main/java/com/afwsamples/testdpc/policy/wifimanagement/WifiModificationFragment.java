@@ -133,6 +133,9 @@ public class WifiModificationFragment extends Fragment
                 @Override
                 public void onClick(View v) {
                     WifiConfiguration oldConf = getClickedItem();
+                    if (oldConf == null) {
+                        return;
+                    }
                     try {
                         DialogFragment dialog;
                         if (oldConf.enterpriseConfig == null ||
