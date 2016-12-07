@@ -58,6 +58,7 @@ import java.io.OutputStreamWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -131,6 +132,9 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
         // permissions for TestDPC.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             autoGrantRequestedPermissionsToSelf(context);
+        }
+        if (Util.isAtLeastO()) {
+            maybeSetAffiliationIds(context, extras);
         }
 
         // Hide the setup launcher when this app is the admin
@@ -517,6 +521,20 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
             nm.notify(CHANGE_PASSWORD_NOTIFICATION_ID, warn.getNotification());
         } else {
             nm.cancel(CHANGE_PASSWORD_NOTIFICATION_ID);
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.O)
+    private void maybeSetAffiliationIds(Context context, PersistableBundle extras) {
+        if (extras == null) {
+            return;
+        }
+        String affiliationId = extras.getString(LaunchIntentUtil.EXTRA_AFFILIATION_ID);
+        if (affiliationId != null) {
+            DevicePolicyManager devicePolicyManager = (DevicePolicyManager)
+                    context.getSystemService(Context.DEVICE_POLICY_SERVICE);
+            devicePolicyManager.setAffiliationIds(getComponentName(context),
+                    Arrays.asList(affiliationId));
         }
     }
 }
