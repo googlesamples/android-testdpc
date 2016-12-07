@@ -36,6 +36,7 @@
     <string name="skip_user_setup">Skip user setup</string>
     <string name="skip_user_consent">Skip user consent for COMP provisioning</string>
     <string name="keep_account_migrated">Keep account migrated</string>
+    <string name="skip_encryption">Skip encryption</string>
     <string name="managed_profile_name">Sample Managed Profile</string>
     <string name="managed_user_name">Sample Managed User</string>
     <string name="finish_setup">Finish setup</string>
