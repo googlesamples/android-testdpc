@@ -32,9 +32,9 @@ public class RestrictionManagerCompat {
     private static final String TAG = "RestrictionManager";
 
     // These keys are used inside TesDPC only. We never save them to DevicePolicyManager
-    public static final String CHOICE_SELECTED_VALUE= "testdpc_arg_choice_selected_value";
-    public static final String CHOICE_ENTRIES= "testdpc_arg_choice_entries";
-    public static final String CHOICE_VALUES= "testdpc_arg_choice_values";
+    public static final String CHOICE_SELECTED_VALUE = "testdpc_arg_choice_selected_value";
+    public static final String CHOICE_ENTRIES = "testdpc_arg_choice_entries";
+    public static final String CHOICE_VALUES = "testdpc_arg_choice_values";
 
 
     /**
