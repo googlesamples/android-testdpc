@@ -13,13 +13,13 @@ ext {
 }
 
 android {
-    compileSdkVersion 'android-O'
+    compileSdkVersion 26
     buildToolsVersion "26.0.0"
 
     defaultConfig {
         applicationId "com.afwsamples.testdpc"
-        minSdkVersion 21
-        targetSdkVersion 25
+        minSdkVersion 'O'
+        targetSdkVersion 'O'
         versionCode versionMajor * 1000 + versionMinor * 100 + versionBuild
         versionName "${versionMajor}.${versionMinor}.${versionBuild}"
         jackOptions {
