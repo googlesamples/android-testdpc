@@ -69,7 +69,8 @@ public class ManageAppRestrictionsFragment extends ManageAppFragment
             KeyValuePairDialogFragment.DialogType.STRING_TYPE,
             KeyValuePairDialogFragment.DialogType.STRING_ARRAY_TYPE,
             KeyValuePairDialogFragment.DialogType.BUNDLE_TYPE,
-            KeyValuePairDialogFragment.DialogType.BUNDLE_ARRAY_TYPE
+            KeyValuePairDialogFragment.DialogType.BUNDLE_ARRAY_TYPE,
+            KeyValuePairDialogFragment.DialogType.CHOICE_TYPE
     };
     private static final int[] SUPPORTED_TYPES_PRE_M = {
             KeyValuePairDialogFragment.DialogType.BOOL_TYPE,
@@ -107,7 +108,7 @@ public class ManageAppRestrictionsFragment extends ManageAppFragment
         }
     }
 
-    protected RestrictionEntry[] convertBundleToRestrictions(Bundle restrictionBundle) {
+    protected RestrictionEntry[] convertBundleToRestrictions(Bundle restrictionBundle, Bundle manifestRestrictionsBundle) {
         List<RestrictionEntry> restrictionEntries = new ArrayList<>();
         Set<String> keys = restrictionBundle.keySet();
         for (String key : keys) {
@@ -117,15 +118,46 @@ public class ManageAppRestrictionsFragment extends ManageAppFragment
             } else if (value instanceof Integer) {
                 restrictionEntries.add(new RestrictionEntry(key, (int) value));
             } else if (value instanceof String) {
-                RestrictionEntry entry = new RestrictionEntry(RestrictionEntry.TYPE_STRING, key);
+                // DevicePolicyManager returns Choice restriction string
+                // We need to find corresponding restriction in app manifest restrictions
+                // and, if it has type Choice, use entries and values defined by app
+                RestrictionEntry entry = null;
+                Bundle manifestRestrictionData = null;
+                if (manifestRestrictionsBundle != null) {
+                    manifestRestrictionData = manifestRestrictionsBundle.getBundle(key);
+                }
+                if (manifestRestrictionData != null
+                        && manifestRestrictionData.containsKey(RestrictionManagerCompat.CHOICE_SELECTED_VALUE)) {
+                    String[] choiceEntries = manifestRestrictionData.getStringArray(RestrictionManagerCompat.CHOICE_ENTRIES);
+                    String[] choiceValues = manifestRestrictionData.getStringArray(RestrictionManagerCompat.CHOICE_VALUES);
+                    entry = new RestrictionEntry(RestrictionEntry.TYPE_CHOICE, key);
+                    entry.setChoiceEntries(choiceEntries);
+                    entry.setChoiceValues(choiceValues);
+                } else {
+                    entry = new RestrictionEntry(RestrictionEntry.TYPE_STRING, key);
+                }
                 entry.setSelectedString((String) value);
                 restrictionEntries.add(entry);
             } else if (value instanceof String[]) {
                 restrictionEntries.add(new RestrictionEntry(key, (String[]) value));
             } else if (value instanceof Bundle) {
-                addBundleEntryToRestrictions(restrictionEntries, key, (Bundle) value);
+                // We are using Bundle to store Choice restriction for UI
+                if (((Bundle) value).containsKey(RestrictionManagerCompat.CHOICE_SELECTED_VALUE)) {
+                    addChoiceEntryToRestrictions(restrictionEntries, key, (Bundle) value);
+                } else {
+                    Bundle manifestRestrictionData = null;
+                    if (manifestRestrictionsBundle != null) {
+                        manifestRestrictionData = manifestRestrictionsBundle.getBundle(key);
+                    }
+                    addBundleEntryToRestrictions(
+                            restrictionEntries, key, (Bundle) value, manifestRestrictionData);
+                }
             } else if (value instanceof Parcelable[]) {
-                addBundleArrayToRestrictions(restrictionEntries, key, (Parcelable[]) value);
+                Parcelable[] manifestRestrictionData = null;
+                if (manifestRestrictionsBundle != null) {
+                    manifestRestrictionData = manifestRestrictionsBundle.getParcelableArray(key);
+                }
+                addBundleArrayToRestrictions(restrictionEntries, key, (Parcelable[]) value, manifestRestrictionData);
             }
         }
         return restrictionEntries.toArray(new RestrictionEntry[0]);
@@ -133,21 +165,34 @@ public class ManageAppRestrictionsFragment extends ManageAppFragment
 
     @TargetApi(Build.VERSION_CODES.M)
     private void addBundleEntryToRestrictions(List<RestrictionEntry> restrictionEntries,
-            String key, Bundle value) {
+            String key, Bundle value, Bundle manifestRestrictionsBundle) {
         restrictionEntries.add(RestrictionEntry.createBundleEntry(
-                key, convertBundleToRestrictions(value)));
+                key, convertBundleToRestrictions(value, manifestRestrictionsBundle)));
     }
 
     @TargetApi(Build.VERSION_CODES.M)
     private void addBundleArrayToRestrictions(List<RestrictionEntry> restrictionEntries,
-            String key, Parcelable[] value) {
+            String key, Parcelable[] value, Parcelable[] manifestRestrictionsBundleArray) {
         int length = value.length;
         RestrictionEntry[] entriesArray = new RestrictionEntry[length];
         for (int i = 0; i < entriesArray.length; ++i) {
+            Parcelable manifestRestrictionsBundle = null;
+            if (manifestRestrictionsBundleArray != null && manifestRestrictionsBundleArray.length > i) {
+                manifestRestrictionsBundle = manifestRestrictionsBundleArray[i];
+            }
             entriesArray[i] = RestrictionEntry.createBundleEntry(key,
-                    convertBundleToRestrictions((Bundle) value[i]));
+                    convertBundleToRestrictions((Bundle) value[i], (Bundle) manifestRestrictionsBundle));
         }
         restrictionEntries.add(RestrictionEntry.createBundleArrayEntry(key, entriesArray));
+    }
+
+    private void addChoiceEntryToRestrictions(List<RestrictionEntry> restrictionEntries,
+                                              String key, Bundle value) {
+        RestrictionEntry choiceEntry = new RestrictionEntry(RestrictionEntry.TYPE_CHOICE, key);
+        choiceEntry.setSelectedString(value.getString(RestrictionManagerCompat.CHOICE_SELECTED_VALUE));
+        choiceEntry.setChoiceEntries(value.getStringArray(RestrictionManagerCompat.CHOICE_ENTRIES));
+        choiceEntry.setChoiceValues(value.getStringArray(RestrictionManagerCompat.CHOICE_VALUES));
+        restrictionEntries.add(choiceEntry);
     }
 
     protected void showToast(String msg) {
@@ -176,13 +221,19 @@ public class ManageAppRestrictionsFragment extends ManageAppFragment
                     break;
                 case RestrictionEntry.TYPE_STRING:
                     value = restrictionEntry.getSelectedString();
+                    // UI uses value to find restriction type.
+                    // If string restrictions has null value, it will be displayed as boolean
+                    // To avoid this we should set empty string as value
+                    if (value == null) {
+                        value = "";
+                    }
                     break;
                 case RestrictionEntry.TYPE_MULTI_SELECT:
                     value = restrictionEntry.getAllSelectedStrings();
                     break;
                 case RestrictionEntry.TYPE_BUNDLE:
                     value = RestrictionManagerCompat.convertRestrictionsToBundle(Arrays.asList(
-                            getRestrictionEntries(restrictionEntry)));
+                            getRestrictionEntries(restrictionEntry)), true);
                     break;
                 case RestrictionEntry.TYPE_BUNDLE_ARRAY:
                     RestrictionEntry[] restrictionEntries = getRestrictionEntries(restrictionEntry);
@@ -190,9 +241,12 @@ public class ManageAppRestrictionsFragment extends ManageAppFragment
                     for (int i = 0; i < restrictionEntries.length; i++) {
                         bundles[i] =
                                 RestrictionManagerCompat.convertRestrictionsToBundle(Arrays.asList(
-                                        getRestrictionEntries(restrictionEntries[i])));
+                                        getRestrictionEntries(restrictionEntries[i])), true);
                     }
                     value = bundles;
+                    break;
+                case RestrictionEntry.TYPE_CHOICE:
+                    value = RestrictionManagerCompat.convertChoiceRestrictionToBundle(restrictionEntry);
                     break;
             }
         }
@@ -220,6 +274,8 @@ public class ManageAppRestrictionsFragment extends ManageAppFragment
                 return KeyValuePairDialogFragment.DialogType.BUNDLE_TYPE;
             case RestrictionEntry.TYPE_BUNDLE_ARRAY:
                 return KeyValuePairDialogFragment.DialogType.BUNDLE_ARRAY_TYPE;
+            case RestrictionEntry.TYPE_CHOICE:
+                return KeyValuePairDialogFragment.DialogType.CHOICE_TYPE;
             default:
                 throw new AssertionError("Unknown restriction type");
         }
@@ -235,12 +291,17 @@ public class ManageAppRestrictionsFragment extends ManageAppFragment
             case RESULT_CODE_EDIT_DIALOG:
                 int type = result.getIntExtra(KeyValuePairDialogFragment.RESULT_TYPE, 0);
                 String key = result.getStringExtra(KeyValuePairDialogFragment.RESULT_KEY);
-                newRestrictionEntry = new RestrictionEntry(getRestrictionTypeFromDialogType(type),
-                        key);
-                updateRestrictionEntryFromResultIntent(newRestrictionEntry, result);
-                mAppRestrictionsArrayAdapter.remove(mEditingRestrictionEntry);
+                int editedRestrictionType = getRestrictionTypeFromDialogType(type);
+                if (mEditingRestrictionEntry == null || mEditingRestrictionEntry.getType() != editedRestrictionType) {
+                    newRestrictionEntry = new RestrictionEntry(getRestrictionTypeFromDialogType(type),
+                            key);
+                    updateRestrictionEntryFromResultIntent(newRestrictionEntry, result);
+                    mAppRestrictionsArrayAdapter.remove(mEditingRestrictionEntry);
+                    mAppRestrictionsArrayAdapter.add(newRestrictionEntry);
+                } else {
+                    updateRestrictionEntryFromResultIntent(mEditingRestrictionEntry, result);
+                }
                 mEditingRestrictionEntry = null;
-                mAppRestrictionsArrayAdapter.add(newRestrictionEntry);
                 break;
         }
     }
@@ -265,7 +326,7 @@ public class ManageAppRestrictionsFragment extends ManageAppFragment
                 break;
             case RestrictionEntry.TYPE_BUNDLE: {
                 Bundle bundle = intent.getBundleExtra(RESULT_VALUE);
-                restrictionEntry.setRestrictions(convertBundleToRestrictions(bundle));
+                restrictionEntry.setRestrictions(convertBundleToRestrictions(bundle, null));
                 break;
             }
             case RestrictionEntry.TYPE_BUNDLE_ARRAY: {
@@ -273,11 +334,14 @@ public class ManageAppRestrictionsFragment extends ManageAppFragment
                 RestrictionEntry[] restrictionEntryArray = new RestrictionEntry[bundleArray.length];
                 for (int i = 0; i< bundleArray.length; i++) {
                     restrictionEntryArray[i] = RestrictionEntry.createBundleEntry(String.valueOf(i),
-                            convertBundleToRestrictions((Bundle) bundleArray[i]));
+                            convertBundleToRestrictions((Bundle) bundleArray[i], null));
                 }
                 restrictionEntry.setRestrictions(restrictionEntryArray);
                 break;
             }
+            case RestrictionEntry.TYPE_CHOICE:
+                restrictionEntry.setSelectedString(intent.getStringExtra(RESULT_VALUE));
+                break;
         }
     }
 
@@ -295,6 +359,8 @@ public class ManageAppRestrictionsFragment extends ManageAppFragment
                 return RestrictionEntry.TYPE_BUNDLE;
             case KeyValuePairDialogFragment.DialogType.BUNDLE_ARRAY_TYPE:
                 return RestrictionEntry.TYPE_BUNDLE_ARRAY;
+            case KeyValuePairDialogFragment.DialogType.CHOICE_TYPE:
+                return RestrictionEntry.TYPE_CHOICE;
             default:
                 throw new AssertionError("Unknown type index");
         }
@@ -327,7 +393,13 @@ public class ManageAppRestrictionsFragment extends ManageAppFragment
         if (!TextUtils.isEmpty(pkgName)) {
             Bundle bundle = mDevicePolicyManager.getApplicationRestrictions(
                     DeviceAdminReceiver.getComponentName(getActivity()), pkgName);
-            loadAppRestrictionsList(convertBundleToRestrictions(bundle));
+            // We need restrictions from app manifest to get entries and values for Choice restrictions
+            List<RestrictionEntry> manifestRestrictions = getManifestRestrictions(pkgName);
+            Bundle manifestRestrictionsBundle = null;
+            if (manifestRestrictions != null) {
+                manifestRestrictionsBundle = RestrictionManagerCompat.convertRestrictionsToBundle(manifestRestrictions, true);
+            }
+            loadAppRestrictionsList(convertBundleToRestrictions(bundle, manifestRestrictionsBundle));
             mLastRestrictionEntries = new ArrayList<>(mRestrictionEntries);
         }
     }
@@ -344,26 +416,33 @@ public class ManageAppRestrictionsFragment extends ManageAppFragment
 
     private void loadManifestAppRestrictions(String pkgName) {
         if (!TextUtils.isEmpty(pkgName)) {
-            List<RestrictionEntry> manifestRestrictions = null;
-            try {
-                manifestRestrictions = mRestrictionsManager.getManifestRestrictions(pkgName);
-                convertTypeChoiceAndNullToString(manifestRestrictions);
-            } catch (NullPointerException e) {
-                // This means no default restrictions.
-            }
+            List<RestrictionEntry> manifestRestrictions = getManifestRestrictions(pkgName);
             if (manifestRestrictions != null) {
                 loadAppRestrictionsList(manifestRestrictions.toArray(new RestrictionEntry[0]));
             }
         }
     }
 
+    private List<RestrictionEntry> getManifestRestrictions(String pkgName) {
+        List<RestrictionEntry> manifestRestrictions = null;
+        if (!TextUtils.isEmpty(pkgName)) {
+            try {
+                manifestRestrictions = mRestrictionsManager.getManifestRestrictions(pkgName);
+                convertTypeNullToString(manifestRestrictions);
+            } catch (NullPointerException e) {
+                // This means no default restrictions.
+            }
+        }
+
+        return manifestRestrictions;
+    }
+
     /**
-     * TODO (b/23378519): Remove this method and add support for type choice and null.
+     * TODO (b/23378519): Remove this method and add support for type null.
      */
-    private void convertTypeChoiceAndNullToString(List<RestrictionEntry> restrictionEntries) {
+    private void convertTypeNullToString(List<RestrictionEntry> restrictionEntries) {
         for (RestrictionEntry entry : restrictionEntries) {
-            if (entry.getType() == RestrictionEntry.TYPE_CHOICE ||
-                    entry.getType() == RestrictionEntry.TYPE_NULL) {
+            if (entry.getType() == RestrictionEntry.TYPE_NULL) {
                 entry.setType(RestrictionEntry.TYPE_STRING);
             }
         }
@@ -375,7 +454,7 @@ public class ManageAppRestrictionsFragment extends ManageAppFragment
                 ((ApplicationInfo) mManagedAppsSpinner.getSelectedItem()).packageName;
         mDevicePolicyManager.setApplicationRestrictions(
                 DeviceAdminReceiver.getComponentName(getActivity()), pkgName,
-                RestrictionManagerCompat.convertRestrictionsToBundle(mRestrictionEntries));
+                RestrictionManagerCompat.convertRestrictionsToBundle(mRestrictionEntries, false));
         mLastRestrictionEntries = new ArrayList<>(mRestrictionEntries);
         showToast(getString(R.string.set_app_restrictions_success, pkgName));
     }

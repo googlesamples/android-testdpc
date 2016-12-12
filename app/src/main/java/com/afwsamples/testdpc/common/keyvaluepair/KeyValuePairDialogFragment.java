@@ -43,6 +43,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afwsamples.testdpc.R;
+import com.afwsamples.testdpc.common.RestrictionManagerCompat;
 import com.afwsamples.testdpc.common.StringArrayTypeInputAdapter;
 
 import java.util.ArrayList;
@@ -62,6 +63,8 @@ public class KeyValuePairDialogFragment extends DialogFragment {
     static final String ARG_INITIAL_VALUE = "initial_value";
     static final String ARG_SUPPORTED_TYPE = "supported_type";
     static final String ARG_APP_NAME = "app_name";
+    static final String ARG_CHOICE_ENTRIES= "choice_entries";
+    static final String ARG_CHOICE_VALUES= "choice_values";
 
     public static final String RESULT_KEY = "key";
     public static final String RESULT_VALUE = "value";
@@ -77,11 +80,14 @@ public class KeyValuePairDialogFragment extends DialogFragment {
     private Button mConfigureBundleArray;
     private View[] mValueViews;
     private Spinner mTypeSpinner;
+    private Spinner mChoiceSpinner;
 
     private StringArrayTypeInputAdapter mStringArrayAdapter;
     private Set<Integer> mSupportedTypes;
     private int mDialogType;
     private String mAppName;
+    private String[] mChoiceEntries;
+    private String[] mChoiceValues;
 
     public interface DialogType {
         int BOOL_TYPE = 0;
@@ -90,6 +96,7 @@ public class KeyValuePairDialogFragment extends DialogFragment {
         int STRING_ARRAY_TYPE = 3;
         int BUNDLE_TYPE = 4;
         int BUNDLE_ARRAY_TYPE = 5;
+        int CHOICE_TYPE = 6;
     }
 
     private static final String[] TYPE_DISPLAY_STRING_ARRAY = new String[] {
@@ -98,7 +105,8 @@ public class KeyValuePairDialogFragment extends DialogFragment {
             "String",
             "String[]",
             "Bundle",
-            "Bundle[]"
+            "Bundle[]",
+            "Choice"
     };
 
     private final BundleButtonOnClickListener bundleButtonOnClickListener =
@@ -133,6 +141,14 @@ public class KeyValuePairDialogFragment extends DialogFragment {
                 case DialogType.BUNDLE_ARRAY_TYPE:
                     argument.putParcelableArray(ARG_INITIAL_VALUE, (Bundle[]) value);
                     break;
+                case DialogType.CHOICE_TYPE:
+                    argument.putString(ARG_INITIAL_VALUE,
+                            ((Bundle) value).getString(RestrictionManagerCompat.CHOICE_SELECTED_VALUE));
+                    argument.putStringArray(ARG_CHOICE_ENTRIES,
+                            ((Bundle) value).getStringArray(RestrictionManagerCompat.CHOICE_ENTRIES));
+                    argument.putStringArray(ARG_CHOICE_VALUES,
+                            ((Bundle) value).getStringArray(RestrictionManagerCompat.CHOICE_VALUES));
+                    break;
             }
         }
         argument.putIntArray(ARG_SUPPORTED_TYPE, supportedType);
@@ -153,9 +169,10 @@ public class KeyValuePairDialogFragment extends DialogFragment {
         mStringArrayList = (RecyclerView) rootView.findViewById(R.id.value_str_array_list);
         mConfigureBundle = (Button) rootView.findViewById(R.id.configure_bundle);
         mConfigureBundleArray = (Button) rootView.findViewById(R.id.configure_bundle_array);
+        mChoiceSpinner = (Spinner) rootView.findViewById(R.id.value_choice_spinner);
         // The order is based on TYPE_DISPLAY_STRING_ARRAY.
         mValueViews = new View[] { mBoolView, mIntView, mStringView, mStringArrayContainer,
-                mConfigureBundle, mConfigureBundleArray };
+                mConfigureBundle, mConfigureBundleArray, mChoiceSpinner };
         mTypeSpinner = (Spinner) rootView.findViewById(R.id.type_spinner);
         mConfigureBundle.setOnClickListener(bundleButtonOnClickListener);
         mConfigureBundleArray.setOnClickListener(bundleArrayButtonOnClickListener);
@@ -237,6 +254,14 @@ public class KeyValuePairDialogFragment extends DialogFragment {
                 }
                 result.putExtra(RESULT_VALUE, initialBundleArray);
                 return true;
+            case DialogType.CHOICE_TYPE:
+                String value = "";
+                int selectedPosition = mChoiceSpinner.getSelectedItemPosition();
+                if (mChoiceValues != null && selectedPosition < mChoiceValues.length) {
+                    value = mChoiceValues[selectedPosition];
+                }
+                result.putExtra(RESULT_VALUE, value);
+                return true;
         }
         return false;
     }
@@ -281,8 +306,52 @@ public class KeyValuePairDialogFragment extends DialogFragment {
         configureKeyView(arguments.getBoolean(ARG_CAN_EDIT_KEY), arguments.getString(ARG_KEY));
         setSupportedType(arguments.getIntArray(ARG_SUPPORTED_TYPE));
         setDialogType(arguments.getInt(ARG_DIALOG_TYPE));
+        if (mDialogType == DialogType.CHOICE_TYPE) {
+            configureChoiceSpinner(arguments.getStringArray(ARG_CHOICE_ENTRIES),
+                    arguments.getStringArray(ARG_CHOICE_VALUES));
+        }
         populateInitialValue(arguments.get(ARG_INITIAL_VALUE));
         mAppName = arguments.getString(ARG_APP_NAME);
+    }
+
+    private void configureChoiceSpinner(String[] choiceEntries, String[] choiceValues) {
+        mChoiceEntries = choiceEntries;
+        mChoiceValues = choiceValues;
+
+        if (mChoiceEntries == null) {
+            mChoiceEntries = new String[]{""};
+        }
+        if (mChoiceValues == null) {
+            mChoiceValues = new String[]{""};
+        }
+
+        ArrayAdapter<String> typeArrayAdapter =
+                new ArrayAdapter<String>(getActivity(),
+                        android.R.layout.simple_spinner_item, mChoiceEntries) {
+                    @Override
+                    public boolean isEnabled(int position) {
+                        return true;
+                    }
+
+                    @Override
+                    public View getDropDownView(int position, View convertView, ViewGroup parent) {
+                        TextView textView = (TextView) super.getDropDownView(position, convertView,
+                                parent);
+                            textView.setTextColor(Color.BLACK);
+                        return textView;
+                    }
+                };
+        typeArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mChoiceSpinner.setAdapter(typeArrayAdapter);
+        mChoiceSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long l) {
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+            }
+        });
     }
 
     private void configureKeyView(boolean canEditKeyView, String key) {
@@ -350,7 +419,22 @@ public class KeyValuePairDialogFragment extends DialogFragment {
             case DialogType.BUNDLE_ARRAY_TYPE:
                 bundleArrayButtonOnClickListener.setBundleArray((Bundle[]) initialValue);
                 break;
+            case DialogType.CHOICE_TYPE:
+                mChoiceSpinner.setSelection(findInitialPositionForChoiceSpinner((String) initialValue));
+                break;
         }
+    }
+
+    private int findInitialPositionForChoiceSpinner(String intialValue) {
+        int position = 0;
+
+        if (mChoiceValues != null && intialValue != null) {
+            while (position < mChoiceValues.length && !intialValue.equals(mChoiceValues[position])) {
+                position++;
+            }
+        }
+
+        return position;
     }
 
     private void showFragmentForFurtherInput(Fragment fragment) {

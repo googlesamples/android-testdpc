@@ -30,8 +30,11 @@ import android.widget.BaseAdapter;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.EditDeleteArrayAdapter;
 import com.afwsamples.testdpc.common.ManageAppFragment;
+import com.afwsamples.testdpc.common.RestrictionManagerCompat;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import static com.afwsamples.testdpc.common.EditDeleteArrayAdapter.OnDeleteButtonClickListener;
@@ -75,7 +78,8 @@ public class KeyValueBundleFragment extends ManageAppFragment implements
             DialogType.STRING_TYPE,
             DialogType.STRING_ARRAY_TYPE,
             DialogType.BUNDLE_TYPE,
-            DialogType.BUNDLE_ARRAY_TYPE
+            DialogType.BUNDLE_ARRAY_TYPE,
+            DialogType.CHOICE_TYPE
     };
 
     /**
@@ -121,6 +125,8 @@ public class KeyValueBundleFragment extends ManageAppFragment implements
     @Override
     protected BaseAdapter createListAdapter() {
         mAdapter = new StringEditDeleteArrayAdapter(getActivity(), mKeyList, this, this);
+        // To sort keys after enter
+        mAdapter.notifyDataSetChanged();
         return mAdapter;
     }
 
@@ -166,7 +172,12 @@ public class KeyValueBundleFragment extends ManageAppFragment implements
             } else if (value instanceof String[]) {
                 type = DialogType.STRING_ARRAY_TYPE;
             } else if (value instanceof Bundle) {
-                type = DialogType.BUNDLE_TYPE;
+                // CHOICE restriction is passed as Bundle with entries and values
+                if (((Bundle) value).containsKey(RestrictionManagerCompat.CHOICE_SELECTED_VALUE)) {
+                    type = DialogType.CHOICE_TYPE;
+                } else {
+                    type = DialogType.BUNDLE_TYPE;
+                }
             } else if (value instanceof Bundle[]) {
                 type = DialogType.BUNDLE_ARRAY_TYPE;
             }
@@ -198,10 +209,11 @@ public class KeyValueBundleFragment extends ManageAppFragment implements
                 int type = result.getIntExtra(KeyValuePairDialogFragment.RESULT_TYPE, 0);
                 String key = result.getStringExtra(KeyValuePairDialogFragment.RESULT_KEY);
                 updateBundleFromResultIntent(type, key, result);
-                if (!TextUtils.isEmpty(mEditingKey)) {
+                // We need this only if key name was changed
+                if (TextUtils.isEmpty(mEditingKey) || !mEditingKey.equals(key)) {
                     mAdapter.remove(mEditingKey);
+                    mAdapter.add(key);
                 }
-                mAdapter.add(key);
                 mAdapter.notifyDataSetChanged();
                 mEditingKey = null;
                 break;
@@ -210,15 +222,32 @@ public class KeyValueBundleFragment extends ManageAppFragment implements
 
     private static class StringEditDeleteArrayAdapter extends EditDeleteArrayAdapter<String> {
 
+        private List<String> mEntries;
+
         public StringEditDeleteArrayAdapter(Context context, List<String> entries,
                 OnEditButtonClickListener onEditButtonClickListener,
                 OnDeleteButtonClickListener onDeleteButtonClickListener) {
             super(context, entries, onEditButtonClickListener, onDeleteButtonClickListener);
+            mEntries = entries;
         }
 
         @Override
         protected String getDisplayName(String entry) {
             return entry;
+        }
+
+        @Override
+        public void notifyDataSetChanged() {
+            if (mEntries != null) {
+                // Sort keys in alphabetic order
+                Collections.sort(mEntries, new Comparator<String>() {
+                    @Override
+                    public int compare(String entry1, String entry2) {
+                        return getDisplayName(entry1).compareTo(getDisplayName(entry2));
+                    }
+                });
+            }
+            super.notifyDataSetChanged();
         }
     }
 
@@ -241,6 +270,14 @@ public class KeyValueBundleFragment extends ManageAppFragment implements
                 break;
             case DialogType.BUNDLE_ARRAY_TYPE:
                 mBundle.putParcelableArray(key, intent.getParcelableArrayExtra(RESULT_VALUE));
+                break;
+            case DialogType.CHOICE_TYPE:
+                // Update existing data for CHOICE restriction if exists
+                Bundle choiceData = (Bundle) mBundle.get(key);
+                if (choiceData == null) {
+                    choiceData = new Bundle();
+                }
+                choiceData.putString(RestrictionManagerCompat.CHOICE_SELECTED_VALUE, intent.getStringExtra(RESULT_VALUE));
                 break;
             default:
                 throw new IllegalArgumentException("invalid type:" + type);

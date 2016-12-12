@@ -129,7 +129,14 @@ public class KeyValueBundleArrayFragment extends ManageAppFragment implements
 
     @Override
     protected void addNewRow() {
-        Bundle bundle = new Bundle();
+        Bundle bundle = null;
+        // Use same bundle structure as first bundle, if exists
+        // In case of empty bundle user will need to add all restrictions manually
+        if (mInitialBundleList != null && mInitialBundleList.size() > 0 && mInitialBundleList.get(0) != null) {
+            bundle = (Bundle) mInitialBundleList.get(0).clone();
+        } else {
+            bundle = new Bundle();
+        }
         mAdapter.add(bundle);
         showEditDialog(bundle);
     }

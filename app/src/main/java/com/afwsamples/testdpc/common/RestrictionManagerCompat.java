@@ -31,6 +31,12 @@ import java.util.List;
 public class RestrictionManagerCompat {
     private static final String TAG = "RestrictionManager";
 
+    // These keys are used inside TesDPC only. We never save them to DevicePolicyManager
+    public static final String CHOICE_SELECTED_VALUE= "testdpc_arg_choice_selected_value";
+    public static final String CHOICE_ENTRIES= "testdpc_arg_choice_entries";
+    public static final String CHOICE_VALUES= "testdpc_arg_choice_values";
+
+
     /**
      * Converts a list of restrictions to the corresponding bundle, using the following mapping:
      * <table>
@@ -47,21 +53,21 @@ public class RestrictionManagerCompat {
      * </table>
      * TYPE_BUNDLE and TYPE_BUNDLE_ARRAY are supported from api level 23 onwards.
      * @param entries list of restrictions
+     * @param saveChoiceDataForDialog if true, then Choice restriction will be converted into Bundle with entries and values
      */
-    public static Bundle convertRestrictionsToBundle(List<RestrictionEntry> entries) {
+    public static Bundle convertRestrictionsToBundle(List<RestrictionEntry> entries, boolean saveChoiceDataForDialog) {
         final Bundle bundle = new Bundle();
         for (RestrictionEntry entry : entries) {
-            addRestrictionToBundle(bundle, entry);
+            addRestrictionToBundle(bundle, entry, saveChoiceDataForDialog);
         }
         return bundle;
     }
 
-    private static Bundle addRestrictionToBundle(Bundle bundle, RestrictionEntry entry) {
+    private static Bundle addRestrictionToBundle(Bundle bundle, RestrictionEntry entry, boolean saveChoiceDataForDialog) {
         switch (entry.getType()) {
             case RestrictionEntry.TYPE_BOOLEAN:
                 bundle.putBoolean(entry.getKey(), entry.getSelectedState());
                 break;
-            case RestrictionEntry.TYPE_CHOICE:
             case RestrictionEntry.TYPE_MULTI_SELECT:
                 bundle.putStringArray(entry.getKey(), entry.getAllSelectedStrings());
                 break;
@@ -69,14 +75,32 @@ public class RestrictionManagerCompat {
                 bundle.putInt(entry.getKey(), entry.getIntValue());
                 break;
             case RestrictionEntry.TYPE_STRING:
+                // UI uses value to find restriction type.
+                // If string restrictions has null value, it will be displayed as boolean
+                // To avoid this we should set empty string as value
+                String value = entry.getSelectedString();
+                if (value == null) {
+                    value = "";
+                }
+                bundle.putString(entry.getKey(), value);
+                break;
             case RestrictionEntry.TYPE_NULL:
                 bundle.putString(entry.getKey(), entry.getSelectedString());
                 break;
             case RestrictionEntry.TYPE_BUNDLE:
-                addBundleRestrictionToBundle(bundle, entry);
+                addBundleRestrictionToBundle(bundle, entry, saveChoiceDataForDialog);
                 break;
             case RestrictionEntry.TYPE_BUNDLE_ARRAY:
-                addBundleArrayRestrictionToBundle(bundle, entry);
+                addBundleArrayRestrictionToBundle(bundle, entry, saveChoiceDataForDialog);
+                break;
+            case RestrictionEntry.TYPE_CHOICE:
+                // For UI we are adding entries and values of Choice restriction
+                // For DevicePolicyManager we are saving selected string value only
+                if (saveChoiceDataForDialog) {
+                    bundle.putBundle(entry.getKey(), convertChoiceRestrictionToBundle(entry));
+                } else {
+                    bundle.putString(entry.getKey(), entry.getSelectedString());
+                }
                 break;
             default:
                 throw new IllegalArgumentException(
@@ -86,10 +110,10 @@ public class RestrictionManagerCompat {
     }
 
     @TargetApi(Build.VERSION_CODES.M)
-    private static void addBundleRestrictionToBundle(Bundle bundle, RestrictionEntry entry) {
+    private static void addBundleRestrictionToBundle(Bundle bundle, RestrictionEntry entry, boolean saveChoiceDataForDialog) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             RestrictionEntry[] restrictions = entry.getRestrictions();
-            Bundle childBundle = convertRestrictionsToBundle(Arrays.asList(restrictions));
+            Bundle childBundle = convertRestrictionsToBundle(Arrays.asList(restrictions), saveChoiceDataForDialog);
             bundle.putBundle(entry.getKey(), childBundle);
         } else {
             Log.w(TAG, "addBundleRestrictionToBundle is called in pre-M");
@@ -97,7 +121,7 @@ public class RestrictionManagerCompat {
     }
 
     @TargetApi(Build.VERSION_CODES.M)
-    private static void addBundleArrayRestrictionToBundle(Bundle bundle, RestrictionEntry entry) {
+    private static void addBundleArrayRestrictionToBundle(Bundle bundle, RestrictionEntry entry, boolean saveChoiceDataForDialog) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             RestrictionEntry[] bundleRestrictionArray = entry.getRestrictions();
             Bundle[] bundleArray = new Bundle[bundleRestrictionArray.length];
@@ -111,12 +135,28 @@ public class RestrictionManagerCompat {
                     bundleArray[i] = new Bundle();
                 } else {
                     bundleArray[i] = convertRestrictionsToBundle(Arrays.asList(
-                            bundleRestrictions));
+                            bundleRestrictions), saveChoiceDataForDialog);
                 }
             }
             bundle.putParcelableArray(entry.getKey(), bundleArray);
         } else {
             Log.w(TAG, "addBundleArrayRestrictionToBundle is called in pre-M");
         }
+    }
+
+    /*
+     * Saves Choice restriction data to Bundle for UI
+     * @param restrictionEntry Choice restriction entry
+     */
+    public static Bundle convertChoiceRestrictionToBundle(RestrictionEntry restrictionEntry) {
+        Bundle choiceData = new Bundle();
+
+        if (restrictionEntry != null) {
+            choiceData.putString(CHOICE_SELECTED_VALUE, restrictionEntry.getSelectedString());
+            choiceData.putStringArray(CHOICE_ENTRIES, restrictionEntry.getChoiceEntries());
+            choiceData.putStringArray(CHOICE_VALUES, restrictionEntry.getChoiceValues());
+        }
+
+        return choiceData;
     }
 }

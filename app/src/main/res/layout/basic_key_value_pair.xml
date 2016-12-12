@@ -116,6 +116,14 @@
                 android:paddingTop="8dp"
                 android:visibility="gone"/>
 
+            <Spinner
+                android:id="@+id/value_choice_spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:textAlignment="viewStart"
+                android:visibility="gone"/>
+
         <LinearLayout
                 android:id="@+id/value_str_array_container"
                 android:layout_width="match_parent"
