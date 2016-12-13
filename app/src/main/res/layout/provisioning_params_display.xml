@@ -66,6 +66,14 @@
                   android:visibility="gone"
                   android:layout_marginTop="@dimen/params_padding_top_bottom"
                   style="@style/containerText" />
+        <CheckBox android:id="@+id/skip_encryption"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="@string/skip_encryption"
+                  android:checked="false"
+                  android:visibility="gone"
+                  android:layout_marginTop="@dimen/params_padding_top_bottom"
+                  style="@style/containerText" />
     </LinearLayout>
 
 </LinearLayout>

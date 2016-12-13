@@ -19,6 +19,7 @@ package com.afwsamples.testdpc;
 import android.accounts.Account;
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.admin.DevicePolicyManager;
 import android.content.ClipData;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -74,6 +75,7 @@ public class SetupManagementFragment extends Fragment implements
     private RadioGroup mSetupOptions;
     private Button mNavigationNextButton;
     private CheckBox mSkipUserConsent;
+    private CheckBox mSkipEncryption;
     private CheckBox mKeepAccountMigrated;
     private ImageButton mParamsIndicator;
     private View mParamsView;
@@ -116,6 +118,7 @@ public class SetupManagementFragment extends Fragment implements
         mSetupOptions.setOnCheckedChangeListener(this);
         mSkipUserConsent = (CheckBox) view.findViewById(R.id.skip_user_consent);
         mKeepAccountMigrated = (CheckBox) view.findViewById(R.id.keep_account_migrated);
+        mSkipEncryption = (CheckBox) view.findViewById(R.id.skip_encryption);
 
         mParamsView = view.findViewById(R.id.params);
         mParamsIndicator = (ImageButton) view.findViewById(R.id.params_indicator);
@@ -189,11 +192,16 @@ public class SetupManagementFragment extends Fragment implements
     private void setProvisioningModeSpecificUI() {
         final int setUpOptionId = mSetupOptions.getCheckedRadioButtonId();
         final boolean isManagedProfileAction = setUpOptionId == R.id.setup_managed_profile;
+        final boolean isManagedDeviceAction = setUpOptionId == R.id.setup_device_owner;
         mSkipUserConsent.setVisibility(Util.isAtLeastO() && isManagedProfileAction &&
                 Util.isDeviceOwner(getActivity())
                 ? View.VISIBLE
                 : View.GONE);
         mKeepAccountMigrated.setVisibility(Util.isAtLeastO() && isManagedProfileAction
+                ? View.VISIBLE
+                : View.GONE);
+        mSkipEncryption.setVisibility((isManagedProfileAction && BuildCompat.isAtLeastN())
+                || (isManagedDeviceAction && Util.isAtLeastM())
                 ? View.VISIBLE
                 : View.GONE);
     }
@@ -217,6 +225,7 @@ public class SetupManagementFragment extends Fragment implements
         maybeSpecifySyncAuthExtras(intent);
         specifySkipUserConsent(intent);
         specifyKeepAccountMigrated(intent);
+        specifySkipEncryption(intent);
 
         if (intent.resolveActivity(activity.getPackageManager()) != null) {
             startActivityForResult(intent, requestCode);
@@ -282,6 +291,14 @@ public class SetupManagementFragment extends Fragment implements
                     mKeepAccountMigrated.isChecked());
         }
     }
+
+    private void specifySkipEncryption(Intent intent) {
+        if (mSkipEncryption.getVisibility() == View.VISIBLE) {
+            intent.putExtra(DevicePolicyManager.EXTRA_PROVISIONING_SKIP_ENCRYPTION,
+                    mSkipEncryption.isChecked());
+        }
+    }
+
 
     private void specifyLogoUri(Intent intent) {
         intent.putExtra(EXTRA_PROVISIONING_LOGO_URI, mLogoUri);
