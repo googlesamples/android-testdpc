@@ -14,4 +14,11 @@
             android:title="@string/hide_profile_launcher_icon"
             testdpc:admin="deviceOwner"
             testdpc:minSdkVersion="O"/>
+
+    <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="install_ca_cert"
+            android:selectable="true"
+            android:title="@string/install_ca_certificate"
+            testdpc:admin="deviceOwner"
+            testdpc:minSdkVersion="O"/>
 </PreferenceScreen>

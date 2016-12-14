@@ -27,6 +27,7 @@ import android.app.FragmentManager;
 import android.app.admin.DevicePolicyManager;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -200,7 +201,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final int CAPTURE_IMAGE_REQUEST_CODE = 7691;
     private static final int CAPTURE_VIDEO_REQUEST_CODE = 7692;
 
-    public static final int DEFAULT_BUFFER_SIZE = 4096;
     public static final String X509_CERT_TYPE = "X.509";
     public static final String TAG = "PolicyManagement";
 
@@ -608,13 +608,15 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 showFragment(new ManageAppPermissionsFragment());
                 return true;
             case INSTALL_KEY_CERTIFICATE_KEY:
-                showFileViewerForImportingCertificate(INSTALL_KEY_CERTIFICATE_REQUEST_CODE);
+                Util.showFileViewerForImportingCertificate(this,
+                        INSTALL_KEY_CERTIFICATE_REQUEST_CODE);
                 return true;
             case REMOVE_KEY_CERTIFICATE_KEY:
                 choosePrivateKeyForRemoval();
                 return true;
             case INSTALL_CA_CERTIFICATE_KEY:
-                showFileViewerForImportingCertificate(INSTALL_CA_CERTIFICATE_REQUEST_CODE);
+                Util.showFileViewerForImportingCertificate(this,
+                        INSTALL_CA_CERTIFICATE_REQUEST_CODE);
                 return true;
             case GET_CA_CERTIFICATES_KEY:
                 showCaCertificateList();
@@ -1545,19 +1547,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     }
 
     /**
-     * Shows the file viewer for importing a certificate.
-     */
-    private void showFileViewerForImportingCertificate(int requestCode) {
-        Intent certIntent = new Intent(Intent.ACTION_GET_CONTENT);
-        certIntent.setTypeAndNormalize("*/*");
-        try {
-            startActivityForResult(certIntent, requestCode);
-        } catch (ActivityNotFoundException e) {
-            Log.e(TAG, "showFileViewerForImportingCertificate: ", e);
-        }
-    }
-
-    /**
      * Imports a certificate to the managed profile. If the provided password failed to decrypt the
      * given certificate, shows a try again prompt. Otherwise, shows a prompt for the certificate
      * alias.
@@ -1731,21 +1720,13 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         }
         Uri data = null;
         if (intent != null && (data = intent.getData()) != null) {
+            ContentResolver cr = getActivity().getContentResolver();
             boolean isCaInstalled = false;
             try {
-                InputStream certificateInputStream = getActivity().getContentResolver()
-                        .openInputStream(data);
-                if (certificateInputStream != null) {
-                    ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
-                    byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
-                    int len = 0;
-                    while ((len = certificateInputStream.read(buffer)) > 0) {
-                        byteBuffer.write(buffer, 0, len);
-                    }
-                    isCaInstalled = mDevicePolicyManager.installCaCert(mAdminComponentName,
-                            byteBuffer.toByteArray());
-                }
-            } catch (IOException e) {
+                InputStream certificateInputStream = cr.openInputStream(data);
+                isCaInstalled = Util.installCaCertificate(certificateInputStream,
+                        mDevicePolicyManager, mAdminComponentName);
+            } catch (FileNotFoundException e) {
                 Log.e(TAG, "importCaCertificateFromIntent: ", e);
             }
             showToast(isCaInstalled ? R.string.install_ca_successfully : R.string.install_ca_fail);

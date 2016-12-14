@@ -23,13 +23,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.content.res.AssetFileDescriptor;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.os.UserHandle;
 import android.support.annotation.Nullable;
-
+import android.util.Log;
+import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.LaunchActivity;
+import com.afwsamples.testdpc.common.Util;
+import java.io.FileInputStream;
+import java.io.IOException;
 
 import static android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DEFAULT;
 import static android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
@@ -42,6 +47,7 @@ import static android.content.pm.PackageManager.DONT_KILL_APP;
  */
 public class ProfileOwnerService extends Service {
     private Binder mBinder;
+    private static final String TAG = "ProfileOwnerService";
 
     @Override
     public void onCreate() {
@@ -79,6 +85,17 @@ public class ProfileOwnerService extends Service {
             return mPm.getComponentEnabledSetting(
                     new ComponentName(mContext, LaunchActivity.class))
                     == COMPONENT_ENABLED_STATE_DISABLED;
+        }
+
+        @Override
+        public boolean installCaCertificate(AssetFileDescriptor afd) {
+            try (FileInputStream fis = afd.createInputStream()) {
+                return Util.installCaCertificate(fis, mDpm, DeviceAdminReceiver.getComponentName(
+                        mContext));
+            } catch (IOException e) {
+                Log.e(TAG, "Unable to install a certificate", e);
+                return false;
+            }
         }
     }
 }

@@ -16,20 +16,29 @@
 
 package com.afwsamples.testdpc.comp;
 
+import android.app.Activity;
 import android.app.admin.DevicePolicyManager;
+import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.res.AssetFileDescriptor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.ParcelFileDescriptor;
 import android.os.UserHandle;
 import android.os.UserManager;
 import android.support.annotation.StringRes;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.Preference.OnPreferenceChangeListener;
-
+import android.util.Log;
+import android.widget.Toast;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.BaseSearchablePolicyPreferenceFragment;
 import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.common.preference.CustomConstraint;
+import com.afwsamples.testdpc.common.preference.DpcPreference;
 import com.afwsamples.testdpc.common.preference.DpcSwitchPreference;
+import java.io.FileNotFoundException;
 
 import static com.afwsamples.testdpc.common.preference.DpcPreferenceHelper.NO_CUSTOM_CONSTRIANT;
 
@@ -38,13 +47,20 @@ import static com.afwsamples.testdpc.common.preference.DpcPreferenceHelper.NO_CU
  */
 public class CompSpecificFragment extends BaseSearchablePolicyPreferenceFragment
         implements OnPreferenceChangeListener {
+
+    private static final String TAG = "CompSpecificFragment";
+
     private static final String KEY_PROFILE_STATUS = "profile_status";
     private static final String KEY_HIDE_PROFILE_LAUNCHER_ICON = "hide_profile_launcher_icon";
+
+    private static final String KEY_INSTALL_CA_CERTIFICATE = "install_ca_cert";
+    private static final int INSTALL_CA_CERTIFICATE_REQUEST_CODE = 0;
 
     private UserManager mUserManager;
     private BindDeviceAdminServiceHelper<IProfileOwnerService> mBindDeviceAdminServiceHelper;
     private UserHandle mProfileUserHandle;
     private DpcSwitchPreference mHideLauncherIconPreference;
+    private DpcPreference mInstallCaCertificatePreference;
 
     @Override
     public int getPreferenceXml() {
@@ -76,6 +92,18 @@ public class CompSpecificFragment extends BaseSearchablePolicyPreferenceFragment
                 (DpcSwitchPreference) findPreference(KEY_HIDE_PROFILE_LAUNCHER_ICON);
         mHideLauncherIconPreference.setOnPreferenceChangeListener(this);
         mHideLauncherIconPreference.setCustomConstraint(userRunningConstraint);
+
+        mInstallCaCertificatePreference = (DpcPreference) findPreference(
+                KEY_INSTALL_CA_CERTIFICATE);
+        mInstallCaCertificatePreference.setCustomConstraint(userRunningConstraint);
+
+        mInstallCaCertificatePreference.setOnPreferenceClickListener(
+                preference -> {
+                    Util.showFileViewerForImportingCertificate(this,
+                            INSTALL_CA_CERTIFICATE_REQUEST_CODE);
+                    return true;
+                }
+        );
     }
 
     @Override
@@ -139,5 +167,35 @@ public class CompSpecificFragment extends BaseSearchablePolicyPreferenceFragment
     private void refresh() {
         refreshUserStatePreference();
         refreshLauncherIconHiddenPreference();
+        mInstallCaCertificatePreference.refreshEnabledState();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == INSTALL_CA_CERTIFICATE_REQUEST_CODE) {
+                Uri uri = null;
+                if (data != null && (uri = data.getData()) != null) {
+                    ContentResolver contentResolver = getActivity().getContentResolver();
+                    AssetFileDescriptor afd;
+                    try {
+                        afd = contentResolver.openAssetFileDescriptor(uri, "r");
+                    } catch (FileNotFoundException e) {
+                        Log.e(TAG, "Could not find certificate file", e);
+                        return;
+                    }
+                    mBindDeviceAdminServiceHelper.crossUserCall(service -> {
+                        boolean isCaInstalled = service.installCaCertificate(afd);
+                        String toastMessage = isCaInstalled ?
+                                getString(R.string.install_ca_successfully)
+                                : getString(R.string.install_ca_fail);
+                        getActivity().runOnUiThread(() -> Toast.makeText(getActivity(),
+                                toastMessage, Toast.LENGTH_SHORT).show());
+                        Toast.makeText(getActivity(), toastMessage, Toast.LENGTH_SHORT).show();
+                    });
+                }
+            }
+        }
     }
 }
