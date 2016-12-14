@@ -1,0 +1,6 @@
+<h1>TestDPC company</h1>
+<h3>This is TestDPC company disclaimer.</h3>
+<ul>
+<li>Item1</li>
+<li>Item2</li>
+</ul>
