@@ -28,6 +28,8 @@ import com.afwsamples.testdpc.cosu.EnableCosuActivity;
 public class LaunchIntentUtil {
     public static final String EXTRA_ACCOUNT_NAME = "account_name";
 
+    public static final String EXTRA_AFFILIATION_ID = "affiliation_id";
+
     private static final String EXTRA_IS_SETUP_WIZARD = "is_setup_wizard";
     private static final String EXTRA_ACCOUNT = "account";
 

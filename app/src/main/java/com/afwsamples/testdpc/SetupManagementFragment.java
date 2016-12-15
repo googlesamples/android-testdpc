@@ -17,10 +17,12 @@
 package com.afwsamples.testdpc;
 
 import android.accounts.Account;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.admin.DevicePolicyManager;
 import android.content.ClipData;
+import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -48,6 +50,9 @@ import com.afwsamples.testdpc.common.ProvisioningStateUtil;
 import com.afwsamples.testdpc.common.Util;
 import com.android.setupwizardlib.SetupWizardLayout;
 import com.android.setupwizardlib.view.NavigationBar;
+import java.security.SecureRandom;
+import java.util.Arrays;
+import java.util.List;
 
 import static android.app.admin.DevicePolicyManager.ACTION_PROVISION_MANAGED_DEVICE;
 import static android.app.admin.DevicePolicyManager.ACTION_PROVISION_MANAGED_PROFILE;
@@ -222,11 +227,16 @@ public class SetupManagementFragment extends Fragment implements
             // Unable to handle user-input - can't continue.
             return;
         }
-        maybeSpecifySyncAuthExtras(intent);
+        PersistableBundle adminExtras = new PersistableBundle();
+        maybeSpecifySyncAuthExtras(intent, adminExtras);
+        maybePassAffiliationIds(intent, adminExtras);
         specifySkipUserConsent(intent);
         specifyKeepAccountMigrated(intent);
         specifySkipEncryption(intent);
 
+        if (adminExtras.size() > 0) {
+            intent.putExtra(EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE, adminExtras);
+        }
         if (intent.resolveActivity(activity.getPackageManager()) != null) {
             startActivityForResult(intent, requestCode);
         } else {
@@ -235,7 +245,7 @@ public class SetupManagementFragment extends Fragment implements
         }
     }
 
-    private void maybeSpecifySyncAuthExtras(Intent intent) {
+    private void maybeSpecifySyncAuthExtras(Intent intent, PersistableBundle adminExtras) {
         Activity activity = getActivity();
         Intent launchIntent = activity.getIntent();
 
@@ -258,9 +268,32 @@ public class SetupManagementFragment extends Fragment implements
         }
 
         // Perculate launch intent extras through to DeviceAdminReceiver so they can be used there.
-        PersistableBundle adminExtras = new PersistableBundle();
         LaunchIntentUtil.prepareDeviceAdminExtras(launchIntent, adminExtras);
-        intent.putExtra(EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE, adminExtras);
+    }
+
+    private void maybePassAffiliationIds(Intent intent, PersistableBundle adminExtras) {
+        if (Util.isDeviceOwner(getActivity())
+                && ACTION_PROVISION_MANAGED_PROFILE.equals(intent.getAction())
+                && Util.isAtLeastO()) {
+            passAffiliationIds(intent, adminExtras);
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.O)
+    private void passAffiliationIds(Intent intent, PersistableBundle adminExtras) {
+        ComponentName admin = DeviceAdminReceiver.getComponentName(getActivity());
+        DevicePolicyManager dpm = (DevicePolicyManager)
+                getActivity().getSystemService(Context.DEVICE_POLICY_SERVICE);
+        List<String> ids = dpm.getAffiliationIds(admin);
+        String affiliationId = null;
+        if (ids.size() == 0) {
+            SecureRandom randomGenerator = new SecureRandom();
+            affiliationId = Integer.toString(randomGenerator.nextInt(1000000));
+            dpm.setAffiliationIds(admin, Arrays.asList(affiliationId));
+        } else {
+            affiliationId = ids.get(0);
+        }
+        adminExtras.putString(LaunchIntentUtil.EXTRA_AFFILIATION_ID, affiliationId);
     }
 
     /**
