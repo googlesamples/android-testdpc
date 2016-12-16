@@ -466,8 +466,19 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
         return new ComponentName(context.getApplicationContext(), DeviceAdminReceiver.class);
     }
 
+    @Deprecated
     @Override
     public void onPasswordExpiring(Context context, Intent intent) {
+        onPasswordExpiring(context, intent, Process.myUserHandle());
+    }
+
+    @TargetApi(Build.VERSION_CODES.O)
+    // @Override
+    public void onPasswordExpiring(Context context, Intent intent, UserHandle user) {
+        if (!Process.myUserHandle().equals(user)) {
+            // This password expiration was on another user, for example a parent profile. Skip it.
+            return;
+        }
         DevicePolicyManager devicePolicyManager = (DevicePolicyManager) context.getSystemService(
                 Context.DEVICE_POLICY_SERVICE);
 
@@ -483,8 +494,19 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
                 Util.PASSWORD_EXPIRATION_NOTIFICATION_ID);
     }
 
+    @Deprecated
     @Override
     public void onPasswordFailed(Context context, Intent intent) {
+        onPasswordFailed(context, intent, Process.myUserHandle());
+    }
+
+    @TargetApi(Build.VERSION_CODES.O)
+    // @Override
+    public void onPasswordFailed(Context context, Intent intent, UserHandle user) {
+        if (!Process.myUserHandle().equals(user)) {
+            // This password failure was on another user, for example a parent profile. Ignore it.
+            return;
+        }
         DevicePolicyManager devicePolicyManager = (DevicePolicyManager) context.getSystemService(
                 Context.DEVICE_POLICY_SERVICE);
         /*
@@ -535,10 +557,34 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
         nm.notify(PASSWORD_FAILED_NOTIFICATION_ID, warn.getNotification());
     }
 
+    @Deprecated
     @Override
     public void onPasswordSucceeded(Context context, Intent intent) {
-        logFile(context).delete();
+        onPasswordSucceeded(context, intent, Process.myUserHandle());
     }
+
+    @TargetApi(Build.VERSION_CODES.O)
+    // @Override
+    public void onPasswordSucceeded(Context context, Intent intent, UserHandle user) {
+        if (Process.myUserHandle().equals(user)) {
+            logFile(context).delete();
+        }
+    }
+
+    @Deprecated
+    @Override
+    public void onPasswordChanged(Context context, Intent intent) {
+        onPasswordChanged(context, intent, Process.myUserHandle());
+    }
+
+    @TargetApi(Build.VERSION_CODES.O)
+    // @Override
+    public void onPasswordChanged(Context context, Intent intent, UserHandle user) {
+        if (Process.myUserHandle().equals(user)) {
+            updatePasswordQualityNotification(context);
+        }
+    }
+
 
     private static File logFile(Context context) {
         File parent = context.getDir(LOGS_DIR, Context.MODE_PRIVATE);
@@ -596,11 +642,6 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
         }
 
         bw.close();
-    }
-
-    @Override
-    public void onPasswordChanged(Context context, Intent intent) {
-        updatePasswordQualityNotification(context);
     }
 
     private static void updatePasswordQualityNotification(Context context) {
