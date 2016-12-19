@@ -305,6 +305,7 @@
     <string name="disallow_add_user">Disallow add user</string>
     <string name="disallow_adjust_volume">Disallow adjust volume</string>
     <string name="disallow_apps_control">Disallow apps control</string>
+    <string name="disallow_bluetooth">Disallow bluetooth</string>
     <string name="disallow_config_bluetooth">Disallow config bluetooth</string>
     <string name="disallow_config_cell_broadcasts">Disallow config cell broadcasts</string>
     <string name="disallow_config_credentials">Disallow config credentials</string>

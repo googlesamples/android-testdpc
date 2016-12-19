@@ -20,6 +20,7 @@ import static android.os.UserManager.ALLOW_PARENT_PROFILE_APP_LINKING;
 import static android.os.UserManager.DISALLOW_ADD_USER;
 import static android.os.UserManager.DISALLOW_ADJUST_VOLUME;
 import static android.os.UserManager.DISALLOW_APPS_CONTROL;
+import static android.os.UserManager.DISALLOW_BLUETOOTH;
 import static android.os.UserManager.DISALLOW_CONFIG_BLUETOOTH;
 import static android.os.UserManager.DISALLOW_CONFIG_CELL_BROADCASTS;
 import static android.os.UserManager.DISALLOW_CONFIG_CREDENTIALS;
@@ -84,6 +85,7 @@ public class UserRestrictionsDisplayFragment extends PreferenceFragment
             new UserRestriction(DISALLOW_ADD_USER, R.string.disallow_add_user),
             new UserRestriction(DISALLOW_ADJUST_VOLUME, R.string.disallow_adjust_volume),
             new UserRestriction(DISALLOW_APPS_CONTROL, R.string.disallow_apps_control),
+            new UserRestriction(DISALLOW_BLUETOOTH, R.string.disallow_bluetooth),
             new UserRestriction(DISALLOW_CONFIG_BLUETOOTH, R.string.disallow_config_bluetooth),
             new UserRestriction(DISALLOW_CONFIG_CELL_BROADCASTS,
                     R.string.disallow_config_cell_broadcasts),
@@ -128,6 +130,7 @@ public class UserRestrictionsDisplayFragment extends PreferenceFragment
     private static final String[] PRIMARY_USER_ONLY_RESTRICTIONS = {
             DISALLOW_ADD_USER,
             DISALLOW_ADJUST_VOLUME,
+            DISALLOW_BLUETOOTH,
             DISALLOW_CONFIG_BLUETOOTH,
             DISALLOW_CONFIG_CELL_BROADCASTS,
             DISALLOW_CONFIG_MOBILE_NETWORKS,
@@ -174,6 +177,10 @@ public class UserRestrictionsDisplayFragment extends PreferenceFragment
             DISALLOW_DATA_ROAMING,
             DISALLOW_SET_USER_ICON,
             DISALLOW_SET_WALLPAPER
+    };
+
+    private static String[] OC_PLUS_RESTRICTIONS = {
+            DISALLOW_BLUETOOTH
     };
 
     public static UserRestrictionsDisplayFragment newInstance() {
@@ -261,6 +268,10 @@ public class UserRestrictionsDisplayFragment extends PreferenceFragment
         for (String restriction : NYC_PLUS_RESTRICTIONS) {
             DpcPreferenceBase pref = (DpcPreferenceBase) findPreference(restriction);
             pref.setMinSdkVersion(Build.VERSION_CODES.N);
+        }
+        for (String restriction : OC_PLUS_RESTRICTIONS) {
+            DpcPreferenceBase pref = (DpcPreferenceBase) findPreference(restriction);
+            pref.setMinSdkVersion(Build.VERSION_CODES.O);
         }
         for (String restriction : PRIMARY_USER_ONLY_RESTRICTIONS) {
             DpcPreferenceBase pref = (DpcPreferenceBase) findPreference(restriction);
