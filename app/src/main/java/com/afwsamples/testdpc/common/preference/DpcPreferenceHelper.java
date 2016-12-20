@@ -86,22 +86,14 @@ public class DpcPreferenceHelper {
     private @UserKind int mUserConstraint;
 
     /**
-     * Magic number to represent the SDK int of the next release before it has been added to
-     * {@link Build.VERSION_CODES}.
-     *
-     * This value can be used in attrs.xml as a value for minSdkVersion if the version has not yet
-     * been assigned an SDK version.
-     */
-    public static final int PREVIEW_SDK_INT = 9999;
-
-    /**
      * Update this method as {@link Build.VERSION_CODES} and Android releases are updated.
      *
-     * @return The version SDK int or {@link #PREVIEW_SDK_INT} if the SDK int is not yet assigned.
+     * @return The version SDK int or {@link Build.VERSION_CODES.CUR_DEVELOPMENT} if the SDK int is
+     *         not yet assigned.
      */
     private int getDeviceSdkInt() {
         if (Util.isAtLeastO()) {
-            return PREVIEW_SDK_INT;
+            return Build.VERSION_CODES.O;
         }
         return Build.VERSION.SDK_INT;
     }
@@ -227,7 +219,7 @@ public class DpcPreferenceHelper {
      */
     private CharSequence findConstraintViolation() {
         if (getDeviceSdkInt() < mMinSdkVersion) {
-            if (mMinSdkVersion == PREVIEW_SDK_INT) {
+            if (mMinSdkVersion == Build.VERSION_CODES.O) {
                 return mContext.getString(R.string.requires_preview_release);
             }
             return mContext.getString(R.string.requires_android_api_level, mMinSdkVersion);
