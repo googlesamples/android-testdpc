@@ -494,6 +494,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     }
 
     @Override
+    @TargetApi(Build.VERSION_CODES.N)
     public boolean onPreferenceClick(Preference preference) {
         String key = preference.getKey();
         switch (key) {
@@ -728,14 +729,47 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     @TargetApi(Build.VERSION_CODES.N)
     private void lockNow() {
         if (BuildCompat.isAtLeastN() && Util.isManagedProfile(getActivity())) {
-            // In N for work profiles we should call lockNow on the parent instance to
-            // lock the device.
-            DevicePolicyManager parentDpm
-                    = mDevicePolicyManager.getParentProfileInstance(mAdminComponentName);
-            parentDpm.lockNow();
+            showLockNowPrompt();
         } else {
             mDevicePolicyManager.lockNow();
         }
+    }
+
+    /**
+     * Shows a prompt to ask for any flags to pass to lockNow.
+     */
+    @TargetApi(Build.VERSION_CODES.N)
+    private void showLockNowPrompt() {
+        final LayoutInflater inflater = getActivity().getLayoutInflater();
+        final View dialogView = inflater.inflate(R.layout.lock_now_dialog_prompt, null);
+        final CheckBox lockParentCheckBox
+                = (CheckBox) dialogView.findViewById(R.id.evict_key_checkbox);
+        final CheckBox evictKeyCheckBox
+                = (CheckBox) dialogView.findViewById(R.id.lock_parent_checkbox);
+
+        if (!Util.isAtLeastO()) {
+            evictKeyCheckBox.setEnabled(false);
+            evictKeyCheckBox.setText(evictKeyCheckBox.getText() + " (" + getActivity().getString(
+                    R.string.requires_android_api_level, Build.VERSION_CODES.O) + ")");
+        }
+
+        new AlertDialog.Builder(getActivity())
+                .setTitle(R.string.lock_now)
+                .setView(dialogView)
+                .setPositiveButton(android.R.string.ok, (DialogInterface d, int i) -> {
+                    final int flags = (evictKeyCheckBox.isChecked() ? ReflectionUtil.intConstant(
+                            DevicePolicyManager.class, "FLAG_EVICT_CE_KEY") : 0);
+                    final DevicePolicyManager dpm = lockParentCheckBox.isChecked()
+                            ? mDevicePolicyManager.getParentProfileInstance(mAdminComponentName)
+                            : mDevicePolicyManager;
+                    if (Util.isAtLeastO()) {
+                        ReflectionUtil.invoke(dpm, "lockNow", new Class<?>[]{int.class}, flags);
+                    } else {
+                        dpm.lockNow();
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
     }
 
     @Override

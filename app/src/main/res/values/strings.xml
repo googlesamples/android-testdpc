@@ -170,6 +170,8 @@
     <string name="profile_management_title">Work profile management</string>
     <string name="remove_managed_profile">Remove work profile</string>
     <string name="removing_managed_profile">Removing work profile</string>
+    <string name="lock_parent_key">Lock parent</string>
+    <string name="evict_ce_key">Evict CE key</string>
 
     <!-- Strings for cross-profile widget provider -->
     <string name="cross_profile_widget_providers_title">Cross-profile widget providers</string>
