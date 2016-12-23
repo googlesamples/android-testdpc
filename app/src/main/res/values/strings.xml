@@ -302,6 +302,7 @@
     <string name="user_restrictions_preference_title">Set user restrictions</string>
     <string name="user_restrictions_management_title">User restrictions</string>
     <string name="allow_parent_profile_app_linking">Allow web links to apps of the parent</string>
+    <string name="disallow_add_managed_profile">Disallow add managed profile</string>
     <string name="disallow_add_user">Disallow add user</string>
     <string name="disallow_adjust_volume">Disallow adjust volume</string>
     <string name="disallow_apps_control">Disallow apps control</string>
@@ -330,6 +331,7 @@
     <string name="disallow_network_reset">Disallow network reset</string>
     <string name="disallow_outgoing_beam">Disallow outgoing beam</string>
     <string name="disallow_outgoing_calls">Disallow outgoing calls</string>
+    <string name="disallow_remove_managed_profile">Disallow remove managed profile</string>
     <string name="disallow_remove_user">Disallow remove user</string>
     <string name="disallow_safe_boot">Disallow safe boot</string>
     <string name="disallow_set_user_icon">Disallow set user icon</string>
