@@ -35,6 +35,8 @@ import android.os.Build;
 import android.os.ParcelFileDescriptor;
 import android.os.PersistableBundle;
 import android.os.Process;
+import android.os.UserHandle;
+import android.os.UserManager;
 import android.preference.PreferenceManager;
 import android.support.v4.os.BuildCompat;
 import android.text.TextUtils;
@@ -263,6 +265,30 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
         Util.showNotification(context, R.string.bugreport_title,
                 context.getString(R.string.bugreport_failure_message, failureReason),
                 Util.BUGREPORT_NOTIFICATION_ID);
+    }
+
+
+    @TargetApi(Build.VERSION_CODES.O)
+    @Override
+    public void onUserAdded(Context context, Intent intent, UserHandle newUser) {
+        UserManager userManager = (UserManager) context.getSystemService(Context.USER_SERVICE);
+        String message = context.getString(R.string.on_user_added_message,
+                userManager.getSerialNumberForUser(newUser));
+        Log.i(TAG, message);
+        Util.showNotification(context, R.string.on_user_added_title,
+                message,
+                Util.USER_ADDED_NOTIFICATION_ID);
+    }
+
+    @TargetApi(Build.VERSION_CODES.O)
+    @Override
+    public void onUserRemoved(Context context, Intent intent, UserHandle removedUser) {
+        UserManager userManager = (UserManager) context.getSystemService(Context.USER_SERVICE);
+        String message = context.getString(R.string.on_user_removed_message,
+                userManager.getSerialNumberForUser(removedUser));
+        Log.i(TAG, message);
+        Util.showNotification(context, R.string.on_user_removed_title, message,
+                Util.USER_REMOVED_NOTIFICATION_ID);
     }
 
     @TargetApi(Build.VERSION_CODES.M)

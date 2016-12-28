@@ -470,6 +470,10 @@
     <string name="enter_user_id">Enter a user serial number</string>
     <string name="user_removed">User removed.</string>
     <string name="failed_to_remove_user">Failed to remove user.</string>
+    <string name="on_user_added_title">User Created</string>
+    <string name="on_user_removed_title">User Removed</string>
+    <string name="on_user_added_message">User created with serial number %1$d.</string>
+    <string name="on_user_removed_message">User with serial number %1$d removed.</string>
 
     <!-- Strings for block uninstall -->
     <string name="block_uninstallation_title">Block uninstallation</string>
