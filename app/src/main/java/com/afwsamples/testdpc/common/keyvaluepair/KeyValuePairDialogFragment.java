@@ -22,6 +22,7 @@ import android.app.DialogFragment;
 import android.app.Fragment;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.RestrictionEntry;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -43,7 +44,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afwsamples.testdpc.R;
-import com.afwsamples.testdpc.common.RestrictionManagerCompat;
 import com.afwsamples.testdpc.common.StringArrayTypeInputAdapter;
 
 import java.util.ArrayList;
@@ -63,12 +63,12 @@ public class KeyValuePairDialogFragment extends DialogFragment {
     static final String ARG_INITIAL_VALUE = "initial_value";
     static final String ARG_SUPPORTED_TYPE = "supported_type";
     static final String ARG_APP_NAME = "app_name";
-    static final String ARG_CHOICE_ENTRIES= "choice_entries";
-    static final String ARG_CHOICE_VALUES= "choice_values";
+    static final String ARG_RESTRICTION_ENTRY = "restriction_entry";
 
     public static final String RESULT_KEY = "key";
     public static final String RESULT_VALUE = "value";
     public static final String RESULT_TYPE = "type";
+    public static final String RESULT_ENTRY = "entry";
 
     private EditText mKeyView;
     private Switch mBoolView;
@@ -88,6 +88,7 @@ public class KeyValuePairDialogFragment extends DialogFragment {
     private String mAppName;
     private String[] mChoiceEntries;
     private String[] mChoiceValues;
+    private RestrictionEntry mRestrictionEntry;
 
     public interface DialogType {
         int BOOL_TYPE = 0;
@@ -115,13 +116,16 @@ public class KeyValuePairDialogFragment extends DialogFragment {
             new BundleArrayButtonOnClickListener();
 
     public static KeyValuePairDialogFragment newInstance(int dialogType, boolean canEditKey,
-            String key, Object value, int[] supportedType, String appName) {
+            String key, Object value, RestrictionEntry entry, int[] supportedType,
+            String appName) {
         KeyValuePairDialogFragment fragment = new KeyValuePairDialogFragment();
         Bundle argument = new Bundle();
         argument.putInt(ARG_DIALOG_TYPE, dialogType);
         argument.putBoolean(ARG_CAN_EDIT_KEY, canEditKey);
         argument.putString(ARG_KEY, key);
-        if (value != null) {
+        if (entry != null) {
+            argument.putParcelable(ARG_RESTRICTION_ENTRY, entry);
+        } else if (value != null) {
             switch (dialogType) {
                 case DialogType.BOOL_TYPE:
                     argument.putBoolean(ARG_INITIAL_VALUE, (boolean) value);
@@ -130,6 +134,7 @@ public class KeyValuePairDialogFragment extends DialogFragment {
                     argument.putInt(ARG_INITIAL_VALUE, (int) value);
                     break;
                 case DialogType.STRING_TYPE:
+                case DialogType.CHOICE_TYPE:
                     argument.putString(ARG_INITIAL_VALUE, (String) value);
                     break;
                 case DialogType.STRING_ARRAY_TYPE:
@@ -140,14 +145,6 @@ public class KeyValuePairDialogFragment extends DialogFragment {
                     break;
                 case DialogType.BUNDLE_ARRAY_TYPE:
                     argument.putParcelableArray(ARG_INITIAL_VALUE, (Bundle[]) value);
-                    break;
-                case DialogType.CHOICE_TYPE:
-                    argument.putString(ARG_INITIAL_VALUE,
-                            ((Bundle) value).getString(RestrictionManagerCompat.CHOICE_SELECTED_VALUE));
-                    argument.putStringArray(ARG_CHOICE_ENTRIES,
-                            ((Bundle) value).getStringArray(RestrictionManagerCompat.CHOICE_ENTRIES));
-                    argument.putStringArray(ARG_CHOICE_VALUES,
-                            ((Bundle) value).getStringArray(RestrictionManagerCompat.CHOICE_VALUES));
                     break;
             }
         }
@@ -205,7 +202,7 @@ public class KeyValuePairDialogFragment extends DialogFragment {
                                 Intent result = new Intent();
                                 result.putExtra(RESULT_TYPE, mDialogType);
                                 result.putExtra(RESULT_KEY, key);
-                                boolean valid = putValueFromUiToResultIntent(result);
+                                boolean valid = putValueFromUiToResultIntent(result, key);
                                 if (valid) {
                                     getTargetFragment().onActivityResult(getTargetRequestCode(),
                                             Activity.RESULT_OK, result);
@@ -220,39 +217,97 @@ public class KeyValuePairDialogFragment extends DialogFragment {
         return dialog;
     }
 
-    private boolean putValueFromUiToResultIntent(Intent result) {
+    private boolean putValueFromUiToResultIntent(Intent result, String key) {
         switch (mDialogType) {
             case DialogType.BOOL_TYPE:
-                result.putExtra(RESULT_VALUE, mBoolView.isChecked());
+                if (mRestrictionEntry != null) {
+                    if (mRestrictionEntry.getType() != RestrictionEntry.TYPE_BOOLEAN
+                            || !key.equals(mRestrictionEntry.getKey())) {
+                        mRestrictionEntry = new RestrictionEntry(RestrictionEntry.TYPE_BOOLEAN,key);
+                    }
+                    mRestrictionEntry.setSelectedState(mBoolView.isChecked());
+                    result.putExtra(RESULT_ENTRY, mRestrictionEntry);
+                } else {
+                    result.putExtra(RESULT_VALUE, mBoolView.isChecked());
+                }
                 return true;
             case DialogType.INT_TYPE:
+                int intResult = 0;
                 try {
-                    result.putExtra(RESULT_VALUE, Integer.valueOf(mIntView.getText().toString()));
+                    intResult = Integer.valueOf(mIntView.getText().toString());
                 } catch (NumberFormatException ex) {
                     return false;
                 }
+                if (mRestrictionEntry != null) {
+                    if (mRestrictionEntry.getType() != RestrictionEntry.TYPE_INTEGER
+                            || !key.equals(mRestrictionEntry.getKey())) {
+                        mRestrictionEntry = new RestrictionEntry(RestrictionEntry.TYPE_INTEGER,key);
+                    }
+                    mRestrictionEntry.setIntValue(intResult);
+                    result.putExtra(RESULT_ENTRY, mRestrictionEntry);
+                } else {
+                    result.putExtra(RESULT_VALUE, intResult);
+                }
                 return true;
             case DialogType.STRING_TYPE:
-                result.putExtra(RESULT_VALUE, mStringView.getText().toString());
+                if (mRestrictionEntry != null) {
+                    if (mRestrictionEntry.getType() != RestrictionEntry.TYPE_STRING
+                            || !key.equals(mRestrictionEntry.getKey())) {
+                        mRestrictionEntry = new RestrictionEntry(RestrictionEntry.TYPE_STRING, key);
+                    }
+                    mRestrictionEntry.setSelectedString(mStringView.getText().toString());
+                    result.putExtra(RESULT_ENTRY, mRestrictionEntry);
+                } else {
+                    result.putExtra(RESULT_VALUE, mStringView.getText().toString());
+                }
                 return true;
             case DialogType.STRING_ARRAY_TYPE:
-                result.putExtra(RESULT_VALUE, mStringArrayAdapter.getStringList().toArray(new
-                        String[0]));
+                if (mRestrictionEntry != null) {
+                    if (mRestrictionEntry.getType() != RestrictionEntry.TYPE_MULTI_SELECT
+                            || !key.equals(mRestrictionEntry.getKey())) {
+                        mRestrictionEntry = new RestrictionEntry(RestrictionEntry.TYPE_MULTI_SELECT,
+                            key);
+                    }
+                    mRestrictionEntry.setAllSelectedStrings(mStringArrayAdapter.getStringList()
+                        .toArray(new String[0]));
+                    result.putExtra(RESULT_ENTRY, mRestrictionEntry);
+                } else {
+                    result.putExtra(RESULT_VALUE, mStringArrayAdapter.getStringList().toArray(new
+                            String[0]));
+                }
                 return true;
             case DialogType.BUNDLE_TYPE:
-                Bundle initialBundle = getArguments().getBundle(ARG_INITIAL_VALUE);
-                if (initialBundle == null) {
-                    initialBundle = new Bundle();
+                if (mRestrictionEntry != null) {
+                    if (mRestrictionEntry.getType() != RestrictionEntry.TYPE_BUNDLE
+                            || !key.equals(mRestrictionEntry.getKey())) {
+                        mRestrictionEntry = KeyValueUtil.createBundleRestriction(key,
+                            new RestrictionEntry[0]);
+                    }
+                    result.putExtra(RESULT_ENTRY, mRestrictionEntry);
+                } else {
+                    Bundle initialBundle = getArguments().getBundle(ARG_INITIAL_VALUE);
+                    if (initialBundle == null) {
+                        initialBundle = new Bundle();
+                    }
+                    result.putExtra(RESULT_VALUE, initialBundle);
                 }
-                result.putExtra(RESULT_VALUE, initialBundle);
                 return true;
             case DialogType.BUNDLE_ARRAY_TYPE:
-                Parcelable[] initialBundleArray =
-                        getArguments().getParcelableArray(ARG_INITIAL_VALUE);
-                if (initialBundleArray == null) {
-                    initialBundleArray = new Bundle[0];
+                if (mRestrictionEntry != null) {
+                    if (mRestrictionEntry.getType() != RestrictionEntry.TYPE_BUNDLE_ARRAY
+                            || !key.equals(mRestrictionEntry.getKey())) {
+                        mRestrictionEntry = KeyValueUtil.createBundleArrayRestriction(key,
+                            new RestrictionEntry[0]);
+                    }
+                    result.putExtra(RESULT_ENTRY, mRestrictionEntry);
+                } else {
+                    Parcelable[] initialBundleArray =
+                            getArguments().getParcelableArray(ARG_INITIAL_VALUE);
+                    if (initialBundleArray == null) {
+                        initialBundleArray = new Bundle[0];
+                    }
+                    result.putExtra(RESULT_VALUE, initialBundleArray);
                 }
-                result.putExtra(RESULT_VALUE, initialBundleArray);
                 return true;
             case DialogType.CHOICE_TYPE:
                 String value = "";
@@ -260,7 +315,16 @@ public class KeyValuePairDialogFragment extends DialogFragment {
                 if (mChoiceValues != null && selectedPosition < mChoiceValues.length) {
                     value = mChoiceValues[selectedPosition];
                 }
-                result.putExtra(RESULT_VALUE, value);
+                if (mRestrictionEntry != null) {
+                    if (mRestrictionEntry.getType() != RestrictionEntry.TYPE_CHOICE
+                            || !key.equals(mRestrictionEntry.getKey())) {
+                        mRestrictionEntry = new RestrictionEntry(RestrictionEntry.TYPE_CHOICE, key);
+                    }
+                    mRestrictionEntry.setSelectedString(value);
+                    result.putExtra(RESULT_ENTRY, mRestrictionEntry);
+                } else {
+                    result.putExtra(RESULT_VALUE, value);
+                }
                 return true;
         }
         return false;
@@ -306,17 +370,23 @@ public class KeyValuePairDialogFragment extends DialogFragment {
         configureKeyView(arguments.getBoolean(ARG_CAN_EDIT_KEY), arguments.getString(ARG_KEY));
         setSupportedType(arguments.getIntArray(ARG_SUPPORTED_TYPE));
         setDialogType(arguments.getInt(ARG_DIALOG_TYPE));
+        mRestrictionEntry = arguments.getParcelable(ARG_RESTRICTION_ENTRY);
         if (mDialogType == DialogType.CHOICE_TYPE) {
-            configureChoiceSpinner(arguments.getStringArray(ARG_CHOICE_ENTRIES),
-                    arguments.getStringArray(ARG_CHOICE_VALUES));
+            configureChoiceSpinner();
         }
-        populateInitialValue(arguments.get(ARG_INITIAL_VALUE));
+        if (mRestrictionEntry != null) {
+            populateInitialValueFromEntry(mRestrictionEntry);
+        } else {
+            populateInitialValue(arguments.get(ARG_INITIAL_VALUE));
+        }
         mAppName = arguments.getString(ARG_APP_NAME);
     }
 
-    private void configureChoiceSpinner(String[] choiceEntries, String[] choiceValues) {
-        mChoiceEntries = choiceEntries;
-        mChoiceValues = choiceValues;
+    private void configureChoiceSpinner() {
+        if (mRestrictionEntry != null) {
+            mChoiceEntries = mRestrictionEntry.getChoiceEntries();
+            mChoiceValues = mRestrictionEntry.getChoiceValues();
+        }
 
         if (mChoiceEntries == null) {
             mChoiceEntries = new String[]{""};
@@ -420,20 +490,56 @@ public class KeyValuePairDialogFragment extends DialogFragment {
                 bundleArrayButtonOnClickListener.setBundleArray((Bundle[]) initialValue);
                 break;
             case DialogType.CHOICE_TYPE:
-                mChoiceSpinner.setSelection(findInitialPositionForChoiceSpinner((String) initialValue));
+                int position = findInitialPositionForChoiceSpinner((String) initialValue);
+                if (position > 0) {
+                    mChoiceSpinner.setSelection(position);
+                }
+                break;
+        }
+    }
+
+    private void populateInitialValueFromEntry(final RestrictionEntry entry) {
+        if (entry == null) {
+            return;
+        }
+        switch (mDialogType) {
+            case DialogType.BOOL_TYPE:
+                mBoolView.setChecked(entry.getSelectedState());
+                break;
+            case DialogType.INT_TYPE:
+                mIntView.setText(String.valueOf(entry.getIntValue()));
+                break;
+            case DialogType.STRING_TYPE:
+                mStringView.setText(entry.getSelectedString());
+                break;
+            case DialogType.STRING_ARRAY_TYPE:
+                mStringArrayAdapter.setStringList(new ArrayList<>(Arrays.asList(
+                        entry.getAllSelectedStrings())));
+                break;
+            case DialogType.BUNDLE_TYPE:
+            case DialogType.BUNDLE_ARRAY_TYPE:
+                // No need to initialize Bundle and BundleArray, we will use mRestrictionEntry
+                break;
+            case DialogType.CHOICE_TYPE:
+                int position = findInitialPositionForChoiceSpinner(entry.getSelectedString());
+                if (position > 0) {
+                    mChoiceSpinner.setSelection(position);
+                }
                 break;
         }
     }
 
     private int findInitialPositionForChoiceSpinner(String intialValue) {
-        int position = 0;
-
+        int position = -1;
         if (mChoiceValues != null && intialValue != null) {
+            position = 0;
             while (position < mChoiceValues.length && !intialValue.equals(mChoiceValues[position])) {
                 position++;
             }
         }
-
+        if (position >= mChoiceValues.length) {
+            position = -1;
+        }
         return position;
     }
 
@@ -465,7 +571,8 @@ public class KeyValuePairDialogFragment extends DialogFragment {
                 showToast(R.string.key_empty_error);
                 return;
             }
-            Fragment fragment = KeyValueBundleFragment.newInstance(key, mBundle, mAppName);
+            Fragment fragment = KeyValueBundleFragment.newInstance(key, mBundle, mRestrictionEntry,
+                    mAppName);
             showFragmentForFurtherInput(fragment);
         }
     }
@@ -484,7 +591,7 @@ public class KeyValuePairDialogFragment extends DialogFragment {
                 return;
             }
             Fragment fragment = KeyValueBundleArrayFragment.newInstance(key,
-                    mBundles, mAppName);
+                    mBundles, mRestrictionEntry, mAppName);
             showFragmentForFurtherInput(fragment);
         }
     }

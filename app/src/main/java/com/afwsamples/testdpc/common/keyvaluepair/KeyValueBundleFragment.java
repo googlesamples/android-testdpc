@@ -19,6 +19,7 @@ package com.afwsamples.testdpc.common.keyvaluepair;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.RestrictionEntry;
 import android.content.pm.ApplicationInfo;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -30,11 +31,9 @@ import android.widget.BaseAdapter;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.EditDeleteArrayAdapter;
 import com.afwsamples.testdpc.common.ManageAppFragment;
-import com.afwsamples.testdpc.common.RestrictionManagerCompat;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.afwsamples.testdpc.common.EditDeleteArrayAdapter.OnDeleteButtonClickListener;
@@ -43,7 +42,10 @@ import static com.afwsamples.testdpc.common.keyvaluepair.KeyValuePairDialogFragm
 import static com.afwsamples.testdpc.common.keyvaluepair.KeyValuePairDialogFragment
         .ARG_INITIAL_VALUE;
 import static com.afwsamples.testdpc.common.keyvaluepair.KeyValuePairDialogFragment.ARG_KEY;
+import static com.afwsamples.testdpc.common.keyvaluepair.KeyValuePairDialogFragment
+        .ARG_RESTRICTION_ENTRY;
 import static com.afwsamples.testdpc.common.keyvaluepair.KeyValuePairDialogFragment.DialogType;
+import static com.afwsamples.testdpc.common.keyvaluepair.KeyValuePairDialogFragment.RESULT_ENTRY;
 import static com.afwsamples.testdpc.common.keyvaluepair.KeyValuePairDialogFragment.RESULT_KEY;
 import static com.afwsamples.testdpc.common.keyvaluepair.KeyValuePairDialogFragment.RESULT_TYPE;
 import static com.afwsamples.testdpc.common.keyvaluepair.KeyValuePairDialogFragment.RESULT_VALUE;
@@ -67,7 +69,12 @@ public class KeyValueBundleFragment extends ManageAppFragment implements
      * Key of entry that is currently editing.
      */
     private String mEditingKey;
+    private RestrictionEntry mEditingRestrictionEntry;
     private String mAppName;
+    private RestrictionEntry mRestrictionEntry;
+    private ArrayList<RestrictionEntry> mBundleRestrictions;
+    private ArrayList<RestrictionEntry> mInitialBundleRestrictions;
+
     List<String> mKeyList;
 
     private static final int RESULT_CODE_EDIT_DIALOG = 1;
@@ -86,11 +93,13 @@ public class KeyValueBundleFragment extends ManageAppFragment implements
      * @param key key of the bundle. Can be null if not needed.
      * @param bundle initial value of the bundle for editing.
      */
-    public static KeyValueBundleFragment newInstance(String key, Bundle bundle, String appName) {
+    public static KeyValueBundleFragment newInstance(String key, Bundle bundle,
+        RestrictionEntry entry, String appName) {
         Bundle arguments = new Bundle();
         arguments.putString(ARG_KEY, key);
         arguments.putBundle(ARG_INITIAL_VALUE, bundle);
         arguments.putString(ARG_APP_NAME, appName);
+        arguments.putParcelable(ARG_RESTRICTION_ENTRY, entry);
         KeyValueBundleFragment fragment = new KeyValueBundleFragment();
         fragment.setArguments(arguments);
         return fragment;
@@ -102,12 +111,34 @@ public class KeyValueBundleFragment extends ManageAppFragment implements
         mAppName = getArguments().getString(ARG_APP_NAME);
         mKey = getArguments().getString(ARG_KEY);
         mBundle = getArguments().getBundle(ARG_INITIAL_VALUE);
+        mRestrictionEntry = getArguments().getParcelable(ARG_RESTRICTION_ENTRY);
         if (mBundle == null) {
             mBundle = new Bundle();
         }
         mInitialBundle = new Bundle(mBundle);
         mKeyList = new ArrayList<>();
-        mKeyList.addAll(mBundle.keySet());
+        if (mRestrictionEntry != null) {
+            // If we received RestrictionEntry with wrong type, we will make new empty Bundle
+            // restriction with same key, title and description
+            if (mRestrictionEntry.getType() != RestrictionEntry.TYPE_BUNDLE) {
+                RestrictionEntry newBundleEntry = KeyValueUtil.createBundleRestriction(
+                        mKey, new RestrictionEntry[0]);
+                if (newBundleEntry != null) {
+                    newBundleEntry.setTitle(mRestrictionEntry.getTitle());
+                    newBundleEntry.setDescription(mRestrictionEntry.getDescription());
+                }
+                mRestrictionEntry = newBundleEntry;
+            }
+            RestrictionEntry[] entries = KeyValueUtil.getRestrictionEntries(mRestrictionEntry);
+            if (entries == null) {
+                entries = new RestrictionEntry[0];
+            }
+            mBundleRestrictions = new ArrayList<>(Arrays.asList(entries));
+            mInitialBundleRestrictions = new ArrayList<>(mBundleRestrictions);
+            mKeyList.addAll(getRestrictionsKeys(mBundleRestrictions));
+        } else {
+            mKeyList.addAll(mBundle.keySet());
+        }
     }
 
     @Override
@@ -136,7 +167,11 @@ public class KeyValueBundleFragment extends ManageAppFragment implements
     @Override
     protected void resetConfig() {
         mAdapter.clear();
-        mAdapter.addAll(mInitialBundle.keySet());
+        if (mInitialBundleRestrictions != null) {
+            mKeyList.addAll(getRestrictionsKeys(mInitialBundleRestrictions));
+        } else {
+            mAdapter.addAll(mInitialBundle.keySet());
+        }
     }
 
     @Override
@@ -144,7 +179,15 @@ public class KeyValueBundleFragment extends ManageAppFragment implements
         Intent intent = new Intent();
         intent.putExtra(RESULT_KEY, mKey);
         intent.putExtra(RESULT_TYPE, DialogType.BUNDLE_TYPE);
-        intent.putExtra(RESULT_VALUE, mBundle);
+        if (mRestrictionEntry != null) {
+            if (mBundleRestrictions != null) {
+                KeyValueUtil.setRestrictionEntries(mRestrictionEntry,
+                        mBundleRestrictions.toArray(new RestrictionEntry[0]));
+            }
+            intent.putExtra(RESULT_ENTRY, mRestrictionEntry);
+        } else {
+            intent.putExtra(RESULT_VALUE, mBundle);
+        }
         getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_OK, intent);
         getFragmentManager().popBackStack();
     }
@@ -157,12 +200,24 @@ public class KeyValueBundleFragment extends ManageAppFragment implements
     @Override
     protected void loadDefault() {}
 
-    private void showEditDialog(final String key) {
+    private void showEditDialog(String key) {
+        if (key == null) {
+            key = "";
+        }
         mEditingKey = key;
         int type = DialogType.BOOL_TYPE;
         Object value = null;
-        if (key != null) {
-             value = mBundle.get(key);
+        if (mRestrictionEntry != null) {
+            mEditingRestrictionEntry =
+                    getEditingRestrictionEntry(key, mBundleRestrictions);
+            if (mEditingRestrictionEntry != null) {
+                type = KeyValueUtil.getTypeIndexFromRestrictionType(
+                        mEditingRestrictionEntry.getType());
+            } else {
+                mEditingRestrictionEntry = new RestrictionEntry(mEditingKey, false);
+            }
+        } else {
+            value = mBundle.get(key);
             if (value instanceof Boolean) {
                 type = DialogType.BOOL_TYPE;
             } else if (value instanceof Integer) {
@@ -172,21 +227,67 @@ public class KeyValueBundleFragment extends ManageAppFragment implements
             } else if (value instanceof String[]) {
                 type = DialogType.STRING_ARRAY_TYPE;
             } else if (value instanceof Bundle) {
-                // CHOICE restriction is passed as Bundle with entries and values
-                if (((Bundle) value).containsKey(RestrictionManagerCompat.CHOICE_SELECTED_VALUE)) {
-                    type = DialogType.CHOICE_TYPE;
-                } else {
-                    type = DialogType.BUNDLE_TYPE;
-                }
+                type = DialogType.BUNDLE_TYPE;
             } else if (value instanceof Bundle[]) {
                 type = DialogType.BUNDLE_ARRAY_TYPE;
             }
         }
         KeyValuePairDialogFragment dialogFragment =
-                KeyValuePairDialogFragment.newInstance(type, true, key, value, SUPPORTED_TYPE,
-                        mAppName);
+                KeyValuePairDialogFragment.newInstance(type, true, key, value,
+                        mEditingRestrictionEntry, SUPPORTED_TYPE, mAppName);
         dialogFragment.setTargetFragment(this, RESULT_CODE_EDIT_DIALOG);
         dialogFragment.show(getFragmentManager(), "dialog");
+    }
+
+    private List<String> getRestrictionsKeys(ArrayList<RestrictionEntry> entries) {
+        List<String> keys = new ArrayList<String>();
+        if (entries != null) {
+            for (RestrictionEntry entry : entries) {
+                if (entry != null && entry.getKey() != null) {
+                    keys.add(entry.getKey());
+                }
+            }
+        }
+        return keys;
+    }
+
+    private RestrictionEntry getEditingRestrictionEntry(String key,
+            ArrayList<RestrictionEntry> entries) {
+        RestrictionEntry editingEntry = null;
+        if (!TextUtils.isEmpty(key) && entries != null) {
+            for (RestrictionEntry entry : entries) {
+                if (entry != null && key.equals(entry.getKey())) {
+                    editingEntry = entry;
+                    break;
+                }
+            }
+        }
+        return editingEntry;
+    }
+
+    private void removeRestrictionEntry(String key, ArrayList<RestrictionEntry> bundleRestrictions){
+        if (!TextUtils.isEmpty(key) && bundleRestrictions != null) {
+            if (bundleRestrictions != null) {
+                RestrictionEntry entryToDelete = null;
+                for (RestrictionEntry entry : bundleRestrictions) {
+                    if (entry != null && key.equals(entry.getKey())) {
+                        entryToDelete = entry;
+                        break;
+                    }
+                }
+                if (entryToDelete != null) {
+                    bundleRestrictions.remove(entryToDelete);
+                }
+            }
+        }
+    }
+
+    private void replaceRestrictionEntry(String key, ArrayList<RestrictionEntry> bundleRestrictions,
+                                         RestrictionEntry newRestriction) {
+        if (!TextUtils.isEmpty(key) && bundleRestrictions != null && newRestriction != null) {
+            removeRestrictionEntry(key, bundleRestrictions);
+            bundleRestrictions.add(newRestriction);
+        }
     }
 
     @Override
@@ -196,7 +297,14 @@ public class KeyValueBundleFragment extends ManageAppFragment implements
 
     @Override
     public void onDeleteButtonClick(String entry) {
-        mBundle.remove(entry);
+        if (mRestrictionEntry != null) {
+            removeRestrictionEntry(entry, mBundleRestrictions);
+            return;
+        }
+
+        if (mBundle != null) {
+            mBundle.remove(entry);
+        }
     }
 
     @Override
@@ -208,7 +316,13 @@ public class KeyValueBundleFragment extends ManageAppFragment implements
             case RESULT_CODE_EDIT_DIALOG:
                 int type = result.getIntExtra(KeyValuePairDialogFragment.RESULT_TYPE, 0);
                 String key = result.getStringExtra(KeyValuePairDialogFragment.RESULT_KEY);
-                updateBundleFromResultIntent(type, key, result);
+                RestrictionEntry resultEntry =
+                        result.getParcelableExtra(KeyValuePairDialogFragment.RESULT_ENTRY);
+                if (resultEntry != null) {
+                    replaceRestrictionEntry(key, mBundleRestrictions, resultEntry);
+                } else {
+                    updateBundleFromResultIntent(type, key, result);
+                }
                 // We need this only if key name was changed
                 if (TextUtils.isEmpty(mEditingKey) || !mEditingKey.equals(key)) {
                     mAdapter.remove(mEditingKey);
@@ -235,23 +349,12 @@ public class KeyValueBundleFragment extends ManageAppFragment implements
         protected String getDisplayName(String entry) {
             return entry;
         }
-
-        @Override
-        public void notifyDataSetChanged() {
-            if (mEntries != null) {
-                // Sort keys in alphabetic order
-                Collections.sort(mEntries, new Comparator<String>() {
-                    @Override
-                    public int compare(String entry1, String entry2) {
-                        return getDisplayName(entry1).compareTo(getDisplayName(entry2));
-                    }
-                });
-            }
-            super.notifyDataSetChanged();
-        }
     }
 
     private void updateBundleFromResultIntent(int type, String key, Intent intent) {
+        if (mBundle == null)
+            return;
+
         switch (type) {
             case DialogType.BOOL_TYPE:
                 mBundle.putBoolean(key, intent.getBooleanExtra(RESULT_VALUE, false));
@@ -260,6 +363,7 @@ public class KeyValueBundleFragment extends ManageAppFragment implements
                 mBundle.putInt(key, intent.getIntExtra(RESULT_VALUE, 0));
                 break;
             case DialogType.STRING_TYPE:
+            case DialogType.CHOICE_TYPE:
                 mBundle.putString(key, intent.getStringExtra(RESULT_VALUE));
                 break;
             case DialogType.STRING_ARRAY_TYPE:
@@ -271,17 +375,8 @@ public class KeyValueBundleFragment extends ManageAppFragment implements
             case DialogType.BUNDLE_ARRAY_TYPE:
                 mBundle.putParcelableArray(key, intent.getParcelableArrayExtra(RESULT_VALUE));
                 break;
-            case DialogType.CHOICE_TYPE:
-                // Update existing data for CHOICE restriction if exists
-                Bundle choiceData = (Bundle) mBundle.get(key);
-                if (choiceData == null) {
-                    choiceData = new Bundle();
-                }
-                choiceData.putString(RestrictionManagerCompat.CHOICE_SELECTED_VALUE, intent.getStringExtra(RESULT_VALUE));
-                break;
             default:
                 throw new IllegalArgumentException("invalid type:" + type);
         }
     }
-
 }

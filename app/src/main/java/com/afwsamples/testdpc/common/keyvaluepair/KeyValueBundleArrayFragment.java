@@ -19,6 +19,7 @@ package com.afwsamples.testdpc.common.keyvaluepair;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.RestrictionEntry;
 import android.content.pm.ApplicationInfo;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -40,13 +41,16 @@ import static com.afwsamples.testdpc.common.keyvaluepair.KeyValuePairDialogFragm
 import static com.afwsamples.testdpc.common.keyvaluepair.KeyValuePairDialogFragment
         .ARG_INITIAL_VALUE;
 import static com.afwsamples.testdpc.common.keyvaluepair.KeyValuePairDialogFragment.ARG_KEY;
+import static com.afwsamples.testdpc.common.keyvaluepair.KeyValuePairDialogFragment
+        .ARG_RESTRICTION_ENTRY;
 import static com.afwsamples.testdpc.common.keyvaluepair.KeyValuePairDialogFragment.DialogType;
+import static com.afwsamples.testdpc.common.keyvaluepair.KeyValuePairDialogFragment.RESULT_ENTRY;
 import static com.afwsamples.testdpc.common.keyvaluepair.KeyValuePairDialogFragment.RESULT_KEY;
 import static com.afwsamples.testdpc.common.keyvaluepair.KeyValuePairDialogFragment.RESULT_TYPE;
 import static com.afwsamples.testdpc.common.keyvaluepair.KeyValuePairDialogFragment.RESULT_VALUE;
 
 public class KeyValueBundleArrayFragment extends ManageAppFragment implements
-        OnEditButtonClickListener<Bundle>, OnDeleteButtonClickListener<Bundle> {
+        OnEditButtonClickListener<Integer>, OnDeleteButtonClickListener<Integer> {
     /**
      * Key of the editing bundle array.
      */
@@ -54,18 +58,21 @@ public class KeyValueBundleArrayFragment extends ManageAppFragment implements
     /**
      * The current bundle list.
      */
-    private List<Bundle> mBundleList;
+    private ArrayList<Object> mBundleList;
     /**
      * The initial value of the passed in bundle list.
      */
-    private List<Bundle> mInitialBundleList;
+    private ArrayList<Object> mInitialBundleList;
     private String mAppName;
-    private BundleEditDeleteArrayAdapter mAdapter;
+    private EditDeleteArrayAdapter mAdapter;
+    private RestrictionEntry mBundleArrayRestrictionEntry;
+    private Integer mEditingItemNumber;
+    List<Integer> mBundleNumbers;
 
     private static final int RESULT_CODE_EDIT_DIALOG = 1;
 
     private static final int[] SUPPORTED_TYPE = {
-            DialogType.BUNDLE_TYPE,
+            DialogType.BUNDLE_TYPE
     };
 
     /**
@@ -73,10 +80,11 @@ public class KeyValueBundleArrayFragment extends ManageAppFragment implements
      * @param bundles initial value of the bundle array for editing.
      */
     public static KeyValueBundleArrayFragment newInstance(String key, Bundle[] bundles,
-            String appName) {
+            RestrictionEntry entry, String appName) {
         Bundle arguments = new Bundle();
         arguments.putString(ARG_KEY, key);
         arguments.putParcelableArray(ARG_INITIAL_VALUE, bundles);
+        arguments.putParcelable(ARG_RESTRICTION_ENTRY, entry);
         arguments.putString(ARG_APP_NAME, appName);
         KeyValueBundleArrayFragment fragment = new KeyValueBundleArrayFragment();
         fragment.setArguments(arguments);
@@ -87,12 +95,37 @@ public class KeyValueBundleArrayFragment extends ManageAppFragment implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mKey = getArguments().getString(ARG_KEY);
-        Bundle[] bundles = (Bundle[]) getArguments().getParcelableArray(ARG_INITIAL_VALUE);
+        Object[] bundles = getArguments().getParcelableArray(ARG_INITIAL_VALUE);
         if (bundles == null) {
             bundles = new Bundle[0];
         }
-        mBundleList = new ArrayList<>(Arrays.asList(bundles));
-        mInitialBundleList = new ArrayList<>(mBundleList);
+        mBundleArrayRestrictionEntry = (RestrictionEntry) getArguments().getParcelable(
+                ARG_RESTRICTION_ENTRY);
+
+        if (mBundleArrayRestrictionEntry != null) {
+            // If we received RestrictionEntry with wrong type, we will make new empty BundleArray
+            // restriction with same key, title and description
+            if (mBundleArrayRestrictionEntry.getType() != RestrictionEntry.TYPE_BUNDLE_ARRAY) {
+                RestrictionEntry newBundleEntry = KeyValueUtil.createBundleArrayRestriction(
+                        mKey, new RestrictionEntry[0]);
+                if (newBundleEntry != null) {
+                    newBundleEntry.setTitle(mBundleArrayRestrictionEntry.getTitle());
+                    newBundleEntry.setDescription(mBundleArrayRestrictionEntry.getDescription());
+                }
+                mBundleArrayRestrictionEntry = newBundleEntry;
+            }
+            RestrictionEntry[] entries = KeyValueUtil.getRestrictionEntries(
+                    mBundleArrayRestrictionEntry);
+            if (entries == null){
+                entries = new RestrictionEntry[0];
+            }
+            mBundleList = new ArrayList<>(Arrays.asList((Object[])entries));
+            mInitialBundleList = KeyValueUtil.cloneRestrictionsList(mBundleList);
+        } else {
+            mBundleList = new ArrayList<>(Arrays.asList(bundles));
+            mInitialBundleList = new ArrayList<>(mBundleList);
+        }
+        mBundleNumbers = getBundleNumbers(mBundleList);
         mAppName = getArguments().getString(ARG_APP_NAME);
     }
 
@@ -114,7 +147,10 @@ public class KeyValueBundleArrayFragment extends ManageAppFragment implements
     @Override
     protected void resetConfig() {
         mAdapter.clear();
-        mAdapter.addAll(mInitialBundleList);
+        mBundleList.clear();
+        mBundleList = new ArrayList<>(mInitialBundleList);
+        mBundleNumbers = getBundleNumbers(mInitialBundleList);
+        mAdapter.addAll(mBundleNumbers);
     }
 
     @Override
@@ -122,23 +158,45 @@ public class KeyValueBundleArrayFragment extends ManageAppFragment implements
         Intent intent = new Intent();
         intent.putExtra(RESULT_KEY, mKey);
         intent.putExtra(RESULT_TYPE, DialogType.BUNDLE_ARRAY_TYPE);
-        intent.putExtra(RESULT_VALUE, mBundleList.toArray(new Bundle[0]));
+        if (mBundleArrayRestrictionEntry != null) {
+            KeyValueUtil.setRestrictionEntries(mBundleArrayRestrictionEntry,
+                    mBundleList.toArray(new RestrictionEntry[0]));
+            intent.putExtra(RESULT_ENTRY, mBundleArrayRestrictionEntry);
+        } else  {
+            intent.putExtra(RESULT_VALUE, mBundleList.toArray(new Bundle[0]));
+        }
         getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_OK, intent);
         getFragmentManager().popBackStack();
     }
 
     @Override
     protected void addNewRow() {
-        Bundle bundle = null;
         // Use same bundle structure as first bundle, if exists
         // In case of empty bundle user will need to add all restrictions manually
-        if (mInitialBundleList != null && mInitialBundleList.size() > 0 && mInitialBundleList.get(0) != null) {
-            bundle = (Bundle) mInitialBundleList.get(0).clone();
+        if (mInitialBundleList.size() > 0
+                && mInitialBundleList.get(0) != null) {
+            if (mBundleArrayRestrictionEntry != null) {
+                RestrictionEntry newEntry = KeyValueUtil.cloneRestriction(
+                        (RestrictionEntry) mInitialBundleList.get(0));
+                mBundleList.add(newEntry);
+            } else {
+                Bundle bundle = (Bundle)((Bundle) mInitialBundleList.get(0)).clone();
+                mBundleList.add(bundle);
+            }
         } else {
-            bundle = new Bundle();
+            Bundle bundle = null;
+            if (mBundleArrayRestrictionEntry != null) {
+                RestrictionEntry newEntry = KeyValueUtil.createBundleRestriction(
+                        mBundleArrayRestrictionEntry.getKey(), new RestrictionEntry[0]);
+                mBundleList.add(newEntry);
+            } else {
+                bundle = new Bundle();
+                mBundleList.add(bundle);
+            }
         }
-        mAdapter.add(bundle);
-        showEditDialog(bundle);
+        mEditingItemNumber = mBundleList.size()-1;
+        mAdapter.add(mEditingItemNumber);
+        showEditDialog(mEditingItemNumber);
     }
 
     @Override
@@ -146,28 +204,40 @@ public class KeyValueBundleArrayFragment extends ManageAppFragment implements
 
     @Override
     protected BaseAdapter createListAdapter() {
-        mAdapter = new BundleEditDeleteArrayAdapter(getActivity(), mBundleList, this, this);
+            mAdapter = new BundleEditDeleteArrayAdapter(getActivity(), mBundleNumbers, this, this);
         return mAdapter;
     }
 
-    private void showEditDialog(final Bundle bundle) {
+    private void showEditDialog(final int itemNumber) {
         int type = DialogType.BUNDLE_TYPE;
-        int index = mBundleList.indexOf(bundle);
-        KeyValuePairDialogFragment dialogFragment =
-                KeyValuePairDialogFragment.newInstance(type, false, "Bundle #" + index,
-                        bundle, SUPPORTED_TYPE, mAppName);
-        dialogFragment.setTargetFragment(this, RESULT_CODE_EDIT_DIALOG);
-        dialogFragment.show(getFragmentManager(), "dialog");
+        Bundle bundle = null;
+        RestrictionEntry editingEntry = null;
+        mEditingItemNumber = itemNumber;
+        if (itemNumber < mBundleList.size()) {
+            if (mBundleArrayRestrictionEntry != null) {
+                editingEntry = (RestrictionEntry) mBundleList.get(itemNumber);
+            } else {
+                bundle = (Bundle) mBundleList.get(itemNumber);
+            }
+            KeyValuePairDialogFragment dialogFragment =
+                    KeyValuePairDialogFragment.newInstance(type, false, "Bundle #" + itemNumber,
+                            bundle, editingEntry, SUPPORTED_TYPE, mAppName);
+            dialogFragment.setTargetFragment(this, RESULT_CODE_EDIT_DIALOG);
+            dialogFragment.show(getFragmentManager(), "dialog");
+        }
     }
 
     @Override
-    public void onEditButtonClick(Bundle bundle) {
-        showEditDialog(bundle);
+    public void onEditButtonClick(Integer entryNumber) {
+        showEditDialog(entryNumber);
     }
 
     @Override
-    public void onDeleteButtonClick(Bundle bundle) {
-        mBundleList.remove(bundle);
+    public void onDeleteButtonClick(Integer entryNumber) {
+        mAdapter.clear();
+        mBundleList.remove((int)entryNumber);
+        mBundleNumbers = getBundleNumbers(mBundleList);
+        mAdapter.addAll(mBundleNumbers);
     }
 
     @Override
@@ -177,22 +247,38 @@ public class KeyValueBundleArrayFragment extends ManageAppFragment implements
         }
         if (requestCode == RESULT_CODE_EDIT_DIALOG) {
             Bundle value = result.getBundleExtra(RESULT_VALUE);
-            int index = mBundleList.indexOf(value);
-            mAdapter.set(index, value);
+            RestrictionEntry entry = result.getParcelableExtra(RESULT_ENTRY);
+            if (entry != null) {
+                mBundleList.set(mEditingItemNumber, entry);
+            } else {
+                mBundleList.set(mEditingItemNumber, value);
+            }
+            mAdapter.set(mEditingItemNumber, mEditingItemNumber);
+            mEditingItemNumber = null;
         }
     }
 
-    private class BundleEditDeleteArrayAdapter extends EditDeleteArrayAdapter<Bundle> {
+    private class BundleEditDeleteArrayAdapter extends EditDeleteArrayAdapter<Integer> {
 
-        public BundleEditDeleteArrayAdapter(Context context, List<Bundle> entries,
+        public BundleEditDeleteArrayAdapter(Context context, List<Integer> entries,
                 OnEditButtonClickListener onEditButtonClickListener,
                 OnDeleteButtonClickListener onDeleteButtonClickListener) {
             super(context, entries, onEditButtonClickListener, onDeleteButtonClickListener);
         }
 
         @Override
-        protected String getDisplayName(Bundle entry) {
-            return String.valueOf("Bundle #" + mBundleList.indexOf(entry));
+        protected String getDisplayName(Integer entryNumber) {
+            return String.valueOf("Bundle #" + entryNumber);
         }
+    }
+
+    private List<Integer> getBundleNumbers(List<Object> entries) {
+        List<Integer> numbers = new ArrayList<>();
+        if (entries != null) {
+            for (int i=0; i<entries.size(); i++) {
+                numbers.add(i);
+            }
+        }
+        return numbers;
     }
 }

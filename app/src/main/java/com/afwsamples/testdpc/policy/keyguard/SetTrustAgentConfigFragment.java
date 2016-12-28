@@ -197,7 +197,7 @@ public class SetTrustAgentConfigFragment extends ManageResolveInfoFragment
             }
         }
         KeyValuePairDialogFragment dialogFragment =
-                KeyValuePairDialogFragment.newInstance(type, true, key, value, SUPPORTED_TYPE,
+                KeyValuePairDialogFragment.newInstance(type, true, key, value, null, SUPPORTED_TYPE,
                         mResolveInfo.loadLabel(mPackageManager).toString());
         dialogFragment.setTargetFragment(this, RESULT_CODE_EDIT_DIALOG);
         dialogFragment.show(getFragmentManager(), "dialog");
