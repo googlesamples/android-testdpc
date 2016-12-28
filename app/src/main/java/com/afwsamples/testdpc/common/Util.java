@@ -53,6 +53,8 @@ public class Util {
     private  static final int DEFAULT_BUFFER_SIZE = 4096;
     public static final int BUGREPORT_NOTIFICATION_ID = 1;
     public static final int PASSWORD_EXPIRATION_NOTIFICATION_ID = 2;
+    public static final int USER_ADDED_NOTIFICATION_ID = 3;
+    public static final int USER_REMOVED_NOTIFICATION_ID = 4;
 
     public static void showNotification(Context context, int titleId, String msg,
             int notificationId) {
