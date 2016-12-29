@@ -102,8 +102,7 @@ public class SetupManagementFragment extends Fragment implements
             mLogoUri = (Uri) savedInstanceState.getParcelable(EXTRA_PROVISIONING_LOGO_URI);
             mCurrentColor = savedInstanceState.getInt(EXTRA_PROVISIONING_MAIN_COLOR);
         } else {
-            mLogoUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://"
-                    + getActivity().getPackageName() + "/" + R.drawable.ic_launcher);
+            mLogoUri = resourceToUri(getActivity(), R.drawable.ic_launcher);
             mCurrentColor = getResources().getColor(R.color.teal);
         }
 
@@ -233,6 +232,7 @@ public class SetupManagementFragment extends Fragment implements
         specifySkipUserConsent(intent);
         specifyKeepAccountMigrated(intent);
         specifySkipEncryption(intent);
+        specifyDefaultDisclaimers(intent);
 
         if (adminExtras.size() > 0) {
             intent.putExtra(EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE, adminExtras);
@@ -305,6 +305,38 @@ public class SetupManagementFragment extends Fragment implements
             specifyColor(intent);
         }
         return true;
+    }
+
+    // TODO: replace with O SDK API
+    private static final String EXTRA_PROVISIONING_DISCLAIMERS =
+            "android.app.extra.PROVISIONING_DISCLAIMERS";
+    private static final String EXTRA_PROVISIONING_DISCLAIMER_HEADER =
+            "android.app.extra.PROVISIONING_DISCLAIMER_HEADER";
+    private static final String EXTRA_PROVISIONING_DISCLAIMER_CONTENT =
+            "android.app.extra.PROVISIONING_DISCLAIMER_CONTENT";
+
+    private void specifyDefaultDisclaimers(Intent intent) {
+        if (Util.isAtLeastO()) {
+            Bundle emmBundle = new Bundle();
+            emmBundle.putString(EXTRA_PROVISIONING_DISCLAIMER_HEADER,
+                    getString(R.string.default_disclaimer_emm_name));
+            emmBundle.putParcelable(EXTRA_PROVISIONING_DISCLAIMER_CONTENT,
+                    resourceToUri(getActivity(), R.raw.emm_disclaimer));
+            Bundle companyBundle = new Bundle();
+            companyBundle.putString(EXTRA_PROVISIONING_DISCLAIMER_HEADER,
+                    getString(R.string.default_disclaimer_company_name));
+            companyBundle.putParcelable(EXTRA_PROVISIONING_DISCLAIMER_CONTENT,
+                    resourceToUri(getActivity(), R.raw.company_disclaimer));
+            intent.putExtra(EXTRA_PROVISIONING_DISCLAIMERS,
+                    new Bundle[] { emmBundle, companyBundle });
+        }
+    }
+
+    private static Uri resourceToUri(Context context, int resID) {
+        return Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" +
+                context.getResources().getResourcePackageName(resID) + '/' +
+                context.getResources().getResourceTypeName(resID) + '/' +
+                context.getResources().getResourceEntryName(resID) );
     }
 
     private void specifySkipUserConsent(Intent intent) {
