@@ -19,7 +19,6 @@ package com.afwsamples.testdpc.policy.keyguard;
 import android.annotation.TargetApi;
 import android.app.Fragment;
 import android.app.admin.DevicePolicyManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
@@ -28,12 +27,10 @@ import android.support.v7.preference.EditTextPreference;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.TwoStatePreference;
 import android.util.ArrayMap;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.ProfileOrParentFragment;
-import com.afwsamples.testdpc.common.ReflectionUtil;
 import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.common.preference.DpcPreferenceBase;
 import com.afwsamples.testdpc.common.preference.DpcPreferenceHelper;
@@ -53,8 +50,6 @@ import static com.afwsamples.testdpc.policy.keyguard.SetTrustAgentConfigFragment
  */
 public final class LockScreenPolicyFragment extends ProfileOrParentFragment implements
         Preference.OnPreferenceChangeListener, Preference.OnPreferenceClickListener {
-
-    private static final String TAG = "LockScreenPolicyFragment";
 
     public static class Container extends ProfileOrParentFragment.Container {
         @Override
@@ -141,14 +136,17 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
     }
 
     @Override
+    @TargetApi(Build.VERSION_CODES.O)
     public void onResume() {
         super.onResume();
         updateAggregates();
         findPreference(Keys.STRONG_AUTH_TIMEOUT).setSummary(Long.toString(
-                TimeUnit.MILLISECONDS.toSeconds(getRequiredStrongAuthTimeout(getAdmin()))));
+                TimeUnit.MILLISECONDS.toSeconds(getDpm().getRequiredStrongAuthTimeout(
+                        getAdmin()))));
     }
 
     @Override
+    @TargetApi(Build.VERSION_CODES.O)
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         if (KEYGUARD_FEATURES.containsKey(preference.getKey())) {
             final int featureFlag = KEYGUARD_FEATURES.get(preference.getKey());
@@ -172,9 +170,9 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
             case Keys.STRONG_AUTH_TIMEOUT:
                 try {
                     final long setting = TimeUnit.SECONDS.toMillis(parseLong((String) newValue));
-                    setRequiredStrongAuthTimeout(getAdmin(), setting);
+                    getDpm().setRequiredStrongAuthTimeout(getAdmin(), setting);
                     preference.setSummary(Long.toString(TimeUnit.MILLISECONDS.toSeconds(
-                            getRequiredStrongAuthTimeout(getAdmin()))));
+                            getDpm().getRequiredStrongAuthTimeout(getAdmin()))));
                 } catch (NumberFormatException e) {
                     showToast(R.string.not_valid_input);
                     return false;
@@ -256,14 +254,14 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
                 : null);
     }
 
-    @TargetApi(Build.VERSION_CODES.N)
+    @TargetApi(Build.VERSION_CODES.O)
     private void setupAll() {
         setup(Keys.LOCK_SCREEN_MESSAGE,
                 BuildCompat.isAtLeastN() && isDeviceOwner()
                         ? getDpm().getDeviceOwnerLockScreenInfo() : null);
         setup(Keys.MAX_FAILS_BEFORE_WIPE, getDpm().getMaximumFailedPasswordsForWipe(getAdmin()));
         setup(Keys.STRONG_AUTH_TIMEOUT,
-                TimeUnit.MILLISECONDS.toSeconds(getRequiredStrongAuthTimeout(getAdmin())));
+                TimeUnit.MILLISECONDS.toSeconds(getDpm().getRequiredStrongAuthTimeout(getAdmin())));
         setup(Keys.MAX_TIME_SCREEN_LOCK,
                 TimeUnit.MILLISECONDS.toSeconds(getDpm().getMaximumTimeToLock(getAdmin())));
         setup(Keys.SET_TRUST_AGENT_CONFIG, null);
@@ -325,35 +323,5 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
 
     private void showToast(int titleId) {
         Toast.makeText(getActivity(), titleId, Toast.LENGTH_SHORT).show();
-    }
-
-    /*
-     * Wrapper for calling getDpm().getRequiredStrongAuthTimeout(admin); that's currently hidden
-     * in DPM via reflection.
-     * TODO(mkarpinski): replace this when API becomes public in Android O
-     */
-    private long getRequiredStrongAuthTimeout(ComponentName admin) {
-        try {
-            return (Long) ReflectionUtil.invoke(getDpm(), "getRequiredStrongAuthTimeout",
-                    new Class<?>[] {ComponentName.class}, (ComponentName) admin);
-        } catch (RuntimeException e) {
-            Log.e(TAG, "Failed to getRequiredStrongAuthTimeout", e);
-            return 0;
-        }
-    }
-
-    /*
-     * Wrapper for calling getDpm().setRequiredStrongAuthTimeout(admin, setting); that's currently
-     * hidden in DPM via reflection.
-     * TODO(mkarpinski): replace this when API becomes public in Android O
-     */
-    private void setRequiredStrongAuthTimeout(ComponentName admin, long setting) {
-        try {
-            ReflectionUtil.invoke(getDpm(), "setRequiredStrongAuthTimeout",
-                    new Class<?>[] {ComponentName.class, long.class}, (ComponentName) admin,
-                    setting);
-        } catch (RuntimeException e) {
-            Log.e(TAG, "Failed to setRequiredStrongAuthTimeout", e);
-        }
     }
 }
