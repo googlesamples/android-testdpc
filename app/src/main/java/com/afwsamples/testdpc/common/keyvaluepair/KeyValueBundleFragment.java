@@ -27,6 +27,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Toast;
 
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.EditDeleteArrayAdapter;
@@ -282,14 +283,6 @@ public class KeyValueBundleFragment extends ManageAppFragment implements
         }
     }
 
-    private void replaceRestrictionEntry(String key, ArrayList<RestrictionEntry> bundleRestrictions,
-                                         RestrictionEntry newRestriction) {
-        if (!TextUtils.isEmpty(key) && bundleRestrictions != null && newRestriction != null) {
-            removeRestrictionEntry(key, bundleRestrictions);
-            bundleRestrictions.add(newRestriction);
-        }
-    }
-
     @Override
     public void onEditButtonClick(String key) {
         showEditDialog(key);
@@ -319,8 +312,38 @@ public class KeyValueBundleFragment extends ManageAppFragment implements
                 RestrictionEntry resultEntry =
                         result.getParcelableExtra(KeyValuePairDialogFragment.RESULT_ENTRY);
                 if (resultEntry != null) {
-                    replaceRestrictionEntry(key, mBundleRestrictions, resultEntry);
+                    if (mEditingRestrictionEntry != null) {
+                        // If restriction key was changed, we will try to find existing restriction
+                        // with same key and replace it. In other case we will add new restriction
+                        if (mEditingKey != null && !mEditingKey.equals(key)
+                                && KeyValueUtil.keyAlreadyUsed(key, mBundleRestrictions)) {
+                            Toast.makeText(getActivity(),
+                                    getString(R.string.key_already_exists_error, key),
+                                    Toast.LENGTH_LONG).show();
+                            return;
+                        }
+                        int position = mBundleRestrictions.indexOf(mEditingRestrictionEntry);;
+                        if (position >= 0) {
+                            mBundleRestrictions.add(position, resultEntry);
+                            mBundleRestrictions.remove(mEditingRestrictionEntry);
+                        } else {
+                            mBundleRestrictions.add(resultEntry);
+                        }
+                    } else {
+                        mBundleRestrictions.add(resultEntry);
+                    }
                 } else {
+                    if (mEditingKey != null && !mEditingKey.equals(key)) {
+                        if (mBundle.containsKey(key)) {
+                            Toast.makeText(getActivity(),
+                                    getString(R.string.key_already_exists_error, key),
+                                    Toast.LENGTH_LONG).show();
+                            return;
+                        } else {
+                            // Remove old entry, because it was renamed
+                            mBundle.remove(mEditingKey);
+                        }
+                    }
                     updateBundleFromResultIntent(type, key, result);
                 }
                 // We need this only if key name was changed

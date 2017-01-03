@@ -120,7 +120,7 @@ public class KeyValueBundleArrayFragment extends ManageAppFragment implements
                 entries = new RestrictionEntry[0];
             }
             mBundleList = new ArrayList<>(Arrays.asList((Object[])entries));
-            mInitialBundleList = KeyValueUtil.cloneRestrictionsList(mBundleList);
+            mInitialBundleList = KeyValueUtil.cloneRestrictionsListAsObjects(mBundleList);
         } else {
             mBundleList = new ArrayList<>(Arrays.asList(bundles));
             mInitialBundleList = new ArrayList<>(mBundleList);

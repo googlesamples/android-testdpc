@@ -56,8 +56,8 @@ import static com.afwsamples.testdpc.common.keyvaluepair.KeyValuePairDialogFragm
  */
 public class ManageAppRestrictionsFragment extends ManageAppFragment
         implements EditDeleteArrayAdapter.OnEditButtonClickListener<RestrictionEntry> {
-    private List<RestrictionEntry> mRestrictionEntries = new ArrayList<>();
-    private List<RestrictionEntry> mLastRestrictionEntries;
+    private ArrayList<RestrictionEntry> mRestrictionEntries = new ArrayList<>();
+    private ArrayList<RestrictionEntry> mLastRestrictionEntries;
     private DevicePolicyManager mDevicePolicyManager;
     private RestrictionsManager mRestrictionsManager;
     private EditDeleteArrayAdapter<RestrictionEntry> mAppRestrictionsArrayAdapter;
@@ -112,28 +112,32 @@ public class ManageAppRestrictionsFragment extends ManageAppFragment
 
     protected ArrayList<RestrictionEntry> convertBundleToRestrictions(
             Bundle restrictionBundle, ArrayList<RestrictionEntry> manifestRestrictionEntries) {
-        ArrayList<RestrictionEntry> restrictionEntries = new ArrayList<>();
+        ArrayList<RestrictionEntry> restrictionEntries = KeyValueUtil.cloneRestrictionsList(
+                manifestRestrictionEntries);
+        if (restrictionEntries == null) {
+            restrictionEntries = new ArrayList<>();
+        }
         Set<String> keys = restrictionBundle.keySet();
         for (String key : keys) {
             Object value = restrictionBundle.get(key);
             RestrictionEntry currentEntry = findRestrictionEntryByKey(key,
-                manifestRestrictionEntries);
+                restrictionEntries);
             if (value instanceof Boolean) {
                 if (currentEntry == null
                         || currentEntry.getType() != RestrictionEntry.TYPE_BOOLEAN) {
                     currentEntry = new RestrictionEntry(key, (boolean) value);
+                    restrictionEntries.add(currentEntry);
                 } else {
                     currentEntry.setSelectedState((boolean) value);
                 }
-                restrictionEntries.add(currentEntry);
             } else if (value instanceof Integer) {
                 if (currentEntry == null
                         || currentEntry.getType() != RestrictionEntry.TYPE_INTEGER) {
                     currentEntry = new RestrictionEntry(key, (int) value);
+                    restrictionEntries.add(currentEntry);
                 } else {
                     currentEntry.setIntValue((int) value);
                 }
-                restrictionEntries.add(currentEntry);
             } else if (value instanceof String) {
                 // DevicePolicyManager returns Choice restriction as string
                 // We will find correct type in app manifest restrictions
@@ -142,17 +146,17 @@ public class ManageAppRestrictionsFragment extends ManageAppFragment
                         && currentEntry.getType() != RestrictionEntry.TYPE_CHOICE)) {
                     currentEntry = new RestrictionEntry(RestrictionEntry.TYPE_STRING, key);
                     currentEntry.setSelectedString((String) value);
+                    restrictionEntries.add(currentEntry);
                 } else {
                     currentEntry.setSelectedString((String) value);
                 }
-                restrictionEntries.add(currentEntry);
             } else if (value instanceof String[]) {
                 if (currentEntry == null || currentEntry.getType() != RestrictionEntry.TYPE_MULTI_SELECT) {
                     currentEntry = new RestrictionEntry(key, (String[]) value);
+                    restrictionEntries.add(currentEntry);
                 } else {
                     currentEntry.setAllSelectedStrings((String[]) value);
                 }
-                restrictionEntries.add(currentEntry);
             } else if (value instanceof Bundle) {
                     addBundleEntryToRestrictions(
                             restrictionEntries, key, (Bundle) value, currentEntry);
@@ -160,6 +164,7 @@ public class ManageAppRestrictionsFragment extends ManageAppFragment
                 addBundleArrayToRestrictions(restrictionEntries, key, (Parcelable[]) value, currentEntry);
             }
         }
+        restrictionEntries = removeRestrictionsNotAvailableInBunlde(restrictionBundle, restrictionEntries);
         return restrictionEntries;
     }
 
@@ -175,19 +180,36 @@ public class ManageAppRestrictionsFragment extends ManageAppFragment
         return null;
     }
 
+    private ArrayList<RestrictionEntry> removeRestrictionsNotAvailableInBunlde(Bundle bundle,
+            ArrayList<RestrictionEntry> restrictionsList) {
+        if (bundle == null || bundle.size() == 0) {
+            restrictionsList.clear();
+        }
+        if (restrictionsList != null && restrictionsList.size() > 0) {
+            ArrayList<RestrictionEntry> itemsToDelete = new ArrayList<RestrictionEntry>();
+            for (RestrictionEntry entry : restrictionsList) {
+                if (entry != null && !bundle.containsKey(entry.getKey())) {
+                    itemsToDelete.add(entry);
+                }
+            }
+            restrictionsList.removeAll(itemsToDelete);
+        }
+        return restrictionsList;
+    }
+
     @TargetApi(Build.VERSION_CODES.M)
     private void addBundleEntryToRestrictions(List<RestrictionEntry> restrictionEntries,
             String key, Bundle value, RestrictionEntry currentEntry) {
         if (currentEntry == null || currentEntry.getType() != RestrictionEntry.TYPE_BUNDLE) {
             currentEntry = RestrictionEntry.createBundleEntry(
                     key, convertBundleToRestrictions(value, null).toArray(new RestrictionEntry[0]));
+            restrictionEntries.add(currentEntry);
         } else {
             currentEntry.setRestrictions(
                 convertBundleToRestrictions(value,
                     new ArrayList<RestrictionEntry>(Arrays.asList(
                             currentEntry.getRestrictions()))).toArray(new RestrictionEntry[0]));
         }
-        restrictionEntries.add(currentEntry);
     }
 
     @TargetApi(Build.VERSION_CODES.M)
@@ -229,10 +251,10 @@ public class ManageAppRestrictionsFragment extends ManageAppFragment
         if (manifestBundleArrayEntry == null
                 || manifestBundleArrayEntry.getType() != RestrictionEntry.TYPE_BUNDLE_ARRAY) {
             manifestBundleArrayEntry = RestrictionEntry.createBundleArrayEntry(key, entriesArray);
+            restrictionEntries.add(manifestBundleArrayEntry);
         } else {
             manifestBundleArrayEntry.setRestrictions(entriesArray);
         }
-        restrictionEntries.add(manifestBundleArrayEntry);
     }
 
     protected void showToast(String msg) {
@@ -276,11 +298,28 @@ public class ManageAppRestrictionsFragment extends ManageAppFragment
             case RESULT_CODE_EDIT_DIALOG:
                 RestrictionEntry newRestrictionEntry = result.getParcelableExtra(RESULT_ENTRY);
                 if (newRestrictionEntry != null) {
-                    if (mEditingRestrictionEntry != null
-                            && mEditingRestrictionEntry.getKey().equals(newRestrictionEntry.getKey())) {
-                        mAppRestrictionsArrayAdapter.remove(mEditingRestrictionEntry);
+                    if (mEditingRestrictionEntry != null) {
+                        if (mEditingRestrictionEntry.getKey() != null
+                                && !mEditingRestrictionEntry.getKey().equals(newRestrictionEntry
+                                    .getKey())
+                                && KeyValueUtil.keyAlreadyUsed(newRestrictionEntry.getKey(),
+                                    mRestrictionEntries)) {
+                            Toast.makeText(getActivity(),
+                                    getString(R.string.key_already_exists_error, newRestrictionEntry.getKey()),
+                                    Toast.LENGTH_LONG).show();
+                            return;
+                        }
+                        int position = mAppRestrictionsArrayAdapter.getPosition(
+                                mEditingRestrictionEntry);
+                        if (position >= 0) {
+                            mAppRestrictionsArrayAdapter.insert(newRestrictionEntry, position);
+                            mAppRestrictionsArrayAdapter.remove(mEditingRestrictionEntry);
+                        } else {
+                            mAppRestrictionsArrayAdapter.add(newRestrictionEntry);
+                        }
+                    } else {
+                        mAppRestrictionsArrayAdapter.add(newRestrictionEntry);
                     }
-                    mAppRestrictionsArrayAdapter.add(newRestrictionEntry);
                     mAppRestrictionsArrayAdapter.notifyDataSetChanged();
                 }
                 mEditingRestrictionEntry = null;

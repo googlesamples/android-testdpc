@@ -20,6 +20,7 @@ package com.afwsamples.testdpc.common.keyvaluepair;
 import android.annotation.TargetApi;
 import android.content.RestrictionEntry;
 import android.os.Build;
+import android.text.TextUtils;
 
 import java.util.ArrayList;
 
@@ -154,7 +155,7 @@ public class KeyValueUtil {
         return RestrictionEntry.createBundleArrayEntry(key, restrictions);
     }
 
-    public static ArrayList<Object> cloneRestrictionsList(
+    public static ArrayList<Object> cloneRestrictionsListAsObjects(
             ArrayList<Object> originalList) {
         ArrayList<Object> newList = null;
         if (originalList != null) {
@@ -164,5 +165,28 @@ public class KeyValueUtil {
             }
         }
         return newList;
+    }
+
+    public static ArrayList<RestrictionEntry> cloneRestrictionsList(
+            ArrayList<RestrictionEntry> originalList) {
+        ArrayList<RestrictionEntry> newList = null;
+        if (originalList != null) {
+            newList = new ArrayList<>();
+            for (RestrictionEntry entry : originalList) {
+                newList.add(KeyValueUtil.cloneRestriction(entry));
+            }
+        }
+        return newList;
+    }
+
+    public static boolean keyAlreadyUsed(String key,ArrayList<RestrictionEntry> bundleRestrictions){
+        if (!TextUtils.isEmpty(key) && bundleRestrictions != null) {
+            for (RestrictionEntry entry : bundleRestrictions) {
+                if (entry != null && key.equals(entry.getKey())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

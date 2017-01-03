@@ -90,19 +90,6 @@ public abstract class EditDeleteArrayAdapter<T> extends ArrayAdapter<T>
         }
     }
 
-    @Override
-    public void notifyDataSetChanged() {
-        if (mEntries != null) {
-            Collections.sort(mEntries, new Comparator<T>() {
-                @Override
-                public int compare(T entry1, T entry2) {
-                    return getDisplayName(entry1).compareTo(getDisplayName(entry2));
-                }
-            });
-        }
-        super.notifyDataSetChanged();
-    }
-
     public void set(int index, T item) {
         mEntries.set(index, item);
         notifyDataSetChanged();
@@ -122,5 +109,16 @@ public abstract class EditDeleteArrayAdapter<T> extends ArrayAdapter<T>
 
     public interface OnDeleteButtonClickListener<T> {
         void onDeleteButtonClick(T entry);
+    }
+
+    protected void sort() {
+        if (mEntries != null) {
+            Collections.sort(mEntries, new Comparator<T>() {
+                @Override
+                public int compare(T entry1, T entry2) {
+                    return getDisplayName(entry1).compareTo(getDisplayName(entry2));
+                }
+            });
+        }
     }
 }

@@ -281,5 +281,11 @@ public class SetTrustAgentConfigFragment extends ManageResolveInfoFragment
         protected String getDisplayName(String entry) {
             return entry;
         }
+
+        @Override
+        public void notifyDataSetChanged() {
+            sort();
+            super.notifyDataSetChanged();
+        }
     }
 }

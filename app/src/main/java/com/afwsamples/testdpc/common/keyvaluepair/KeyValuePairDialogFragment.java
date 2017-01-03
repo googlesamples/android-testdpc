@@ -371,6 +371,9 @@ public class KeyValuePairDialogFragment extends DialogFragment {
         setSupportedType(arguments.getIntArray(ARG_SUPPORTED_TYPE));
         setDialogType(arguments.getInt(ARG_DIALOG_TYPE));
         mRestrictionEntry = arguments.getParcelable(ARG_RESTRICTION_ENTRY);
+        if (mDialogType == DialogType.STRING_TYPE && !TextUtils.isEmpty(mKeyView.getText())) {
+            mStringView.requestFocus();
+        }
         if (mDialogType == DialogType.CHOICE_TYPE) {
             configureChoiceSpinner();
         }

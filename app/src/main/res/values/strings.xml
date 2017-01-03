@@ -403,6 +403,7 @@
     <string name="value_not_valid">Restriction value is not valid</string>
     <string name="restriction_save_label">Save</string>
     <string name="restriction_cancel_label">Cancel</string>
+    <string name="key_already_exists_error">Key %1$s already exists. Cannot add</string>
     <!-- Text shown in configure button when bundle/bundle array is chosen -->
     <string name="configure">Configure</string>
 
