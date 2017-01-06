@@ -892,34 +892,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         mDevicePolicyManager.setSecurityLoggingEnabled(mAdminComponentName, enabled);
     }
 
-    /*
-     * Wrapper for calling mDevicePolicyManager.isBackupServiceEnabled(admin); that's currently
-     * hidden in DPM via reflection.
-     * TODO(mkarpinski): replace this when API becomes public in Android O
-     */
-    private boolean isBackupServiceEnabled() {
-        try {
-            return (Boolean) ReflectionUtil.invoke(mDevicePolicyManager, "isBackupServiceEnabled",
-                    new Class<?>[] {ComponentName.class}, (ComponentName) mAdminComponentName);
-        } catch (RuntimeException e) {
-            Log.e(TAG, "Failed to call isBackupServiceEnabled", e);
-            return false;
-        }
-    }
-
-    /*
-     * Wrapper for calling mDevicePolicyManager.setBackupServiceEnabled(admin, enabled); that's
-     * currently hidden in DPM via reflection.
-     * TODO(mkarpinski): replace this when API becomes public in Android O
-     */
+    @TargetApi(Build.VERSION_CODES.O)
     private void setBackupServiceEnabled(boolean enabled) {
-        try {
-            ReflectionUtil.invoke(mDevicePolicyManager, "setBackupServiceEnabled",
-                    new Class<?>[] {ComponentName.class, boolean.class},
-                    (ComponentName) mAdminComponentName, enabled);
-        } catch (RuntimeException e) {
-            Log.e(TAG, "Failed to setBackupServiceEnabled", e);
-        }
+        mDevicePolicyManager.setBackupServiceEnabled(mAdminComponentName, enabled);
     }
 
     @TargetApi(Build.VERSION_CODES.M)
@@ -1578,7 +1553,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     private void reloadEnableBackupServiceUi() {
         if (mEnableBackupServicePreference.isEnabled()) {
-            mEnableBackupServicePreference.setChecked(isBackupServiceEnabled());
+            mEnableBackupServicePreference.setChecked(mDevicePolicyManager.isBackupServiceEnabled(
+                    mAdminComponentName));
         }
     }
 
