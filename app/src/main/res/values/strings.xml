@@ -429,6 +429,9 @@
     <string name="failed_to_retrieve_process_logs">Failed to retrieve process logs, they were probably accessed less than 2 hours ago</string>
     <string name="process_logs_retrieved_message">---- Logs retrieved  %s ----</string>
 
+    <!-- Network logging -->
+    <string name="enable_network_logging">Enable network logging</string>
+
     <!-- Accessibility -->
     <string name="accessibility_title">Accessibility</string>
     <string name="set_accessibility_services">Set accessibility services</string>

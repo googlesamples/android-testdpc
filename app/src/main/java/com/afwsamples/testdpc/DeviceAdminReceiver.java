@@ -22,7 +22,10 @@ import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.admin.ConnectEvent;
 import android.app.admin.DevicePolicyManager;
+import android.app.admin.DnsEvent;
+import android.app.admin.NetworkEvent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -99,6 +102,56 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
             default:
                super.onReceive(context, intent);
                break;
+        }
+    }
+
+    /*
+     * TODO: reconsider how to store and present the logs in the future, e.g. save the file into
+     * internal memory and show the content in a ListView
+     */
+    @TargetApi(Build.VERSION_CODES.O)
+    @Override
+    public void onNetworkLogsAvailable(Context context, Intent intent, long batchToken,
+            int networkLogsCount) {
+        Log.d(TAG, "onNetworkLogsAvailable(), batchToken: " + batchToken);
+
+        DevicePolicyManager dpm =
+                (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
+
+        List<NetworkEvent> events = dpm.retrieveNetworkLogs(getComponentName(context), batchToken);
+        if (events == null) {
+            Log.e(TAG, "Failed to retrieve network logs batch with batchToken: " + batchToken);
+            return;
+        }
+        ArrayList<String> loggedEvents = new ArrayList<String>();
+        events.forEach(event -> loggedEvents.add(event.toString()));
+        new EventSavingTask(context, loggedEvents).execute();
+    }
+
+    private static class EventSavingTask extends AsyncTask<Void, Void, Void> {
+
+        private Context mContext;
+        private List<String> mLoggedEvents;
+
+        public EventSavingTask(Context context, ArrayList<String> loggedEvents) {
+            mContext = context;
+            mLoggedEvents = loggedEvents;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            String filename = "network_logs_"
+                    + new Date().toString().replaceAll("\\s+","_") + ".txt";
+            File file = new File(mContext.getExternalFilesDir(null), filename);
+            try (OutputStream os = new FileOutputStream(file)) {
+                for (String event : mLoggedEvents) {
+                    os.write((event + "\n").getBytes());
+                }
+                Log.d(TAG, "Saved network logs to file: " + filename);
+            } catch (IOException e) {
+                Log.e(TAG, "Failed saving network events to file" + filename, e);
+            }
+            return null;
         }
     }
 
