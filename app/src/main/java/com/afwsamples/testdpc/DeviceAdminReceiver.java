@@ -105,6 +105,17 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
         }
     }
 
+    @TargetApi(Build.VERSION_CODES.N)
+    @Override
+    public void onSecurityLogsAvailable(Context context, Intent intent) {
+        Log.i(TAG, "onSecurityLogsAvailable() called");
+        Toast.makeText(context,
+                context.getString(R.string.on_security_logs_available),
+                Toast.LENGTH_LONG)
+                .show();
+    }
+
+
     /*
      * TODO: reconsider how to store and present the logs in the future, e.g. save the file into
      * internal memory and show the content in a ListView
@@ -113,16 +124,33 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
     @Override
     public void onNetworkLogsAvailable(Context context, Intent intent, long batchToken,
             int networkLogsCount) {
-        Log.d(TAG, "onNetworkLogsAvailable(), batchToken: " + batchToken);
+        Log.i(TAG, "onNetworkLogsAvailable(), batchToken: " + batchToken
+                + ", event count: " + networkLogsCount);
 
         DevicePolicyManager dpm =
                 (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
+        List<NetworkEvent> events = null;
+        try {
+            events = dpm.retrieveNetworkLogs(getComponentName(context), batchToken);
+        } catch (SecurityException e) {
+            Log.e(TAG,
+                "Exception while retrieving network logs batch with batchToken: " + batchToken, e);
+        }
 
-        List<NetworkEvent> events = dpm.retrieveNetworkLogs(getComponentName(context), batchToken);
         if (events == null) {
             Log.e(TAG, "Failed to retrieve network logs batch with batchToken: " + batchToken);
+            Toast.makeText(context,
+                    context.getString(R.string.on_network_logs_available_failure, batchToken),
+                    Toast.LENGTH_LONG)
+                    .show();
             return;
         }
+
+        Toast.makeText(context,
+                context.getString(R.string.on_network_logs_available_success, batchToken),
+                Toast.LENGTH_LONG)
+                .show();
+
         ArrayList<String> loggedEvents = new ArrayList<String>();
         events.forEach(event -> loggedEvents.add(event.toString()));
         new EventSavingTask(context, loggedEvents).execute();
@@ -176,7 +204,7 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
 
         // Drop out quickly if we're neither profile or device owner.
         if (!isProfileOwner && !isDeviceOwner) {
-            Log.e("TestDPC", "DeviceAdminReceiver.onProvisioningComplete() invoked, but ownership "
+            Log.e(TAG, "DeviceAdminReceiver.onProvisioningComplete() invoked, but ownership "
                     + "not assigned");
             Toast.makeText(context, R.string.device_admin_receiver_failure, Toast.LENGTH_LONG)
                     .show();
