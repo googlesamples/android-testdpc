@@ -25,7 +25,6 @@ import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.admin.DevicePolicyManager;
-import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -102,7 +101,6 @@ import com.afwsamples.testdpc.profilepolicy.permission.ManageAppPermissionsFragm
 import com.afwsamples.testdpc.safetynet.SafetyNetFragment;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -185,9 +183,10 @@ import static com.afwsamples.testdpc.common.preference.DpcPreferenceHelper.NO_CU
  * <li> {@link DevicePolicyManager#getScreenCaptureDisabled(ComponentName)} </li>
  * <li> {@link DevicePolicyManager#setMaximumTimeToLock(ComponentName, long)} </li>
  * <li> {@link DevicePolicyManager#setMaximumFailedPasswordsForWipe(ComponentName, int)} </li>
+ * <li> {@link DevicePolicyManager#setAffiliationIds(ComponentName, List)} </li>
  * <li> {@link DevicePolicyManager#setApplicationHidden(ComponentName, String, boolean)} </li>
- * <li> {@link DevicePolicyManager#setShortSupportMessage(ComponentName, String)} </li>
- * <li> {@link DevicePolicyManager#setLongSupportMessage(ComponentName, String)} </li>
+ * <li> {@link DevicePolicyManager#setShortSupportMessage(ComponentName, CharSequence)} </li>
+ * <li> {@link DevicePolicyManager#setLongSupportMessage(ComponentName, CharSequence)} </li>
  * <li> {@link UserManager#DISALLOW_CONFIG_WIFI} </li>
  * </ul>
  */
@@ -215,6 +214,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String CHECK_LOCK_TASK_PERMITTED_KEY = "check_lock_task_permitted";
     private static final String CREATE_MANAGED_PROFILE_KEY = "create_managed_profile";
     private static final String CREATE_AND_MANAGE_USER_KEY = "create_and_manage_user";
+    private static final String SET_AFFILIATION_IDS_KEY = "set_affiliation_ids";
     private static final String DELEGATED_CERT_INSTALLER_KEY = "manage_cert_installer";
     private static final String APP_STATUS_KEY = "app_status";
     private static final String SECURITY_PATCH_KEY = "security_patch";
@@ -356,6 +356,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(CREATE_MANAGED_PROFILE_KEY).setOnPreferenceClickListener(this);
         findPreference(CREATE_AND_MANAGE_USER_KEY).setOnPreferenceClickListener(this);
         findPreference(REMOVE_USER_KEY).setOnPreferenceClickListener(this);
+        findPreference(SET_AFFILIATION_IDS_KEY).setOnPreferenceClickListener(this);
         mDisableCameraSwitchPreference = (SwitchPreference) findPreference(DISABLE_CAMERA_KEY);
         findPreference(CAPTURE_IMAGE_KEY).setOnPreferenceClickListener(this);
         findPreference(CAPTURE_VIDEO_KEY).setOnPreferenceClickListener(this);
@@ -571,6 +572,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 return true;
             case REMOVE_USER_KEY:
                 showRemoveUserPrompt();
+                return true;
+            case SET_AFFILIATION_IDS_KEY:
+                showFragment(new AffiliationIdsFragment());
                 return true;
             case BLOCK_UNINSTALLATION_BY_PKG_KEY:
                 showBlockUninstallationByPackageNamePrompt();
@@ -869,13 +873,13 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     @TargetApi(Build.VERSION_CODES.N)
     private void requestBugReport() {
-        boolean startedSuccessfully = mDevicePolicyManager.requestBugreport(
-                mAdminComponentName);
-        if (!startedSuccessfully) {
-            Context context = getActivity();
-            Util.showNotification(context, R.string.bugreport_title,
-                    context.getString(R.string.bugreport_failure_throttled),
-                    Util.BUGREPORT_NOTIFICATION_ID);
+        try {
+            if (!mDevicePolicyManager.requestBugreport(mAdminComponentName)) {
+                showToast(R.string.bugreport_failure_throttled);
+            }
+        } catch (SecurityException e) {
+            Log.i(TAG, "Exception when calling requestBugreport()", e);
+            showToast(R.string.bugreport_failure_exception);
         }
     }
 

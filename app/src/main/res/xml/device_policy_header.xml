@@ -333,6 +333,11 @@
             android:title="@string/remove_user"
             testdpc:user="primaryUser"
             testdpc:minSdkVersion="L" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="set_affiliation_ids"
+            android:title="@string/manage_affiliation_ids"
+            testdpc:admin="deviceOwner|profileOwner"
+            testdpc:minSdkVersion="O" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/user_restrictions_management_title">
