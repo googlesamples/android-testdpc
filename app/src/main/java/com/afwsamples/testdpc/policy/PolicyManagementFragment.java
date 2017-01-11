@@ -33,6 +33,7 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.net.ProxyInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.BatteryManager;
@@ -258,6 +259,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String LOCK_NOW_KEY = "lock_now";
     private static final String SET_ACCESSIBILITY_SERVICES_KEY = "set_accessibility_services";
     private static final String SET_ALWAYS_ON_VPN_KEY = "set_always_on_vpn";
+    private static final String SET_GLOBAL_HTTP_PROXY_KEY = "set_global_http_proxy";
+    private static final String CLEAR_GLOBAL_HTTP_PROXY_KEY = "clear_global_http_proxy";
     private static final String SET_DEVICE_ORGANIZATION_NAME_KEY = "set_device_organization_name";
     private static final String SET_AUTO_TIME_REQUIRED_KEY = "set_auto_time_required";
     private static final String SET_DISABLE_ACCOUNT_MANAGEMENT_KEY
@@ -373,6 +376,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(LOCK_NOW_KEY).setOnPreferenceClickListener(this);
         findPreference(SYSTEM_UPDATE_POLICY_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_ALWAYS_ON_VPN_KEY).setOnPreferenceClickListener(this);
+        findPreference(SET_GLOBAL_HTTP_PROXY_KEY).setOnPreferenceClickListener(this);
+        findPreference(CLEAR_GLOBAL_HTTP_PROXY_KEY).setOnPreferenceClickListener(this);
         findPreference(NETWORK_STATS_KEY).setOnPreferenceClickListener(this);
         findPreference(DELEGATED_CERT_INSTALLER_KEY).setOnPreferenceClickListener(this);
         findPreference(DISABLE_STATUS_BAR).setOnPreferenceClickListener(this);
@@ -649,6 +654,13 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 return true;
             case SET_ALWAYS_ON_VPN_KEY:
                 showFragment(new AlwaysOnVpnFragment());
+                return true;
+            case SET_GLOBAL_HTTP_PROXY_KEY:
+                showSetGlobalHttpProxyDialog();
+                return true;
+            case CLEAR_GLOBAL_HTTP_PROXY_KEY:
+                mDevicePolicyManager.setRecommendedGlobalProxy(mAdminComponentName,
+                        null /* proxyInfo */);
                 return true;
             case NETWORK_STATS_KEY:
                 showFragment(new NetworkUsageStatsFragment());
@@ -1818,6 +1830,51 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         }
         mShowCaCertificateListTask = new ShowCaCertificateListTask();
         mShowCaCertificateListTask.execute();
+    }
+
+    /**
+     * Shows a dialog that asks the user for a host and port, then sets the recommended global proxy
+     * to these values.
+     */
+    private void showSetGlobalHttpProxyDialog() {
+        if (getActivity() == null || getActivity().isFinishing()) {
+            return;
+        }
+
+        final View dialogView = getActivity().getLayoutInflater().inflate(
+                R.layout.proxy_config_dialog, null);
+        final EditText hostEditText = (EditText) dialogView.findViewById(R.id.proxy_host);
+        final EditText portEditText = (EditText) dialogView.findViewById(R.id.proxy_port);
+        final String host = System.getProperty("http.proxyHost");
+        if (!TextUtils.isEmpty(host)) {
+            hostEditText.setText(host);
+            portEditText.setText(System.getProperty("http.proxyPort"));
+        }
+
+        new AlertDialog.Builder(getActivity())
+                .setTitle(R.string.set_global_http_proxy)
+                .setView(dialogView)
+                .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
+                    final String hostString = hostEditText.getText().toString();
+                    if (hostString.isEmpty()) {
+                        showToast(R.string.no_host);
+                        return;
+                    }
+                    final String portString = portEditText.getText().toString();
+                    if (portString.isEmpty()) {
+                        showToast(R.string.no_port);
+                        return;
+                    }
+                    final int port = Integer.parseInt(portString);
+                    if (port > 65535) {
+                        showToast(R.string.port_out_of_range);
+                        return;
+                    }
+                    mDevicePolicyManager.setRecommendedGlobalProxy(mAdminComponentName,
+                            ProxyInfo.buildDirectProxy(hostString, port));
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
     }
 
     /**

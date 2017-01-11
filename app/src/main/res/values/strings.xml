@@ -528,6 +528,15 @@
     <!-- Strings for networking -->
     <string name="networking_management_title">Networking</string>
     <string name="set_always_on_vpn">Set always-on VPN</string>
+    <string name="set_global_http_proxy">Set global HTTP proxy</string>
+    <string name="clear_global_http_proxy">Clear global HTTP proxy</string>
+    <string name="networking_proxy_host">Host</string>
+    <string name="networking_proxy_host_hint">Enter the host</string>
+    <string name="networking_proxy_port">Port</string>
+    <string name="networking_proxy_port_hint">Enter the port</string>
+    <string name="no_host">No host specified.</string>
+    <string name="no_port">No port specified.</string>
+    <string name="port_out_of_range">Port out of range.</string>
 
     <!--  Strings for data usage -->
     <string name="data_usage">Data usage</string>

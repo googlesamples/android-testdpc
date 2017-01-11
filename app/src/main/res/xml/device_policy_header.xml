@@ -268,6 +268,16 @@
             android:key="set_always_on_vpn"
             android:title="@string/set_always_on_vpn"
             testdpc:minSdkVersion="N" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="set_global_http_proxy"
+            android:title="@string/set_global_http_proxy"
+            testdpc:admin="deviceOwner"
+            testdpc:minSdkVersion="L" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="clear_global_http_proxy"
+            android:title="@string/clear_global_http_proxy"
+            testdpc:admin="deviceOwner"
+            testdpc:minSdkVersion="L" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/permission_management">
