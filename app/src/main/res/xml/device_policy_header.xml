@@ -325,6 +325,11 @@
             android:title="@string/system_update_policy"
             testdpc:user="primaryUser"
             testdpc:minSdkVersion="M" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="system_update_pending"
+            android:title="@string/system_update_pending"
+            testdpc:admin="deviceOwner|profileOwner"
+            testdpc:minSdkVersion="O" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/user_management">

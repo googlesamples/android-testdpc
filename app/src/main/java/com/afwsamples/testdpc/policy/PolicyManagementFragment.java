@@ -277,6 +277,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String STOP_LOCK_TASK = "stop_lock_task";
     private static final String SUSPEND_APPS_KEY = "suspend_apps";
     private static final String SYSTEM_UPDATE_POLICY_KEY = "system_update_policy";
+    private static final String SYSTEM_UPDATE_PENDING_KEY = "system_update_pending";
+
     private static final String UNHIDE_APPS_KEY = "unhide_apps";
     private static final String UNSUSPEND_APPS_KEY = "unsuspend_apps";
     private static final String WIPE_DATA_KEY = "wipe_data";
@@ -375,6 +377,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(RESET_PASSWORD_KEY).setOnPreferenceClickListener(this);
         findPreference(LOCK_NOW_KEY).setOnPreferenceClickListener(this);
         findPreference(SYSTEM_UPDATE_POLICY_KEY).setOnPreferenceClickListener(this);
+        findPreference(SYSTEM_UPDATE_PENDING_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_ALWAYS_ON_VPN_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_GLOBAL_HTTP_PROXY_KEY).setOnPreferenceClickListener(this);
         findPreference(CLEAR_GLOBAL_HTTP_PROXY_KEY).setOnPreferenceClickListener(this);
@@ -652,6 +655,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             case SYSTEM_UPDATE_POLICY_KEY:
                 showFragment(new SystemUpdatePolicyFragment());
                 return true;
+            case SYSTEM_UPDATE_PENDING_KEY:
+                showPendingSystemUpdate();
+                return true;
             case SET_ALWAYS_ON_VPN_KEY:
                 showFragment(new AlwaysOnVpnFragment());
                 return true;
@@ -740,6 +746,27 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 return true;
         }
         return false;
+    }
+
+    private void showPendingSystemUpdate() {
+        try {
+            // SystemUpdateInfo instance.
+            final Object updateInfo = ReflectionUtil.invoke(mDevicePolicyManager,
+                    "getPendingSystemUpdate", mAdminComponentName);
+            if (updateInfo == null) {
+                showToast(getString(R.string.update_info_no_update_toast));
+            } else {
+                final long timestamp = (long) ReflectionUtil.invoke(updateInfo, "getReceivedTime");
+                final String date = DateFormat.getDateTimeInstance().format(new Date(timestamp));
+                new AlertDialog.Builder(getActivity())
+                        .setTitle(R.string.update_info_title)
+                        .setMessage(getString(R.string.update_info_received, date))
+                        .setPositiveButton(android.R.string.ok, null)
+                        .show();
+            }
+        } catch (RuntimeException e) {
+            Log.e(TAG, "Failed to call getPendingSystemUpdate", e);
+        }
     }
 
     @TargetApi(Build.VERSION_CODES.N)

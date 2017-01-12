@@ -525,6 +525,12 @@
     <string name="system_update_policy_window_end_label">Maintenance window end:</string>
     <string name="system_update_policy_set_policy">Set new policy</string>
 
+    <!-- Strings for pending update info checking -->
+    <string name="system_update_pending">Check pending system update</string>
+    <string name="update_info_no_update_toast">No system update available.</string>
+    <string name="update_info_title">Pending update information</string>
+    <string name="update_info_received">Update was received on %s</string>
+
     <!-- Strings for networking -->
     <string name="networking_management_title">Networking</string>
     <string name="set_always_on_vpn">Set always-on VPN</string>
