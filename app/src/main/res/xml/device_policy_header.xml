@@ -346,7 +346,7 @@
         <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
             android:key="stay_on_while_plugged_in"
             android:title="@string/stay_on_while_plugged_in"
-            testdpc:user="primaryUser"
+            testdpc:admin="deviceOwner"
             testdpc:minSdkVersion="M" />
         <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
             android:key="install_nonmarket_apps"
