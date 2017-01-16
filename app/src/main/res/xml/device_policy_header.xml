@@ -80,10 +80,24 @@
             android:key="manage_app_restrictions"
             android:title="@string/manage_app_restrictions"
             testdpc:minSdkVersion="L" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/delegation_title">
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="app_restrictions_managing_package"
             android:title="@string/app_restrictions_managing_package"
+            testdpc:admin="deviceOwner|profileOwner"
             testdpc:minSdkVersion="L" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="manage_cert_installer"
+            android:title="@string/manage_cert_installer"
+            testdpc:admin="deviceOwner|profileOwner"
+            testdpc:minSdkVersion="M" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="generic_delegation"
+            android:title="@string/generic_delegation"
+            testdpc:admin="deviceOwner|profileOwner"
+            testdpc:minSdkVersion="O" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/block_uninstallation_title">
@@ -147,10 +161,6 @@
             android:key="remove_all_ca_certificates"
             android:title="@string/remove_all_ca_certificates"
             testdpc:minSdkVersion="L" />
-        <com.afwsamples.testdpc.common.preference.DpcPreference
-            android:key="manage_cert_installer"
-            android:title="@string/manage_cert_installer"
-            testdpc:minSdkVersion="M" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/wifi_management_title">

@@ -399,6 +399,21 @@
     <string name="plus">+</string>
     <string name="app_restrictions_managing_package">App restrictions manager</string>
 
+    <!-- Strings for delegation -->
+    <string name="delegation_title">Delegation</string>
+    <string name="generic_delegation">Generic delegation</string>
+    <string name="delegation_success">Scopes successfully saved</string>
+    <string name="delegation_error">Error, see logs</string>
+    <string name="delegation_scope_instructions">Check the scopes that should be delegated</string>
+    <string name="delegation_scope_prompt_title">Delegation scopes</string>
+    <string name="delegation_scope_cert_install">Cert installation</string>
+    <string name="delegation_scope_app_restrictions">App restrictions</string>
+    <string name="delegation_scope_block_uninstall">Block uninstall</string>
+    <string name="delegation_scope_permission_grant">Permission grant</string>
+    <string name="delegation_scope_package_access">Package access</string>
+    <string name="delegation_scope_enable_system_app">System app enabling</string>
+    <string name="delegation_scope_keep_uninstalled_packages">Keep uninstalled packages</string>
+    <string name="manage_cert_installer">Delegated cert installer</string>
 
     <!-- strings used in the alert dialog for editing application restrictions. -->
     <string name="select_type">Select type:</string>
@@ -580,9 +595,6 @@
     <string name="network_stats_security_error_msg">
         To see this data, Test DPC needs to be enabled under Settings &gt; Security &gt; Apps with usage access.
     </string>
-
-    <!--  Strings for delegated certificate installer -->
-    <string name="manage_cert_installer">Delegated cert installer</string>
 
     <!-- Strings for permission policies -->
     <string name="permission_management">Permission management</string>

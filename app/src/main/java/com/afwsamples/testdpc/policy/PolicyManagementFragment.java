@@ -98,6 +98,7 @@ import com.afwsamples.testdpc.profilepolicy.ProfilePolicyManagementFragment;
 import com.afwsamples.testdpc.profilepolicy.addsystemapps.EnableSystemAppsByIntentFragment;
 import com.afwsamples.testdpc.profilepolicy.apprestrictions.AppRestrictionsManagingPackageFragment;
 import com.afwsamples.testdpc.profilepolicy.apprestrictions.ManageAppRestrictionsFragment;
+import com.afwsamples.testdpc.profilepolicy.delegation.DelegationFragment;
 import com.afwsamples.testdpc.profilepolicy.permission.ManageAppPermissionsFragment;
 import com.afwsamples.testdpc.safetynet.SafetyNetFragment;
 
@@ -206,6 +207,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     public static final String OVERRIDE_KEY_SELECTION_KEY = "override_key_selection";
 
+    private static final String GENERIC_DELEGATION_KEY = "generic_delegation";
     private static final String APP_RESTRICTIONS_MANAGING_PACKAGE_KEY
             = "app_restrictions_managing_package";
     private static final String BLOCK_UNINSTALLATION_BY_PKG_KEY = "block_uninstallation_by_pkg";
@@ -420,6 +422,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(SUSPEND_APPS_KEY).setOnPreferenceClickListener(this);
         findPreference(UNSUSPEND_APPS_KEY).setOnPreferenceClickListener(this);
         findPreference(MANAGE_APP_RESTRICTIONS_KEY).setOnPreferenceClickListener(this);
+        findPreference(GENERIC_DELEGATION_KEY).setOnPreferenceClickListener(this);
         findPreference(APP_RESTRICTIONS_MANAGING_PACKAGE_KEY).setOnPreferenceClickListener(this);
         findPreference(INSTALL_KEY_CERTIFICATE_KEY).setOnPreferenceClickListener(this);
         findPreference(REMOVE_KEY_CERTIFICATE_KEY).setOnPreferenceClickListener(this);
@@ -614,6 +617,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 return true;
             case MANAGE_APP_RESTRICTIONS_KEY:
                 showFragment(new ManageAppRestrictionsFragment());
+                return true;
+            case GENERIC_DELEGATION_KEY:
+                showFragment(new DelegationFragment());
                 return true;
             case APP_RESTRICTIONS_MANAGING_PACKAGE_KEY:
                 showFragment(new AppRestrictionsManagingPackageFragment());
