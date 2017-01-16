@@ -24,8 +24,10 @@
     <string name="set_up_device_owner">Set up device owner</string>
     <string name="set_up_management_header">Set up management</string>
     <string name="setup_management_message">This app is currently not the owner of this device or
-        profile. Please select an option below and click SET UP to set up appropriate management by this app.</string>
+        profile. Please select an option below and tap SET UP to set up appropriate management by this app.</string>
+    <string name="setup_management_message_for_do">This app is currently set as device owner. Please select the options below and tap SET UP to create a profile managed by the same app</string>
     <string name="provisioning_not_possible">TestDPC isn\'t currently allowed to be set up as the profile or device owner.</string>
+    <string name="provisioning_not_possible_for_do">TestDPC isn\'t currently allowed to create a managed profile.</string>
     <string name="exit">Exit</string>
     <string name="managed_account_message">Added account that requires management:</string>
     <string name="managed_account_complete_message">Added account that is now managed:</string>
@@ -34,8 +36,8 @@
     <string name="setup_label">Set up</string>
     <string name="profile_name">Sample Managed Profile</string>
     <string name="skip_user_setup">Skip user setup</string>
-    <string name="skip_user_consent">Skip user consent for COMP provisioning</string>
-    <string name="keep_account_migrated">Keep account migrated</string>
+    <string name="skip_user_consent">Skip user consent during provisioning</string>
+    <string name="keep_account_migrated">Keep account on this user, if migrated</string>
     <string name="skip_encryption">Skip encryption</string>
     <string name="managed_profile_name">Sample Managed Profile</string>
     <string name="managed_user_name">Sample Managed User</string>
@@ -419,6 +421,7 @@
     <string name="bugreport_sharing_declined">User declined sharing bugreport</string>
     <string name="bugreport_failure_message">Bugreport request failed: %s</string>
     <string name="bugreport_failure_throttled">Bugreport is already being collected on this device</string>
+    <string name="bugreport_failure_exception">Cannot request bugreport: There are unaffiliated users on the device</string>
     <string name="bugreport_failure_failed_completing">Bugreport collection operation failed</string>
     <string name="bugreport_failure_file_no_longer_available">Bugreport file is no longer available for collection</string>
 
@@ -489,6 +492,11 @@
     <string name="on_user_removed_title">User Removed</string>
     <string name="on_user_added_message">User created with serial number %1$d.</string>
     <string name="on_user_removed_message">User with serial number %1$d removed.</string>
+
+    <!-- Affiliation ids -->
+    <string name="manage_affiliation_ids">Manage affiliation ids</string>
+    <string name="enter_affiliation_id">Enter affiliation id</string>
+    <string name="affiliation_id_empty_error">Affiliation id cannot be empty</string>
 
     <!-- Strings for block uninstall -->
     <string name="block_uninstallation_title">Block uninstallation</string>

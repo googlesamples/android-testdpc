@@ -78,12 +78,6 @@ public class ManageAppRestrictionsFragment extends ManageAppFragment
             KeyValuePairDialogFragment.DialogType.STRING_ARRAY_TYPE,
     };
 
-    public static ManageAppRestrictionsFragment newInstance() {
-        ManageAppRestrictionsFragment fragment = new ManageAppRestrictionsFragment();
-        fragment.setArguments(null);
-        return fragment;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

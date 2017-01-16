@@ -77,6 +77,7 @@ public class SetupManagementFragment extends Fragment implements
     private static final int REQUEST_PROVISION_DEVICE_OWNER = 2;
     private static final int REQUEST_GET_LOGO = 3;
 
+    private TextView mSetupManagementMessage;
     private RadioGroup mSetupOptions;
     private Button mNavigationNextButton;
     private CheckBox mSkipUserConsent;
@@ -118,6 +119,7 @@ public class SetupManagementFragment extends Fragment implements
         mNavigationNextButton = navigationBar.getNextButton();
         mNavigationNextButton.setText(R.string.setup_label);
 
+        mSetupManagementMessage = (TextView) view.findViewById(R.id.setup_management_message_id);
         mSetupOptions = (RadioGroup) view.findViewById(R.id.setup_options);
         mSetupOptions.setOnCheckedChangeListener(this);
         mSkipUserConsent = (CheckBox) view.findViewById(R.id.skip_user_consent);
@@ -208,6 +210,12 @@ public class SetupManagementFragment extends Fragment implements
                 || (isManagedDeviceAction && Util.isAtLeastM())
                 ? View.VISIBLE
                 : View.GONE);
+
+        // If TestDpc is already a device owner, but can create a managed profile, show a different
+        // message.
+        if (Util.isDeviceOwner(getActivity())) {
+            mSetupManagementMessage.setText(R.string.setup_management_message_for_do);
+        }
     }
 
     private void maybeLaunchProvisioning(String intentAction, int requestCode) {
@@ -380,7 +388,9 @@ public class SetupManagementFragment extends Fragment implements
     private void showNoProvisioningPossibleUI() {
         mNavigationNextButton.setVisibility(View.GONE);
         TextView textView = (TextView) getView().findViewById(R.id.setup_management_message_id);
-        textView.setText(R.string.provisioning_not_possible);
+        textView.setText(Util.isDeviceOwner(getActivity())
+                ? R.string.provisioning_not_possible_for_do
+                : R.string.provisioning_not_possible);
     }
 
     /**
