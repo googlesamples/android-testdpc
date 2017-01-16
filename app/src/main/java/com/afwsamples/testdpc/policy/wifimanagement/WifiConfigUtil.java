@@ -32,28 +32,29 @@ public class WifiConfigUtil {
     public static boolean saveWifiConfiguration(Context context, WifiConfiguration
             wifiConfiguration) {
         WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        final int networkId;
+
         if (wifiConfiguration.networkId == -1) {
             // new wifi configuration, add it and then save it.
-            int networkId = wifiManager.addNetwork(wifiConfiguration);
-            if (networkId != -1) {
-                // Added successfully, try to save it now.
-                if (wifiManager.saveConfiguration()) {
-                    return true;
-                } else {
-                    // Remove the added network that fail to save.
-                    wifiManager.removeNetwork(networkId);
-                }
-            }
+            networkId = wifiManager.addNetwork(wifiConfiguration);
         } else {
             // existing wifi configuration, update it and then save it.
-            int networkId = wifiManager.updateNetwork(wifiConfiguration);
-            if (networkId != -1) {
-                if (wifiManager.saveConfiguration()) {
-                    return true;
-                }
-            }
+            networkId = wifiManager.updateNetwork(wifiConfiguration);
         }
-        return false;
+
+        if (networkId == -1) {
+            return false;
+        }
+
+        // Added successfully, try to save it now.
+        wifiManager.enableNetwork(networkId, /* disableOthers */ false);
+        if (wifiManager.saveConfiguration()) {
+            return true;
+        } else {
+            // Remove the added network that fail to save.
+            wifiManager.removeNetwork(networkId);
+            return false;
+        }
     }
 
 }
