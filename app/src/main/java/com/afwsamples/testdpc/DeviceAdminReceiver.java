@@ -329,7 +329,7 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
         return permissions;
     }
 
-    private boolean isRuntimePermission(PackageManager packageManager, String permission) {
+    private static boolean isRuntimePermission(PackageManager packageManager, String permission) {
         try {
             PermissionInfo pInfo = packageManager.getPermissionInfo(permission, 0);
             if (pInfo != null) {
