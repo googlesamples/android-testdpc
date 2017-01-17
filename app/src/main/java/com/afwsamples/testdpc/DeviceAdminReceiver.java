@@ -216,7 +216,7 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             autoGrantRequestedPermissionsToSelf(context);
         }
-        if (Util.isAtLeastO()) {
+        if (BuildCompat.isAtLeastO()) {
             maybeSetAffiliationIds(context, extras);
         }
 

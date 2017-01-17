@@ -199,11 +199,11 @@ public class SetupManagementFragment extends Fragment implements
         final int setUpOptionId = mSetupOptions.getCheckedRadioButtonId();
         final boolean isManagedProfileAction = setUpOptionId == R.id.setup_managed_profile;
         final boolean isManagedDeviceAction = setUpOptionId == R.id.setup_device_owner;
-        mSkipUserConsent.setVisibility(Util.isAtLeastO() && isManagedProfileAction &&
+        mSkipUserConsent.setVisibility(BuildCompat.isAtLeastO() && isManagedProfileAction &&
                 Util.isDeviceOwner(getActivity())
                 ? View.VISIBLE
                 : View.GONE);
-        mKeepAccountMigrated.setVisibility(Util.isAtLeastO() && isManagedProfileAction
+        mKeepAccountMigrated.setVisibility(BuildCompat.isAtLeastO() && isManagedProfileAction
                 ? View.VISIBLE
                 : View.GONE);
         mSkipEncryption.setVisibility((isManagedProfileAction && BuildCompat.isAtLeastN())
@@ -282,7 +282,7 @@ public class SetupManagementFragment extends Fragment implements
     private void maybePassAffiliationIds(Intent intent, PersistableBundle adminExtras) {
         if (Util.isDeviceOwner(getActivity())
                 && ACTION_PROVISION_MANAGED_PROFILE.equals(intent.getAction())
-                && Util.isAtLeastO()) {
+                && BuildCompat.isAtLeastO()) {
             passAffiliationIds(intent, adminExtras);
         }
     }
@@ -324,7 +324,7 @@ public class SetupManagementFragment extends Fragment implements
             "android.app.extra.PROVISIONING_DISCLAIMER_CONTENT";
 
     private void specifyDefaultDisclaimers(Intent intent) {
-        if (Util.isAtLeastO()) {
+        if (BuildCompat.isAtLeastO()) {
             Bundle emmBundle = new Bundle();
             emmBundle.putString(EXTRA_PROVISIONING_DISCLAIMER_HEADER,
                     getString(R.string.default_disclaimer_emm_name));
@@ -348,7 +348,7 @@ public class SetupManagementFragment extends Fragment implements
     }
 
     private void specifySkipUserConsent(Intent intent) {
-        if (Util.isAtLeastO() && ACTION_PROVISION_MANAGED_PROFILE.equals(intent.getAction())
+        if (BuildCompat.isAtLeastO() && ACTION_PROVISION_MANAGED_PROFILE.equals(intent.getAction())
                 && mSkipUserConsent.getVisibility() == View.VISIBLE) {
             // TODO: use action string in Android SDK
             intent.putExtra("android.app.extra.PROVISIONING_SKIP_USER_CONSENT",
@@ -357,7 +357,7 @@ public class SetupManagementFragment extends Fragment implements
     }
 
     private void specifyKeepAccountMigrated(Intent intent) {
-        if (Util.isAtLeastO() && ACTION_PROVISION_MANAGED_PROFILE.equals(intent.getAction())
+        if (BuildCompat.isAtLeastO() && ACTION_PROVISION_MANAGED_PROFILE.equals(intent.getAction())
                 && mKeepAccountMigrated.getVisibility() == View.VISIBLE) {
             // TODO: use action string in Android SDK
             intent.putExtra("android.app.extra.PROVISIONING_KEEP_ACCOUNT_ON_MIGRATION",
