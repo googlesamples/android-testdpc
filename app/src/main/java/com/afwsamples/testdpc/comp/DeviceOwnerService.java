@@ -24,6 +24,9 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
 
+import com.afwsamples.testdpc.R;
+import com.afwsamples.testdpc.common.Util;
+
 public class DeviceOwnerService extends Service {
     private static final String TAG = "DeviceOwnerService";
 
@@ -48,8 +51,8 @@ public class DeviceOwnerService extends Service {
 
         @Override
         public void notifyUserIsUnlocked() throws RemoteException {
-            // TODO: Possibly show a notification, want to  merge the base class to confirm the
-            // architecture first.
+            Util.showNotification(mContext, R.string.profile_status,
+                    mContext.getString(R.string.profile_is_unlocked), 0);
             Log.d(TAG, "notifyUserIsUnlocked() called");
         }
     }
