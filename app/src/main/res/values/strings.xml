@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
  Copyright (C) 2015 The Android Open Source Project
 
  Licensed under the Apache License, Version 2.0 (the "License");
@@ -235,7 +234,7 @@
     <string name="wifi_client_cert_password">Client certificate password (if any)</string>
     <string name="import_ca_certificate">Import CA certificate</string>
     <string name="import_user_certificate">Import user certificate</string>
-    <string name="selected_certificate">Selected certificate: <xliff:g id="certificate_alias" example="server certificate">%1$s</xliff:g></string>
+    <string name="selected_certificate">Selected certificate: <xliff:g example="server certificate" id="certificate_alias">%1$s</xliff:g></string>
     <string name="selected_certificate_none">None</string>
     <string name="error_missing_ssid">Missing SSID</string>
     <string name="error_missing_ca_cert">Missing CA cert</string>
@@ -256,7 +255,7 @@
     </string>
     <string name="enable_system_apps_attempt_msg">Enabled system apps that receive the given intent
     </string>
-    <string name ="no_disabled_system_apps">All system apps have been enabled.</string>
+    <string name="no_disabled_system_apps">All system apps have been enabled.</string>
     <string name="enable">Enable</string>
     <string name="invalid_system_apps_action">Invalid action</string>
     <string name="hide_apps_title">Hide apps</string>
@@ -684,7 +683,7 @@
     <string name="reset_password">Reset password</string>
     <string name="new_password">New password</string>
     <string name="require_password_entry">Require strongest available authentication type on next unlock</string>
-    <string name="require_password_on_boot">Require password to start user</string>
+    <string name="dont_require_password_on_boot">Do not require password to start user in future</string>
     <string name="password_reset_success">Password has been reset</string>
     <string name="password_reset_failed">Failed to reset password</string>
 
@@ -768,4 +767,24 @@
     <string name="require_one_po_to_bind">Requires exactly one profile owner allowed to bind to</string>
     <string name="hide_profile_owner_launcher_icon">Hide profile owner icon</string>
     <string name="install_ca_cert_in_po_user">Install CA certificate in the profile owner user</string>
+
+    <!-- strings used in the reset password with token dialog -->
+    <string name="reset_password_token_none">(None)</string>
+    <string name="reset_password_token_active">Active</string>
+    <string name="reset_password_token_inactive">Inactive</string>
+    <string name="activate_reset_password_token_cancelled">Token activation canceled</string>
+    <string name="set_password_reset_token_failed">Failed to set password token</string>
+    <string name="clear_password_reset_token_failed">Failed to remove password token</string>
+    <string name="reset_password_with_token_failed">Reset password failed</string>
+    <string name="reset_password_with_token_succeed">"Password successfully changed to: '%1$s'</string>
+    <string name="reset_password_fragment_set_new_token">Set new token</string>
+    <string name="reset_password_fragment_status">Status:</string>
+    <string name="reset_password_fragment_delete_token">Delete token</string>
+    <string name="reset_password_fragment_activate">Activate</string>
+    <string name="reset_password_fragment_token_label">Token:</string>
+    <string name="reset_password_fragment_reset_password_section">Reset password</string>
+    <string name="reset_password_fragment_new_password_label">New password:</string>
+    <string name="reset_password_fragment_set_password">Set password</string>
+    <string name="reset_password_no_token">No token</string>
+    <string name="reset_password_notification">Swipe away this notification to reset password</string>
 </resources>

@@ -93,6 +93,7 @@ import com.afwsamples.testdpc.policy.locktask.KioskModeActivity;
 import com.afwsamples.testdpc.policy.locktask.LockTaskAppInfoArrayAdapter;
 import com.afwsamples.testdpc.policy.networking.AlwaysOnVpnFragment;
 import com.afwsamples.testdpc.policy.networking.NetworkUsageStatsFragment;
+import com.afwsamples.testdpc.policy.resetpassword.ResetPasswordWithTokenFragment;
 import com.afwsamples.testdpc.policy.systemupdatepolicy.SystemUpdatePolicyFragment;
 import com.afwsamples.testdpc.policy.wifimanagement.WifiConfigCreationDialog;
 import com.afwsamples.testdpc.policy.wifimanagement.WifiEapTlsCreateDialogFragment;
@@ -552,8 +553,13 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 showCheckLockTaskPermittedPrompt();
                 return true;
             case RESET_PASSWORD_KEY:
-                showResetPasswordPrompt();
-                return false;
+                if (BuildCompat.isAtLeastO()) {
+                    showFragment(new ResetPasswordWithTokenFragment());
+                    return true;
+                } else {
+                    showResetPasswordPrompt();
+                    return false;
+                }
             case LOCK_NOW_KEY:
                 lockNow();
                 return true;
@@ -1102,8 +1108,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 R.id.password);
         final CheckBox requireEntry = (CheckBox) dialogView.findViewById(
                 R.id.require_password_entry_checkbox);
-        final CheckBox requireOnBoot = (CheckBox) dialogView.findViewById(
-                R.id.require_password_on_boot_checkbox);
+        final CheckBox dontRequireOnBoot = (CheckBox) dialogView.findViewById(
+                R.id.dont_require_password_on_boot_checkbox);
 
         DialogInterface.OnClickListener resetListener = new DialogInterface.OnClickListener() {
             @Override
@@ -1116,7 +1122,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 int flags = 0;
                 flags |= requireEntry.isChecked() ?
                         DevicePolicyManager.RESET_PASSWORD_REQUIRE_ENTRY : 0;
-                flags |= requireOnBoot.isChecked() ?
+                flags |= dontRequireOnBoot.isChecked() ?
                         DevicePolicyManager.RESET_PASSWORD_DO_NOT_ASK_CREDENTIALS_ON_BOOT : 0;
 
                 boolean ok = false;
