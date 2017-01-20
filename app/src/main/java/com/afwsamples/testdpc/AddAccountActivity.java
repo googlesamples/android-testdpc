@@ -48,7 +48,7 @@ public class AddAccountActivity extends Activity implements NavigationBar.Naviga
     private static final String TAG = "AddAccountActivity";
     private static final String GOOGLE_ACCOUNT_TYPE = "com.google";
 
-    /* package */ static final String EXTRA_NEXT_ACTIVITY_INTENT = "nextActivityIntent";
+    public static final String EXTRA_NEXT_ACTIVITY_INTENT = "nextActivityIntent";
 
     private Intent mNextActivityIntent = null;
 
