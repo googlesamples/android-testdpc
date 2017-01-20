@@ -544,7 +544,10 @@
     <string name="system_update_pending">Check pending system update</string>
     <string name="update_info_no_update_toast">No system update available.</string>
     <string name="update_info_title">Pending update information</string>
-    <string name="update_info_received">Update was received on %s</string>
+    <string name="update_info_received">Update was received on %1$s. Security patch: %2$s.</string>
+    <string name="update_info_security_false">false</string>
+    <string name="update_info_security_true">true</string>
+    <string name="update_info_security_unknown">unknown</string>
 
     <!-- Strings for networking -->
     <string name="networking_management_title">Networking</string>
