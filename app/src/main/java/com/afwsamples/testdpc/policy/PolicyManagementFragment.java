@@ -764,9 +764,23 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             } else {
                 final long timestamp = (long) ReflectionUtil.invoke(updateInfo, "getReceivedTime");
                 final String date = DateFormat.getDateTimeInstance().format(new Date(timestamp));
+
+                final Class updateInfoClazz = updateInfo.getClass();
+                final int securityFalseConst =
+                    ReflectionUtil.intConstant(updateInfoClazz, "SECURITY_PATCH_STATE_FALSE");
+                final int securityTrueConst =
+                    ReflectionUtil.intConstant(updateInfoClazz, "SECURITY_PATCH_STATE_TRUE");
+                final int securityState =
+                    (int) ReflectionUtil.invoke(updateInfo, "getSecurityPatchState");
+                final String securityText = securityState == securityFalseConst
+                        ? getString(R.string.update_info_security_false)
+                        : (securityState == securityTrueConst
+                                ? getString(R.string.update_info_security_true)
+                                : getString(R.string.update_info_security_unknown));
+
                 new AlertDialog.Builder(getActivity())
                         .setTitle(R.string.update_info_title)
-                        .setMessage(getString(R.string.update_info_received, date))
+                        .setMessage(getString(R.string.update_info_received, date, securityText))
                         .setPositiveButton(android.R.string.ok, null)
                         .show();
             }
