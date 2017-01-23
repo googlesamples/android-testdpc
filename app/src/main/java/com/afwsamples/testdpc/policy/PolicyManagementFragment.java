@@ -799,6 +799,11 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         final CheckBox evictKeyCheckBox
                 = (CheckBox) dialogView.findViewById(R.id.lock_parent_checkbox);
 
+        lockParentCheckBox.setOnCheckedChangeListener(
+                (button, checked) -> evictKeyCheckBox.setEnabled(!checked));
+        evictKeyCheckBox.setOnCheckedChangeListener(
+                (button, checked) -> lockParentCheckBox.setEnabled(!checked));
+
         new AlertDialog.Builder(getActivity())
                 .setTitle(R.string.lock_now)
                 .setView(dialogView)
