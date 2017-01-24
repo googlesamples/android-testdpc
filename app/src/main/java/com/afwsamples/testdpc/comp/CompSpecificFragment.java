@@ -16,6 +16,7 @@
 
 package com.afwsamples.testdpc.comp;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.admin.DevicePolicyManager;
 import android.content.ContentResolver;
@@ -23,6 +24,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
 import android.os.UserHandle;
@@ -153,6 +155,7 @@ public class CompSpecificFragment extends BaseSearchablePolicyPreferenceFragment
         return mUserManager.isUserRunning(mProfileUserHandle);
     }
 
+    @TargetApi(Build.VERSION_CODES.N)
     private boolean isProfileUnlocked() {
         return mUserManager.isUserUnlocked(mProfileUserHandle);
     }

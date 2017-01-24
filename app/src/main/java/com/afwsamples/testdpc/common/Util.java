@@ -167,7 +167,7 @@ public class Util {
     }
 
     public static boolean isInCompMode(Context context) {
-        return getBindDeviceAdminTargetUsers(context).size() > 0;
+        return BuildCompat.isAtLeastO() && getBindDeviceAdminTargetUsers(context).size() > 0;
     }
 
     public static void showFileViewerForImportingCertificate(PreferenceFragment fragment,

@@ -18,8 +18,8 @@ android {
 
     defaultConfig {
         applicationId "com.afwsamples.testdpc"
-        minSdkVersion 'O'
-        targetSdkVersion 'O'
+        minSdkVersion 21
+        targetSdkVersion 25
         versionCode versionMajor * 1000 + versionMinor * 100 + versionBuild
         versionName "${versionMajor}.${versionMinor}.${versionBuild}"
         jackOptions {
@@ -56,14 +56,6 @@ android {
     repositories {
         flatDir {
             dirs 'libs'
-        }
-    }
-
-    // Enable lint checking in all build variants.
-    applicationVariants.all { variant ->
-        variant.outputs.each { output ->
-            def lintTask = tasks["lint${variant.name.capitalize()}"]
-            output.assemble.dependsOn lintTask
         }
     }
 }

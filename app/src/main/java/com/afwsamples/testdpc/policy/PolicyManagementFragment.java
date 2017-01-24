@@ -403,7 +403,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         mRequestLogsPreference = (DpcPreference) findPreference(REQUEST_PROCESS_LOGS);
         mRequestLogsPreference.setOnPreferenceClickListener(this);
         mRequestLogsPreference.setCustomConstraint(
-                () -> mDevicePolicyManager.isSecurityLoggingEnabled(mAdminComponentName)
+                () -> isSecurityLoggingEnabled()
                         ? NO_CUSTOM_CONSTRIANT
                         : R.string.requires_process_logs);
         mEnableNetworkLoggingPreference = (SwitchPreference) findPreference(ENABLE_NETWORK_LOGGING);
@@ -789,7 +789,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.N)
+    @TargetApi(Build.VERSION_CODES.O)
     private void lockNow() {
         if (BuildCompat.isAtLeastO() && Util.isManagedProfile(getActivity())) {
             showLockNowPrompt();
@@ -821,13 +821,19 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         new AlertDialog.Builder(getActivity())
                 .setTitle(R.string.lock_now)
                 .setView(dialogView)
-                .setPositiveButton(android.R.string.ok, (DialogInterface d, int i) -> {
-                    final int flags = (evictKeyCheckBox.isChecked() ? ReflectionUtil.intConstant(
-                            DevicePolicyManager.class, "FLAG_EVICT_CE_KEY") : 0);
-                    final DevicePolicyManager dpm = lockParentCheckBox.isChecked()
-                            ? mDevicePolicyManager.getParentProfileInstance(mAdminComponentName)
-                            : mDevicePolicyManager;
-                    ReflectionUtil.invoke(dpm, "lockNow", new Class<?>[]{int.class}, flags);
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    @TargetApi(Build.VERSION_CODES.O)
+                    public void onClick(DialogInterface d, int i) {
+                        final int flags = evictKeyCheckBox.isChecked()
+                                ? ReflectionUtil.intConstant(
+                                DevicePolicyManager.class, "FLAG_EVICT_CE_KEY")
+                                : 0;
+                        final DevicePolicyManager dpm = lockParentCheckBox.isChecked()
+                                ? mDevicePolicyManager.getParentProfileInstance(mAdminComponentName)
+                                : mDevicePolicyManager;
+                        ReflectionUtil.invoke(dpm, "lockNow", new Class<?>[] {int.class}, flags);
+                    }
                 })
                 .setNegativeButton(android.R.string.cancel, null)
                 .show();
@@ -935,6 +941,11 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     private void setMasterVolumeMuted(boolean muted) {
 
+    }
+
+    @TargetApi(Build.VERSION_CODES.O)
+    private boolean isSecurityLoggingEnabled() {
+        return mDevicePolicyManager.isSecurityLoggingEnabled(mAdminComponentName);
     }
 
     @TargetApi(Build.VERSION_CODES.N)
@@ -1570,6 +1581,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         }
     }
 
+    @TargetApi(Build.VERSION_CODES.O)
     private void reloadEnableBackupServiceUi() {
         if (mEnableBackupServicePreference.isEnabled()) {
             mEnableBackupServicePreference.setChecked(mDevicePolicyManager.isBackupServiceEnabled(
