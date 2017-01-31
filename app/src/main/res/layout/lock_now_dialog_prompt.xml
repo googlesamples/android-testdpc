@@ -25,11 +25,11 @@
         android:layout_marginTop="8dp"
         android:layout_marginStart="24dp"
         android:layout_marginEnd="24dp">
-        <CheckBox android:id="@+id/evict_key_checkbox"
+        <CheckBox android:id="@+id/lock_parent_checkbox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/lock_parent_key"/>
-        <CheckBox android:id="@+id/lock_parent_checkbox"
+        <CheckBox android:id="@+id/evict_ce_key_checkbox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/evict_ce_key"/>
