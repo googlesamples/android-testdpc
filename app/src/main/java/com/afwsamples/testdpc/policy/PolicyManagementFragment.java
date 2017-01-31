@@ -25,6 +25,7 @@ import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.admin.DevicePolicyManager;
+import android.app.admin.SystemUpdateInfo;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -754,38 +755,27 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         return false;
     }
 
+    @TargetApi(Build.VERSION_CODES.O)
     private void showPendingSystemUpdate() {
-        try {
-            // SystemUpdateInfo instance.
-            final Object updateInfo = ReflectionUtil.invoke(mDevicePolicyManager,
-                    "getPendingSystemUpdate", mAdminComponentName);
-            if (updateInfo == null) {
-                showToast(getString(R.string.update_info_no_update_toast));
-            } else {
-                final long timestamp = (long) ReflectionUtil.invoke(updateInfo, "getReceivedTime");
-                final String date = DateFormat.getDateTimeInstance().format(new Date(timestamp));
+        final SystemUpdateInfo updateInfo =
+                mDevicePolicyManager.getPendingSystemUpdate(mAdminComponentName);
+        if (updateInfo == null) {
+            showToast(getString(R.string.update_info_no_update_toast));
+        } else {
+            final long timestamp = updateInfo.getReceivedTime();
+            final String date = DateFormat.getDateTimeInstance().format(new Date(timestamp));
+            final int securityState = updateInfo.getSecurityPatchState();
+            final String securityText = securityState == SystemUpdateInfo.SECURITY_PATCH_STATE_FALSE
+                    ? getString(R.string.update_info_security_false)
+                    : (securityState == SystemUpdateInfo.SECURITY_PATCH_STATE_TRUE
+                            ? getString(R.string.update_info_security_true)
+                            : getString(R.string.update_info_security_unknown));
 
-                final Class updateInfoClazz = updateInfo.getClass();
-                final int securityFalseConst =
-                    ReflectionUtil.intConstant(updateInfoClazz, "SECURITY_PATCH_STATE_FALSE");
-                final int securityTrueConst =
-                    ReflectionUtil.intConstant(updateInfoClazz, "SECURITY_PATCH_STATE_TRUE");
-                final int securityState =
-                    (int) ReflectionUtil.invoke(updateInfo, "getSecurityPatchState");
-                final String securityText = securityState == securityFalseConst
-                        ? getString(R.string.update_info_security_false)
-                        : (securityState == securityTrueConst
-                                ? getString(R.string.update_info_security_true)
-                                : getString(R.string.update_info_security_unknown));
-
-                new AlertDialog.Builder(getActivity())
-                        .setTitle(R.string.update_info_title)
-                        .setMessage(getString(R.string.update_info_received, date, securityText))
-                        .setPositiveButton(android.R.string.ok, null)
-                        .show();
-            }
-        } catch (RuntimeException e) {
-            Log.e(TAG, "Failed to call getPendingSystemUpdate", e);
+            new AlertDialog.Builder(getActivity())
+                    .setTitle(R.string.update_info_title)
+                    .setMessage(getString(R.string.update_info_received, date, securityText))
+                    .setPositiveButton(android.R.string.ok, null)
+                    .show();
         }
     }
 
