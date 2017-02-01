@@ -4,5 +4,5 @@ interface IDeviceOwnerService {
     /**
      * Notify device owner that work profile is unlocked.
      */
-    oneway void notifyUserIsUnlocked();
+    oneway void notifyUserIsUnlocked(in UserHandle callingUserHandle);
 }

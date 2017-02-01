@@ -260,10 +260,10 @@
             testdpc:minSdkVersion="L" />
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="@string/comp_specific_policy_category_title">
+    <PreferenceCategory android:title="@string/bind_device_admin_category_title">
         <com.afwsamples.testdpc.common.preference.DpcPreference
-                android:key="comp_policies"
-                android:title="@string/comp_specific_policy_title"
+                android:key="bind_device_admin_policies"
+                android:title="@string/bind_device_admin_policy_title"
                 testdpc:admin="deviceOwner"
                 testdpc:minSdkVersion="O" />
     </PreferenceCategory>

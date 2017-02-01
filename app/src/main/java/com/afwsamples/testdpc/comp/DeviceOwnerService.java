@@ -22,6 +22,8 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.os.UserHandle;
+import android.os.UserManager;
 import android.util.Log;
 
 import com.afwsamples.testdpc.R;
@@ -43,17 +45,20 @@ public class DeviceOwnerService extends Service {
     }
 
     static class DeviceOwnerServiceImpl extends IDeviceOwnerService.Stub {
-        private Context mContext;
+        private final Context mContext;
+        private final UserManager mUserManager;
 
         private DeviceOwnerServiceImpl(Context context) {
             mContext = context;
+            mUserManager = (UserManager) context.getSystemService(Context.USER_SERVICE);
         }
 
         @Override
-        public void notifyUserIsUnlocked() throws RemoteException {
-            Util.showNotification(mContext, R.string.profile_status,
-                    mContext.getString(R.string.profile_is_unlocked), 0);
-            Log.d(TAG, "notifyUserIsUnlocked() called");
+        public void notifyUserIsUnlocked(UserHandle callingUserHandle) throws RemoteException {
+            long userSerialNumber = mUserManager.getSerialNumberForUser(callingUserHandle);
+            Util.showNotification(mContext, R.string.po_user_status,
+                    mContext.getString(R.string.po_user_is_unlocked, userSerialNumber), 0);
+            Log.d(TAG, "notifyUserIsUnlocked() called for user with serial " + userSerialNumber);
         }
     }
 }

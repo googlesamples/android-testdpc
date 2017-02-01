@@ -43,6 +43,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -155,19 +156,15 @@ public class Util {
         return Build.VERSION.SDK_INT >= VERSION_CODES.M;
     }
 
-    /**
-     * TODO: Replace the reflection once the API is in the O SDK.
-     */
+    @TargetApi(VERSION_CODES.O)
     public static List<UserHandle> getBindDeviceAdminTargetUsers(Context context) {
+        if (!BuildCompat.isAtLeastO()) {
+            return Collections.emptyList();
+        }
+
         final DevicePolicyManager dpm =
                 (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
-        return (List<UserHandle>) ReflectionUtil.invoke(dpm,
-                "getBindDeviceAdminTargetUsers",
-                DeviceAdminReceiver.getComponentName(context));
-    }
-
-    public static boolean isInCompMode(Context context) {
-        return BuildCompat.isAtLeastO() && getBindDeviceAdminTargetUsers(context).size() > 0;
+        return dpm.getBindDeviceAdminTargetUsers(DeviceAdminReceiver.getComponentName(context));
     }
 
     public static void showFileViewerForImportingCertificate(PreferenceFragment fragment,
