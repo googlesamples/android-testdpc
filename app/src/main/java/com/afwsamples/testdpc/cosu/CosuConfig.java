@@ -121,11 +121,16 @@ import java.util.Set;
         }
     }
 
-    public void applyPolicies(ComponentName admin) {
+    public boolean applyPolicies(ComponentName admin) {
         DevicePolicyManager dpm = (DevicePolicyManager) mContext.getSystemService(
                 Context.DEVICE_POLICY_SERVICE);
-        // set the lock task packages
-        dpm.setLockTaskPackages(admin, getKioskApps());
+
+        try {
+            dpm.setLockTaskPackages(admin, getKioskApps());
+        } catch (SecurityException e) {
+            Log.d(CosuUtils.TAG, "Exception when setting lock task packages", e);
+            return false;
+        }
 
         // hide apps
         for (String pkg : mHideApps) {
@@ -156,6 +161,8 @@ import java.util.Set;
         }
         dpm.setScreenCaptureDisabled(admin, mDisableScreenCapture);
         dpm.setCameraDisabled(admin, mDisableCamera);
+
+        return true;
     }
 
     @TargetApi(Build.VERSION_CODES.M)
