@@ -60,17 +60,17 @@ public class AppInfoArrayAdapter extends ArrayAdapter<String> {
                     false);
         }
 
+        final ImageView iconImageView = (ImageView) convertView.findViewById(R.id.pkg_icon);
+        final TextView pkgNameTextView = (TextView) convertView.findViewById(R.id.pkg_name);
         try {
             ApplicationInfo applicationInfo = mPackageManager.getApplicationInfo(getItem(position),
                     mAppInfoFlags);
-            ImageView iconImageView = (ImageView) convertView.findViewById(R.id.pkg_icon);
             iconImageView.setImageDrawable(mPackageManager.getApplicationIcon(applicationInfo));
-            TextView pkgNameTextView = (TextView) convertView.findViewById(R.id.pkg_name);
             pkgNameTextView.setText(mPackageManager.getApplicationLabel(applicationInfo));
         } catch (PackageManager.NameNotFoundException e) {
-            Log.e(TAG, "Package not found ", e);
-            // Returns an empty view in case the package is not found.
-            return new View(getContext());
+            // The package has probably been uninstalled so just show it's package name
+            iconImageView.setImageDrawable(null);
+            pkgNameTextView.setText(getItem(position));
         }
         return convertView;
     }
