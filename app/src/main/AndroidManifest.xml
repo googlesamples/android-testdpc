@@ -93,6 +93,16 @@
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
+
+        <activity
+                android:name=".provision.ProvisioningSuccessActivity"
+                android:theme="@android:style/Theme.NoDisplay">
+            <intent-filter>
+                <action android:name="android.app.action.PROVISIONING_SUCCESSFUL"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+
         <receiver
                 android:name=".DeviceAdminReceiver"
                 android:description="@string/app_name"
