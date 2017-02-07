@@ -288,6 +288,7 @@
     </string>
     <string name="start_lock_task">Start lock task mode</string>
     <string name="stop_lock_task">Stop lock task mode</string>
+    <string name="lock_task_unavailable">Cannot set lock task packages: This user is not affiliated</string>
 
     <!-- Strings for single-use devices -->
     <string name="single_use_devices">Single-use devices</string>

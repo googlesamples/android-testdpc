@@ -81,6 +81,8 @@ import com.afwsamples.testdpc.common.MediaDisplayFragment;
 import com.afwsamples.testdpc.common.ReflectionUtil;
 import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.common.preference.DpcPreference;
+import com.afwsamples.testdpc.common.preference.DpcPreferenceBase;
+import com.afwsamples.testdpc.common.preference.DpcPreferenceHelper;
 import com.afwsamples.testdpc.common.preference.DpcSwitchPreference;
 import com.afwsamples.testdpc.comp.CompSpecificFragment;
 import com.afwsamples.testdpc.policy.blockuninstallation.BlockUninstallationInfoArrayAdapter;
@@ -466,6 +468,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
         constrainSpecialCasePreferences();
 
+        maybeDisableLockTaskPreferences();
         loadAppStatus();
         loadSecurityPatch();
         loadDeviceOrganizationName();
@@ -482,6 +485,22 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         // Reset password can be used in all contexts since N
         if (BuildCompat.isAtLeastN()) {
             ((DpcPreference) findPreference(RESET_PASSWORD_KEY)).clearNonCustomConstraints();
+        }
+    }
+
+    /**
+     * Pre O, lock task APIs were only available to the Device Owner. From O, they are also
+     * available to affiliated profile owners. The XML file sets a deviceowner|profileowner
+     * restriction for those restriciton so further restricting them, if necessary
+     */
+    private void maybeDisableLockTaskPreferences() {
+        if (!BuildCompat.isAtLeastO()) {
+            String[] lockTaskPreferences = { MANAGE_LOCK_TASK_LIST_KEY,
+                    CHECK_LOCK_TASK_PERMITTED_KEY, START_LOCK_TASK, STOP_LOCK_TASK };
+            for (String preference : lockTaskPreferences) {
+                ((DpcPreferenceBase) findPreference(preference))
+                        .setAdminConstraint(DpcPreferenceHelper.ADMIN_DEVICE_OWNER);
+            }
         }
     }
 
@@ -516,9 +535,14 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                         new ManageLockTaskListCallback() {
                             @Override
                             public void onPositiveButtonClicked(String[] lockTaskArray) {
-                                mDevicePolicyManager.setLockTaskPackages(
-                                        DeviceAdminReceiver.getComponentName(getActivity()),
-                                        lockTaskArray);
+                                try {
+                                    mDevicePolicyManager.setLockTaskPackages(
+                                            DeviceAdminReceiver.getComponentName(getActivity()),
+                                            lockTaskArray);
+                                } catch (SecurityException e) {
+                                    Log.d(TAG, "Exception when setting lock task packages", e);
+                                    showToast(R.string.lock_task_unavailable);
+                                }
                             }
                         }
                 );

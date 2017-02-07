@@ -233,22 +233,22 @@
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="manage_lock_task"
             android:title="@string/manage_lock_task"
-            testdpc:user="primaryUser"
+            testdpc:admin="deviceOwner|profileOwner"
             testdpc:minSdkVersion="L" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="check_lock_task_permitted"
             android:title="@string/check_lock_task_permitted"
-            testdpc:user="primaryUser"
+            testdpc:admin="deviceOwner|profileOwner"
             testdpc:minSdkVersion="L" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="start_lock_task"
             android:title="@string/start_lock_task"
-            testdpc:user="primaryUser"
+            testdpc:admin="deviceOwner|profileOwner"
             testdpc:minSdkVersion="M" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="stop_lock_task"
             android:title="@string/stop_lock_task"
-            testdpc:user="primaryUser"
+            testdpc:admin="deviceOwner|profileOwner"
             testdpc:minSdkVersion="M" />
     </PreferenceCategory>
 
@@ -325,7 +325,7 @@
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="start_kiosk_mode"
             android:title="@string/start_kiosk_mode"
-            testdpc:user="primaryUser"
+            testdpc:admin="deviceOwner"
             testdpc:minSdkVersion="M" />
     </PreferenceCategory>
 
