@@ -19,6 +19,7 @@ package com.afwsamples.testdpc;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Process;
 import android.os.UserHandle;
 
 import com.afwsamples.testdpc.common.Util;
@@ -32,17 +33,16 @@ public class BootReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         final String action = intent.getAction();
         if (Intent.ACTION_BOOT_COMPLETED.equals(action)) {
-            if (!Util.isManagedProfile(context)) {
+            if (Util.isDeviceOwner(context)
+                    || Util.getBindDeviceAdminTargetUsers(context).size() == 0) {
                 return;
             }
-            if (!Util.isInCompMode(context)) {
-                return;
-            }
-            // In COMP mode, profile owner notifies device owner that it is running.
+            // We are a profile owner and can bind to the device owner - let's notify the device
+            // owner that we are up and running (i.e. our user was just started and/or unlocked)
             UserHandle targetUser = Util.getBindDeviceAdminTargetUsers(context).get(0);
             BindDeviceAdminServiceHelper<IDeviceOwnerService> helper =
                     createBindDeviceOwnerServiceHelper(context, targetUser);
-            helper.crossUserCall(service -> service.notifyUserIsUnlocked());
+            helper.crossUserCall(service -> service.notifyUserIsUnlocked(Process.myUserHandle()));
         }
     }
 

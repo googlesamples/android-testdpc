@@ -151,7 +151,6 @@ public class UserRestrictionsDisplayFragment extends PreferenceFragment
             DISALLOW_NETWORK_RESET,
             DISALLOW_OUTGOING_CALLS,
             DISALLOW_REMOVE_MANAGED_PROFILE,
-            DISALLOW_REMOVE_USER,
             DISALLOW_SAFE_BOOT,
             DISALLOW_SMS,
             DISALLOW_UNMUTE_MICROPHONE,
@@ -170,6 +169,7 @@ public class UserRestrictionsDisplayFragment extends PreferenceFragment
      * These restrictions are not meant to be used with managed profiles.
      */
     private static String[] NON_MANAGED_PROFILE_RESTRICTIONS = {
+            DISALLOW_REMOVE_USER,
             DISALLOW_SET_WALLPAPER
     };
 

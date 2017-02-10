@@ -2,7 +2,7 @@ package com.afwsamples.testdpc.search;
 
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.BaseSearchablePolicyPreferenceFragment;
-import com.afwsamples.testdpc.comp.CompSpecificFragment;
+import com.afwsamples.testdpc.comp.BindDeviceAdminFragment;
 import com.afwsamples.testdpc.policy.PolicyManagementFragment;
 import com.afwsamples.testdpc.policy.keyguard.LockScreenPolicyFragment;
 import com.afwsamples.testdpc.policy.keyguard.PasswordConstraintsFragment;
@@ -22,7 +22,7 @@ import java.util.List;
  * </p>
  */
 public class IndexableFragments {
-    private static List<IndexableFragment> sIndexableFragments = new ArrayList<>();
+    private static final List<IndexableFragment> sIndexableFragments = new ArrayList<>();
 
     static {
         sIndexableFragments.add(new IndexableFragment(PolicyManagementFragment.class,
@@ -33,8 +33,8 @@ public class IndexableFragments {
                 R.xml.lock_screen_preferences));
         sIndexableFragments.add(new IndexableFragment(PasswordConstraintsFragment.class,
                 R.xml.password_constraint_preferences));
-        sIndexableFragments.add(new IndexableFragment(CompSpecificFragment.class,
-                R.xml.comp_policies));
+        sIndexableFragments.add(new IndexableFragment(BindDeviceAdminFragment.class,
+                R.xml.bind_device_admin_policies));
     }
 
     public static List<IndexableFragment> values() {

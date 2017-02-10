@@ -84,7 +84,7 @@ import com.afwsamples.testdpc.common.preference.DpcPreference;
 import com.afwsamples.testdpc.common.preference.DpcPreferenceBase;
 import com.afwsamples.testdpc.common.preference.DpcPreferenceHelper;
 import com.afwsamples.testdpc.common.preference.DpcSwitchPreference;
-import com.afwsamples.testdpc.comp.CompSpecificFragment;
+import com.afwsamples.testdpc.comp.BindDeviceAdminFragment;
 import com.afwsamples.testdpc.policy.blockuninstallation.BlockUninstallationInfoArrayAdapter;
 import com.afwsamples.testdpc.policy.certificate.DelegatedCertInstallerFragment;
 import com.afwsamples.testdpc.policy.keyguard.LockScreenPolicyFragment;
@@ -299,7 +299,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String SECURITY_PATCH_FORMAT = "yyyy-MM-dd";
     private static final String SET_NEW_PASSWORD = "set_new_password";
     private static final String SET_PROFILE_PARENT_NEW_PASSWORD = "set_profile_parent_new_password";
-    private static final String COMP_POLICIES = "comp_policies";
+    private static final String BIND_DEVICE_ADMIN_POLICIES = "bind_device_admin_policies";
 
     private static final String BATTERY_PLUGGED_ANY = Integer.toString(
             BatteryManager.BATTERY_PLUGGED_AC |
@@ -455,12 +455,13 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(SET_NEW_PASSWORD).setOnPreferenceClickListener(this);
         findPreference(SET_PROFILE_PARENT_NEW_PASSWORD).setOnPreferenceClickListener(this);
 
-        DpcPreference compPreference = (DpcPreference) findPreference(COMP_POLICIES);
-        compPreference.setCustomConstraint(
-                () -> Util.isInCompMode(getActivity())
+        DpcPreference bindDeviceAdminPreference =
+                (DpcPreference) findPreference(BIND_DEVICE_ADMIN_POLICIES);
+        bindDeviceAdminPreference.setCustomConstraint(
+                () -> (Util.getBindDeviceAdminTargetUsers(getActivity()).size() == 1)
                         ? NO_CUSTOM_CONSTRIANT
-                        : R.string.require_comp);
-        compPreference.setOnPreferenceClickListener(this);
+                        : R.string.require_one_po_to_bind);
+        bindDeviceAdminPreference.setOnPreferenceClickListener(this);
 
         mSetAutoTimeRequiredPreference = (SwitchPreference) findPreference(
                 SET_AUTO_TIME_REQUIRED_KEY);
@@ -772,8 +773,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 startActivity(
                         new Intent(DevicePolicyManager.ACTION_SET_NEW_PARENT_PROFILE_PASSWORD));
                 return true;
-            case COMP_POLICIES:
-                showFragment(new CompSpecificFragment());
+            case BIND_DEVICE_ADMIN_POLICIES:
+                showFragment(new BindDeviceAdminFragment());
                 return true;
         }
         return false;

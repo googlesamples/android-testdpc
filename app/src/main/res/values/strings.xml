@@ -753,14 +753,19 @@
     <string name="request_to_set_new_password">Request user to set new password</string>
     <string name="request_to_set_profile_parent_new_password">Request user to set profile parent new password</string>
 
-    <string name="comp_specific_policy_category_title">Corp owned managed profile (COMP) policies</string>
-    <string name="comp_specific_policy_title">COMP specific policies</string>
+    <!-- Device owner to profile owner communication (COMP and DO<->PO of secondary users) -->
+    <string name="bind_device_admin_category_title">Bind to profile owner</string>
+    <string name="bind_device_admin_policy_title">Bind to profile owner service</string>
 
-    <string name="profile_status">Work profile status</string>
-    <string name="profile_is_not_running">Work profile is not running</string>
-    <string name="profile_is_running_but_locked">Work profile is running but locked</string>
-    <string name="profile_is_unlocked">Work profile is unlocked</string>
-    <string name="require_comp">Requires a corp owned managed profile</string>
-    <string name="hide_profile_launcher_icon">Hide the launcher icon in profile</string>
-    <string name="profile_user_status_is_changed">Work profile user status is changed</string>
+    <string name="bind_to_profile_owner_failed">Failed to bind to profile owner. Is the user running/unlocked?</string>
+    <string name="po_user_status">Profile owner user status</string>
+    <string name="managed_profile_not_running">Managed profile not running</string>
+    <string name="managed_profile_running_but_locked">Managed profile running but locked</string>
+    <string name="managed_profile_not_running_or_unlocked">Managed Profile not running or is locked</string>
+    <string name="managed_profile_unlocked">Managed Profile unlocked</string>
+    <string name="po_user_is_unlocked">Profile owner user with serial number %1$d is unlocked</string>
+    <string name="po_user_is_secondary">Profile owner belongs to secondary user</string>
+    <string name="require_one_po_to_bind">Requires exactly one profile owner allowed to bind to</string>
+    <string name="hide_profile_owner_launcher_icon">Hide profile owner icon</string>
+    <string name="install_ca_cert_in_po_user">Install CA certificate in the profile owner user</string>
 </resources>

@@ -28,6 +28,7 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.os.UserHandle;
 import android.util.Log;
+import android.widget.SectionIndexer;
 
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 
@@ -39,11 +40,11 @@ import com.afwsamples.testdpc.DeviceAdminReceiver;
 public class BindDeviceAdminServiceHelper<T> {
     private static final String TAG = "BindDeviceAdminService";
 
-    private Context mContext;
-    private DevicePolicyManager mDpm;
-    private Intent mServiceIntent;
-    private UserHandle mTargetUserHandle;
-    private ServiceInterfaceConverter<T> mServiceInterfaceConverter;
+    private final Context mContext;
+    private final DevicePolicyManager mDpm;
+    private final Intent mServiceIntent;
+    private final UserHandle mTargetUserHandle;
+    private final ServiceInterfaceConverter<T> mServiceInterfaceConverter;
 
     /**
      * @param context
@@ -74,6 +75,7 @@ public class BindDeviceAdminServiceHelper<T> {
         final ServiceConnection serviceConnection = new ServiceConnection() {
             @Override
             public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+                Log.d(TAG, "onServiceConnected() called");
                 T service = mServiceInterfaceConverter.convert(iBinder);
                 try {
                     listener.onServiceConnected(service);
@@ -86,14 +88,20 @@ public class BindDeviceAdminServiceHelper<T> {
 
             @Override
             public void onServiceDisconnected(ComponentName componentName) {
+                Log.e(TAG, "onServiceDisconnected() called");
                 mContext.unbindService(this);
             }
         };
-        return mDpm.bindDeviceAdminServiceAsUser(
-                DeviceAdminReceiver.getComponentName(mContext),
-                mServiceIntent,
-                serviceConnection,
-                Context.BIND_AUTO_CREATE,
-                mTargetUserHandle);
+        try {
+            return mDpm.bindDeviceAdminServiceAsUser(
+                    DeviceAdminReceiver.getComponentName(mContext),
+                    mServiceIntent,
+                    serviceConnection,
+                    Context.BIND_AUTO_CREATE,
+                    mTargetUserHandle);
+        } catch (SecurityException | IllegalArgumentException e) {
+            Log.e(TAG, "Cannot bind to user " + mTargetUserHandle, e);
+            return false;
+        }
     }
 }
