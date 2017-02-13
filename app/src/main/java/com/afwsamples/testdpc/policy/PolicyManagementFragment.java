@@ -948,10 +948,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         mDevicePolicyManager.setScreenCaptureDisabled(mAdminComponentName, disabled);
     }
 
-    private void setMasterVolumeMuted(boolean muted) {
-
-    }
-
     @TargetApi(Build.VERSION_CODES.O)
     private boolean isSecurityLoggingEnabled() {
         return mDevicePolicyManager.isSecurityLoggingEnabled(mAdminComponentName);

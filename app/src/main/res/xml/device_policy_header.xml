@@ -133,6 +133,7 @@
         <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
             android:key="mute_audio"
             android:title="@string/mute_audio"
+            testdpc:user="notManagedProfile"
             testdpc:minSdkVersion="L" />
     </PreferenceCategory>
 
