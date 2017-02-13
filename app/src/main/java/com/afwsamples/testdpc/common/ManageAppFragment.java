@@ -23,9 +23,20 @@ import com.afwsamples.testdpc.R;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public abstract class ManageAppFragment extends BaseManageComponentFragment<ApplicationInfo> {
+    /**
+     * List of packages always shown in the app list.
+     */
+    private static final Set<String> WHITELISTED_APPS = new HashSet<>();
+    static {
+        // GmsCore
+        WHITELISTED_APPS.add("com.google.android.gms");
+    }
+
     @Override
     protected SpinnerAdapter createSpinnerAdapter() {
         List<ApplicationInfo> managedAppList = getInstalledOrLaunchableApps();
@@ -35,14 +46,14 @@ public abstract class ManageAppFragment extends BaseManageComponentFragment<Appl
                 managedAppList);
     }
 
-
     private List<ApplicationInfo> getInstalledOrLaunchableApps() {
         List<ApplicationInfo> installedApps = mPackageManager.getInstalledApplications(
                 0 /* Default flags */);
         List<ApplicationInfo> filteredAppList = new ArrayList<>();
         for (ApplicationInfo applicationInfo : installedApps) {
             if (mPackageManager.getLaunchIntentForPackage(applicationInfo.packageName) != null
-                    || (applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0) {
+                    || (applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0
+                    || WHITELISTED_APPS.contains(applicationInfo.packageName)) {
                 filteredAppList.add(applicationInfo);
             }
         }
