@@ -45,6 +45,10 @@
             android:key="get_disable_account_management"
             android:title="@string/get_disable_account_management"
             testdpc:minSdkVersion="L" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="add_account"
+            android:title="@string/add_account"
+            testdpc:minSdkVersion="L" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/apps_management_title">

@@ -71,6 +71,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import com.afwsamples.testdpc.AddAccountActivity;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.SetupManagementActivity;
@@ -239,6 +240,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String GET_CA_CERTIFICATES_KEY = "get_ca_certificates";
     private static final String GET_DISABLE_ACCOUNT_MANAGEMENT_KEY
             = "get_disable_account_management";
+    private static final String ADD_ACCOUNT_KEY = "add_account";
     private static final String HIDE_APPS_KEY = "hide_apps";
     private static final String INSTALL_CA_CERTIFICATE_KEY = "install_ca_certificate";
     private static final String INSTALL_KEY_CERTIFICATE_KEY = "install_key_certificate";
@@ -416,6 +418,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(SET_INPUT_METHODS_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_DISABLE_ACCOUNT_MANAGEMENT_KEY).setOnPreferenceClickListener(this);
         findPreference(GET_DISABLE_ACCOUNT_MANAGEMENT_KEY).setOnPreferenceClickListener(this);
+        findPreference(ADD_ACCOUNT_KEY).setOnPreferenceClickListener(this);
         findPreference(BLOCK_UNINSTALLATION_BY_PKG_KEY).setOnPreferenceClickListener(this);
         findPreference(BLOCK_UNINSTALLATION_LIST_KEY).setOnPreferenceClickListener(this);
         findPreference(ENABLE_SYSTEM_APPS_KEY).setOnPreferenceClickListener(this);
@@ -607,6 +610,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 return true;
             case GET_DISABLE_ACCOUNT_MANAGEMENT_KEY:
                 showDisableAccountTypeList();
+                return true;
+            case ADD_ACCOUNT_KEY:
+                getActivity().startActivity(new Intent(getActivity(), AddAccountActivity.class));
                 return true;
             case CREATE_MANAGED_PROFILE_KEY:
                 showSetupManagement();

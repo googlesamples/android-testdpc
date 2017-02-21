@@ -17,15 +17,17 @@
 package com.afwsamples.testdpc;
 
 import android.accounts.AccountManager;
-import android.accounts.AccountManagerCallback;
-import android.accounts.AccountManagerFuture;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
+import android.app.admin.DevicePolicyManager;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.UserManager;
+import android.support.v4.os.BuildCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -51,10 +53,21 @@ public class AddAccountActivity extends Activity implements NavigationBar.Naviga
     public static final String EXTRA_NEXT_ACTIVITY_INTENT = "nextActivityIntent";
 
     private Intent mNextActivityIntent = null;
+    private boolean mDisallowModifyAccounts;
+
+    private UserManager mUserManager;
+    private DevicePolicyManager mDevicePolicyManager;
+    private ComponentName mAdminComponentName;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mUserManager = (UserManager) getSystemService(Context.USER_SERVICE);
+        mDevicePolicyManager =
+                (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
+        mAdminComponentName = DeviceAdminReceiver.getComponentName(this);
 
         setContentView(R.layout.activity_add_account);
         SetupWizardLayout layout = (SetupWizardLayout) findViewById(R.id.setup_wizard_layout);
@@ -66,10 +79,18 @@ public class AddAccountActivity extends Activity implements NavigationBar.Naviga
         if (extras != null) {
             mNextActivityIntent = (Intent) extras.get(EXTRA_NEXT_ACTIVITY_INTENT);
         }
-        if (mNextActivityIntent == null) {
-            Log.e(TAG, EXTRA_NEXT_ACTIVITY_INTENT + " extra must be provided");
-            finish();
-        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        disableUserRestrictions();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        restoreUserRestrictions();
     }
 
     private void addAccount(String accountName) {
@@ -80,31 +101,48 @@ public class AddAccountActivity extends Activity implements NavigationBar.Naviga
         }
 
         accountManager.addAccount(GOOGLE_ACCOUNT_TYPE, null, null, bundle, this,
-                new AccountManagerCallback<Bundle>() {
-                    @Override
-                    public void run(AccountManagerFuture<Bundle> accountManagerFuture) {
-                        boolean isAccountAdded = false;
-                        String accountNameAdded = null;
-                        try {
-                            Bundle bundle = accountManagerFuture.getResult();
-                            if (bundle.containsKey(AccountManager.KEY_ACCOUNT_NAME)) {
-                                isAccountAdded = true;
-                                accountNameAdded =
-                                        bundle.getString(AccountManager.KEY_ACCOUNT_NAME);
-                            }
-                        } catch (OperationCanceledException | AuthenticatorException
-                                | IOException e) {
-                            Log.e(TAG, "addAccount - failed", e);
-                            Toast.makeText(AddAccountActivity.this,
-                                    R.string.fail_to_add_account, Toast.LENGTH_LONG).show();
-                            return;
+                accountManagerFuture -> {
+                    try {
+                        Bundle result = accountManagerFuture.getResult();
+                        String accountNameAdded = result.getString(AccountManager.KEY_ACCOUNT_NAME);
+                        Log.d(TAG, "addAccount - accountNameAdded: " + accountNameAdded);
+                        if (mNextActivityIntent != null) {
+                            startActivity(mNextActivityIntent);
                         }
-                        Log.d(TAG, "addAccount - isAccountAdded: " + isAccountAdded
-                                + ", accountNameAdded: " + accountNameAdded);
-                        startActivity(mNextActivityIntent);
                         finish();
+                    } catch (OperationCanceledException | AuthenticatorException
+                            | IOException e) {
+                        Log.e(TAG, "addAccount - failed", e);
+                        Toast.makeText(AddAccountActivity.this,
+                                R.string.fail_to_add_account, Toast.LENGTH_LONG).show();
                     }
                 }, null);
+    }
+
+    private void disableUserRestrictions() {
+        if (BuildCompat.isAtLeastN()) {
+            // DPC is allowed to bypass DISALLOW_MODIFY_ACCOUNTS on N or above.
+            Log.v(TAG, "skip disabling user restriction on N or above");
+            return;
+        }
+        Log.v(TAG, "disabling user restrictions");
+        mDisallowModifyAccounts =
+                mUserManager.hasUserRestriction(UserManager.DISALLOW_MODIFY_ACCOUNTS);
+        mDevicePolicyManager
+                .clearUserRestriction(mAdminComponentName, UserManager.DISALLOW_MODIFY_ACCOUNTS);
+    }
+
+    private void restoreUserRestrictions() {
+        if (BuildCompat.isAtLeastN()) {
+            // DPC is allowed to bypass DISALLOW_MODIFY_ACCOUNTS on N or above.
+            Log.v(TAG, "skip restoring user restrictions on N or above");
+            return;
+        }
+        Log.v(TAG, "restoring user restrictions");
+        if (mDisallowModifyAccounts) {
+            mDevicePolicyManager
+                    .addUserRestriction(mAdminComponentName, UserManager.DISALLOW_MODIFY_ACCOUNTS);
+        }
     }
 
     @Override
@@ -120,20 +158,19 @@ public class AddAccountActivity extends Activity implements NavigationBar.Naviga
                         .setTitle(R.string.add_account_dialog_title)
                         .setView(view)
                         .setPositiveButton(android.R.string.ok,
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        EditText editText = (EditText) view.findViewById(
-                                                R.id.input);
-                                        String accountName = editText.getText().toString();
-                                        addAccount(accountName);
-                                    }
+                                (dialogInterface, i) -> {
+                                    EditText editText = (EditText) view.findViewById(
+                                            R.id.input);
+                                    String accountName = editText.getText().toString();
+                                    addAccount(accountName);
                                 })
                         .show();
                 break;
             case R.id.add_account_skip:
-                mNextActivityIntent.putExtra(EnableProfileActivity.EXTRA_ENABLE_PROFILE_NOW, true);
-                startActivity(mNextActivityIntent);
+                if (mNextActivityIntent != null) {
+                    mNextActivityIntent.putExtra(EnableProfileActivity.EXTRA_ENABLE_PROFILE_NOW, true);
+                    startActivity(mNextActivityIntent);
+                }
                 finish();
                 break;
         }
