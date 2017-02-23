@@ -190,6 +190,12 @@
 
     <PreferenceCategory android:title="@string/lock_category">
         <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="password_compliant"
+            android:selectable="false"
+            android:title="@string/password_compliant_title"
+            testdpc:minSdkVersion="N" />
+
+        <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="lock_screen_policy"
             android:title="@string/lock_screen_policy"
             testdpc:minSdkVersion="L" />
