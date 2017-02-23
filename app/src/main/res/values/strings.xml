@@ -679,6 +679,10 @@
     </plurals>
     <string name="password_failed_no_limit_set">No limit set on failed password attempts.</string>
 
+    <string name="password_compliant_title">Active password compliant</string>
+    <string name="password_compliant_profile_summary">Personal: %1$s, Work: %2$s</string>
+    <string name="password_compliant_summary">Compliant %1$s</string>
+
     <!-- Strings for setting a new password -->
     <string name="reset_password">Reset password</string>
     <string name="new_password">New password</string>

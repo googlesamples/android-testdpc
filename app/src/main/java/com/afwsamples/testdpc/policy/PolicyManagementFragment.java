@@ -226,6 +226,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String DELEGATED_CERT_INSTALLER_KEY = "manage_cert_installer";
     private static final String APP_STATUS_KEY = "app_status";
     private static final String SECURITY_PATCH_KEY = "security_patch";
+    private static final String PASSWORD_COMPLIANT_KEY = "password_compliant";
     private static final String DISABLE_CAMERA_KEY = "disable_camera";
     private static final String DISABLE_KEYGUARD = "disable_keyguard";
     private static final String DISABLE_SCREEN_CAPTURE_KEY = "disable_screen_capture";
@@ -528,6 +529,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         // so, we need to make sure the preference gets updated accordingly.
         updateStayOnWhilePluggedInPreference();
         updateInstallNonMarketAppsPreference();
+        loadPasswordCompliant();
     }
 
     @Override
@@ -1572,6 +1574,30 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 // Method not implemented yet.
             }
         }
+    }
+
+    @TargetApi(Build.VERSION_CODES.N)
+    private void loadPasswordCompliant() {
+        Preference passwordCompliantPreference = findPreference(PASSWORD_COMPLIANT_KEY);
+        if (!passwordCompliantPreference.isEnabled()) {
+            return;
+        }
+
+        String summary;
+        boolean compliant = mDevicePolicyManager.isActivePasswordSufficient();
+        if (Util.isManagedProfile(getActivity())) {
+            DevicePolicyManager parentDpm
+                    = mDevicePolicyManager.getParentProfileInstance(mAdminComponentName);
+            boolean parentCompliant = parentDpm.isActivePasswordSufficient();
+            summary = String.format(getResources()
+                    .getString(R.string.password_compliant_profile_summary),
+                    Boolean.toString(parentCompliant), Boolean.toString(compliant));
+        } else {
+            summary = String.format(getResources()
+                    .getString(R.string.password_compliant_summary),
+                    Boolean.toString(compliant));
+        }
+        passwordCompliantPreference.setSummary(summary);
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
