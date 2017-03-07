@@ -145,11 +145,18 @@ public class Util {
         }
     }
 
-    @TargetApi(VERSION_CODES.M)
+    @TargetApi(VERSION_CODES.LOLLIPOP)
     public static boolean isDeviceOwner(Context context) {
         final DevicePolicyManager dpm =
                 (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
         return dpm.isDeviceOwnerApp(context.getPackageName());
+    }
+
+    @TargetApi(VERSION_CODES.LOLLIPOP)
+    public static boolean isProfileOwner(Context context) {
+        final DevicePolicyManager dpm =
+                (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
+        return dpm.isProfileOwnerApp(context.getPackageName());
     }
 
     public static boolean isAtLeastM() {

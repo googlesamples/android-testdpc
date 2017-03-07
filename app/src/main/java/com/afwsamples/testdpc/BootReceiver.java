@@ -33,7 +33,7 @@ public class BootReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         final String action = intent.getAction();
         if (Intent.ACTION_BOOT_COMPLETED.equals(action)) {
-            if (Util.isDeviceOwner(context)
+            if (!Util.isProfileOwner(context)
                     || Util.getBindDeviceAdminTargetUsers(context).size() == 0) {
                 return;
             }
