@@ -298,6 +298,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String UNHIDE_APPS_KEY = "unhide_apps";
     private static final String UNSUSPEND_APPS_KEY = "unsuspend_apps";
     private static final String WIPE_DATA_KEY = "wipe_data";
+    private static final String PERSISTENT_DEVICE_OWNER_KEY = "persistent_device_owner";
     private static final String CREATE_WIFI_CONFIGURATION_KEY = "create_wifi_configuration";
     private static final String CREATE_EAP_TLS_WIFI_CONFIGURATION_KEY
             = "create_eap_tls_wifi_configuration";
@@ -409,6 +410,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 STAY_ON_WHILE_PLUGGED_IN);
         mStayOnWhilePluggedInSwitchPreference.setOnPreferenceChangeListener(this);
         findPreference(WIPE_DATA_KEY).setOnPreferenceClickListener(this);
+        findPreference(PERSISTENT_DEVICE_OWNER_KEY).setOnPreferenceClickListener(this);
         findPreference(REMOVE_DEVICE_OWNER_KEY).setOnPreferenceClickListener(this);
         mEnableBackupServicePreference = (SwitchPreference) findPreference(ENABLE_BACKUP_SERVICE);
         mEnableBackupServicePreference.setOnPreferenceChangeListener(this);
@@ -584,6 +586,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 return true;
             case WIPE_DATA_KEY:
                 showWipeDataPrompt();
+                return true;
+            case PERSISTENT_DEVICE_OWNER_KEY:
+                showFragment(new PersistentDeviceOwnerFragment());
                 return true;
             case REMOVE_DEVICE_OWNER_KEY:
                 showRemoveDeviceOwnerPrompt();
