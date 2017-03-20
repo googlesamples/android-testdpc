@@ -1,5 +1,6 @@
 package com.afwsamples.testdpc.profilepolicy.delegation;
 
+import android.app.admin.DevicePolicyManager;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
@@ -40,26 +41,23 @@ class DelegationScopesArrayAdapter
         DelegationFragment.DelegationScope delegationScope = getItem(position);
         viewHolder.setChecked(delegationScope.granted);
         switch (delegationScope.scope) {
-            case DelegationFragment.DELEGATION_CERT_INSTALL:
+            case DevicePolicyManager.DELEGATION_CERT_INSTALL:
                 viewHolder.setText(R.string.delegation_scope_cert_install);
                 break;
-            case DelegationFragment.DELEGATION_APP_RESTRICTIONS:
+            case DevicePolicyManager.DELEGATION_APP_RESTRICTIONS:
                 viewHolder.setText(R.string.delegation_scope_app_restrictions);
                 break;
-            case DelegationFragment.DELEGATION_BLOCK_UNINSTALL:
+            case DevicePolicyManager.DELEGATION_BLOCK_UNINSTALL:
                 viewHolder.setText(R.string.delegation_scope_block_uninstall);
                 break;
-            case DelegationFragment.DELEGATION_PERMISSION_GRANT:
+            case DevicePolicyManager.DELEGATION_PERMISSION_GRANT:
                 viewHolder.setText(R.string.delegation_scope_permission_grant);
                 break;
-            case DelegationFragment.DELEGATION_PACKAGE_ACCESS:
+            case DevicePolicyManager.DELEGATION_PACKAGE_ACCESS:
                 viewHolder.setText(R.string.delegation_scope_package_access);
                 break;
-            case DelegationFragment.DELEGATION_ENABLE_SYSTEM_APP:
+            case DevicePolicyManager.DELEGATION_ENABLE_SYSTEM_APP:
                 viewHolder.setText(R.string.delegation_scope_enable_system_app);
-                break;
-            case DelegationFragment.DELEGATION_KEEP_UNINSTALLED_PACKAGES:
-                viewHolder.setText(R.string.delegation_scope_keep_uninstalled_packages);
                 break;
         }
 

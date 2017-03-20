@@ -16,10 +16,11 @@
 
 package com.afwsamples.testdpc.profilepolicy.delegation;
 
+import android.annotation.TargetApi;
 import android.app.admin.DevicePolicyManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -32,11 +33,9 @@ import android.widget.Toast;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.ManageAppFragment;
-import com.afwsamples.testdpc.common.ReflectionUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -47,19 +46,6 @@ public class DelegationFragment extends ManageAppFragment {
     private static final String TAG = DelegationFragment.class.getSimpleName();
 
     private DevicePolicyManager mDpm;
-
-    /**
-     * Delegation scopes.
-     */
-    // TODO(edmanp) Import constants from DPM after CLs land ag/1658534, ag/1732483, ag/1781370.
-    public static final String DELEGATION_CERT_INSTALL = "delegation-cert-install";
-    public static final String DELEGATION_APP_RESTRICTIONS = "delegation-app-restrictions";
-    public static final String DELEGATION_BLOCK_UNINSTALL = "delegation-block-uninstall";
-    public static final String DELEGATION_PERMISSION_GRANT = "delegation-permission-grant";
-    public static final String DELEGATION_PACKAGE_ACCESS = "delegation-package-access";
-    public static final String DELEGATION_ENABLE_SYSTEM_APP = "delegation-enable-system-app";
-    public static final String DELEGATION_KEEP_UNINSTALLED_PACKAGES =
-            "delegation-keep-uninstalled-packages";
 
     /**
      * Model for representing the scopes delegated to the selected app.
@@ -86,21 +72,12 @@ public class DelegationFragment extends ManageAppFragment {
     /**
      * Query the DevicePolicyManager for the delegation scopes granted to pkgName.
      */
+    @TargetApi(Build.VERSION_CODES.O)
     private void readScopesFromDpm(String pkgName) {
         // Get the scopes delegated to pkgName.
-        List<String> scopes;
-        // TODO(edmanp) Call DPM directly after CL lands ag/1658534.
-        try {
-            scopes = (List<String>) ReflectionUtil.invoke(mDpm, "getDelegatedScopes",
-                    new Class<?>[] {ComponentName.class, String.class},
-                    DeviceAdminReceiver.getComponentName(getActivity()), pkgName);
-            Log.i(TAG, pkgName + " | " + Arrays.toString(scopes.toArray()));
-        } catch (RuntimeException e) {
-            Toast.makeText(getActivity(), getString(R.string.delegation_error),
-                    Toast.LENGTH_SHORT).show();
-            Log.e(TAG, "Error on getDelegatedScopes", e);
-            scopes = Collections.EMPTY_LIST;
-        }
+        List<String> scopes = mDpm.getDelegatedScopes(
+                DeviceAdminReceiver.getComponentName(getActivity()), pkgName);
+        Log.i(TAG, pkgName + " | " + Arrays.toString(scopes.toArray()));
 
         // Update our model.
         for (DelegationScope delegationScope : mDelegations) {
@@ -142,6 +119,7 @@ public class DelegationFragment extends ManageAppFragment {
     }
 
     @Override
+    @TargetApi(Build.VERSION_CODES.O)
     protected void saveConfig() {
         // Get selected package name.
         final ApplicationInfo info = (ApplicationInfo) mManagedAppsSpinner.getSelectedItem();
@@ -151,19 +129,10 @@ public class DelegationFragment extends ManageAppFragment {
         final List<String> scopes = readScopesFromUi();
 
         // Set the delegated scopes.
-        // TODO(edmanp) Call DPM directly after CL lands ag/1658534.
-        try {
-            ReflectionUtil.invoke(mDpm, "setDelegatedScopes",
-                    new Class<?>[] {ComponentName.class, String.class, List.class},
-                    DeviceAdminReceiver.getComponentName(getActivity()),
-                    pkgName, scopes);
-            Toast.makeText(getActivity(), getString(R.string.delegation_success),
-                    Toast.LENGTH_SHORT).show();
-        } catch (RuntimeException e) {
-            Toast.makeText(getActivity(), getString(R.string.delegation_error),
-                    Toast.LENGTH_SHORT).show();
-            Log.e(TAG, "Error on getDelegatedScopes", e);
-        }
+        mDpm.setDelegatedScopes(
+                DeviceAdminReceiver.getComponentName(getActivity()), pkgName, scopes);
+        Toast.makeText(getActivity(), getString(R.string.delegation_success),
+                Toast.LENGTH_SHORT).show();
 
         Log.i(TAG, Arrays.toString(scopes.toArray()) + " | " + pkgName);
     }
@@ -194,15 +163,21 @@ public class DelegationFragment extends ManageAppFragment {
             this.granted = false;
         }
 
+        @TargetApi(Build.VERSION_CODES.O)
         static List<DelegationScope> defaultDelegationScopes() {
             List<DelegationScope> defaultDelegations = new ArrayList<>();
-            defaultDelegations.add(new DelegationScope(DELEGATION_CERT_INSTALL));
-            defaultDelegations.add(new DelegationScope(DELEGATION_APP_RESTRICTIONS));
-            defaultDelegations.add(new DelegationScope(DELEGATION_BLOCK_UNINSTALL));
-            defaultDelegations.add(new DelegationScope(DELEGATION_PERMISSION_GRANT));
-            defaultDelegations.add(new DelegationScope(DELEGATION_PACKAGE_ACCESS));
-            defaultDelegations.add(new DelegationScope(DELEGATION_ENABLE_SYSTEM_APP));
-            defaultDelegations.add(new DelegationScope(DELEGATION_KEEP_UNINSTALLED_PACKAGES));
+            defaultDelegations.add(
+                    new DelegationScope(DevicePolicyManager.DELEGATION_CERT_INSTALL));
+            defaultDelegations.add(
+                    new DelegationScope(DevicePolicyManager.DELEGATION_APP_RESTRICTIONS));
+            defaultDelegations.add(
+                    new DelegationScope(DevicePolicyManager.DELEGATION_BLOCK_UNINSTALL));
+            defaultDelegations.add(
+                    new DelegationScope(DevicePolicyManager.DELEGATION_PERMISSION_GRANT));
+            defaultDelegations.add(
+                    new DelegationScope(DevicePolicyManager.DELEGATION_PACKAGE_ACCESS));
+            defaultDelegations.add(
+                    new DelegationScope(DevicePolicyManager.DELEGATION_ENABLE_SYSTEM_APP));
             return defaultDelegations;
         }
     }
