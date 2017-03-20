@@ -79,7 +79,6 @@ import com.afwsamples.testdpc.common.AppInfoArrayAdapter;
 import com.afwsamples.testdpc.common.BaseSearchablePolicyPreferenceFragment;
 import com.afwsamples.testdpc.common.CertificateUtil;
 import com.afwsamples.testdpc.common.MediaDisplayFragment;
-import com.afwsamples.testdpc.common.ReflectionUtil;
 import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.common.preference.DpcPreference;
 import com.afwsamples.testdpc.common.preference.DpcPreferenceBase;
@@ -477,7 +476,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         maybeDisableLockTaskPreferences();
         loadAppStatus();
         loadSecurityPatch();
-        loadDeviceOrganizationName();
         reloadCameraDisableUi();
         reloadScreenCaptureDisableUi();
         reloadMuteAudioUi();
@@ -1555,25 +1553,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         }
         String display = DateFormat.getDateInstance(DateFormat.MEDIUM).format(date);
         securityPatchPreference.setSummary(display);
-    }
-
-    // TODO: Uncomment once O's API level is decided
-    // @TargetApi(Build.VERSION_CODES.O)
-    private void loadDeviceOrganizationName() {
-        mSetDeviceOrganizationNamePreference = findPreference(SET_DEVICE_ORGANIZATION_NAME_KEY);
-
-        if (mSetDeviceOrganizationNamePreference.isEnabled()) {
-            mSetDeviceOrganizationNamePreference.setOnPreferenceChangeListener(this);
-            try {
-                final CharSequence organizationName = (CharSequence) ReflectionUtil.invoke(
-                        mDevicePolicyManager, "getDeviceOwnerOrganizationName");
-                final String name = organizationName != null ? organizationName.toString() : null;
-                mSetDeviceOrganizationNamePreference.setSummary(name);
-            } catch (RuntimeException e) {
-                // TODO: Remove this exception handler once O's API is final.
-                // Method not implemented yet.
-            }
-        }
     }
 
     @TargetApi(Build.VERSION_CODES.N)
