@@ -23,7 +23,6 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.app.admin.DevicePolicyManager;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -35,9 +34,6 @@ import android.util.Log;
 
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
-import com.afwsamples.testdpc.common.ReflectionUtil;
-
-import java.lang.reflect.InvocationTargetException;
 
 import static android.content.Intent.ACTION_USER_UNLOCKED;
 
@@ -111,7 +107,7 @@ public class ResetPasswordService extends Service {
         if (token == null) {
             return null;
         }
-        if (!dpmIsResetPasswordTokenActive(DeviceAdminReceiver.getComponentName(this))) {
+        if (!mDpm.isResetPasswordTokenActive(DeviceAdminReceiver.getComponentName(this))) {
             Log.i(TAG, "Token exists but is not activated.");
             return null;
         }
@@ -123,7 +119,7 @@ public class ResetPasswordService extends Service {
         byte[] token = getActiveResetPasswordToken();
         boolean result;
         if (token != null) {
-            result = dpmResetPasswordWithToken(DeviceAdminReceiver.getComponentName(this), password,
+            result = mDpm.resetPasswordWithToken(DeviceAdminReceiver.getComponentName(this), password,
                     token, 0);
         } else {
             Log.e(TAG, "Cannot reset password without token");
@@ -157,16 +153,5 @@ public class ResetPasswordService extends Service {
     private void dismissNotification() {
         mNm.cancel(NOTIFICATION_TAP_TO_RESET);
         mNm.cancel(NOTIFICATION_RESET_RESULT);
-    }
-
-    private boolean dpmIsResetPasswordTokenActive(ComponentName admin) {
-        return (Boolean) ReflectionUtil.invoke(mDpm, "isResetPasswordTokenActive", admin);
-    }
-
-    private boolean dpmResetPasswordWithToken(ComponentName admin, String password, byte[] token,
-                                              int flags) {
-        return (Boolean) ReflectionUtil.invoke(mDpm, "resetPasswordWithToken",
-                new Class<?>[] {ComponentName.class, String.class, byte[].class, int.class},
-                admin, password, token, flags);
     }
 }
