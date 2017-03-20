@@ -20,7 +20,6 @@ import android.annotation.TargetApi;
 import android.app.Fragment;
 import android.app.KeyguardManager;
 import android.app.admin.DevicePolicyManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -36,7 +35,6 @@ import android.widget.Toast;
 
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
-import com.afwsamples.testdpc.common.ReflectionUtil;
 
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
@@ -109,7 +107,7 @@ public class ResetPasswordWithTokenFragment extends Fragment implements View.OnC
                 : getString(R.string.reset_password_token_none);
         mEdtToken.setText(tokenString);
         mEdtUseToken.setText(tokenString);
-        boolean active = dpmIsResetPasswordTokenActive(DeviceAdminReceiver.getComponentName(
+        boolean active = mDpm.isResetPasswordTokenActive(DeviceAdminReceiver.getComponentName(
                 getContext()));
         mEdtTokenStatus.setText(getString(active ? R.string.reset_password_token_active
                 : R.string.reset_password_token_inactive));
@@ -189,7 +187,7 @@ public class ResetPasswordWithTokenFragment extends Fragment implements View.OnC
     }
     private void createNewPasswordToken() {
         byte[] token = generateRandomPasswordToken();
-        if (!dpmSetResetPasswordToken(DeviceAdminReceiver.getComponentName(getContext()),
+        if (!mDpm.setResetPasswordToken(DeviceAdminReceiver.getComponentName(getContext()),
                 token)) {
             showToast(getString(R.string.set_password_reset_token_failed));
             return;
@@ -206,7 +204,7 @@ public class ResetPasswordWithTokenFragment extends Fragment implements View.OnC
     }
 
     private void removePasswordToken() {
-        if (!dpmClearResetPasswordToken(DeviceAdminReceiver.getComponentName(getContext()))) {
+        if (!mDpm.clearResetPasswordToken(DeviceAdminReceiver.getComponentName(getContext()))) {
             showToast(getString(R.string.clear_password_reset_token_failed));
             return;
         }
@@ -231,7 +229,7 @@ public class ResetPasswordWithTokenFragment extends Fragment implements View.OnC
                 DevicePolicyManager.RESET_PASSWORD_DO_NOT_ASK_CREDENTIALS_ON_BOOT : 0;
 
         if (token != null) {
-            boolean result = dpmResetPasswordWithToken(
+            boolean result = mDpm.resetPasswordWithToken(
                     DeviceAdminReceiver.getComponentName(getContext()),
                     password, token, flags);
             if (result) {
@@ -246,24 +244,5 @@ public class ResetPasswordWithTokenFragment extends Fragment implements View.OnC
 
     private void showToast(String msg) {
         Toast.makeText(getContext(), msg, Toast.LENGTH_LONG).show();
-    }
-
-    private boolean dpmSetResetPasswordToken(ComponentName admin, byte[] token) {
-        return (Boolean) ReflectionUtil.invoke(mDpm, "setResetPasswordToken", admin, token);
-    }
-
-    private boolean dpmClearResetPasswordToken(ComponentName admin) {
-        return (Boolean) ReflectionUtil.invoke(mDpm, "clearResetPasswordToken", admin);
-    }
-
-    private boolean dpmIsResetPasswordTokenActive(ComponentName admin) {
-        return (Boolean) ReflectionUtil.invoke(mDpm, "isResetPasswordTokenActive", admin);
-    }
-
-    private boolean dpmResetPasswordWithToken(ComponentName admin, String password, byte[] token,
-                                              int flags) {
-        return (Boolean) ReflectionUtil.invoke(mDpm, "resetPasswordWithToken",
-                new Class<?>[] {ComponentName.class, String.class, byte[].class, int.class},
-                admin, password, token, flags);
     }
 }
