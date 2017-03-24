@@ -17,9 +17,11 @@
 package com.afwsamples.testdpc.policy;
 
 import static android.os.UserManager.ALLOW_PARENT_PROFILE_APP_LINKING;
+import static android.os.UserManager.DISALLOW_ADD_MANAGED_PROFILE;
 import static android.os.UserManager.DISALLOW_ADD_USER;
 import static android.os.UserManager.DISALLOW_ADJUST_VOLUME;
 import static android.os.UserManager.DISALLOW_APPS_CONTROL;
+import static android.os.UserManager.DISALLOW_BLUETOOTH;
 import static android.os.UserManager.DISALLOW_CONFIG_BLUETOOTH;
 import static android.os.UserManager.DISALLOW_CONFIG_CELL_BROADCASTS;
 import static android.os.UserManager.DISALLOW_CONFIG_CREDENTIALS;
@@ -40,6 +42,7 @@ import static android.os.UserManager.DISALLOW_MOUNT_PHYSICAL_MEDIA;
 import static android.os.UserManager.DISALLOW_NETWORK_RESET;
 import static android.os.UserManager.DISALLOW_OUTGOING_BEAM;
 import static android.os.UserManager.DISALLOW_OUTGOING_CALLS;
+import static android.os.UserManager.DISALLOW_REMOVE_MANAGED_PROFILE;
 import static android.os.UserManager.DISALLOW_REMOVE_USER;
 import static android.os.UserManager.DISALLOW_SAFE_BOOT;
 import static android.os.UserManager.DISALLOW_SET_USER_ICON;
@@ -81,9 +84,12 @@ public class UserRestrictionsDisplayFragment extends PreferenceFragment
     private static final UserRestriction[] ALL_USER_RESTRICTIONS = {
             new UserRestriction(ALLOW_PARENT_PROFILE_APP_LINKING,
                     R.string.allow_parent_profile_app_linking),
+            new UserRestriction(DISALLOW_ADD_MANAGED_PROFILE,
+                    R.string.disallow_add_managed_profile),
             new UserRestriction(DISALLOW_ADD_USER, R.string.disallow_add_user),
             new UserRestriction(DISALLOW_ADJUST_VOLUME, R.string.disallow_adjust_volume),
             new UserRestriction(DISALLOW_APPS_CONTROL, R.string.disallow_apps_control),
+            new UserRestriction(DISALLOW_BLUETOOTH, R.string.disallow_bluetooth),
             new UserRestriction(DISALLOW_CONFIG_BLUETOOTH, R.string.disallow_config_bluetooth),
             new UserRestriction(DISALLOW_CONFIG_CELL_BROADCASTS,
                     R.string.disallow_config_cell_broadcasts),
@@ -110,6 +116,8 @@ public class UserRestrictionsDisplayFragment extends PreferenceFragment
             new UserRestriction(DISALLOW_NETWORK_RESET, R.string.disallow_network_reset),
             new UserRestriction(DISALLOW_OUTGOING_BEAM, R.string.disallow_outgoing_beam),
             new UserRestriction(DISALLOW_OUTGOING_CALLS, R.string.disallow_outgoing_calls),
+            new UserRestriction(DISALLOW_REMOVE_MANAGED_PROFILE,
+                    R.string.disallow_remove_managed_profile),
             new UserRestriction(DISALLOW_REMOVE_USER, R.string.disallow_remove_user),
             new UserRestriction(DISALLOW_SAFE_BOOT, R.string.disallow_safe_boot),
             new UserRestriction(DISALLOW_SET_USER_ICON, R.string.disallow_set_user_icon),
@@ -126,8 +134,10 @@ public class UserRestrictionsDisplayFragment extends PreferenceFragment
      * Setting these user restrictions only have effect on primary users.
      */
     private static final String[] PRIMARY_USER_ONLY_RESTRICTIONS = {
+            DISALLOW_ADD_MANAGED_PROFILE,
             DISALLOW_ADD_USER,
             DISALLOW_ADJUST_VOLUME,
+            DISALLOW_BLUETOOTH,
             DISALLOW_CONFIG_BLUETOOTH,
             DISALLOW_CONFIG_CELL_BROADCASTS,
             DISALLOW_CONFIG_MOBILE_NETWORKS,
@@ -140,7 +150,7 @@ public class UserRestrictionsDisplayFragment extends PreferenceFragment
             DISALLOW_MOUNT_PHYSICAL_MEDIA,
             DISALLOW_NETWORK_RESET,
             DISALLOW_OUTGOING_CALLS,
-            DISALLOW_REMOVE_USER,
+            DISALLOW_REMOVE_MANAGED_PROFILE,
             DISALLOW_SAFE_BOOT,
             DISALLOW_SMS,
             DISALLOW_UNMUTE_MICROPHONE,
@@ -159,6 +169,7 @@ public class UserRestrictionsDisplayFragment extends PreferenceFragment
      * These restrictions are not meant to be used with managed profiles.
      */
     private static String[] NON_MANAGED_PROFILE_RESTRICTIONS = {
+            DISALLOW_REMOVE_USER,
             DISALLOW_SET_WALLPAPER
     };
 
@@ -174,6 +185,12 @@ public class UserRestrictionsDisplayFragment extends PreferenceFragment
             DISALLOW_DATA_ROAMING,
             DISALLOW_SET_USER_ICON,
             DISALLOW_SET_WALLPAPER
+    };
+
+    private static String[] OC_PLUS_RESTRICTIONS = {
+            DISALLOW_ADD_MANAGED_PROFILE,
+            DISALLOW_BLUETOOTH,
+            DISALLOW_REMOVE_MANAGED_PROFILE
     };
 
     public static UserRestrictionsDisplayFragment newInstance() {
@@ -261,6 +278,10 @@ public class UserRestrictionsDisplayFragment extends PreferenceFragment
         for (String restriction : NYC_PLUS_RESTRICTIONS) {
             DpcPreferenceBase pref = (DpcPreferenceBase) findPreference(restriction);
             pref.setMinSdkVersion(Build.VERSION_CODES.N);
+        }
+        for (String restriction : OC_PLUS_RESTRICTIONS) {
+            DpcPreferenceBase pref = (DpcPreferenceBase) findPreference(restriction);
+            pref.setMinSdkVersion(Build.VERSION_CODES.O);
         }
         for (String restriction : PRIMARY_USER_ONLY_RESTRICTIONS) {
             DpcPreferenceBase pref = (DpcPreferenceBase) findPreference(restriction);

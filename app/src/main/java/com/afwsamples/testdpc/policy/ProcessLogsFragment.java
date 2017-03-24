@@ -48,7 +48,12 @@ public class ProcessLogsFragment extends ListFragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mAdapter.add(getString(R.string.process_logs_retrieved_message, new Date().toString()));
-        processEvents(mDevicePolicyManager.retrieveSecurityLogs(mAdminName));
+        try {
+            processEvents(mDevicePolicyManager.retrieveSecurityLogs(mAdminName));
+        } catch (SecurityException e) {
+            Log.e(TAG, "Exception thrown when trying to retrieve security logs", e);
+            mAdapter.add(getString(R.string.exception_retrieving_process_logs));
+        }
     }
 
     @Override

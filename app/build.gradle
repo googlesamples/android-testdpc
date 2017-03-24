@@ -3,23 +3,26 @@ apply plugin: 'com.android.application'
 ext {
     /* Version code for *next* release, bump *after* a release is created. */
     // 1 or more digits
-    versionMajor = 3
+    versionMajor = 4
     // exactly 1 digit
     versionMinor = 0
     // exactly 2 digits
-    versionBuild = 11
+    versionBuild = 0
 }
 
 android {
-    compileSdkVersion 24
-    buildToolsVersion '24.0.0'
+    compileSdkVersion 26
+    buildToolsVersion "26.0.0"
 
     defaultConfig {
         applicationId "com.afwsamples.testdpc"
         minSdkVersion 21
-        targetSdkVersion 24
+        targetSdkVersion 25
         versionCode versionMajor * 1000 + versionMinor * 100 + versionBuild
         versionName "${versionMajor}.${versionMinor}.${versionBuild}"
+        jackOptions {
+          enabled true
+        }
     }
 
     buildTypes {
@@ -38,8 +41,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 
     repositories {
@@ -47,20 +50,12 @@ android {
             dirs 'libs'
         }
     }
-
-    // Enable lint checking in all build variants.
-    applicationVariants.all { variant ->
-        variant.outputs.each { output ->
-            def lintTask = tasks["lint${variant.name.capitalize()}"]
-            output.assemble.dependsOn lintTask
-        }
-    }
 }
 
 dependencies {
-    compile 'com.android.support:preference-v14:24.0.0'
-    compile 'com.android.support:recyclerview-v7:24.+'
-    compile "com.android.support:support-v13:24.+"
+    compile 'com.android.support:preference-v14:25.+'
+    compile 'com.android.support:recyclerview-v7:25.+'
+    compile "com.android.support:support-v13:25.+"
     compile 'com.google.android.gms:play-services-safetynet:+'
     compile(name:'setup-wizard-lib-platform-release', ext:'aar')
 }

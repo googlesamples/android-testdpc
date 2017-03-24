@@ -35,13 +35,11 @@ import android.widget.Toast;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.AppInfoArrayAdapter;
-import com.afwsamples.testdpc.common.ColorPicker;
 import com.afwsamples.testdpc.common.BaseSearchablePolicyPreferenceFragment;
+import com.afwsamples.testdpc.common.ColorPicker;
 import com.afwsamples.testdpc.common.Util;
-import com.afwsamples.testdpc.profilepolicy.crossprofileintentfilter
-        .AddCrossProfileIntentFilterFragment;
-import com.afwsamples.testdpc.profilepolicy.crossprofilewidgetprovider
-        .ManageCrossProfileWidgetProviderUtil;
+import com.afwsamples.testdpc.profilepolicy.crossprofileintentfilter.AddCrossProfileIntentFilterFragment;
+import com.afwsamples.testdpc.profilepolicy.crossprofilewidgetprovider.ManageCrossProfileWidgetProviderUtil;
 
 import java.util.List;
 
@@ -82,7 +80,7 @@ public class ProfilePolicyManagementFragment extends BaseSearchablePolicyPrefere
             "remove_cross_profile_app_widgets";
     private static final String REMOVE_PROFILE_KEY = "remove_profile";
     private static final String SET_ORGANIZATION_COLOR_KEY = "set_organization_color";
-    private static final String SET_ORGANIZATION_NAME_KEY = "set_organization_name";
+    private static final String SET_PROFILE_ORGANIZATION_NAME_KEY = "set_profile_organization_name";
 
     private static final String ORGANIZATION_COLOR_ID = "organizationColor";
 
@@ -135,7 +133,7 @@ public class ProfilePolicyManagementFragment extends BaseSearchablePolicyPrefere
 
     @Override
     public boolean isAvailable(Context context) {
-        return Util.isManagedProfile(context, DeviceAdminReceiver.getComponentName(context));
+        return Util.isManagedProfile(context);
     }
 
     @Override
@@ -215,7 +213,7 @@ public class ProfilePolicyManagementFragment extends BaseSearchablePolicyPrefere
                 // Reload UI to verify the state of cross-profile contacts search is set correctly.
                 reloadCrossProfileContactsSearchDisableUi();
                 return true;
-            case SET_ORGANIZATION_NAME_KEY:
+            case SET_PROFILE_ORGANIZATION_NAME_KEY:
                 mDevicePolicyManager.setOrganizationName(mAdminComponentName, (String) newValue);
                 mSetOrganizationNamePreference.setSummary((String) newValue);
                 return true;
@@ -236,7 +234,7 @@ public class ProfilePolicyManagementFragment extends BaseSearchablePolicyPrefere
     @TargetApi(Build.VERSION_CODES.N)
     private void initializeOrganizationInfoPreferences() {
         mSetOrganizationColorPreference = findPreference(SET_ORGANIZATION_COLOR_KEY);
-        mSetOrganizationNamePreference = findPreference(SET_ORGANIZATION_NAME_KEY);
+        mSetOrganizationNamePreference = findPreference(SET_PROFILE_ORGANIZATION_NAME_KEY);
 
         if (mSetOrganizationColorPreference.isEnabled()) {
             mSetOrganizationColorPreference.setOnPreferenceClickListener(this);

@@ -41,6 +41,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import static com.afwsamples.testdpc.common.preference.DpcPreferenceHelper.NO_CUSTOM_CONSTRIANT;
 import static com.afwsamples.testdpc.policy.keyguard.SetTrustAgentConfigFragment.Type;
 
 /**
@@ -62,6 +63,8 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
 
         static final String MAX_FAILS_BEFORE_WIPE = "key_max_fails_before_wipe";
         static final String MAX_FAILS_BEFORE_WIPE_ALL = "key_max_fails_before_wipe_aggregate";
+
+        static final String STRONG_AUTH_TIMEOUT = "key_strong_auth_timeout";
 
         static final String MAX_TIME_SCREEN_LOCK = "key_max_time_screen_lock";
         static final String MAX_TIME_SCREEN_LOCK_ALL = "key_max_time_screen_lock_aggregate";
@@ -133,12 +136,17 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
     }
 
     @Override
+    @TargetApi(Build.VERSION_CODES.O)
     public void onResume() {
         super.onResume();
         updateAggregates();
+        findPreference(Keys.STRONG_AUTH_TIMEOUT).setSummary(Long.toString(
+                TimeUnit.MILLISECONDS.toSeconds(getDpm().getRequiredStrongAuthTimeout(
+                        getAdmin()))));
     }
 
     @Override
+    @TargetApi(Build.VERSION_CODES.O)
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         if (KEYGUARD_FEATURES.containsKey(preference.getKey())) {
             final int featureFlag = KEYGUARD_FEATURES.get(preference.getKey());
@@ -154,6 +162,17 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
                     final int setting = parseInt((String) newValue);
                     getDpm().setMaximumFailedPasswordsForWipe(getAdmin(), setting);
                     preference.setSummary(setting != 0 ? Integer.toString(setting) : null);
+                } catch (NumberFormatException e) {
+                    showToast(R.string.not_valid_input);
+                    return false;
+                }
+                break;
+            case Keys.STRONG_AUTH_TIMEOUT:
+                try {
+                    final long setting = TimeUnit.SECONDS.toMillis(parseLong((String) newValue));
+                    getDpm().setRequiredStrongAuthTimeout(getAdmin(), setting);
+                    preference.setSummary(Long.toString(TimeUnit.MILLISECONDS.toSeconds(
+                            getDpm().getRequiredStrongAuthTimeout(getAdmin()))));
                 } catch (NumberFormatException e) {
                     showToast(R.string.not_valid_input);
                     return false;
@@ -235,12 +254,14 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
                 : null);
     }
 
-    @TargetApi(Build.VERSION_CODES.N)
+    @TargetApi(Build.VERSION_CODES.O)
     private void setupAll() {
         setup(Keys.LOCK_SCREEN_MESSAGE,
-                Util.isBeforeN() || !isDeviceOwner() ? null :
-                        getDpm().getDeviceOwnerLockScreenInfo());
+                BuildCompat.isAtLeastN() && isDeviceOwner()
+                        ? getDpm().getDeviceOwnerLockScreenInfo() : null);
         setup(Keys.MAX_FAILS_BEFORE_WIPE, getDpm().getMaximumFailedPasswordsForWipe(getAdmin()));
+        setup(Keys.STRONG_AUTH_TIMEOUT,
+                TimeUnit.MILLISECONDS.toSeconds(getDpm().getRequiredStrongAuthTimeout(getAdmin())));
         setup(Keys.MAX_TIME_SCREEN_LOCK,
                 TimeUnit.MILLISECONDS.toSeconds(getDpm().getMaximumTimeToLock(getAdmin())));
         setup(Keys.SET_TRUST_AGENT_CONFIG, null);
@@ -254,10 +275,11 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
         final DpcPreferenceBase dpcPref = (DpcPreferenceBase) pref;
 
         // Disable preferences that don't apply to the parent profile
-        if (Keys.NOT_APPLICABLE_TO_PARENT.contains(key) && isParentProfileInstance()) {
-            dpcPref.setCustomConstraint(R.string.not_for_parent_profile);
-            return;
-        }
+        dpcPref.setCustomConstraint(
+                () -> Keys.NOT_APPLICABLE_TO_PARENT.contains(key) && isParentProfileInstance()
+                        ? R.string.not_for_parent_profile
+                        : NO_CUSTOM_CONSTRIANT
+        );
 
         // We do not allow user to add trust agent config in pre-N devices in managed profile.
         if (!BuildCompat.isAtLeastN() && key.equals(Keys.SET_TRUST_AGENT_CONFIG)) {
@@ -283,7 +305,7 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
     }
 
     private void disableIncompatibleManagementOptionsInCurrentProfile() {
-        if (Util.isBeforeM()) {
+        if (!Util.isAtLeastM()) {
             for (String preference : KEYGUARD_FEATURES.keySet()) {
                 ((DpcPreferenceBase) findPreference(preference))
                         .setAdminConstraint(DpcPreferenceHelper.ADMIN_DEVICE_OWNER);

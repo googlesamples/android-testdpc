@@ -23,7 +23,7 @@
             android:title="@string/set_organization_color"
             testdpc:minSdkVersion="N" />
         <com.afwsamples.testdpc.common.preference.DpcEditTextPreference
-            android:key="set_organization_name"
+            android:key="set_profile_organization_name"
             android:title="@string/set_organization_name"
             testdpc:minSdkVersion="N" />
     </PreferenceCategory>

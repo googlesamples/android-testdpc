@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:testdpc="http://schemas.android.com/apk/res/com.afwsamples.testdpc">
+
+    <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="po_user_status"
+            android:selectable="false"
+            android:title="@string/po_user_status"
+            testdpc:admin="deviceOwner"
+            testdpc:minSdkVersion="O"/>
+
+    <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
+            android:key="hide_po_launcher_icon"
+            android:title="@string/hide_profile_owner_launcher_icon"
+            testdpc:admin="deviceOwner"
+            testdpc:minSdkVersion="O"/>
+
+    <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="install_ca_cert"
+            android:selectable="true"
+            android:title="@string/install_ca_cert_in_po_user"
+            testdpc:admin="deviceOwner"
+            testdpc:minSdkVersion="O"/>
+</PreferenceScreen>

@@ -16,37 +16,31 @@
 
 package com.afwsamples.testdpc;
 
-import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE;
-import static android.app.admin.DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED;
 import static com.afwsamples.testdpc.policy.PolicyManagementFragment.OVERRIDE_KEY_SELECTION_KEY;
 
-import android.accounts.Account;
-import android.accounts.AccountManager;
 import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.admin.DevicePolicyManager;
+import android.app.admin.NetworkEvent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.PermissionInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.ParcelFileDescriptor;
-import android.os.PersistableBundle;
 import android.os.Process;
+import android.os.UserHandle;
+import android.os.UserManager;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.afwsamples.testdpc.common.LaunchIntentUtil;
 import com.afwsamples.testdpc.common.Util;
-import com.afwsamples.testdpc.cosu.EnableCosuActivity;
+import com.afwsamples.testdpc.provision.PostProvisioningTask;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -95,84 +89,100 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
         }
     }
 
+    @TargetApi(Build.VERSION_CODES.N)
     @Override
-    public void onProfileProvisioningComplete(Context context, Intent intent) {
-        // Retreive the admin extras bundle, which we can use to determine the original context for
-        // TestDPCs launch.
-        PersistableBundle extras = intent.getParcelableExtra(
-                EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE);
+    public void onSecurityLogsAvailable(Context context, Intent intent) {
+        Log.i(TAG, "onSecurityLogsAvailable() called");
+        Toast.makeText(context,
+                context.getString(R.string.on_security_logs_available),
+                Toast.LENGTH_LONG)
+                .show();
+    }
 
-        DevicePolicyManager devicePolicyManager =
+
+    /*
+     * TODO: reconsider how to store and present the logs in the future, e.g. save the file into
+     * internal memory and show the content in a ListView
+     */
+    @TargetApi(Build.VERSION_CODES.O)
+    @Override
+    public void onNetworkLogsAvailable(Context context, Intent intent, long batchToken,
+            int networkLogsCount) {
+        Log.i(TAG, "onNetworkLogsAvailable(), batchToken: " + batchToken
+                + ", event count: " + networkLogsCount);
+
+        DevicePolicyManager dpm =
                 (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
+        List<NetworkEvent> events = null;
+        try {
+            events = dpm.retrieveNetworkLogs(getComponentName(context), batchToken);
+        } catch (SecurityException e) {
+            Log.e(TAG,
+                "Exception while retrieving network logs batch with batchToken: " + batchToken, e);
+        }
 
-        // Enable the profile after provisioning is complete.
-        Intent launch = null;
-
-        String packageName = context.getPackageName();
-        boolean synchronousAuthLaunch = LaunchIntentUtil.isSynchronousAuthLaunch(extras);
-        boolean cosuLaunch = LaunchIntentUtil.isCosuLaunch(extras);
-        boolean isProfileOwner = devicePolicyManager.isProfileOwnerApp(packageName);
-        boolean isDeviceOwner = devicePolicyManager.isDeviceOwnerApp(packageName);
-
-        // Drop out quickly if we're neither profile or device owner.
-        if (!isProfileOwner && !isDeviceOwner) {
-            Log.e("TestDPC", "DeviceAdminReceiver.onProvisioningComplete() invoked, but ownership "
-                    + "not assigned");
-            Toast.makeText(context, R.string.device_admin_receiver_failure, Toast.LENGTH_LONG)
+        if (events == null) {
+            Log.e(TAG, "Failed to retrieve network logs batch with batchToken: " + batchToken);
+            Toast.makeText(context,
+                    context.getString(R.string.on_network_logs_available_failure, batchToken),
+                    Toast.LENGTH_LONG)
                     .show();
             return;
         }
 
-        // From M onwards, permissions are not auto-granted, so we need to manually grant
-        // permissions for TestDPC.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            autoGrantRequestedPermissionsToSelf(context);
+        Toast.makeText(context,
+                context.getString(R.string.on_network_logs_available_success, batchToken),
+                Toast.LENGTH_LONG)
+                .show();
+
+        ArrayList<String> loggedEvents = new ArrayList<String>();
+        events.forEach(event -> loggedEvents.add(event.toString()));
+        new EventSavingTask(context, loggedEvents).execute();
+    }
+
+    private static class EventSavingTask extends AsyncTask<Void, Void, Void> {
+
+        private Context mContext;
+        private List<String> mLoggedEvents;
+
+        public EventSavingTask(Context context, ArrayList<String> loggedEvents) {
+            mContext = context;
+            mLoggedEvents = loggedEvents;
         }
 
-        if (isProfileOwner) {
-            launch = new Intent(context, EnableProfileActivity.class);
-        } else if (cosuLaunch) {
-            launch = new Intent(context, EnableCosuActivity.class);
-            launch.putExtra(EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE, extras);
+        @Override
+        protected Void doInBackground(Void... params) {
+            String filename = "network_logs_"
+                    + new Date().toString().replaceAll("\\s+","_") + ".txt";
+            File file = new File(mContext.getExternalFilesDir(null), filename);
+            try (OutputStream os = new FileOutputStream(file)) {
+                for (String event : mLoggedEvents) {
+                    os.write((event + "\n").getBytes());
+                }
+                Log.d(TAG, "Saved network logs to file: " + filename);
+            } catch (IOException e) {
+                Log.e(TAG, "Failed saving network events to file" + filename, e);
+            }
+            return null;
+        }
+    }
+
+    @Override
+    public void onProfileProvisioningComplete(Context context, Intent intent) {
+        PostProvisioningTask task = new PostProvisioningTask(context);
+        if (!task.performPostProvisioningOperations(intent)) {
+            return;
+        }
+
+        Intent launchIntent = task.getPostProvisioningLaunchIntent(intent);
+        if (launchIntent != null) {
+            context.startActivity(launchIntent);
         } else {
-            launch = new Intent(context, EnableDeviceOwnerActivity.class);
+            Log.e(TAG, "DeviceAdminReceiver.onProvisioningComplete() invoked, but ownership "
+                    + "not assigned");
+            Toast.makeText(context, R.string.device_admin_receiver_failure, Toast.LENGTH_LONG)
+                    .show();
         }
-
-        if (synchronousAuthLaunch) {
-            String accountName = LaunchIntentUtil.getAddedAccountName(extras);
-            if (accountName != null) {
-                launch.putExtra(LaunchIntentUtil.EXTRA_ACCOUNT_NAME, accountName);
-            }
-        }
-
-        // Enable first account ready receiver for PO flow. On pre-N devices, the only supported
-        // PO flow is managed profile. On N+ devices we need to check whether we're running in a
-        // managed profile.
-        ComponentName adminComponent = DeviceAdminReceiver.getComponentName(context);
-        if (devicePolicyManager.isProfileOwnerApp(context.getPackageName())
-                && (Util.isBeforeN() || Util.isManagedProfile(context, adminComponent))) {
-            FirstAccountReadyBroadcastReceiver.setEnabled(context, true);
-        }
-
-        // For synchronous auth cases, we can assume accounts are already setup (or will be shortly,
-        // as account migration for Profile Owner is asynchronous). For COSU we don't want to show
-        // the account option to the user, as no accounts should be added for now.
-        // In other cases, offer to add an account to the newly configured device/profile.
-        if (!synchronousAuthLaunch && !cosuLaunch) {
-            AccountManager accountManager = AccountManager.get(context);
-            Account[] accounts = accountManager.getAccounts();
-            if (accounts != null && accounts.length == 0) {
-                // Add account after provisioning is complete.
-                Intent addAccountIntent = new Intent(context, AddAccountActivity.class);
-                addAccountIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                addAccountIntent.putExtra(AddAccountActivity.EXTRA_NEXT_ACTIVITY_INTENT, launch);
-                context.startActivity(addAccountIntent);
-                return;
-            }
-        }
-
-        launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(launch);
     }
 
     @TargetApi(Build.VERSION_CODES.N)
@@ -253,57 +263,28 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
                 Util.BUGREPORT_NOTIFICATION_ID);
     }
 
-    @TargetApi(Build.VERSION_CODES.M)
-    private void autoGrantRequestedPermissionsToSelf(Context context) {
-        DevicePolicyManager devicePolicyManager = (DevicePolicyManager) context.getSystemService(
-                Context.DEVICE_POLICY_SERVICE);
-        String packageName = context.getPackageName();
-        ComponentName adminComponentName = getComponentName(context);
 
-        List<String> permissions = getRuntimePermissions(context.getPackageManager(), packageName);
-        for (String permission : permissions) {
-            boolean success = devicePolicyManager.setPermissionGrantState(adminComponentName,
-                    packageName, permission, PERMISSION_GRANT_STATE_GRANTED);
-            if (!success) {
-                Log.e(TAG, "Failed to auto grant permission to self: " + permission);
-            }
-        }
+    @TargetApi(Build.VERSION_CODES.O)
+    @Override
+    public void onUserAdded(Context context, Intent intent, UserHandle newUser) {
+        UserManager userManager = (UserManager) context.getSystemService(Context.USER_SERVICE);
+        String message = context.getString(R.string.on_user_added_message,
+                userManager.getSerialNumberForUser(newUser));
+        Log.i(TAG, message);
+        Util.showNotification(context, R.string.on_user_added_title,
+                message,
+                Util.USER_ADDED_NOTIFICATION_ID);
     }
 
-    private List<String> getRuntimePermissions(PackageManager packageManager, String packageName) {
-        List<String> permissions = new ArrayList<>();
-        PackageInfo packageInfo;
-        try {
-            packageInfo =
-                    packageManager.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS);
-        } catch (PackageManager.NameNotFoundException e) {
-            Log.e(TAG, "Could not retrieve info about the package: " + packageName, e);
-            return permissions;
-        }
-
-        if (packageInfo != null && packageInfo.requestedPermissions != null) {
-            for (String requestedPerm : packageInfo.requestedPermissions) {
-                if (isRuntimePermission(packageManager, requestedPerm)) {
-                    permissions.add(requestedPerm);
-                }
-            }
-        }
-        return permissions;
-    }
-
-    private boolean isRuntimePermission(PackageManager packageManager, String permission) {
-        try {
-            PermissionInfo pInfo = packageManager.getPermissionInfo(permission, 0);
-            if (pInfo != null) {
-                if ((pInfo.protectionLevel & PermissionInfo.PROTECTION_MASK_BASE)
-                        == PermissionInfo.PROTECTION_DANGEROUS) {
-                    return true;
-                }
-            }
-        } catch (PackageManager.NameNotFoundException e) {
-            Log.i(TAG, "Could not retrieve info about the permission: " + permission);
-        }
-        return false;
+    @TargetApi(Build.VERSION_CODES.O)
+    @Override
+    public void onUserRemoved(Context context, Intent intent, UserHandle removedUser) {
+        UserManager userManager = (UserManager) context.getSystemService(Context.USER_SERVICE);
+        String message = context.getString(R.string.on_user_removed_message,
+                userManager.getSerialNumberForUser(removedUser));
+        Log.i(TAG, message);
+        Util.showNotification(context, R.string.on_user_removed_title, message,
+                Util.USER_REMOVED_NOTIFICATION_ID);
     }
 
     @TargetApi(Build.VERSION_CODES.M)
@@ -347,8 +328,19 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
         return new ComponentName(context.getApplicationContext(), DeviceAdminReceiver.class);
     }
 
+    @Deprecated
     @Override
     public void onPasswordExpiring(Context context, Intent intent) {
+        onPasswordExpiring(context, intent, Process.myUserHandle());
+    }
+
+    @TargetApi(Build.VERSION_CODES.O)
+    // @Override
+    public void onPasswordExpiring(Context context, Intent intent, UserHandle user) {
+        if (!Process.myUserHandle().equals(user)) {
+            // This password expiration was on another user, for example a parent profile. Skip it.
+            return;
+        }
         DevicePolicyManager devicePolicyManager = (DevicePolicyManager) context.getSystemService(
                 Context.DEVICE_POLICY_SERVICE);
 
@@ -364,8 +356,19 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
                 Util.PASSWORD_EXPIRATION_NOTIFICATION_ID);
     }
 
+    @Deprecated
     @Override
     public void onPasswordFailed(Context context, Intent intent) {
+        onPasswordFailed(context, intent, Process.myUserHandle());
+    }
+
+    @TargetApi(Build.VERSION_CODES.O)
+    // @Override
+    public void onPasswordFailed(Context context, Intent intent, UserHandle user) {
+        if (!Process.myUserHandle().equals(user)) {
+            // This password failure was on another user, for example a parent profile. Ignore it.
+            return;
+        }
         DevicePolicyManager devicePolicyManager = (DevicePolicyManager) context.getSystemService(
                 Context.DEVICE_POLICY_SERVICE);
         /*
@@ -416,10 +419,34 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
         nm.notify(PASSWORD_FAILED_NOTIFICATION_ID, warn.getNotification());
     }
 
+    @Deprecated
     @Override
     public void onPasswordSucceeded(Context context, Intent intent) {
-        logFile(context).delete();
+        onPasswordSucceeded(context, intent, Process.myUserHandle());
     }
+
+    @TargetApi(Build.VERSION_CODES.O)
+    // @Override
+    public void onPasswordSucceeded(Context context, Intent intent, UserHandle user) {
+        if (Process.myUserHandle().equals(user)) {
+            logFile(context).delete();
+        }
+    }
+
+    @Deprecated
+    @Override
+    public void onPasswordChanged(Context context, Intent intent) {
+        onPasswordChanged(context, intent, Process.myUserHandle());
+    }
+
+    @TargetApi(Build.VERSION_CODES.O)
+    // @Override
+    public void onPasswordChanged(Context context, Intent intent, UserHandle user) {
+        if (Process.myUserHandle().equals(user)) {
+            updatePasswordQualityNotification(context);
+        }
+    }
+
 
     private static File logFile(Context context) {
         File parent = context.getDir(LOGS_DIR, Context.MODE_PRIVATE);
@@ -477,11 +504,6 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
         }
 
         bw.close();
-    }
-
-    @Override
-    public void onPasswordChanged(Context context, Intent intent) {
-        updatePasswordQualityNotification(context);
     }
 
     private static void updatePasswordQualityNotification(Context context) {

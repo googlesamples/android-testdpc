@@ -20,30 +20,42 @@ import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.admin.DevicePolicyManager;
+import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Build.VERSION_CODES;
+import android.os.UserHandle;
 import android.os.UserManager;
-import android.support.v7.preference.Preference;
+import android.support.v14.preference.PreferenceFragment;
+import android.support.v4.os.BuildCompat;
 import android.text.format.DateUtils;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
-
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Common utility functions.
  */
 public class Util {
-
+    private static final String TAG = "Util";
+    private  static final int DEFAULT_BUFFER_SIZE = 4096;
     public static final int BUGREPORT_NOTIFICATION_ID = 1;
     public static final int PASSWORD_EXPIRATION_NOTIFICATION_ID = 2;
+    public static final int USER_ADDED_NOTIFICATION_ID = 3;
+    public static final int USER_REMOVED_NOTIFICATION_ID = 4;
 
     public static void showNotification(Context context, int titleId, String msg,
             int notificationId) {
@@ -100,40 +112,98 @@ public class Util {
         }
     }
 
-    public static boolean isBeforeM() {
-        return Build.VERSION.SDK_INT < VERSION_CODES.M;
-    }
-
-    public static boolean isBeforeN() {
-        return Build.VERSION.SDK_INT < VERSION_CODES.N;
-    }
-
     @TargetApi(VERSION_CODES.N)
-    public static boolean isManagedProfile(Context context, ComponentName admin) {
-        if (isBeforeN()) {
+    public static boolean isManagedProfile(Context context) {
+        if (BuildCompat.isAtLeastN()) {
+            DevicePolicyManager devicePolicyManager =
+                    (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
+            try {
+                return devicePolicyManager.isManagedProfile(
+                        DeviceAdminReceiver.getComponentName(context));
+            } catch (SecurityException e) {
+                // This is thrown if there is no active admin so not the managed profile
+                return false;
+            }
+        } else {
             // If user has more than one profile, then we deal with managed profile.
             // Unfortunately there is no public API available to distinguish user profile owner
             // and managed profile owner. Thus using this hack.
             UserManager userManager = (UserManager) context.getSystemService(Context.USER_SERVICE);
             return userManager.getUserProfiles().size() > 1;
-        } else {
-            DevicePolicyManager devicePolicyManager =
-                    (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
-            return devicePolicyManager.isManagedProfile(admin);
         }
     }
 
     @TargetApi(VERSION_CODES.M)
     public static boolean isPrimaryUser(Context context) {
-        if (isBeforeM()) {
-            // Assume only DO can be primary user. This is not perfect but the cases in which it is
-            // wrong are uncommon and require adb to set up.
-            final DevicePolicyManager dpm =
-                    (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
-            return dpm.isDeviceOwnerApp(context.getPackageName());
-        } else {
+        if (isAtLeastM()) {
             UserManager userManager = (UserManager) context.getSystemService(Context.USER_SERVICE);
             return userManager.isSystemUser();
+        } else {
+            // Assume only DO can be primary user. This is not perfect but the cases in which it is
+            // wrong are uncommon and require adb to set up.
+            return isDeviceOwner(context);
         }
+    }
+
+    @TargetApi(VERSION_CODES.LOLLIPOP)
+    public static boolean isDeviceOwner(Context context) {
+        final DevicePolicyManager dpm =
+                (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
+        return dpm.isDeviceOwnerApp(context.getPackageName());
+    }
+
+    @TargetApi(VERSION_CODES.LOLLIPOP)
+    public static boolean isProfileOwner(Context context) {
+        final DevicePolicyManager dpm =
+                (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
+        return dpm.isProfileOwnerApp(context.getPackageName());
+    }
+
+    public static boolean isAtLeastM() {
+        return Build.VERSION.SDK_INT >= VERSION_CODES.M;
+    }
+
+    @TargetApi(VERSION_CODES.O)
+    public static List<UserHandle> getBindDeviceAdminTargetUsers(Context context) {
+        if (!BuildCompat.isAtLeastO()) {
+            return Collections.emptyList();
+        }
+
+        final DevicePolicyManager dpm =
+                (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
+        return dpm.getBindDeviceAdminTargetUsers(DeviceAdminReceiver.getComponentName(context));
+    }
+
+    public static void showFileViewerForImportingCertificate(PreferenceFragment fragment,
+            int requestCode) {
+        Intent certIntent = new Intent(Intent.ACTION_GET_CONTENT);
+        certIntent.setTypeAndNormalize("*/*");
+        try {
+            fragment.startActivityForResult(certIntent, requestCode);
+        } catch (ActivityNotFoundException e) {
+            Log.e(TAG, "showFileViewerForImportingCertificate: ", e);
+        }
+    }
+
+    /**
+     * @return If the certificate was successfully installed.
+     */
+    public static boolean installCaCertificate(InputStream certificateInputStream,
+            DevicePolicyManager dpm, ComponentName admin) {
+        try {
+            if (certificateInputStream != null) {
+                ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
+                byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
+                int len = 0;
+                while ((len = certificateInputStream.read(buffer)) > 0) {
+                    byteBuffer.write(buffer, 0, len);
+                }
+                return dpm.installCaCert(admin,
+                        byteBuffer.toByteArray());
+            }
+        } catch (IOException e) {
+            Log.e(TAG, "installCaCertificate: ", e);
+        }
+        return false;
     }
 }

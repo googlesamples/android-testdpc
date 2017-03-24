@@ -25,6 +25,7 @@ import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.UserManager;
 import android.support.v13.app.FragmentTabHost;
+import android.support.v4.os.BuildCompat;
 import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -56,28 +57,6 @@ public abstract class ProfileOrParentFragment extends BaseSearchablePolicyPrefer
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-
-            final UserManager userManager = (UserManager)
-                    getActivity().getSystemService(Context.USER_SERVICE);
-
-            if (userManager.getUserProfiles().size() == 1 || Util.isBeforeN()) {
-                // No need for a tabbed view if there's just one item, or if the OS we are running
-                // under does not support parent policies.
-                try {
-                    getFragmentManager()
-                            .popBackStack();
-                    getFragmentManager()
-                            .beginTransaction()
-                            .replace(R.id.container, getContentClass().newInstance())
-                            .addToBackStack(null)
-                            .commit();
-                } catch (Fragment.InstantiationException | java.lang.InstantiationException |
-                        IllegalAccessException ine) {
-                    Log.e(LOG_TAG, "Failed to instantiate " + getContentClass(), ine);
-                }
-                return;
-            }
-
             // FragmentTabHost needs to be retained to keep track of tabs properly.
             setRetainInstance(true);
         }
@@ -88,23 +67,34 @@ public abstract class ProfileOrParentFragment extends BaseSearchablePolicyPrefer
             FragmentTabHost tabHost = new FragmentTabHost(getActivity());
             tabHost.setup(getActivity(), getChildFragmentManager(), View.generateViewId());
 
-            // Tab for the parent profile
-            Bundle parentArgs = new Bundle();
-            parentArgs.putBoolean(EXTRA_PARENT_PROFILE, true);
-            tabHost.addTab(
-                    tabHost.newTabSpec("parent").setIndicator(getString(R.string.personal_profile)),
-                    getContentClass(), parentArgs);
+            final boolean showDualTabs =
+                    Util.isManagedProfile(getActivity()) && BuildCompat.isAtLeastN();
 
-            // Tab for the work profile
-            Bundle workArgs = new Bundle();
-            workArgs.putBoolean(EXTRA_PARENT_PROFILE, false);
+            // Tab for the parent profile
+            if (showDualTabs) {
+                Bundle parentArgs = new Bundle();
+                parentArgs.putBoolean(EXTRA_PARENT_PROFILE, true);
+                tabHost.addTab(
+                        tabHost.newTabSpec("parent").setIndicator(
+                                getString(R.string.personal_profile)),
+                        getContentClass(), parentArgs);
+            }
+
+            // Tab for the profile/ running user.
+            Bundle parentArgs = new Bundle();
+            parentArgs.putBoolean(EXTRA_PARENT_PROFILE, false);
             tabHost.addTab(
                     tabHost.newTabSpec("profile").setIndicator(getString(R.string.work_profile)),
-                    getContentClass(), workArgs);
+                    getContentClass(), parentArgs);
 
-            // Mark work tab as the current one.
-            tabHost.setCurrentTab(1);
-
+            if (showDualTabs) {
+                // Mark work tab as the current one.
+                tabHost.setCurrentTab(1);
+            } else {
+                // We just want to show the fragment for current running user, hide tabs.
+                tabHost.setCurrentTab(0);
+                tabHost.getTabWidget().setVisibility(View.GONE);
+            }
             return tabHost;
         }
 

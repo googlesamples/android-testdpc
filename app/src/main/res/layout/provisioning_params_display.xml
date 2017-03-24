@@ -50,6 +50,30 @@
             tools:visibility="visible">
         <include layout="@layout/choose_color_item" />
         <include layout="@layout/choose_logo_item" />
+        <CheckBox android:id="@+id/skip_user_consent"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="@string/skip_user_consent"
+                  android:checked="true"
+                  android:visibility="gone"
+                  android:layout_marginTop="@dimen/params_padding_top_bottom"
+                  style="@style/containerText" />
+        <CheckBox android:id="@+id/keep_account_migrated"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="@string/keep_account_migrated"
+                  android:checked="false"
+                  android:visibility="gone"
+                  android:layout_marginTop="@dimen/params_padding_top_bottom"
+                  style="@style/containerText" />
+        <CheckBox android:id="@+id/skip_encryption"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="@string/skip_encryption"
+                  android:checked="false"
+                  android:visibility="gone"
+                  android:layout_marginTop="@dimen/params_padding_top_bottom"
+                  style="@style/containerText" />
     </LinearLayout>
 
 </LinearLayout>

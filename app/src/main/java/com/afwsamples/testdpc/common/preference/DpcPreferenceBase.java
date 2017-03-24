@@ -16,7 +16,7 @@
 
 package com.afwsamples.testdpc.common.preference;
 
-import android.support.annotation.StringRes;
+import android.support.annotation.Nullable;
 
 /**
  * Common base class for the DpcPreference family of classes.
@@ -28,7 +28,9 @@ public interface DpcPreferenceBase {
     void setUserConstraint(@DpcPreferenceHelper.UserKind int userConstraints);
     void clearUserConstraint();
     void clearNonCustomConstraints();
-    void setCustomConstraint(CharSequence constraintSummary);
-    void setCustomConstraint(@StringRes int constraintSummaryRes);
-    void clearCustomConstraint();
+    void setCustomConstraint(@Nullable CustomConstraint customConstraint);
+    /**
+     * To re-check is the constraint met and enable/disable the preference accordingly.
+     */
+    void refreshEnabledState();
 }

@@ -42,6 +42,16 @@
             testdpc:minSdkVersion="L" />
     </PreferenceCategory>
 
+    <PreferenceCategory android:title="@string/strong_auth_timeout_category">
+        <com.afwsamples.testdpc.common.preference.DpcEditTextPreference
+            android:defaultValue="0"
+            android:dialogTitle="@string/strong_auth_timeout_seconds"
+            android:inputType="number"
+            android:key="key_strong_auth_timeout"
+            android:title="@string/strong_auth_timeout_seconds"
+            testdpc:minSdkVersion="O" />
+    </PreferenceCategory>
+
     <PreferenceCategory android:title="@string/maximum_password_fails">
         <com.afwsamples.testdpc.common.preference.DpcEditTextPreference
             android:defaultValue="0"

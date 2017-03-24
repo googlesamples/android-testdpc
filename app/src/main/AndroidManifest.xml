@@ -43,7 +43,18 @@
 
         <activity
                 android:name=".SetupManagementActivity"
-                android:label="@string/app_name"/>
+                android:label="@string/setup_app_name"
+                android:taskAffinity="">
+        </activity>
+
+        <activity-alias
+                android:name=".SetupManagementLaunchActivity"
+                android:targetActivity=".SetupManagementActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity-alias>
 
         <activity
                 android:name=".PolicyManagementActivity"
@@ -82,6 +93,16 @@
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
+
+        <activity
+                android:name=".provision.ProvisioningSuccessActivity"
+                android:theme="@android:style/Theme.NoDisplay">
+            <intent-filter>
+                <action android:name="android.app.action.PROVISIONING_SUCCESSFUL"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+
         <receiver
                 android:name=".DeviceAdminReceiver"
                 android:description="@string/app_name"
@@ -108,6 +129,24 @@
             </intent-filter>
         </receiver>
 
+        <receiver android:name=".BootReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name=".policy.resetpassword.ResetPasswordService$LockedBootCompletedReceiver"
+            android:directBootAware="true" >
+            <intent-filter>
+                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <service android:name=".policy.resetpassword.ResetPasswordService"
+            android:directBootAware="true" >
+        </service>
+
         <provider
                 android:authorities="com.afwsamples.testdpc.fileprovider"
                 android:name="android.support.v4.content.FileProvider"
@@ -123,6 +162,14 @@
                 <action android:name="com.android.vending.dpc.APPLICATION_RESTRICTIONS_PROXY" />
             </intent-filter>
         </service>
+
+        <service
+                android:name=".comp.ProfileOwnerService"
+                android:exported="false"/>
+
+        <service
+                android:name=".comp.DeviceOwnerService"
+                android:exported="false"/>
 
     </application>
 

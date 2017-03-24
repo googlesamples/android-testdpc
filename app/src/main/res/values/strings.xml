@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
  Copyright (C) 2015 The Android Open Source Project
 
  Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,13 +17,16 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 
     <string name="app_name">Test DPC</string>
+    <string name="setup_app_name">Set up Test DPC</string>
     <string name="cancel">Cancel</string>
     <string name="set_up_managed_profile">Set up managed profile</string>
     <string name="set_up_device_owner">Set up device owner</string>
     <string name="set_up_management_header">Set up management</string>
     <string name="setup_management_message">This app is currently not the owner of this device or
-        profile. Please select an option below and click SET UP to set up appropriate management by this app.</string>
+        profile. Please select an option below and tap SET UP to set up appropriate management by this app.</string>
+    <string name="setup_management_message_for_do">This app is currently set as device owner. Please select the options below and tap SET UP to create a profile managed by the same app</string>
     <string name="provisioning_not_possible">TestDPC isn\'t currently allowed to be set up as the profile or device owner.</string>
+    <string name="provisioning_not_possible_for_do">TestDPC isn\'t currently allowed to create a managed profile.</string>
     <string name="exit">Exit</string>
     <string name="managed_account_message">Added account that requires management:</string>
     <string name="managed_account_complete_message">Added account that is now managed:</string>
@@ -32,6 +34,12 @@
     <string name="add_account_later_message">Please add the account later.</string>
     <string name="setup_label">Set up</string>
     <string name="profile_name">Sample Managed Profile</string>
+    <string name="skip_user_setup">Skip user setup</string>
+    <string name="skip_user_consent">Skip user consent during provisioning</string>
+    <string name="keep_account_migrated">Keep account on this user, if migrated</string>
+    <string name="skip_encryption">Skip encryption</string>
+    <string name="managed_profile_name">Sample Managed Profile</string>
+    <string name="managed_user_name">Sample Managed User</string>
     <string name="finish_setup">Finish setup</string>
     <string name="finish_setup_account_not_ready">Finish setup but account might not be ready</string>
     <string name="setup_finished">Setup finished</string>
@@ -81,6 +89,7 @@
     <!-- Reasons for disabling preferences -->
     <string name="requires_android_api_level">Requires API level
         <xliff:g id="api level">%d</xliff:g></string>
+    <string name="requires_preview_release">Requires the Android O preview release</string>
     <string name="requires">Requires\u0020</string>
     <string name="requires_delimiter">,\u0020</string>
     <string name="requires_or">\u0020or\u0020</string>
@@ -90,27 +99,20 @@
     <string name="secondary_user">secondary user</string>
     <string name="managed_profile">managed profile</string>
 
-    <string name="not_for_device_owner">Not applicable to device owner</string>
-    <string name="not_for_primary_user">Not applicable to primary user</string>
-    <string name="not_for_profile_owner">Not applicable to profile owner</string>
-    <string name="not_for_managed_profile">Not applicable to managed profile</string>
-
     <string name="not_for_parent_profile">Not applicable to parent profile</string>
-    <string name="device_owner_only">Device owner only</string>
-    <string name="primary_user_only">Primary user only</string>
-    <string name="profile_owner_only">Profile owner only</string>
-    <string name="managed_profile_only">Managed profile only</string>
-    <string name="requires_android_m">Requires API level 23</string>
-    <string name="requires_android_n">Requires API level 24</string>
     <string name="user_restricted">Disallowed by user restriction</string>
     <string name="requires_process_logs">Requires process logging to be enabled</string>
     <string name="not_for_password_quality">Not applicable to current password quality</string>
 
-    <!-- Strings for device owner management -->
-    <string name="this_is_not_a_device_owner">This app is currently not the device owner.</string>
     <string name="this_is_a_device_owner">This app is the device owner.</string>
-    <string name="this_is_a_profile_owner">This app is a profile owner.
-        Some of the management options are not available.</string>
+    <string name="this_is_a_profile_owner">This app is a profile owner.</string>
+    <string name="this_is_not_an_admin">This app is not an admin.</string>
+
+    <!-- Strings for provisioning disclaimers-->
+    <string name="default_disclaimer_company_name">TestDPC Company</string>
+    <string name="default_disclaimer_emm_name">TestDPC EMM</string>
+
+    <!-- Strings for device owner management -->
     <string name="device_owner_management">Device owner management</string>
     <string name="set_auto_time_required">Set auto (network) time required</string>
     <string name="wipe_data">Wipe data</string>
@@ -120,10 +122,9 @@
     <string name="external_storage">External storage</string>
     <string name="reset_protection_data">Factory reset protection</string>
     <string name="remove_device_owner">Remove this device owner</string>
-    <string name="remove_device_owner_title">Device owner removal</string>
-    <string name="remove_device_owner_confirmation">Are you sure you want to remove this device
-        owner?
-    </string>
+    <string name="remove_device_owner_title">Remove device owner?</string>
+    <string name="remove_device_owner_confirmation">Policies and restrictions will continue to be
+        active and may require a factory reset to clear.</string>
     <string name="device_owner_removed">This app is no longer a device owner.</string>
 
     <!-- Strings for device reboot -->
@@ -170,6 +171,8 @@
     <string name="profile_management_title">Work profile management</string>
     <string name="remove_managed_profile">Remove work profile</string>
     <string name="removing_managed_profile">Removing work profile</string>
+    <string name="lock_parent_key">Lock parent</string>
+    <string name="evict_ce_key">Evict CE key</string>
 
     <!-- Strings for cross-profile widget provider -->
     <string name="cross_profile_widget_providers_title">Cross-profile widget providers</string>
@@ -231,7 +234,7 @@
     <string name="wifi_client_cert_password">Client certificate password (if any)</string>
     <string name="import_ca_certificate">Import CA certificate</string>
     <string name="import_user_certificate">Import user certificate</string>
-    <string name="selected_certificate">Selected certificate: <xliff:g id="certificate_alias" example="server certificate">%1$s</xliff:g></string>
+    <string name="selected_certificate">Selected certificate: <xliff:g example="server certificate" id="certificate_alias">%1$s</xliff:g></string>
     <string name="selected_certificate_none">None</string>
     <string name="error_missing_ssid">Missing SSID</string>
     <string name="error_missing_ca_cert">Missing CA cert</string>
@@ -252,7 +255,7 @@
     </string>
     <string name="enable_system_apps_attempt_msg">Enabled system apps that receive the given intent
     </string>
-    <string name ="no_disabled_system_apps">All system apps have been enabled.</string>
+    <string name="no_disabled_system_apps">All system apps have been enabled.</string>
     <string name="enable">Enable</string>
     <string name="invalid_system_apps_action">Invalid action</string>
     <string name="hide_apps_title">Hide apps</string>
@@ -284,6 +287,7 @@
     </string>
     <string name="start_lock_task">Start lock task mode</string>
     <string name="stop_lock_task">Stop lock task mode</string>
+    <string name="lock_task_unavailable">Cannot set lock task packages: This user is not affiliated</string>
 
     <!-- Strings for single-use devices -->
     <string name="single_use_devices">Single-use devices</string>
@@ -306,9 +310,11 @@
     <string name="user_restrictions_preference_title">Set user restrictions</string>
     <string name="user_restrictions_management_title">User restrictions</string>
     <string name="allow_parent_profile_app_linking">Allow web links to apps of the parent</string>
+    <string name="disallow_add_managed_profile">Disallow add managed profile</string>
     <string name="disallow_add_user">Disallow add user</string>
     <string name="disallow_adjust_volume">Disallow adjust volume</string>
     <string name="disallow_apps_control">Disallow apps control</string>
+    <string name="disallow_bluetooth">Disallow bluetooth</string>
     <string name="disallow_config_bluetooth">Disallow config bluetooth</string>
     <string name="disallow_config_cell_broadcasts">Disallow config cell broadcasts</string>
     <string name="disallow_config_credentials">Disallow config credentials</string>
@@ -333,6 +339,7 @@
     <string name="disallow_network_reset">Disallow network reset</string>
     <string name="disallow_outgoing_beam">Disallow outgoing beam</string>
     <string name="disallow_outgoing_calls">Disallow outgoing calls</string>
+    <string name="disallow_remove_managed_profile">Disallow remove managed profile</string>
     <string name="disallow_remove_user">Disallow remove user</string>
     <string name="disallow_safe_boot">Disallow safe boot</string>
     <string name="disallow_set_user_icon">Disallow set user icon</string>
@@ -392,6 +399,21 @@
     <string name="plus">+</string>
     <string name="app_restrictions_managing_package">App restrictions manager</string>
 
+    <!-- Strings for delegation -->
+    <string name="delegation_title">Delegation</string>
+    <string name="generic_delegation">Generic delegation</string>
+    <string name="delegation_success">Scopes successfully saved</string>
+    <string name="delegation_error">Error, see logs</string>
+    <string name="delegation_scope_instructions">Check the scopes that should be delegated</string>
+    <string name="delegation_scope_prompt_title">Delegation scopes</string>
+    <string name="delegation_scope_cert_install">Cert installation</string>
+    <string name="delegation_scope_app_restrictions">App restrictions</string>
+    <string name="delegation_scope_block_uninstall">Block uninstall</string>
+    <string name="delegation_scope_permission_grant">Permission grant</string>
+    <string name="delegation_scope_package_access">Package access</string>
+    <string name="delegation_scope_enable_system_app">System app enabling</string>
+    <string name="delegation_scope_keep_uninstalled_packages">Keep uninstalled packages</string>
+    <string name="manage_cert_installer">Delegated cert installer</string>
 
     <!-- strings used in the alert dialog for editing application restrictions. -->
     <string name="select_type">Select type:</string>
@@ -414,14 +436,25 @@
     <string name="bugreport_sharing_declined">User declined sharing bugreport</string>
     <string name="bugreport_failure_message">Bugreport request failed: %s</string>
     <string name="bugreport_failure_throttled">Bugreport is already being collected on this device</string>
+    <string name="bugreport_failure_exception">Cannot request bugreport: There are unaffiliated users on the device</string>
     <string name="bugreport_failure_failed_completing">Bugreport collection operation failed</string>
     <string name="bugreport_failure_file_no_longer_available">Bugreport file is no longer available for collection</string>
+
+    <!-- Backup and Restore for Device Owner -->
+    <string name="enable_backup_service">Enable backup service</string>
 
     <!-- Enterprise process logging -->
     <string name="enable_process_logging">Enable process logging</string>
     <string name="request_process_logs">Request process logs</string>
     <string name="failed_to_retrieve_process_logs">Failed to retrieve process logs, they were probably accessed less than 2 hours ago</string>
+    <string name="exception_retrieving_process_logs">Not allowed to retrieve process logs, SecurityException thrown</string>
     <string name="process_logs_retrieved_message">---- Logs retrieved  %s ----</string>
+    <string name="on_security_logs_available">Test DPC: Security logs ready to be retrieved</string>
+
+    <!-- Network logging -->
+    <string name="enable_network_logging">Enable network logging</string>
+    <string name="on_network_logs_available_success">Test DPC: Network logs batch %d retrieved</string>
+    <string name="on_network_logs_available_failure">Test DPC: Could not retrieve network logs batch %d</string>
 
     <!-- Accessibility -->
     <string name="accessibility_title">Accessibility</string>
@@ -461,6 +494,7 @@
     <string name="user_management">User management</string>
     <string name="create_and_initialize_user">Create and initialize user</string>
     <string name="create_and_manage_user">Create and manage user</string>
+    <string name="create_managed_profile">Create managed profile</string>
     <string name="skip_setup_wizard">Skip setup wizard</string>
     <string name="remove_user">Remove user</string>
     <string name="user_created">Successfully created user with serial number %1$d.</string>
@@ -469,6 +503,15 @@
     <string name="enter_user_id">Enter a user serial number</string>
     <string name="user_removed">User removed.</string>
     <string name="failed_to_remove_user">Failed to remove user.</string>
+    <string name="on_user_added_title">User Created</string>
+    <string name="on_user_removed_title">User Removed</string>
+    <string name="on_user_added_message">User created with serial number %1$d.</string>
+    <string name="on_user_removed_message">User with serial number %1$d removed.</string>
+
+    <!-- Affiliation ids -->
+    <string name="manage_affiliation_ids">Manage affiliation ids</string>
+    <string name="enter_affiliation_id">Enter affiliation id</string>
+    <string name="affiliation_id_empty_error">Affiliation id cannot be empty</string>
 
     <!-- Strings for block uninstall -->
     <string name="block_uninstallation_title">Block uninstallation</string>
@@ -497,9 +540,27 @@
     <string name="system_update_policy_window_end_label">Maintenance window end:</string>
     <string name="system_update_policy_set_policy">Set new policy</string>
 
+    <!-- Strings for pending update info checking -->
+    <string name="system_update_pending">Check pending system update</string>
+    <string name="update_info_no_update_toast">No system update available.</string>
+    <string name="update_info_title">Pending update information</string>
+    <string name="update_info_received">Update was received on %1$s. Security patch: %2$s.</string>
+    <string name="update_info_security_false">false</string>
+    <string name="update_info_security_true">true</string>
+    <string name="update_info_security_unknown">unknown</string>
+
     <!-- Strings for networking -->
     <string name="networking_management_title">Networking</string>
     <string name="set_always_on_vpn">Set always-on VPN</string>
+    <string name="set_global_http_proxy">Set global HTTP proxy</string>
+    <string name="clear_global_http_proxy">Clear global HTTP proxy</string>
+    <string name="networking_proxy_host">Host</string>
+    <string name="networking_proxy_host_hint">Enter the host</string>
+    <string name="networking_proxy_port">Port</string>
+    <string name="networking_proxy_port_hint">Enter the port</string>
+    <string name="no_host">No host specified.</string>
+    <string name="no_port">No port specified.</string>
+    <string name="port_out_of_range">Port out of range.</string>
 
     <!--  Strings for data usage -->
     <string name="data_usage">Data usage</string>
@@ -538,9 +599,6 @@
         To see this data, Test DPC needs to be enabled under Settings &gt; Security &gt; Apps with usage access.
     </string>
 
-    <!--  Strings for delegated certificate installer -->
-    <string name="manage_cert_installer">Delegated cert installer</string>
-
     <!-- Strings for permission policies -->
     <string name="permission_management">Permission management</string>
     <string name="set_default_permission_policy">Get/Set default permission policy</string>
@@ -572,6 +630,8 @@
     <string name="maximum_lock_time_category">Max time to screen lock</string>
     <string name="maximum_lock_time_seconds">Max time to screen lock (seconds)</string>
     <string name="maximum_lock_time_all_admins">Max time as set by all/other admins</string>
+    <string name="strong_auth_timeout_category">Timeout after which strong auth will be required again</string>
+    <string name="strong_auth_timeout_seconds">Timeout for strong auth (seconds)</string>
     <string name="maximum_password_fails">Max password failures for local wipe</string>
     <string name="maximum_password_fails_all_admins">Max failures as set by all/other admins</string>
     <string name="not_valid_input">Failed to update: Not a valid input</string>
@@ -619,11 +679,15 @@
     </plurals>
     <string name="password_failed_no_limit_set">No limit set on failed password attempts.</string>
 
+    <string name="password_compliant_title">Active password compliant</string>
+    <string name="password_compliant_profile_summary">Personal: %1$s, Work: %2$s</string>
+    <string name="password_compliant_summary">Compliant %1$s</string>
+
     <!-- Strings for setting a new password -->
     <string name="reset_password">Reset password</string>
     <string name="new_password">New password</string>
     <string name="require_password_entry">Require strongest available authentication type on next unlock</string>
-    <string name="require_password_on_boot">Require password to start user</string>
+    <string name="dont_require_password_on_boot">Do not require password to start user in future</string>
     <string name="password_reset_success">Password has been reset</string>
     <string name="password_reset_failed">Failed to reset password</string>
 
@@ -688,4 +752,43 @@
     <string name="safetynet_fail_reason_invalid_jws">Invalid JWS response</string>
     <string name="safetynet_running">Running&#8230; Please wait</string>
     <string name="safetynet_verify_on_server">You should verify the response in your server.</string>
+
+    <string name="request_to_set_new_password">Request user to set new password</string>
+    <string name="request_to_set_profile_parent_new_password">Request user to set profile parent new password</string>
+
+    <!-- Device owner to profile owner communication (COMP and DO<->PO of secondary users) -->
+    <string name="bind_device_admin_category_title">Bind to profile owner</string>
+    <string name="bind_device_admin_policy_title">Bind to profile owner service</string>
+
+    <string name="bind_to_profile_owner_failed">Failed to bind to profile owner. Is the user running/unlocked?</string>
+    <string name="po_user_status">Profile owner user status</string>
+    <string name="managed_profile_not_running">Managed profile not running</string>
+    <string name="managed_profile_running_but_locked">Managed profile running but locked</string>
+    <string name="managed_profile_not_running_or_unlocked">Managed Profile not running or is locked</string>
+    <string name="managed_profile_unlocked">Managed Profile unlocked</string>
+    <string name="po_user_is_unlocked">Profile owner user with serial number %1$d is unlocked</string>
+    <string name="po_user_is_secondary">Profile owner belongs to secondary user</string>
+    <string name="require_one_po_to_bind">Requires exactly one profile owner allowed to bind to</string>
+    <string name="hide_profile_owner_launcher_icon">Hide profile owner icon</string>
+    <string name="install_ca_cert_in_po_user">Install CA certificate in the profile owner user</string>
+
+    <!-- strings used in the reset password with token dialog -->
+    <string name="reset_password_token_none">(None)</string>
+    <string name="reset_password_token_active">Active</string>
+    <string name="reset_password_token_inactive">Inactive</string>
+    <string name="activate_reset_password_token_cancelled">Token activation canceled</string>
+    <string name="set_password_reset_token_failed">Failed to set password token</string>
+    <string name="clear_password_reset_token_failed">Failed to remove password token</string>
+    <string name="reset_password_with_token_failed">Reset password failed</string>
+    <string name="reset_password_with_token_succeed">"Password successfully changed to: '%1$s'</string>
+    <string name="reset_password_fragment_set_new_token">Set new token</string>
+    <string name="reset_password_fragment_status">Status:</string>
+    <string name="reset_password_fragment_delete_token">Delete token</string>
+    <string name="reset_password_fragment_activate">Activate</string>
+    <string name="reset_password_fragment_token_label">Token:</string>
+    <string name="reset_password_fragment_reset_password_section">Reset password</string>
+    <string name="reset_password_fragment_new_password_label">New password:</string>
+    <string name="reset_password_fragment_set_password">Set password</string>
+    <string name="reset_password_no_token">No token</string>
+    <string name="reset_password_notification">Swipe away this notification to reset password</string>
 </resources>

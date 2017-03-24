@@ -17,7 +17,7 @@
 package com.afwsamples.testdpc.common.preference;
 
 import android.content.Context;
-import android.support.annotation.StringRes;
+import android.support.annotation.Nullable;
 import android.support.v7.preference.EditTextPreference;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.preference.PreferenceViewHolder;
@@ -56,7 +56,7 @@ public class DpcEditTextPreference extends EditTextPreference implements DpcPref
 
     @Override
     protected void onAttachedToHierarchy(PreferenceManager preferenceManager) {
-        mHelper.onAttachedToHierarchy();
+        mHelper.disableIfConstraintsNotMet();
         super.onAttachedToHierarchy(preferenceManager);
     }
 
@@ -99,18 +99,13 @@ public class DpcEditTextPreference extends EditTextPreference implements DpcPref
     }
 
     @Override
-    public void setCustomConstraint(CharSequence constraintSummary) {
-        mHelper.setCustomConstraint(constraintSummary);
+    public void setCustomConstraint(@Nullable CustomConstraint customConstraint) {
+        mHelper.setCustomConstraint(customConstraint);
     }
 
     @Override
-    public void setCustomConstraint(@StringRes int constraintSummaryRes) {
-        mHelper.setCustomConstraint(getContext().getString(constraintSummaryRes));
-    }
-
-    @Override
-    public void clearCustomConstraint() {
-        mHelper.clearCustomConstraint();
+    public void refreshEnabledState() {
+        mHelper.disableIfConstraintsNotMet();
     }
 }
 

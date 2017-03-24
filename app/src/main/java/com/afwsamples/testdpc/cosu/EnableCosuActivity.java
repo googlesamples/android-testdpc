@@ -136,7 +136,11 @@ public class EnableCosuActivity extends Activity {
         Log.d(CosuUtils.TAG, "CosuConfig:");
         Log.d(CosuUtils.TAG, mConfig.toString());
 
-        mConfig.applyPolicies(DeviceAdminReceiver.getComponentName(this));
+        if (!mConfig.applyPolicies(DeviceAdminReceiver.getComponentName(this))) {
+            finishWithFailure();
+            return;
+        }
+
         mConfig.initiateDownloadAndInstall(mHandler);
         mStatusText.setText(getString(R.string.setup_cosu_status_apps));
         if (mConfig.areAllInstallsFinished()) {

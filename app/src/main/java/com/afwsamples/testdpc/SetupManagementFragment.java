@@ -17,9 +17,12 @@
 package com.afwsamples.testdpc;
 
 import android.accounts.Account;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.admin.DevicePolicyManager;
 import android.content.ClipData;
+import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -28,11 +31,13 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PersistableBundle;
+import android.support.v4.os.BuildCompat;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RadioGroup;
@@ -45,6 +50,9 @@ import com.afwsamples.testdpc.common.ProvisioningStateUtil;
 import com.afwsamples.testdpc.common.Util;
 import com.android.setupwizardlib.SetupWizardLayout;
 import com.android.setupwizardlib.view.NavigationBar;
+import java.security.SecureRandom;
+import java.util.Arrays;
+import java.util.List;
 
 import static android.app.admin.DevicePolicyManager.ACTION_PROVISION_MANAGED_DEVICE;
 import static android.app.admin.DevicePolicyManager.ACTION_PROVISION_MANAGED_PROFILE;
@@ -61,7 +69,7 @@ import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_MAIN_COLO
  */
 public class SetupManagementFragment extends Fragment implements
         NavigationBar.NavigationBarListener, View.OnClickListener,
-        ColorPicker.OnColorSelectListener {
+        ColorPicker.OnColorSelectListener, RadioGroup.OnCheckedChangeListener {
     // Tag for creating this fragment. This tag can be used to retrieve this fragment.
     public static final String FRAGMENT_TAG = "SetupManagementFragment";
 
@@ -69,7 +77,12 @@ public class SetupManagementFragment extends Fragment implements
     private static final int REQUEST_PROVISION_DEVICE_OWNER = 2;
     private static final int REQUEST_GET_LOGO = 3;
 
+    private TextView mSetupManagementMessage;
+    private RadioGroup mSetupOptions;
     private Button mNavigationNextButton;
+    private CheckBox mSkipUserConsent;
+    private CheckBox mSkipEncryption;
+    private CheckBox mKeepAccountMigrated;
     private ImageButton mParamsIndicator;
     private View mParamsView;
     private static final int[] STATE_EXPANDED = new int[] {R.attr.state_expanded};
@@ -90,8 +103,7 @@ public class SetupManagementFragment extends Fragment implements
             mLogoUri = (Uri) savedInstanceState.getParcelable(EXTRA_PROVISIONING_LOGO_URI);
             mCurrentColor = savedInstanceState.getInt(EXTRA_PROVISIONING_MAIN_COLOR);
         } else {
-            mLogoUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://"
-                    + getActivity().getPackageName() + "/" + R.drawable.ic_launcher);
+            mLogoUri = resourceToUri(getActivity(), R.drawable.ic_launcher);
             mCurrentColor = getResources().getColor(R.color.teal);
         }
 
@@ -106,6 +118,13 @@ public class SetupManagementFragment extends Fragment implements
         navigationBar.getBackButton().setText(R.string.exit);
         mNavigationNextButton = navigationBar.getNextButton();
         mNavigationNextButton.setText(R.string.setup_label);
+
+        mSetupManagementMessage = (TextView) view.findViewById(R.id.setup_management_message_id);
+        mSetupOptions = (RadioGroup) view.findViewById(R.id.setup_options);
+        mSetupOptions.setOnCheckedChangeListener(this);
+        mSkipUserConsent = (CheckBox) view.findViewById(R.id.skip_user_consent);
+        mKeepAccountMigrated = (CheckBox) view.findViewById(R.id.keep_account_migrated);
+        mSkipEncryption = (CheckBox) view.findViewById(R.id.skip_encryption);
 
         mParamsView = view.findViewById(R.id.params);
         mParamsIndicator = (ImageButton) view.findViewById(R.id.params_indicator);
@@ -152,7 +171,7 @@ public class SetupManagementFragment extends Fragment implements
         getActivity().getActionBar().hide();
         if (setProvisioningMethodsVisibility()) {
             // The extra logo uri and color are supported only from N
-            if (ProvisioningStateUtil.versionIsAtLeastN()) {
+            if (BuildCompat.isAtLeastN()) {
                 getView().findViewById(R.id.params_title).setVisibility(View.VISIBLE);
                 if (canAnAppHandleGetContent()) {
                     getView().findViewById(
@@ -161,9 +180,41 @@ public class SetupManagementFragment extends Fragment implements
                     mLogoValue = (TextView) getView().findViewById(R.id.selected_logo_value);
                     mLogoPreviewView = (ImageView) getView().findViewById(R.id.preview_logo);
                 }
+                setProvisioningModeSpecificUI();
             }
         } else {
             showNoProvisioningPossibleUI();
+        }
+    }
+
+    /**
+     * On R.id.setup_options are changed
+     */
+    @Override
+    public void onCheckedChanged(RadioGroup radioGroup, int i) {
+        setProvisioningModeSpecificUI();
+    }
+
+    private void setProvisioningModeSpecificUI() {
+        final int setUpOptionId = mSetupOptions.getCheckedRadioButtonId();
+        final boolean isManagedProfileAction = setUpOptionId == R.id.setup_managed_profile;
+        final boolean isManagedDeviceAction = setUpOptionId == R.id.setup_device_owner;
+        mSkipUserConsent.setVisibility(BuildCompat.isAtLeastO() && isManagedProfileAction &&
+                Util.isDeviceOwner(getActivity())
+                ? View.VISIBLE
+                : View.GONE);
+        mKeepAccountMigrated.setVisibility(BuildCompat.isAtLeastO() && isManagedProfileAction
+                ? View.VISIBLE
+                : View.GONE);
+        mSkipEncryption.setVisibility((isManagedProfileAction && BuildCompat.isAtLeastN())
+                || (isManagedDeviceAction && Util.isAtLeastM())
+                ? View.VISIBLE
+                : View.GONE);
+
+        // If TestDpc is already a device owner, but can create a managed profile, show a different
+        // message.
+        if (Util.isDeviceOwner(getActivity())) {
+            mSetupManagementMessage.setText(R.string.setup_management_message_for_do);
         }
     }
 
@@ -183,8 +234,17 @@ public class SetupManagementFragment extends Fragment implements
             // Unable to handle user-input - can't continue.
             return;
         }
-        maybeSpecifySyncAuthExtras(intent);
+        PersistableBundle adminExtras = new PersistableBundle();
+        maybeSpecifySyncAuthExtras(intent, adminExtras);
+        maybePassAffiliationIds(intent, adminExtras);
+        specifySkipUserConsent(intent);
+        specifyKeepAccountMigrated(intent);
+        specifySkipEncryption(intent);
+        specifyDefaultDisclaimers(intent);
 
+        if (adminExtras.size() > 0) {
+            intent.putExtra(EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE, adminExtras);
+        }
         if (intent.resolveActivity(activity.getPackageManager()) != null) {
             startActivityForResult(intent, requestCode);
         } else {
@@ -193,7 +253,7 @@ public class SetupManagementFragment extends Fragment implements
         }
     }
 
-    private void maybeSpecifySyncAuthExtras(Intent intent) {
+    private void maybeSpecifySyncAuthExtras(Intent intent, PersistableBundle adminExtras) {
         Activity activity = getActivity();
         Intent launchIntent = activity.getIntent();
 
@@ -216,21 +276,102 @@ public class SetupManagementFragment extends Fragment implements
         }
 
         // Perculate launch intent extras through to DeviceAdminReceiver so they can be used there.
-        PersistableBundle adminExtras = new PersistableBundle();
         LaunchIntentUtil.prepareDeviceAdminExtras(launchIntent, adminExtras);
-        intent.putExtra(EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE, adminExtras);
+    }
+
+    private void maybePassAffiliationIds(Intent intent, PersistableBundle adminExtras) {
+        if (Util.isDeviceOwner(getActivity())
+                && ACTION_PROVISION_MANAGED_PROFILE.equals(intent.getAction())
+                && BuildCompat.isAtLeastO()) {
+            passAffiliationIds(intent, adminExtras);
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.O)
+    private void passAffiliationIds(Intent intent, PersistableBundle adminExtras) {
+        ComponentName admin = DeviceAdminReceiver.getComponentName(getActivity());
+        DevicePolicyManager dpm = (DevicePolicyManager)
+                getActivity().getSystemService(Context.DEVICE_POLICY_SERVICE);
+        List<String> ids = dpm.getAffiliationIds(admin);
+        String affiliationId = null;
+        if (ids.size() == 0) {
+            SecureRandom randomGenerator = new SecureRandom();
+            affiliationId = Integer.toString(randomGenerator.nextInt(1000000));
+            dpm.setAffiliationIds(admin, Arrays.asList(affiliationId));
+        } else {
+            affiliationId = ids.get(0);
+        }
+        adminExtras.putString(LaunchIntentUtil.EXTRA_AFFILIATION_ID, affiliationId);
     }
 
     /**
      * @return true if we can launch the intent
      */
     private boolean maybeSpecifyNExtras(Intent intent) {
-        if (ProvisioningStateUtil.versionIsAtLeastN()) {
+        if (BuildCompat.isAtLeastN()) {
             specifyLogoUri(intent);
             specifyColor(intent);
         }
         return true;
     }
+
+    // TODO: replace with O SDK API
+    private static final String EXTRA_PROVISIONING_DISCLAIMERS =
+            "android.app.extra.PROVISIONING_DISCLAIMERS";
+    private static final String EXTRA_PROVISIONING_DISCLAIMER_HEADER =
+            "android.app.extra.PROVISIONING_DISCLAIMER_HEADER";
+    private static final String EXTRA_PROVISIONING_DISCLAIMER_CONTENT =
+            "android.app.extra.PROVISIONING_DISCLAIMER_CONTENT";
+
+    private void specifyDefaultDisclaimers(Intent intent) {
+        if (BuildCompat.isAtLeastO()) {
+            Bundle emmBundle = new Bundle();
+            emmBundle.putString(EXTRA_PROVISIONING_DISCLAIMER_HEADER,
+                    getString(R.string.default_disclaimer_emm_name));
+            emmBundle.putParcelable(EXTRA_PROVISIONING_DISCLAIMER_CONTENT,
+                    resourceToUri(getActivity(), R.raw.emm_disclaimer));
+            Bundle companyBundle = new Bundle();
+            companyBundle.putString(EXTRA_PROVISIONING_DISCLAIMER_HEADER,
+                    getString(R.string.default_disclaimer_company_name));
+            companyBundle.putParcelable(EXTRA_PROVISIONING_DISCLAIMER_CONTENT,
+                    resourceToUri(getActivity(), R.raw.company_disclaimer));
+            intent.putExtra(EXTRA_PROVISIONING_DISCLAIMERS,
+                    new Bundle[] { emmBundle, companyBundle });
+        }
+    }
+
+    private static Uri resourceToUri(Context context, int resID) {
+        return Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" +
+                context.getResources().getResourcePackageName(resID) + '/' +
+                context.getResources().getResourceTypeName(resID) + '/' +
+                context.getResources().getResourceEntryName(resID) );
+    }
+
+    private void specifySkipUserConsent(Intent intent) {
+        if (BuildCompat.isAtLeastO() && ACTION_PROVISION_MANAGED_PROFILE.equals(intent.getAction())
+                && mSkipUserConsent.getVisibility() == View.VISIBLE) {
+            // TODO: use action string in Android SDK
+            intent.putExtra("android.app.extra.PROVISIONING_SKIP_USER_CONSENT",
+                    mSkipUserConsent.isChecked());
+        }
+    }
+
+    private void specifyKeepAccountMigrated(Intent intent) {
+        if (BuildCompat.isAtLeastO() && ACTION_PROVISION_MANAGED_PROFILE.equals(intent.getAction())
+                && mKeepAccountMigrated.getVisibility() == View.VISIBLE) {
+            // TODO: use action string in Android SDK
+            intent.putExtra("android.app.extra.PROVISIONING_KEEP_ACCOUNT_ON_MIGRATION",
+                    mKeepAccountMigrated.isChecked());
+        }
+    }
+
+    private void specifySkipEncryption(Intent intent) {
+        if (mSkipEncryption.getVisibility() == View.VISIBLE) {
+            intent.putExtra(DevicePolicyManager.EXTRA_PROVISIONING_SKIP_ENCRYPTION,
+                    mSkipEncryption.isChecked());
+        }
+    }
+
 
     private void specifyLogoUri(Intent intent) {
         intent.putExtra(EXTRA_PROVISIONING_LOGO_URI, mLogoUri);
@@ -247,7 +388,9 @@ public class SetupManagementFragment extends Fragment implements
     private void showNoProvisioningPossibleUI() {
         mNavigationNextButton.setVisibility(View.GONE);
         TextView textView = (TextView) getView().findViewById(R.id.setup_management_message_id);
-        textView.setText(R.string.provisioning_not_possible);
+        textView.setText(Util.isDeviceOwner(getActivity())
+                ? R.string.provisioning_not_possible_for_do
+                : R.string.provisioning_not_possible);
     }
 
     /**
@@ -337,8 +480,7 @@ public class SetupManagementFragment extends Fragment implements
 
     @Override
     public void onNavigateNext() {
-        RadioGroup setupOptions = (RadioGroup) getView().findViewById(R.id.setup_options);
-        if (setupOptions.getCheckedRadioButtonId() == R.id.setup_managed_profile) {
+        if (mSetupOptions.getCheckedRadioButtonId() == R.id.setup_managed_profile) {
             maybeLaunchProvisioning(ACTION_PROVISION_MANAGED_PROFILE,
                     REQUEST_PROVISION_MANAGED_PROFILE);
         } else {
