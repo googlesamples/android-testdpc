@@ -475,6 +475,16 @@
     <string name="set_input_methods_fail">Cannot disallow input methods enabled by the primary user</string>
     <string name="all_input_methods_enabled">All input methods are enabled.</string>
 
+    <!-- Notification listeners -->
+    <string name="notification_listeners_title">Notification Listener Services</string>
+    <string name="set_notification_listeners">Set notification listener services</string>
+    <string name="set_notification_listeners_successful">The given list of notification listeners is enabled</string>
+    <string name="set_notification_listeners_fail">Cannot add the notification listener list provided</string>
+    <string name="all_notification_listeners_enabled">All notification listeners are enabled.</string>
+    <string name="set_notification_listeners_text">Set notification listener services text</string>
+    <string name="set_notification_listener_text_title">Notification listener packages</string>
+    <string name="set_notification_listener_text_hint">Comma separated package list</string>
+
     <string name="loading_resuls">Loading\u2026</string>
 
     <!-- Account management -->
