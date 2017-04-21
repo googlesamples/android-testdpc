@@ -116,18 +116,13 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
 
     @Override
     public void onCreatePreferences(Bundle bundle, String rootKey) {
-        addPreferencesFromResource(getPreferenceXml());
+        addPreferencesFromResource(R.xml.lock_screen_preferences);
         setupAll();
         disableIncompatibleManagementOptionsInCurrentProfile();
         final int disabledFeatures = getDpm().getKeyguardDisabledFeatures(getAdmin());
         for (Map.Entry<String, Integer> flag : KEYGUARD_FEATURES.entrySet()) {
             setup(flag.getKey(), (disabledFeatures & flag.getValue()) != 0 ? true : false);
         }
-    }
-
-    @Override
-    public int getPreferenceXml() {
-        return R.xml.lock_screen_preferences;
     }
 
     @Override

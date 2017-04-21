@@ -131,11 +131,6 @@ public final class PasswordConstraintsFragment extends ProfileOrParentFragment i
     }
 
     @Override
-    public int getPreferenceXml() {
-        return R.xml.password_constraint_preferences;
-    }
-
-    @Override
     public boolean isAvailable(Context context) {
         return true;
     }
@@ -148,7 +143,7 @@ public final class PasswordConstraintsFragment extends ProfileOrParentFragment i
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-        addPreferencesFromResource(getPreferenceXml());
+        addPreferencesFromResource(R.xml.password_constraint_preferences);
 
         mMinLength = (DpcPreferenceBase) findPreference(Keys.MIN_LENGTH);
         mMinLetters = (DpcPreferenceBase) findPreference(Keys.MIN_LETTERS);

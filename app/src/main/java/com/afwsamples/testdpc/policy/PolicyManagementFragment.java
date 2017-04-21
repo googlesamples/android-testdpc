@@ -356,7 +356,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-        addPreferencesFromResource(getPreferenceXml());
+        addPreferencesFromResource(R.xml.device_policy_header);
 
         EditTextPreference overrideKeySelectionPreference =
                 (EditTextPreference) findPreference(OVERRIDE_KEY_SELECTION_KEY);
@@ -506,11 +506,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                         .setAdminConstraint(DpcPreferenceHelper.ADMIN_DEVICE_OWNER);
             }
         }
-    }
-
-    @Override
-    public int getPreferenceXml() {
-        return R.xml.device_policy_header;
     }
 
     @Override
