@@ -1,21 +1,19 @@
 package com.afwsamples.testdpc.search;
 
 import android.content.Context;
-import android.support.annotation.XmlRes;
 import android.util.Log;
 
 import com.afwsamples.testdpc.common.BaseSearchablePolicyPreferenceFragment;
 
-public class IndexableFragment {
-    private static final String TAG = "IndexableFragment";
+import java.util.List;
 
-    public String fragmentName;
-    public @XmlRes int xmlRes;
+public abstract class BaseIndexableFragment {
+    private static final String TAG = "BaseIndexableFragment";
+    protected String fragmentName;
 
-    public IndexableFragment(Class<? extends BaseSearchablePolicyPreferenceFragment> fragmentClass,
-            @XmlRes int xmlRes) {
+    public BaseIndexableFragment(
+            Class<? extends BaseSearchablePolicyPreferenceFragment> fragmentClass) {
         this.fragmentName = fragmentClass.getName();
-        this.xmlRes = xmlRes;
     }
 
     public boolean isAvailable(Context context) {
@@ -31,4 +29,6 @@ public class IndexableFragment {
         }
         return false;
     }
+
+    public abstract List<PreferenceIndex> index(Context context);
 }

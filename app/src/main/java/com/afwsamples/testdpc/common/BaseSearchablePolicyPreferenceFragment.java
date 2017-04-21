@@ -1,6 +1,5 @@
 package com.afwsamples.testdpc.common;
 
-import android.app.admin.DevicePolicyManager;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v14.preference.PreferenceFragment;
@@ -161,8 +160,6 @@ public abstract class BaseSearchablePolicyPreferenceFragment extends PreferenceF
             }
         }
     }
-
-    public abstract int getPreferenceXml();
 
     /**
      * The implementation must not use any variable that only initialzied in life-cycle callback.

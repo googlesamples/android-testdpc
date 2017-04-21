@@ -65,11 +65,6 @@ public class BindDeviceAdminFragment extends BaseSearchablePolicyPreferenceFragm
     private DpcPreference mInstallCaCertificatePreference;
 
     @Override
-    public int getPreferenceXml() {
-        return R.xml.bind_device_admin_policies;
-    }
-
-    @Override
     public boolean isAvailable(Context context) {
         DevicePolicyManager dpm = (DevicePolicyManager)
                 context.getSystemService(Context.DEVICE_POLICY_SERVICE);
@@ -79,7 +74,7 @@ public class BindDeviceAdminFragment extends BaseSearchablePolicyPreferenceFragm
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-        addPreferencesFromResource(getPreferenceXml());
+        addPreferencesFromResource(R.xml.bind_device_admin_policies);
         mUserManager = (UserManager) getActivity().getSystemService(Context.USER_SERVICE);
 
         mHideLauncherIconPreference =
