@@ -18,6 +18,7 @@ package com.afwsamples.testdpc.policy.resetpassword;
 
 import android.annotation.TargetApi;
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -37,13 +38,14 @@ import com.afwsamples.testdpc.R;
 
 import static android.content.Intent.ACTION_USER_UNLOCKED;
 
-// STOPSHIP: remove reflection calls
 @TargetApi(Build.VERSION_CODES.O)
 public class ResetPasswordService extends Service {
     private static final String TAG = "ResetPasswordService";
 
     private static final int NOTIFICATION_TAP_TO_RESET = 1;
     private static final int NOTIFICATION_RESET_RESULT = 2;
+    private static final int NOTIFICATION_FOREGROUND = 3;
+    private static final String NOTIFICATION_CHANNEL = "reset-password-notification";
 
     private static final String ACTION_RESET_PASSWORD = "com.afwsamples.testdpc.RESET_PASSWORD";
     private DevicePolicyManager mDpm;
@@ -56,8 +58,9 @@ public class ResetPasswordService extends Service {
             Log.d(TAG, "onReceive: " + intent.toString());
             Intent serviceIntent = new Intent(context, ResetPasswordService.class);
             serviceIntent.setAction(intent.getAction());
-            context.startService(serviceIntent);
+            context.startForegroundService(serviceIntent);
         }
+
     }
 
     private BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -67,6 +70,7 @@ public class ResetPasswordService extends Service {
             if (ACTION_USER_UNLOCKED.equals(intent.getAction())) {
                 ResetPasswordService.this.dismissNotification();
                 ResetPasswordService.this.unregisterReceiver(receiver);
+                ResetPasswordService.this.stopSelf();
             } else if (ACTION_RESET_PASSWORD.equals(intent.getAction())) {
                 ResetPasswordService.this.doResetPassword();
             }
@@ -82,18 +86,38 @@ public class ResetPasswordService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (getSystemService(UserManager.class).isUserUnlocked()) {
+        createNotificationChannel();
+        startForeground();
+
+        if (getSystemService(UserManager.class).isUserUnlocked()
+                || getActiveResetPasswordToken() == null) {
             stopSelf();
+            mNm.cancel(NOTIFICATION_FOREGROUND);
             return START_NOT_STICKY;
         }
         IntentFilter filter = new IntentFilter();
         filter.addAction(ACTION_USER_UNLOCKED);
-        if (getActiveResetPasswordToken() != null) {
-            filter.addAction(ACTION_RESET_PASSWORD);
-            showNotification();
-        }
+        filter.addAction(ACTION_RESET_PASSWORD);
         registerReceiver(receiver, filter);
+
+        showNotification();
         return START_REDELIVER_INTENT;
+    }
+
+    private void createNotificationChannel() {
+        NotificationChannel mChannel = new NotificationChannel(NOTIFICATION_CHANNEL,
+                getString(R.string.app_name), NotificationManager.IMPORTANCE_DEFAULT);
+        mNm.createNotificationChannel(mChannel);
+    }
+
+    private void startForeground() {
+        Notification notification = new Notification.Builder(this)
+                .setContentTitle(getString(R.string.app_name))
+                .setContentText(getString(R.string.reset_password_foreground_notification))
+                .setSmallIcon(R.drawable.ic_launcher)
+                .setChannel(NOTIFICATION_CHANNEL)
+                .build();
+        startForeground(NOTIFICATION_FOREGROUND, notification);
     }
 
     @Nullable
@@ -127,7 +151,8 @@ public class ResetPasswordService extends Service {
         }
         Notification.Builder builder = new Notification.Builder(this)
                 .setContentTitle(getString(R.string.app_name))
-                .setSmallIcon(R.drawable.ic_launcher);
+                .setSmallIcon(R.drawable.ic_launcher)
+                .setChannel(NOTIFICATION_CHANNEL);
         if (result) {
             builder.setContentText(getString(R.string.reset_password_with_token_succeed, password));
             builder.setOngoing(true);
@@ -146,6 +171,7 @@ public class ResetPasswordService extends Service {
                 .setContentIntent(intent)
                 .setDeleteIntent(intent)
                 .setSmallIcon(R.drawable.ic_launcher)
+                .setChannel(NOTIFICATION_CHANNEL)
                 .build();
         mNm.notify(NOTIFICATION_TAP_TO_RESET, notification);
     }
