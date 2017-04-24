@@ -61,9 +61,9 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:preference-v14:25.+'
-    compile 'com.android.support:recyclerview-v7:25.+'
-    compile "com.android.support:support-v13:25.+"
+    compile 'com.android.support:preference-v14:26.+'
+    compile 'com.android.support:recyclerview-v7:26.+'
+    compile 'com.android.support:support-v13:26.+'
     compile 'com.google.android.gms:play-services-safetynet:+'
     compile(name:'setup-wizard-lib-platform-release', ext:'aar')
 }
