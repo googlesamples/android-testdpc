@@ -37,6 +37,7 @@ import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.BaseManageComponentFragment;
 import com.afwsamples.testdpc.common.EditDeleteArrayAdapter;
+import com.afwsamples.testdpc.common.Util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -117,7 +118,8 @@ public class AffiliationIdsFragment extends BaseManageComponentFragment<Void>
     @TargetApi(Build.VERSION_CODES.O)
     protected void loadDefault() {
         mAffiliationIdsArrayAdapter.clear();
-        mAffiliationIdsArrayAdapter.addAll(mDevicePolicyManager.getAffiliationIds(mAdminComponent));
+        mAffiliationIdsArrayAdapter.addAll(
+                Util.getAffiliationIds(mDevicePolicyManager, mAdminComponent));
         mLastAffiliationIds = new ArrayList<>(mAffiliationIds);
     }
 

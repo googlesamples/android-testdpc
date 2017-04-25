@@ -41,12 +41,15 @@ import com.afwsamples.testdpc.EnableDeviceOwnerActivity;
 import com.afwsamples.testdpc.EnableProfileActivity;
 import com.afwsamples.testdpc.FirstAccountReadyBroadcastReceiver;
 import com.afwsamples.testdpc.common.LaunchIntentUtil;
+import com.afwsamples.testdpc.common.ReflectionUtil;
 import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.cosu.EnableCosuActivity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Task executed after provisioning is done indicated by either the
@@ -183,8 +186,10 @@ public class PostProvisioningTask {
         }
         String affiliationId = extras.getString(LaunchIntentUtil.EXTRA_AFFILIATION_ID);
         if (affiliationId != null) {
-            mDevicePolicyManager.setAffiliationIds(getComponentName(mContext),
-                    Arrays.asList(affiliationId));
+            Util.setAffiliationIds(
+                    mDevicePolicyManager,
+                    getComponentName(mContext),
+                    Collections.singleton(affiliationId));
         }
     }
 

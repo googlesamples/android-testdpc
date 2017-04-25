@@ -45,6 +45,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Common utility functions.
@@ -205,5 +206,34 @@ public class Util {
             Log.e(TAG, "installCaCertificate: ", e);
         }
         return false;
+    }
+
+    /**
+     * TODO: Remove this before release.
+     */
+    public static Set<String> getAffiliationIds(DevicePolicyManager dpm, ComponentName admin) {
+        try {
+            return (Set<String>) ReflectionUtil.invoke(dpm, "getAffiliationIds", admin);
+        } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
+            Log.e(TAG, "getAffiliationIds: ", e);
+        }
+        return Collections.emptySet();
+    }
+
+    /**
+     * TODO: Remove this before release.
+     */
+    public static void setAffiliationIds(
+            DevicePolicyManager dpm, ComponentName admin, Set<String> ids) {
+        try {
+            ReflectionUtil.invoke(
+                    dpm,
+                    "setAffiliationIds",
+                    new Class[] {ComponentName.class, Set.class},
+                    admin,
+                    ids);
+        } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
+            Log.e(TAG, "maybeSetAffiliationIds: ", e);
+        }
     }
 }
