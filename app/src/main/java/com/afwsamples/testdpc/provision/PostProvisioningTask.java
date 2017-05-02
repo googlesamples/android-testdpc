@@ -187,8 +187,7 @@ public class PostProvisioningTask {
         }
         String affiliationId = extras.getString(LaunchIntentUtil.EXTRA_AFFILIATION_ID);
         if (affiliationId != null) {
-            Util.setAffiliationIds(
-                    mDevicePolicyManager,
+            mDevicePolicyManager.setAffiliationIds(
                     getComponentName(mContext),
                     Collections.singleton(affiliationId));
         }

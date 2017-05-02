@@ -107,8 +107,7 @@ public class AffiliationIdsFragment extends BaseManageComponentFragment<Void>
     @Override
     @TargetApi(Build.VERSION_CODES.O)
     protected void saveConfig() {
-        Util.setAffiliationIds(
-                mDevicePolicyManager,
+        mDevicePolicyManager.setAffiliationIds(
                 DeviceAdminReceiver.getComponentName(getActivity()),
                 new ArraySet<>(mAffiliationIds));
         mLastAffiliationIds = new ArrayList<>(mAffiliationIds);
@@ -123,8 +122,7 @@ public class AffiliationIdsFragment extends BaseManageComponentFragment<Void>
     @TargetApi(Build.VERSION_CODES.O)
     protected void loadDefault() {
         mAffiliationIdsArrayAdapter.clear();
-        mAffiliationIdsArrayAdapter.addAll(
-                Util.getAffiliationIds(mDevicePolicyManager, mAdminComponent));
+        mAffiliationIdsArrayAdapter.addAll(mDevicePolicyManager.getAffiliationIds(mAdminComponent));
         mLastAffiliationIds = new ArrayList<>(mAffiliationIds);
     }
 

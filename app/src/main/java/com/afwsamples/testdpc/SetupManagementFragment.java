@@ -294,12 +294,12 @@ public class SetupManagementFragment extends Fragment implements
         ComponentName admin = DeviceAdminReceiver.getComponentName(getActivity());
         DevicePolicyManager dpm = (DevicePolicyManager)
                 getActivity().getSystemService(Context.DEVICE_POLICY_SERVICE);
-        Set<String> ids = Util.getAffiliationIds(dpm, admin);
+        Set<String> ids = dpm.getAffiliationIds(admin);
         String affiliationId = null;
         if (ids.size() == 0) {
             SecureRandom randomGenerator = new SecureRandom();
             affiliationId = Integer.toString(randomGenerator.nextInt(1000000));
-            Util.setAffiliationIds(dpm, admin, Collections.singleton(affiliationId));
+            dpm.setAffiliationIds(admin, Collections.singleton(affiliationId));
         } else {
             affiliationId = ids.iterator().next();
         }
