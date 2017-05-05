@@ -22,9 +22,6 @@ android {
         targetSdkVersion 25
         versionCode versionMajor * 1000 + versionMinor * 100 + versionBuild
         versionName "${versionMajor}.${versionMinor}.${versionBuild}"
-        jackOptions {
-          enabled true
-        }
     }
 
     buildTypes {
