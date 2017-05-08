@@ -173,6 +173,16 @@
                 android:exported="true"
                 android:permission="android.permission.BIND_DEVICE_ADMIN"/>
 
+        <service
+                android:name=".DeviceAdminService"
+                android:enabled="@bool/is_o_or_later"
+                android:exported="true"
+                android:permission="android.permission.BIND_DEVICE_ADMIN">
+            <intent-filter>
+                <action android:name="android.app.action.DEVICE_ADMIN_SERVICE" />
+            </intent-filter>
+        </service>
+
     </application>
 
 </manifest>
