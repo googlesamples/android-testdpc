@@ -19,6 +19,7 @@ package com.afwsamples.testdpc.common;
 import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.Service;
 import android.app.admin.DevicePolicyManager;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
@@ -113,14 +114,13 @@ public class Util {
         }
     }
 
+    /** Allows to distinguish between Managed Profile and Profile Owner */
     @TargetApi(VERSION_CODES.N)
     public static boolean isManagedProfile(Context context) {
         if (BuildCompat.isAtLeastN()) {
-            DevicePolicyManager devicePolicyManager =
-                    (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
+            DevicePolicyManager dpm = getDevicePolicyManager(context);
             try {
-                return devicePolicyManager.isManagedProfile(
-                        DeviceAdminReceiver.getComponentName(context));
+                return dpm.isManagedProfile(DeviceAdminReceiver.getComponentName(context));
             } catch (SecurityException e) {
                 // This is thrown if there is no active admin so not the managed profile
                 return false;
@@ -132,6 +132,20 @@ public class Util {
             UserManager userManager = (UserManager) context.getSystemService(Context.USER_SERVICE);
             return userManager.getUserProfiles().size() > 1;
         }
+    }
+
+    /**
+     * TODO: unify with {@link Util#isManagedProfile} (there must be one 'correct' way)
+     * <p>
+     * TODO: consider setting a target version for the method
+     */
+    public static boolean isManagedProfile2(Context context) {
+        final DevicePolicyManager dpm = getDevicePolicyManager(context);
+
+        // On pre-N devices, the only supported PO flow is managed profile. On N+ devices we need
+        // to check whether we're running in a managed profile.
+        return dpm.isProfileOwnerApp(context.getPackageName())
+                && (!BuildCompat.isAtLeastN() || Util.isManagedProfile(context));
     }
 
     @TargetApi(VERSION_CODES.M)
@@ -148,15 +162,13 @@ public class Util {
 
     @TargetApi(VERSION_CODES.LOLLIPOP)
     public static boolean isDeviceOwner(Context context) {
-        final DevicePolicyManager dpm =
-                (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
+        final DevicePolicyManager dpm = getDevicePolicyManager(context);
         return dpm.isDeviceOwnerApp(context.getPackageName());
     }
 
     @TargetApi(VERSION_CODES.LOLLIPOP)
     public static boolean isProfileOwner(Context context) {
-        final DevicePolicyManager dpm =
-                (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
+        final DevicePolicyManager dpm = getDevicePolicyManager(context);
         return dpm.isProfileOwnerApp(context.getPackageName());
     }
 
@@ -170,8 +182,7 @@ public class Util {
             return Collections.emptyList();
         }
 
-        final DevicePolicyManager dpm =
-                (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
+        final DevicePolicyManager dpm = getDevicePolicyManager(context);
         return dpm.getBindDeviceAdminTargetUsers(DeviceAdminReceiver.getComponentName(context));
     }
 
@@ -206,5 +217,9 @@ public class Util {
             Log.e(TAG, "installCaCertificate: ", e);
         }
         return false;
+    }
+
+    private static DevicePolicyManager getDevicePolicyManager(Context context) {
+        return (DevicePolicyManager)context.getSystemService(Service.DEVICE_POLICY_SERVICE);
     }
 }
