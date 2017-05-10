@@ -31,6 +31,12 @@ android {
         }
     }
 
+    productFlavors {
+        target25 {
+            targetSdkVersion 25
+        }
+    }
+
     lintOptions {
         check 'NewApi'
         abortOnError true
