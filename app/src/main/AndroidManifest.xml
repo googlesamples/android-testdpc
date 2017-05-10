@@ -120,7 +120,7 @@
 
         <receiver android:name=".FirstAccountReadyBroadcastReceiver"
                 android:exported="true"
-                android:enabled="false">
+                android:enabled="true">
             <intent-filter>
                 <action android:name="com.google.android.work.action.FIRST_ACCOUNT_READY"/>
             </intent-filter>
