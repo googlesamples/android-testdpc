@@ -792,4 +792,9 @@
     <string name="reset_password_no_token">No token</string>
     <string name="reset_password_foreground_notification">TestDPC reset password service running</string>
     <string name="reset_password_notification">Swipe away this notification to reset password</string>
+
+    <string name="package_changed_notification_title">Package change(s) are observed</string>
+    <string name="package_added_notification_text">%1$s is added</string>
+    <string name="package_removed_notification_text">%1$s is removed</string>
+
 </resources>

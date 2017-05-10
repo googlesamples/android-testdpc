@@ -18,6 +18,7 @@ package com.afwsamples.testdpc.common;
 
 import android.annotation.TargetApi;
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.admin.DevicePolicyManager;
 import android.content.ActivityNotFoundException;
@@ -30,8 +31,10 @@ import android.os.Build;
 import android.os.Build.VERSION_CODES;
 import android.os.UserHandle;
 import android.os.UserManager;
+import android.support.annotation.RequiresApi;
 import android.support.v14.preference.PreferenceFragment;
 import android.support.v4.os.BuildCompat;
+import android.support.v7.app.NotificationCompat;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.widget.ImageView;
@@ -39,13 +42,13 @@ import android.widget.Toast;
 
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
+
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Common utility functions.
@@ -57,18 +60,33 @@ public class Util {
     public static final int PASSWORD_EXPIRATION_NOTIFICATION_ID = 2;
     public static final int USER_ADDED_NOTIFICATION_ID = 3;
     public static final int USER_REMOVED_NOTIFICATION_ID = 4;
+    private static final String DEFAULT_CHANNEL_ID = "default_testdpc_channel";
 
     public static void showNotification(Context context, int titleId, String msg,
             int notificationId) {
-        NotificationManager mNotificationManager =
+        NotificationManager notificationManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        Notification notification = new Notification.Builder(context)
+        Log.d(TAG, "showNotification: " + BuildCompat.isAtLeastO());
+        if (BuildCompat.isAtLeastO()) {
+            createDefaultNotificationChannel(context, notificationManager);
+        }
+        Notification notification = new NotificationCompat.Builder(context)
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setContentTitle(context.getString(titleId))
                 .setContentText(msg)
-                .setStyle(new Notification.BigTextStyle().bigText(msg))
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(msg))
+                .setChannel(DEFAULT_CHANNEL_ID)
                 .build();
-        mNotificationManager.notify(notificationId, notification);
+        notificationManager.notify(notificationId, notification);
+    }
+
+    @RequiresApi(VERSION_CODES.O)
+    private static void createDefaultNotificationChannel(
+            Context context, NotificationManager notificationManager) {
+        String appName = context.getString(R.string.app_name);
+        NotificationChannel channel = new NotificationChannel(DEFAULT_CHANNEL_ID,
+                appName, NotificationManager.IMPORTANCE_DEFAULT);
+        notificationManager.createNotificationChannel(channel);
     }
 
     /**
