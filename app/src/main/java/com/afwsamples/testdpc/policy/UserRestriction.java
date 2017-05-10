@@ -7,6 +7,7 @@ import static android.os.UserManager.DISALLOW_ADD_MANAGED_PROFILE;
 import static android.os.UserManager.DISALLOW_ADD_USER;
 import static android.os.UserManager.DISALLOW_ADJUST_VOLUME;
 import static android.os.UserManager.DISALLOW_APPS_CONTROL;
+import static android.os.UserManager.DISALLOW_AUTOFILL;
 import static android.os.UserManager.DISALLOW_BLUETOOTH;
 import static android.os.UserManager.DISALLOW_CONFIG_BLUETOOTH;
 import static android.os.UserManager.DISALLOW_CONFIG_CELL_BROADCASTS;
@@ -148,6 +149,9 @@ public class UserRestriction {
             new UserRestriction(
                     ENSURE_VERIFY_APPS,
                     R.string.ensure_verify_apps),
+            new UserRestriction(
+                    DISALLOW_AUTOFILL,
+                    R.string.disallow_autofill),
     };
 
     /**
@@ -210,7 +214,8 @@ public class UserRestriction {
     public static String[] OC_PLUS_RESTRICTIONS = {
             DISALLOW_ADD_MANAGED_PROFILE,
             DISALLOW_BLUETOOTH,
-            DISALLOW_REMOVE_MANAGED_PROFILE
+            DISALLOW_REMOVE_MANAGED_PROFILE,
+            DISALLOW_AUTOFILL
     };
 
 }
