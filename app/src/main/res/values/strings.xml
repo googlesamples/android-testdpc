@@ -350,6 +350,7 @@
     <string name="disallow_unmute_microphone">Disallow unmute microphone</string>
     <string name="disallow_usb_file_transfer">Disallow usb file transfer</string>
     <string name="ensure_verify_apps">Ensure verify apps</string>
+    <string name="disallow_autofill">Disallow autofill</string>
     <string name="user_restriction_error_msg">Operation not allowed</string>
 
     <!-- Strings for select app -->
