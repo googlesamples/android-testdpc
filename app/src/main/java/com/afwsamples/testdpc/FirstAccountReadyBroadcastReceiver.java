@@ -52,7 +52,7 @@ public class FirstAccountReadyBroadcastReceiver extends BroadcastReceiver {
         final String action = intent.getAction();
         Log.d(TAG, "Received: " + action);
 
-        if (!Util.isManagedProfile2(context)) {
+        if (!Util.isManagedProfileOwner(context)) {
             Log.d(TAG, "Not a Managed Profile case. Ignoring broadcast.");
             return;
         }

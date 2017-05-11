@@ -128,7 +128,7 @@ public class ProfilePolicyManagementFragment extends BaseSearchablePolicyPrefere
 
     @Override
     public boolean isAvailable(Context context) {
-        return Util.isManagedProfile(context);
+        return Util.isManagedProfileOwner(context);
     }
 
     @Override
