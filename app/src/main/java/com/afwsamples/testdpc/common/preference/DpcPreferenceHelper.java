@@ -262,7 +262,7 @@ public class DpcPreferenceHelper {
             return USER_PRIMARY_USER;
         }
 
-        if (Util.isManagedProfile(mContext)) {
+        if (Util.isManagedProfileOwner(mContext)) {
 
             return USER_MANAGED_PROFILE;
         }

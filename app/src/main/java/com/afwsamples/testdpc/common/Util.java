@@ -132,38 +132,24 @@ public class Util {
         }
     }
 
-    /** Allows to distinguish between Managed Profile and Profile Owner */
-    @TargetApi(VERSION_CODES.N)
-    public static boolean isManagedProfile(Context context) {
-        if (BuildCompat.isAtLeastN()) {
-            DevicePolicyManager dpm = getDevicePolicyManager(context);
-            try {
-                return dpm.isManagedProfile(DeviceAdminReceiver.getComponentName(context));
-            } catch (SecurityException e) {
-                // This is thrown if there is no active admin so not the managed profile
-                return false;
-            }
-        } else {
-            // If user has more than one profile, then we deal with managed profile.
-            // Unfortunately there is no public API available to distinguish user profile owner
-            // and managed profile owner. Thus using this hack.
-            UserManager userManager = (UserManager) context.getSystemService(Context.USER_SERVICE);
-            return userManager.getUserProfiles().size() > 1;
-        }
-    }
-
     /**
-     * TODO: unify with {@link Util#isManagedProfile} (there must be one 'correct' way)
-     * <p>
-     * TODO: consider setting a target version for the method
+     * Return {@code true} iff we are the profile owner of a managed profile.
+     * Note that profile owner can be in primary user and secondary user too.
      */
-    public static boolean isManagedProfile2(Context context) {
+    @TargetApi(VERSION_CODES.N)
+    public static boolean isManagedProfileOwner(Context context) {
         final DevicePolicyManager dpm = getDevicePolicyManager(context);
 
-        // On pre-N devices, the only supported PO flow is managed profile. On N+ devices we need
-        // to check whether we're running in a managed profile.
-        return dpm.isProfileOwnerApp(context.getPackageName())
-                && (!BuildCompat.isAtLeastN() || Util.isManagedProfile(context));
+        if (BuildCompat.isAtLeastN()) {
+            try {
+                return dpm.isManagedProfile(DeviceAdminReceiver.getComponentName(context));
+            } catch (SecurityException ex) {
+                // This is thrown if we are neither profile owner nor device owner.
+                return false;
+            }
+        }
+        UserManager userManager = (UserManager) context.getSystemService(Context.USER_SERVICE);
+        return isProfileOwner(context) && userManager.getUserProfiles().size() > 1;
     }
 
     @TargetApi(VERSION_CODES.M)
