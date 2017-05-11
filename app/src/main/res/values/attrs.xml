@@ -25,8 +25,8 @@
             <enum name="L" value="21" />
             <enum name="M" value="23" />
             <enum name="N" value="24" />
+            <enum name="O" value="26" />
             <!-- Build.VERSION_CODES.CUR_DEVELOPMENT, fill in the sdk int once it is finalized -->
-            <enum name="O" value="10000" />
         </attr>
 
         <!-- Constrain a preference to DO or PO admins. -->
