@@ -19,7 +19,7 @@ android {
     defaultConfig {
         applicationId "com.afwsamples.testdpc"
         minSdkVersion 21
-        targetSdkVersion 25
+        targetSdkVersion 26
         versionCode versionMajor * 1000 + versionMinor * 100 + versionBuild
         versionName "${versionMajor}.${versionMinor}.${versionBuild}"
         jackOptions {
@@ -37,6 +37,10 @@ android {
     productFlavors {
         target25 {
             targetSdkVersion 25
+        }
+
+        targetO {
+            targetSdkVersion 'O'
         }
     }
 
