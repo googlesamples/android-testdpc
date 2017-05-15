@@ -17,7 +17,7 @@
 
 <resources>
     <style name="SetupTheme" parent="SuwThemeMaterial.Light">
-        <item name="android:colorAccent">@color/pink</item>
+        <item name="colorAccent">@color/pink</item>
         <item name="suwLayoutTheme">@style/SetupIllustrationTheme</item>
     </style>
 

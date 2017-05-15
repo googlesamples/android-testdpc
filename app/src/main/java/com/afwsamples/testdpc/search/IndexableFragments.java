@@ -4,6 +4,7 @@ import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.BaseSearchablePolicyPreferenceFragment;
 import com.afwsamples.testdpc.comp.BindDeviceAdminFragment;
 import com.afwsamples.testdpc.policy.PolicyManagementFragment;
+import com.afwsamples.testdpc.policy.UserRestriction;
 import com.afwsamples.testdpc.policy.keyguard.LockScreenPolicyFragment;
 import com.afwsamples.testdpc.policy.keyguard.PasswordConstraintsFragment;
 import com.afwsamples.testdpc.profilepolicy.ProfilePolicyManagementFragment;
@@ -22,22 +23,23 @@ import java.util.List;
  * </p>
  */
 public class IndexableFragments {
-    private static final List<IndexableFragment> sIndexableFragments = new ArrayList<>();
+    private static final List<BaseIndexableFragment> sIndexableFragments = new ArrayList<>();
 
     static {
-        sIndexableFragments.add(new IndexableFragment(PolicyManagementFragment.class,
+        sIndexableFragments.add(new XmlIndexableFragment(PolicyManagementFragment.class,
                 R.xml.device_policy_header));
-        sIndexableFragments.add(new IndexableFragment(ProfilePolicyManagementFragment.class,
+        sIndexableFragments.add(new XmlIndexableFragment(ProfilePolicyManagementFragment.class,
                 R.xml.profile_policy_header));
-        sIndexableFragments.add(new IndexableFragment(LockScreenPolicyFragment.class,
+        sIndexableFragments.add(new XmlIndexableFragment(LockScreenPolicyFragment.class,
                 R.xml.lock_screen_preferences));
-        sIndexableFragments.add(new IndexableFragment(PasswordConstraintsFragment.class,
+        sIndexableFragments.add(new XmlIndexableFragment(PasswordConstraintsFragment.class,
                 R.xml.password_constraint_preferences));
-        sIndexableFragments.add(new IndexableFragment(BindDeviceAdminFragment.class,
+        sIndexableFragments.add(new XmlIndexableFragment(BindDeviceAdminFragment.class,
                 R.xml.bind_device_admin_policies));
+        sIndexableFragments.add(new UserRestrictionIndexableFragment());
     }
 
-    public static List<IndexableFragment> values() {
+    public static List<BaseIndexableFragment> values() {
         return new ArrayList<>(sIndexableFragments);
     }
 }
