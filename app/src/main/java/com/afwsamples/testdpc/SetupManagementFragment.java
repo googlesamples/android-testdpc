@@ -50,11 +50,9 @@ import com.afwsamples.testdpc.common.ProvisioningStateUtil;
 import com.afwsamples.testdpc.common.Util;
 import com.android.setupwizardlib.SetupWizardLayout;
 import com.android.setupwizardlib.view.NavigationBar;
-
 import java.security.SecureRandom;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Set;
+import java.util.List;
 
 import static android.app.admin.DevicePolicyManager.ACTION_PROVISION_MANAGED_DEVICE;
 import static android.app.admin.DevicePolicyManager.ACTION_PROVISION_MANAGED_PROFILE;
@@ -294,14 +292,14 @@ public class SetupManagementFragment extends Fragment implements
         ComponentName admin = DeviceAdminReceiver.getComponentName(getActivity());
         DevicePolicyManager dpm = (DevicePolicyManager)
                 getActivity().getSystemService(Context.DEVICE_POLICY_SERVICE);
-        Set<String> ids = dpm.getAffiliationIds(admin);
+        List<String> ids = dpm.getAffiliationIds(admin);
         String affiliationId = null;
         if (ids.size() == 0) {
             SecureRandom randomGenerator = new SecureRandom();
             affiliationId = Integer.toString(randomGenerator.nextInt(1000000));
-            dpm.setAffiliationIds(admin, Collections.singleton(affiliationId));
+            dpm.setAffiliationIds(admin, Arrays.asList(affiliationId));
         } else {
-            affiliationId = ids.iterator().next();
+            affiliationId = ids.get(0);
         }
         adminExtras.putString(LaunchIntentUtil.EXTRA_AFFILIATION_ID, affiliationId);
     }

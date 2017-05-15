@@ -17,14 +17,13 @@
 package com.afwsamples.testdpc.policy;
 
 import android.annotation.TargetApi;
-import android.app.AlertDialog;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
+import android.app.AlertDialog;
 import android.support.annotation.StringRes;
-import android.support.v4.util.ArraySet;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,15 +37,13 @@ import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.BaseManageComponentFragment;
 import com.afwsamples.testdpc.common.EditDeleteArrayAdapter;
-import com.afwsamples.testdpc.common.Util;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Allows the user to see / edit / delete affiliation ids.
- * See {@link DevicePolicyManager#setAffiliationIds(ComponentName, Set)}
+ * See {@link DevicePolicyManager#setAffiliationIds(ComponentName, List)}
  */
 public class AffiliationIdsFragment extends BaseManageComponentFragment<Void>
         implements EditDeleteArrayAdapter.OnEditButtonClickListener<String> {
@@ -107,9 +104,7 @@ public class AffiliationIdsFragment extends BaseManageComponentFragment<Void>
     @Override
     @TargetApi(Build.VERSION_CODES.O)
     protected void saveConfig() {
-        mDevicePolicyManager.setAffiliationIds(
-                DeviceAdminReceiver.getComponentName(getActivity()),
-                new ArraySet<>(mAffiliationIds));
+        mDevicePolicyManager.setAffiliationIds(mAdminComponent, mAffiliationIds);
         mLastAffiliationIds = new ArrayList<>(mAffiliationIds);
     }
 

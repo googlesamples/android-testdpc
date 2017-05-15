@@ -189,7 +189,7 @@ import static com.afwsamples.testdpc.common.preference.DpcPreferenceHelper.NO_CU
  * <li> {@link DevicePolicyManager#getScreenCaptureDisabled(ComponentName)} </li>
  * <li> {@link DevicePolicyManager#setMaximumTimeToLock(ComponentName, long)} </li>
  * <li> {@link DevicePolicyManager#setMaximumFailedPasswordsForWipe(ComponentName, int)} </li>
- * <li> {@link DevicePolicyManager#setAffiliationIds(ComponentName, Set)} </li>
+ * <li> {@link DevicePolicyManager#setAffiliationIds(ComponentName, List)} </li>
  * <li> {@link DevicePolicyManager#setApplicationHidden(ComponentName, String, boolean)} </li>
  * <li> {@link DevicePolicyManager#setShortSupportMessage(ComponentName, CharSequence)} </li>
  * <li> {@link DevicePolicyManager#setLongSupportMessage(ComponentName, CharSequence)} </li>
@@ -845,7 +845,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 .setView(dialogView)
                 .setPositiveButton(android.R.string.ok, (d, i) -> {
                     final int flags = evictKeyCheckBox.isChecked()
-                            ? DevicePolicyManager.FLAG_EVICT_CREDENTIAL_ENCRYPTION_KEY : 0;
+                            ? DevicePolicyManager.FLAG_EVICT_CE_KEY : 0;
                     final DevicePolicyManager dpm = lockParentCheckBox.isChecked()
                             ? mDevicePolicyManager.getParentProfileInstance(mAdminComponentName)
                             : mDevicePolicyManager;
