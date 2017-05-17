@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
 
-import com.afwsamples.testdpc.common.Util;
+import com.afwsamples.testdpc.common.NotificationUtil;
 
 public class PackageMonitorReceiver extends BroadcastReceiver {
     private static final String TAG = "PackageMonitorReceiver";
@@ -27,7 +27,7 @@ public class PackageMonitorReceiver extends BroadcastReceiver {
             return;
         }
         String notificationBody = buildNotificationText(context, packageName, action);
-        Util.showNotification(context,
+        NotificationUtil.showNotification(context,
                 R.string.package_changed_notification_title,
                 notificationBody,
                 PACKAGE_CHANGED_NOTIIFICATION_ID);

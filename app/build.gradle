@@ -31,16 +31,6 @@ android {
         }
     }
 
-    productFlavors {
-        target25 {
-            targetSdkVersion 25
-        }
-
-        targetO {
-            targetSdkVersion 'O'
-        }
-    }
-
     lintOptions {
         check 'NewApi'
         abortOnError true
@@ -76,9 +66,9 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:preference-v14:26.+'
-    compile 'com.android.support:recyclerview-v7:26.+'
-    compile 'com.android.support:support-v13:26.+'
+    compile 'com.android.support:preference-v14:26.0.0-SNAPSHOT'
+    compile 'com.android.support:recyclerview-v7:26.0.0-SNAPSHOT'
+    compile 'com.android.support:support-v13:26.0.0-SNAPSHOT'
     compile 'com.google.android.gms:play-services-safetynet:+'
     compile(name:'setup-wizard-lib-platform-release', ext:'aar')
 }

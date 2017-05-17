@@ -57,38 +57,6 @@ import java.util.List;
 public class Util {
     private static final String TAG = "Util";
     private  static final int DEFAULT_BUFFER_SIZE = 4096;
-    public static final int BUGREPORT_NOTIFICATION_ID = 1;
-    public static final int PASSWORD_EXPIRATION_NOTIFICATION_ID = 2;
-    public static final int USER_ADDED_NOTIFICATION_ID = 3;
-    public static final int USER_REMOVED_NOTIFICATION_ID = 4;
-    private static final String DEFAULT_CHANNEL_ID = "default_testdpc_channel";
-
-    public static void showNotification(Context context, int titleId, String msg,
-            int notificationId) {
-        NotificationManager notificationManager =
-                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        Log.d(TAG, "showNotification: " + BuildCompat.isAtLeastO());
-        if (BuildCompat.isAtLeastO()) {
-            createDefaultNotificationChannel(context, notificationManager);
-        }
-        Notification notification = new NotificationCompat.Builder(context)
-                .setSmallIcon(R.drawable.ic_launcher)
-                .setContentTitle(context.getString(titleId))
-                .setContentText(msg)
-                .setStyle(new NotificationCompat.BigTextStyle().bigText(msg))
-                .setChannel(DEFAULT_CHANNEL_ID)
-                .build();
-        notificationManager.notify(notificationId, notification);
-    }
-
-    @RequiresApi(VERSION_CODES.O)
-    private static void createDefaultNotificationChannel(
-            Context context, NotificationManager notificationManager) {
-        String appName = context.getString(R.string.app_name);
-        NotificationChannel channel = new NotificationChannel(DEFAULT_CHANNEL_ID,
-                appName, NotificationManager.IMPORTANCE_DEFAULT);
-        notificationManager.createNotificationChannel(channel);
-    }
 
     /**
      * Format a friendly datetime for the current locale according to device policy documentation.
