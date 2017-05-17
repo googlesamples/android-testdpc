@@ -116,18 +116,13 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
 
     @Override
     public void onCreatePreferences(Bundle bundle, String rootKey) {
-        addPreferencesFromResource(getPreferenceXml());
+        addPreferencesFromResource(R.xml.lock_screen_preferences);
         setupAll();
         disableIncompatibleManagementOptionsInCurrentProfile();
         final int disabledFeatures = getDpm().getKeyguardDisabledFeatures(getAdmin());
         for (Map.Entry<String, Integer> flag : KEYGUARD_FEATURES.entrySet()) {
             setup(flag.getKey(), (disabledFeatures & flag.getValue()) != 0 ? true : false);
         }
-    }
-
-    @Override
-    public int getPreferenceXml() {
-        return R.xml.lock_screen_preferences;
     }
 
     @Override
@@ -140,9 +135,12 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
     public void onResume() {
         super.onResume();
         updateAggregates();
-        findPreference(Keys.STRONG_AUTH_TIMEOUT).setSummary(Long.toString(
-                TimeUnit.MILLISECONDS.toSeconds(getDpm().getRequiredStrongAuthTimeout(
-                        getAdmin()))));
+
+        final Preference pref = findPreference(Keys.STRONG_AUTH_TIMEOUT);
+        if (pref.isEnabled()) {
+            pref.setSummary(Long.toString(TimeUnit.MILLISECONDS.toSeconds(
+                    getDpm().getRequiredStrongAuthTimeout(getAdmin()))));
+        }
     }
 
     @Override
@@ -260,11 +258,14 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
                 BuildCompat.isAtLeastN() && isDeviceOwner()
                         ? getDpm().getDeviceOwnerLockScreenInfo() : null);
         setup(Keys.MAX_FAILS_BEFORE_WIPE, getDpm().getMaximumFailedPasswordsForWipe(getAdmin()));
-        setup(Keys.STRONG_AUTH_TIMEOUT,
-                TimeUnit.MILLISECONDS.toSeconds(getDpm().getRequiredStrongAuthTimeout(getAdmin())));
         setup(Keys.MAX_TIME_SCREEN_LOCK,
                 TimeUnit.MILLISECONDS.toSeconds(getDpm().getMaximumTimeToLock(getAdmin())));
         setup(Keys.SET_TRUST_AGENT_CONFIG, null);
+
+        final Preference strongAuthPref = findPreference(Keys.STRONG_AUTH_TIMEOUT);
+        setup(Keys.STRONG_AUTH_TIMEOUT,
+                strongAuthPref.isEnabled() ? TimeUnit.MILLISECONDS.toSeconds(
+                        getDpm().getRequiredStrongAuthTimeout(getAdmin())) : null);
     }
 
     /**

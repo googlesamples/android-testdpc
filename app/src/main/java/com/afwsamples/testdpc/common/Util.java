@@ -19,6 +19,7 @@ package com.afwsamples.testdpc.common;
 import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.Service;
 import android.app.admin.DevicePolicyManager;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
@@ -112,25 +113,24 @@ public class Util {
         }
     }
 
+    /**
+     * Return {@code true} iff we are the profile owner of a managed profile.
+     * Note that profile owner can be in primary user and secondary user too.
+     */
     @TargetApi(VERSION_CODES.N)
-    public static boolean isManagedProfile(Context context) {
+    public static boolean isManagedProfileOwner(Context context) {
+        final DevicePolicyManager dpm = getDevicePolicyManager(context);
+
         if (BuildCompat.isAtLeastN()) {
-            DevicePolicyManager devicePolicyManager =
-                    (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
             try {
-                return devicePolicyManager.isManagedProfile(
-                        DeviceAdminReceiver.getComponentName(context));
-            } catch (SecurityException e) {
-                // This is thrown if there is no active admin so not the managed profile
+                return dpm.isManagedProfile(DeviceAdminReceiver.getComponentName(context));
+            } catch (SecurityException ex) {
+                // This is thrown if we are neither profile owner nor device owner.
                 return false;
             }
-        } else {
-            // If user has more than one profile, then we deal with managed profile.
-            // Unfortunately there is no public API available to distinguish user profile owner
-            // and managed profile owner. Thus using this hack.
-            UserManager userManager = (UserManager) context.getSystemService(Context.USER_SERVICE);
-            return userManager.getUserProfiles().size() > 1;
         }
+        UserManager userManager = (UserManager) context.getSystemService(Context.USER_SERVICE);
+        return isProfileOwner(context) && userManager.getUserProfiles().size() > 1;
     }
 
     @TargetApi(VERSION_CODES.M)
@@ -147,15 +147,13 @@ public class Util {
 
     @TargetApi(VERSION_CODES.LOLLIPOP)
     public static boolean isDeviceOwner(Context context) {
-        final DevicePolicyManager dpm =
-                (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
+        final DevicePolicyManager dpm = getDevicePolicyManager(context);
         return dpm.isDeviceOwnerApp(context.getPackageName());
     }
 
     @TargetApi(VERSION_CODES.LOLLIPOP)
     public static boolean isProfileOwner(Context context) {
-        final DevicePolicyManager dpm =
-                (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
+        final DevicePolicyManager dpm = getDevicePolicyManager(context);
         return dpm.isProfileOwnerApp(context.getPackageName());
     }
 
@@ -169,8 +167,7 @@ public class Util {
             return Collections.emptyList();
         }
 
-        final DevicePolicyManager dpm =
-                (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
+        final DevicePolicyManager dpm = getDevicePolicyManager(context);
         return dpm.getBindDeviceAdminTargetUsers(DeviceAdminReceiver.getComponentName(context));
     }
 
@@ -205,5 +202,9 @@ public class Util {
             Log.e(TAG, "installCaCertificate: ", e);
         }
         return false;
+    }
+
+    private static DevicePolicyManager getDevicePolicyManager(Context context) {
+        return (DevicePolicyManager)context.getSystemService(Service.DEVICE_POLICY_SERVICE);
     }
 }

@@ -356,7 +356,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-        addPreferencesFromResource(getPreferenceXml());
+        addPreferencesFromResource(R.xml.device_policy_header);
 
         EditTextPreference overrideKeySelectionPreference =
                 (EditTextPreference) findPreference(OVERRIDE_KEY_SELECTION_KEY);
@@ -506,11 +506,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                         .setAdminConstraint(DpcPreferenceHelper.ADMIN_DEVICE_OWNER);
             }
         }
-    }
-
-    @Override
-    public int getPreferenceXml() {
-        return R.xml.device_policy_header;
     }
 
     @Override
@@ -818,9 +813,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     @TargetApi(Build.VERSION_CODES.O)
     private void lockNow() {
-        if (BuildCompat.isAtLeastO() && Util.isManagedProfile(getActivity())) {
+        if (BuildCompat.isAtLeastO() && Util.isManagedProfileOwner(getActivity())) {
             showLockNowPrompt();
-        } else if (BuildCompat.isAtLeastN() && Util.isManagedProfile(getActivity())) {
+        } else if (BuildCompat.isAtLeastN() && Util.isManagedProfileOwner(getActivity())) {
             // Always call lock now on the parent for managed profile on N
             mDevicePolicyManager.getParentProfileInstance(mAdminComponentName).lockNow();
         } else {
@@ -1564,7 +1559,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
         String summary;
         boolean compliant = mDevicePolicyManager.isActivePasswordSufficient();
-        if (Util.isManagedProfile(getActivity())) {
+        if (Util.isManagedProfileOwner(getActivity())) {
             DevicePolicyManager parentDpm
                     = mDevicePolicyManager.getParentProfileInstance(mAdminComponentName);
             boolean parentCompliant = parentDpm.isActivePasswordSufficient();

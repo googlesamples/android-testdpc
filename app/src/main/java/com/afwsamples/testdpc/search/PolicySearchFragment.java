@@ -139,9 +139,9 @@ public class PolicySearchFragment extends Fragment implements
      * @return a list of fragments that we are going to search for.
      */
     private List<String> getAvailableFragments() {
-        List<IndexableFragment> fragments = IndexableFragments.values();
+        List<BaseIndexableFragment> fragments = IndexableFragments.values();
         List<String> availableFragments = new ArrayList<>();
-        for (IndexableFragment fragment : fragments) {
+        for (BaseIndexableFragment fragment : fragments) {
             if (fragment.isAvailable(getActivity())) {
                 availableFragments.add(fragment.fragmentName);
             }

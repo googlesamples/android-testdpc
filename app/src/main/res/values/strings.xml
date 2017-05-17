@@ -790,5 +790,6 @@
     <string name="reset_password_fragment_new_password_label">New password:</string>
     <string name="reset_password_fragment_set_password">Set password</string>
     <string name="reset_password_no_token">No token</string>
+    <string name="reset_password_foreground_notification">TestDPC reset password service running</string>
     <string name="reset_password_notification">Swipe away this notification to reset password</string>
 </resources>

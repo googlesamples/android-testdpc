@@ -39,7 +39,6 @@ import android.util.Log;
 import com.afwsamples.testdpc.AddAccountActivity;
 import com.afwsamples.testdpc.EnableDeviceOwnerActivity;
 import com.afwsamples.testdpc.EnableProfileActivity;
-import com.afwsamples.testdpc.FirstAccountReadyBroadcastReceiver;
 import com.afwsamples.testdpc.common.LaunchIntentUtil;
 import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.cosu.EnableCosuActivity;
@@ -103,13 +102,6 @@ public class PostProvisioningTask {
                 new ComponentName(mContext, SETUP_MANAGEMENT_LAUNCH_ACTIVITY),
                 PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
 
-        // Enable first account ready receiver for PO flow. On pre-N devices, the only supported
-        // PO flow is managed profile. On N+ devices we need to check whether we're running in a
-        // managed profile.
-        if (mDevicePolicyManager.isProfileOwnerApp(mContext.getPackageName())
-                && (!BuildCompat.isAtLeastN() || Util.isManagedProfile(mContext))) {
-            FirstAccountReadyBroadcastReceiver.setEnabled(mContext, true);
-        }
         return true;
     }
 

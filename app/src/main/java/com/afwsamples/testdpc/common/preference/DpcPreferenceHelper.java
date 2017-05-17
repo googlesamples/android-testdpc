@@ -220,7 +220,8 @@ public class DpcPreferenceHelper {
      */
     private CharSequence findConstraintViolation() {
         if (getDeviceSdkInt() < mMinSdkVersion) {
-            if (mMinSdkVersion == Build.VERSION_CODES.O) {
+            // FIXME: Remove this special checking once O is out.
+            if (mMinSdkVersion >= 26) {
                 return mContext.getString(R.string.requires_preview_release);
             }
             return mContext.getString(R.string.requires_android_api_level, mMinSdkVersion);
@@ -262,7 +263,7 @@ public class DpcPreferenceHelper {
             return USER_PRIMARY_USER;
         }
 
-        if (Util.isManagedProfile(mContext)) {
+        if (Util.isManagedProfileOwner(mContext)) {
 
             return USER_MANAGED_PROFILE;
         }

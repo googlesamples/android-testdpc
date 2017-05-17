@@ -107,7 +107,7 @@ public class ProfilePolicyManagementFragment extends BaseSearchablePolicyPrefere
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-        addPreferencesFromResource(getPreferenceXml());
+        addPreferencesFromResource(R.xml.profile_policy_header);
         mAddCrossProfileIntentFilterPreference = findPreference(
                 ADD_CROSS_PROFILE_INTENT_FILTER_PREFERENCE_KEY);
         mAddCrossProfileIntentFilterPreference.setOnPreferenceClickListener(this);
@@ -127,13 +127,8 @@ public class ProfilePolicyManagementFragment extends BaseSearchablePolicyPrefere
     }
 
     @Override
-    public int getPreferenceXml() {
-        return R.xml.profile_policy_header;
-    }
-
-    @Override
     public boolean isAvailable(Context context) {
-        return Util.isManagedProfile(context);
+        return Util.isManagedProfileOwner(context);
     }
 
     @Override

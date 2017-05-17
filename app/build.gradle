@@ -7,7 +7,7 @@ ext {
     // exactly 1 digit
     versionMinor = 0
     // exactly 2 digits
-    versionBuild = 0
+    versionBuild = 01
 }
 
 android {
@@ -17,7 +17,7 @@ android {
     defaultConfig {
         applicationId "com.afwsamples.testdpc"
         minSdkVersion 21
-        targetSdkVersion 25
+        targetSdkVersion 26
         versionCode versionMajor * 1000 + versionMinor * 100 + versionBuild
         versionName "${versionMajor}.${versionMinor}.${versionBuild}"
         jackOptions {
@@ -29,6 +29,16 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    productFlavors {
+        target25 {
+            targetSdkVersion 25
+        }
+
+        targetO {
+            targetSdkVersion 'O'
         }
     }
 
@@ -53,9 +63,9 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:preference-v14:25.+'
-    compile 'com.android.support:recyclerview-v7:25.+'
-    compile "com.android.support:support-v13:25.+"
+    compile 'com.android.support:preference-v14:26.+'
+    compile 'com.android.support:recyclerview-v7:26.+'
+    compile 'com.android.support:support-v13:26.+'
     compile 'com.google.android.gms:play-services-safetynet:+'
     compile(name:'setup-wizard-lib-platform-release', ext:'aar')
 }

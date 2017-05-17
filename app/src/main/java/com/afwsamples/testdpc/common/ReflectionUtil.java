@@ -22,14 +22,16 @@ public class ReflectionUtil {
      *                   {@link #invoke(Object, String, Class[], Object[])}.
      * @return           The result of the invocation. {@code null} if {@code void}.
      */
-    public static Object invoke(Object obj, String methodName, Object... args) {
+    public static Object invoke(Object obj, String methodName, Object... args)
+            throws ReflectionIsTemporaryException {
         return invoke(obj.getClass(), obj, methodName, args);
     }
 
     /**
      * Same as {@link #invoke(Object, String, Object...)} but for static methods.
      */
-    public static Object invoke(Class<?> clazz, String methodName, Object... args) {
+    public static Object invoke(Class<?> clazz, String methodName, Object... args)
+            throws ReflectionIsTemporaryException {
         return invoke(clazz, null, methodName, args);
     }
 
@@ -48,7 +50,7 @@ public class ReflectionUtil {
      * @return               The result of the invocation. {@code null} if {@code void}.
      */
     public static Object invoke(Object obj, String methodName, Class<?>[] parameterTypes,
-                                Object... args) {
+                                Object... args) throws ReflectionIsTemporaryException {
         return invoke(obj.getClass(), obj, methodName, parameterTypes, args);
     }
 
@@ -56,12 +58,13 @@ public class ReflectionUtil {
      * Same as {@link #invoke(Object, String, Class[], Object...)} but for static methods.
      */
     public static Object invoke(Class<?> clazz, String methodName, Class<?>[] parameterTypes,
-                                Object... args) {
+                                Object... args) throws ReflectionIsTemporaryException {
         return invoke(clazz, null, methodName, parameterTypes, args);
     }
 
     /** Resolve the parameter types and invoke the method. */
-    private static Object invoke(Class<?> clazz, Object obj, String methodName, Object... args) {
+    private static Object invoke(Class<?> clazz, Object obj, String methodName, Object... args)
+            throws ReflectionIsTemporaryException {
         Class<?> parameterTypes[] = new Class<?>[args.length];
         for (int i = 0; i < args.length; ++i) {
             parameterTypes[i] = args[i].getClass();
@@ -71,12 +74,13 @@ public class ReflectionUtil {
 
     /** Resolve the method and invoke it. */
     private static Object invoke(Class<?> clazz, Object obj, String methodName,
-                                 Class<?>[] parameterTypes, Object... args) {
+                                 Class<?>[] parameterTypes, Object... args)
+            throws ReflectionIsTemporaryException {
         try {
             return clazz.getMethod(methodName, parameterTypes).invoke(obj, args);
         } catch (SecurityException | NoSuchMethodException | IllegalArgumentException
                 | IllegalAccessException | InvocationTargetException e) {
-            throw new RuntimeException("Failed to invoke method", e);
+            throw new ReflectionIsTemporaryException("Failed to invoke method", e);
         }
     }
 
@@ -90,11 +94,12 @@ public class ReflectionUtil {
      * @param fieldName The name of the constant field.
      * @return          The value of the constant.
      */
-    public static int intConstant(Class<?> clazz, String fieldName) {
+    public static int intConstant(Class<?> clazz, String fieldName)
+            throws ReflectionIsTemporaryException {
         try {
             return clazz.getField(fieldName).getInt(null);
         } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new RuntimeException("Failed to retrieve constant", e);
+            throw new ReflectionIsTemporaryException("Failed to retrieve constant", e);
         }
     }
 
@@ -108,11 +113,27 @@ public class ReflectionUtil {
      * @param fieldName The name of the constant field.
      * @return          The value of the constant.
      */
-    public static String stringConstant(Class<?> clazz, String fieldName) {
+    public static String stringConstant(Class<?> clazz, String fieldName)
+            throws ReflectionIsTemporaryException {
         try {
             return (String) clazz.getField(fieldName).get(null);
         } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new RuntimeException("Failed to retrieve constant", e);
+            throw new ReflectionIsTemporaryException("Failed to retrieve constant", e);
+        }
+    }
+
+    /**
+     * Thrown when the temporary use of reflection fails to find and use a new API.
+     *
+     * This will happen when the API is not yet available in the SDK and TestDPC is running on
+     * device that isn't running the latest version of the framework and therefore doesn't support
+     * the API.
+     *
+     * To handle this, gracefully fail the operation in progress.
+     */
+    public static class ReflectionIsTemporaryException extends Exception {
+        public ReflectionIsTemporaryException(String message, Throwable cause) {
+            super(message, cause);
         }
     }
 }
