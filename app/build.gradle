@@ -20,9 +20,6 @@ android {
         targetSdkVersion 26
         versionCode versionMajor * 1000 + versionMinor * 100 + versionBuild
         versionName "${versionMajor}.${versionMinor}.${versionBuild}"
-        jackOptions {
-          enabled true
-        }
     }
 
     buildTypes {
@@ -32,6 +29,7 @@ android {
         }
     }
 
+    flavorDimensions "api"
     productFlavors {
         target25 {
             targetSdkVersion 25
@@ -58,6 +56,9 @@ android {
     repositories {
         flatDir {
             dirs 'libs'
+        }
+        maven {
+            url 'https://maven.google.com'
         }
     }
 }
