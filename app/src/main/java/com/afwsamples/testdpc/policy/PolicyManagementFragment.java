@@ -83,7 +83,6 @@ import com.afwsamples.testdpc.common.CertificateUtil;
 import com.afwsamples.testdpc.common.MediaDisplayFragment;
 import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.common.CertificateUtil;
-import com.afwsamples.testdpc.common.ReflectionUtil;
 import com.afwsamples.testdpc.common.preference.DpcPreference;
 import com.afwsamples.testdpc.common.preference.DpcPreferenceBase;
 import com.afwsamples.testdpc.common.preference.DpcPreferenceHelper;
@@ -2312,6 +2311,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         }
     }
 
+    @TargetApi(Build.VERSION_CODES.O)
     private void setNotificationWhitelistEditBox() {
         if (getActivity() == null || getActivity().isFinishing()) {
             return;
@@ -2319,7 +2319,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         View view = getActivity().getLayoutInflater().inflate(R.layout.simple_edittext, null);
         final EditText input = (EditText) view.findViewById(R.id.input);
         input.setHint(getString(R.string.set_notification_listener_text_hint));
-        List<String> enabledComponents = getPermittedNotificationListeners();
+        List<String> enabledComponents = mDevicePolicyManager.
+                getPermittedCrossProfileNotificationListeners(mAdminComponentName);
         if (enabledComponents == null) {
             input.setText("null");
         } else {
@@ -2368,8 +2369,10 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         }
 
         @Override
+        @TargetApi(Build.VERSION_CODES.O)
         protected List<String> getPermittedComponentsList() {
-            return getPermittedNotificationListeners();
+            return mDevicePolicyManager.
+                    getPermittedCrossProfileNotificationListeners(mAdminComponentName);
         }
 
         @Override
@@ -2378,33 +2381,15 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         }
     }
 
+    @TargetApi(Build.VERSION_CODES.O)
     private void setPermittedNotificationListeners(List<String> permittedNotificationListeners) {
-        // STOPSHIP: Call actual method once in the SDK
-        boolean result;
-        try {
-            result = (boolean) ReflectionUtil.invoke(mDevicePolicyManager,
-                    "setPermittedCrossProfileNotificationListeners",
-                    new Class<?>[] {ComponentName.class, List.class},
-                    mAdminComponentName, permittedNotificationListeners);
-        } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
-            Log.e(TAG, "Setting permitted notification listeners failed", e);
-            result = false;
-        }
+        boolean result = mDevicePolicyManager.
+                setPermittedCrossProfileNotificationListeners(
+                mAdminComponentName, permittedNotificationListeners);
         int successMsgId = (permittedNotificationListeners == null)
                 ? R.string.all_notification_listeners_enabled
                 : R.string.set_notification_listeners_successful;
         showToast(result ? successMsgId : R.string.set_notification_listeners_fail);
-    }
-
-    private List<String> getPermittedNotificationListeners() {
-        // STOPSHIP: Call actual method once in the SDK
-        try {
-            return (List<String>) ReflectionUtil.invoke(mDevicePolicyManager,
-                    "getPermittedCrossProfileNotificationListeners", mAdminComponentName);
-        } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
-            Log.e(TAG, "Setting permitted notification listeners failed", e);
-        }
-        return null;
     }
 
     /**
