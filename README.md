@@ -5,23 +5,24 @@ Test DPC is an app designed to help EMMs, ISVs, and OEMs to test their applicati
 
 See the [documentation](https://developer.android.com/work/index.html) to learn more about Android for Work.
 
-Pre-requisites
---------------
-
-- Android O preview SDK
-- Android Build Tools v26.0.0-rc1
-- Android Support Repository
-
 Getting Started
 ---------------
 
 This sample uses the Gradle build system. To build this project, use the "gradlew assemble" command or use "Import Project" in Android Studio.
 
-NFC Provisioning
+Provisioning
 ------------
 
-The [NFC Provisioning app](https://github.com/googlesamples/android-NfcProvisioning) is used for *device owner* provisioning.
+You can find varioud kinds of provisioing methods [here](https://developers.google.com/android/work/prov-devices#Key_provisioning_differences_across_android_releases). Let's take QR and NFC provisioning as an example.
 
+#### QR provisioing (N+ only) ####
+1. Factory reset your device and tap the welcome screen in setup wizard 6 times.
+2. The setup wizard prompts the user to connect to the Internet so the setup wizard can download a QR code reader.
+3. Modify (if needed) and scan [this QR code] (http://down-box.appspot.com/qr/nQB0tw7b).
+3. Follow onscreen instructions
+
+#### NFC provisioning ####
+The [NFC Provisioning app](https://github.com/googlesamples/android-NfcProvisioning) is used for *device owner* provisioning.
 1. Push the nfcprovisioning.txt file to your device:
 `adb push nfcprovisioning.txt /sdcard/`
 2. Open the NFC Provisioning app and ensure that com.afwsamples.testdpc is auto-populated.
