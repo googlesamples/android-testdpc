@@ -29,10 +29,10 @@ The [NFC Provisioning app](https://github.com/googlesamples/android-NfcProvision
 3. Bump the devices and touch to beam.
 4. Follow onscreen instructions on the target device.
 
-### adb command (Device Owner) ###
+#### adb command (Device Owner) ####
 adb shell dpm set-device-owner com.afwsamples.testdpc/.DeviceAdminReceiver
 
-### Work profile ###
+#### Work profile ####
 The easiest way is to launch the Test DPC app in launcher and follow the onscreen instructions.
 
 Screenshots
