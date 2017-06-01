@@ -13,21 +13,27 @@ This sample uses the Gradle build system. To build this project, use the "gradle
 Provisioning
 ------------
 
-You can find varioud kinds of provisioing methods [here](https://developers.google.com/android/work/prov-devices#Key_provisioning_differences_across_android_releases). Let's take QR and NFC provisioning as an example.
+You can find varioud kinds of provisioing methods [here](https://developers.google.com/android/work/prov-devices#Key_provisioning_differences_across_android_releases). Let's take a few of them as an example.
 
-#### QR provisioing (N+ only) ####
+#### QR code provisioing (Device Owner N+ only) ####
 1. Factory reset your device and tap the welcome screen in setup wizard 6 times.
 2. The setup wizard prompts the user to connect to the Internet so the setup wizard can download a QR code reader.
 3. Modify (if needed) and scan [this QR code] (http://down-box.appspot.com/qr/nQB0tw7b).
-3. Follow onscreen instructions
+4. Follow onscreen instructions
 
-#### NFC provisioning ####
+#### NFC provisioning (Device Owner) ####
 The [NFC Provisioning app](https://github.com/googlesamples/android-NfcProvisioning) is used for *device owner* provisioning.
 1. Push the nfcprovisioning.txt file to your device:
 `adb push nfcprovisioning.txt /sdcard/`
 2. Open the NFC Provisioning app and ensure that com.afwsamples.testdpc is auto-populated.
 3. Bump the devices and touch to beam.
 4. Follow onscreen instructions on the target device.
+
+### adb command (Device Owner) ###
+adb shell dpm set-device-owner com.afwsamples.testdpc/.DeviceAdminReceiver
+
+### Work profile ###
+The easiest way is to launch the Test DPC app in launcher and follow the onscreen instructions.
 
 Screenshots
 ------------
