@@ -129,8 +129,11 @@ public class Util {
                 return false;
             }
         }
-        UserManager userManager = (UserManager) context.getSystemService(Context.USER_SERVICE);
-        return isProfileOwner(context) && userManager.getUserProfiles().size() > 1;
+
+        // Pre-N, TestDPC only supports being the profile owner for a managed profile. Other apps
+        // may support being a profile owner in other contexts (e.g. a secondary user) which will
+        // require further checks.
+        return isProfileOwner(context);
     }
 
     @TargetApi(VERSION_CODES.M)
