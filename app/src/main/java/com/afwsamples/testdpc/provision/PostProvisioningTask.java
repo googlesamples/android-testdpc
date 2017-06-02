@@ -73,7 +73,8 @@ public class PostProvisioningTask {
 
     public PostProvisioningTask(Context context) {
         mContext = context;
-        mDevicePolicyManager = context.getSystemService(DevicePolicyManager.class);
+        mDevicePolicyManager =
+                (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
         mSharedPrefs = context.getSharedPreferences(POST_PROV_PREFS, Context.MODE_PRIVATE);
     }
 
