@@ -203,6 +203,19 @@
             testdpc:minSdkVersion="L" />
     </PreferenceCategory>
 
+    <PreferenceCategory android:title="@string/notification_listeners_title">
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="set_notification_listeners"
+            android:title="@string/set_notification_listeners"
+            testdpc:user="managedProfile"
+            testdpc:minSdkVersion="O" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="set_notification_listeners_text"
+            android:title="@string/set_notification_listeners_text"
+            testdpc:user="managedProfile"
+            testdpc:minSdkVersion="O" />
+    </PreferenceCategory>
+
     <PreferenceCategory android:title="@string/lock_category">
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="password_compliant"

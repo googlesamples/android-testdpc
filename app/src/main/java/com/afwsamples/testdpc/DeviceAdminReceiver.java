@@ -16,8 +16,6 @@
 
 package com.afwsamples.testdpc;
 
-import static com.afwsamples.testdpc.policy.PolicyManagementFragment.OVERRIDE_KEY_SELECTION_KEY;
-
 import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -35,10 +33,12 @@ import android.os.Process;
 import android.os.UserHandle;
 import android.os.UserManager;
 import android.preference.PreferenceManager;
+import android.support.v7.app.NotificationCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.afwsamples.testdpc.common.NotificationUtil;
 import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.provision.PostProvisioningTask;
 
@@ -58,6 +58,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+
+import static com.afwsamples.testdpc.policy.PolicyManagementFragment.OVERRIDE_KEY_SELECTION_KEY;
 
 /**
  * Handles events related to the managed profile.
@@ -189,9 +191,9 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
     @Override
     public void onBugreportSharingDeclined(Context context, Intent intent) {
         Log.i(TAG, "Bugreport sharing declined");
-        Util.showNotification(context, R.string.bugreport_title,
+        NotificationUtil.showNotification(context, R.string.bugreport_title,
                 context.getString(R.string.bugreport_sharing_declined),
-                Util.BUGREPORT_NOTIFICATION_ID);
+                NotificationUtil.BUGREPORT_NOTIFICATION_ID);
     }
 
     @TargetApi(Build.VERSION_CODES.N)
@@ -234,8 +236,8 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
 
             @Override
             protected void onPostExecute(String message) {
-                Util.showNotification(context, R.string.bugreport_title,
-                        message, Util.BUGREPORT_NOTIFICATION_ID);
+                NotificationUtil.showNotification(context, R.string.bugreport_title,
+                        message, NotificationUtil.BUGREPORT_NOTIFICATION_ID);
                 result.finish();
             }
 
@@ -258,9 +260,9 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
                         R.string.bugreport_failure_failed_completing);
         }
         Log.i(TAG, "Bugreport failed: " + failureReason);
-        Util.showNotification(context, R.string.bugreport_title,
+        NotificationUtil.showNotification(context, R.string.bugreport_title,
                 context.getString(R.string.bugreport_failure_message, failureReason),
-                Util.BUGREPORT_NOTIFICATION_ID);
+                NotificationUtil.BUGREPORT_NOTIFICATION_ID);
     }
 
 
@@ -271,9 +273,9 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
         String message = context.getString(R.string.on_user_added_message,
                 userManager.getSerialNumberForUser(newUser));
         Log.i(TAG, message);
-        Util.showNotification(context, R.string.on_user_added_title,
+        NotificationUtil.showNotification(context, R.string.on_user_added_title,
                 message,
-                Util.USER_ADDED_NOTIFICATION_ID);
+                NotificationUtil.USER_ADDED_NOTIFICATION_ID);
     }
 
     @TargetApi(Build.VERSION_CODES.O)
@@ -283,8 +285,8 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
         String message = context.getString(R.string.on_user_removed_message,
                 userManager.getSerialNumberForUser(removedUser));
         Log.i(TAG, message);
-        Util.showNotification(context, R.string.on_user_removed_title, message,
-                Util.USER_REMOVED_NOTIFICATION_ID);
+        NotificationUtil.showNotification(context, R.string.on_user_removed_title, message,
+                NotificationUtil.USER_REMOVED_NOTIFICATION_ID);
     }
 
     @TargetApi(Build.VERSION_CODES.M)
@@ -349,11 +351,11 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
                 devicePolicyManager.getPasswordExpiration(getComponentName(context));
         final boolean expiredBySelf = (timeNow >= timeAdminExpires && timeAdminExpires != 0);
 
-        Util.showNotification(context, R.string.password_expired_title,
+        NotificationUtil.showNotification(context, R.string.password_expired_title,
                 context.getString(expiredBySelf
                         ? R.string.password_expired_by_self
                         : R.string.password_expired_by_others),
-                Util.PASSWORD_EXPIRATION_NOTIFICATION_ID);
+                NotificationUtil.PASSWORD_EXPIRATION_NOTIFICATION_ID);
     }
 
     @Deprecated
@@ -397,15 +399,15 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
                 : context.getResources().getQuantityString(
                         R.plurals.password_failed_attempts_content, maxAttempts, maxAttempts);
 
-        Notification.Builder warn = new Notification.Builder(context)
-                .setSmallIcon(R.drawable.ic_launcher)
+        NotificationCompat.Builder warn = NotificationUtil.getNotificationBuilder(context);
+        warn.setSmallIcon(R.drawable.ic_launcher)
                 .setTicker(title)
                 .setContentTitle(title)
                 .setContentText(content)
                 .setContentIntent(PendingIntent.getActivity(context, /* requestCode */ -1,
                         new Intent(DevicePolicyManager.ACTION_SET_NEW_PASSWORD), /* flags */ 0));
 
-        Notification.InboxStyle inboxStyle = new Notification.InboxStyle();
+        NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
         inboxStyle.setBigContentTitle(title);
 
         final DateFormat dateFormat = SimpleDateFormat.getDateTimeInstance();
@@ -416,7 +418,7 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
 
         NotificationManager nm = (NotificationManager)
                 context.getSystemService(Context.NOTIFICATION_SERVICE);
-        nm.notify(PASSWORD_FAILED_NOTIFICATION_ID, warn.getNotification());
+        nm.notify(PASSWORD_FAILED_NOTIFICATION_ID, warn.build());
     }
 
     @Deprecated
@@ -520,8 +522,8 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
                 context.getSystemService(Context.NOTIFICATION_SERVICE);
 
         if (!devicePolicyManager.isActivePasswordSufficient()) {
-            Notification.Builder warn = new Notification.Builder(context)
-                    .setOngoing(true)
+            NotificationCompat.Builder warn = NotificationUtil.getNotificationBuilder(context);
+            warn.setOngoing(true)
                     .setSmallIcon(R.drawable.ic_launcher)
                     .setTicker(context.getText(R.string.password_not_compliant_title))
                     .setContentTitle(context.getText(R.string.password_not_compliant_title))

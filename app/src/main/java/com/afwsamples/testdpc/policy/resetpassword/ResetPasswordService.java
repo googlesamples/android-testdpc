@@ -115,7 +115,7 @@ public class ResetPasswordService extends Service {
                 .setContentTitle(getString(R.string.app_name))
                 .setContentText(getString(R.string.reset_password_foreground_notification))
                 .setSmallIcon(R.drawable.ic_launcher)
-                .setChannel(NOTIFICATION_CHANNEL)
+                .setChannelId(NOTIFICATION_CHANNEL)
                 .build();
         startForeground(NOTIFICATION_FOREGROUND, notification);
     }
@@ -152,7 +152,7 @@ public class ResetPasswordService extends Service {
         Notification.Builder builder = new Notification.Builder(this)
                 .setContentTitle(getString(R.string.app_name))
                 .setSmallIcon(R.drawable.ic_launcher)
-                .setChannel(NOTIFICATION_CHANNEL);
+                .setChannelId(NOTIFICATION_CHANNEL);
         if (result) {
             builder.setContentText(getString(R.string.reset_password_with_token_succeed, password));
             builder.setOngoing(true);
@@ -171,7 +171,7 @@ public class ResetPasswordService extends Service {
                 .setContentIntent(intent)
                 .setDeleteIntent(intent)
                 .setSmallIcon(R.drawable.ic_launcher)
-                .setChannel(NOTIFICATION_CHANNEL)
+                .setChannelId(NOTIFICATION_CHANNEL)
                 .build();
         mNm.notify(NOTIFICATION_TAP_TO_RESET, notification);
     }

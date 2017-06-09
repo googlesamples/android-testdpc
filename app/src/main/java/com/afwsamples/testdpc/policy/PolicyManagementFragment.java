@@ -34,6 +34,7 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.content.pm.ServiceInfo;
 import android.net.ProxyInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -46,6 +47,7 @@ import android.provider.MediaStore;
 import android.provider.Settings;
 import android.security.KeyChain;
 import android.security.KeyChainAliasCallback;
+import android.service.notification.NotificationListenerService;
 import android.support.annotation.StringRes;
 import android.support.v14.preference.SwitchPreference;
 import android.support.v4.content.FileProvider;
@@ -80,6 +82,7 @@ import com.afwsamples.testdpc.common.BaseSearchablePolicyPreferenceFragment;
 import com.afwsamples.testdpc.common.CertificateUtil;
 import com.afwsamples.testdpc.common.MediaDisplayFragment;
 import com.afwsamples.testdpc.common.Util;
+import com.afwsamples.testdpc.common.CertificateUtil;
 import com.afwsamples.testdpc.common.preference.DpcPreference;
 import com.afwsamples.testdpc.common.preference.DpcPreferenceBase;
 import com.afwsamples.testdpc.common.preference.DpcPreferenceHelper;
@@ -111,6 +114,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -189,7 +195,7 @@ import static com.afwsamples.testdpc.common.preference.DpcPreferenceHelper.NO_CU
  * <li> {@link DevicePolicyManager#getScreenCaptureDisabled(ComponentName)} </li>
  * <li> {@link DevicePolicyManager#setMaximumTimeToLock(ComponentName, long)} </li>
  * <li> {@link DevicePolicyManager#setMaximumFailedPasswordsForWipe(ComponentName, int)} </li>
- * <li> {@link DevicePolicyManager#setAffiliationIds(ComponentName, List)} </li>
+ * <li> {@link DevicePolicyManager#setAffiliationIds(ComponentName, Set)} </li>
  * <li> {@link DevicePolicyManager#setApplicationHidden(ComponentName, String, boolean)} </li>
  * <li> {@link DevicePolicyManager#setShortSupportMessage(ComponentName, CharSequence)} </li>
  * <li> {@link DevicePolicyManager#setLongSupportMessage(ComponentName, CharSequence)} </li>
@@ -274,6 +280,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String SET_DISABLE_ACCOUNT_MANAGEMENT_KEY
             = "set_disable_account_management";
     private static final String SET_INPUT_METHODS_KEY = "set_input_methods";
+    private static final String SET_NOTIFICATION_LISTENERS_KEY = "set_notification_listeners";
+    private static final String SET_NOTIFICATION_LISTENERS_TEXT_KEY = "set_notification_listeners_text";
     private static final String SET_LONG_SUPPORT_MESSAGE_KEY = "set_long_support_message";
     private static final String SET_PERMISSION_POLICY_KEY = "set_permission_policy";
     private static final String SET_SHORT_SUPPORT_MESSAGE_KEY = "set_short_support_message";
@@ -333,6 +341,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     private GetAccessibilityServicesTask mGetAccessibilityServicesTask = null;
     private GetInputMethodsTask mGetInputMethodsTask = null;
+    private GetNotificationListenersTask mGetNotificationListenersTask = null;
     private ShowCaCertificateListTask mShowCaCertificateListTask = null;
 
     private Uri mImageUri;
@@ -416,6 +425,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         mEnableNetworkLoggingPreference.setOnPreferenceChangeListener(this);
         findPreference(SET_ACCESSIBILITY_SERVICES_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_INPUT_METHODS_KEY).setOnPreferenceClickListener(this);
+        findPreference(SET_NOTIFICATION_LISTENERS_KEY).setOnPreferenceClickListener(this);
+        findPreference(SET_NOTIFICATION_LISTENERS_TEXT_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_DISABLE_ACCOUNT_MANAGEMENT_KEY).setOnPreferenceClickListener(this);
         findPreference(GET_DISABLE_ACCOUNT_MANAGEMENT_KEY).setOnPreferenceClickListener(this);
         findPreference(ADD_ACCOUNT_KEY).setOnPreferenceClickListener(this);
@@ -599,6 +610,18 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 }
                 mGetInputMethodsTask = new GetInputMethodsTask();
                 mGetInputMethodsTask.execute();
+                return true;
+            case SET_NOTIFICATION_LISTENERS_KEY:
+                // Avoid starting the same task twice.
+                if (mGetNotificationListenersTask != null
+                        && !mGetNotificationListenersTask.isCancelled()) {
+                    mGetNotificationListenersTask.cancel(true);
+                }
+                mGetNotificationListenersTask = new GetNotificationListenersTask();
+                mGetNotificationListenersTask.execute();
+                return true;
+            case SET_NOTIFICATION_LISTENERS_TEXT_KEY:
+                setNotificationWhitelistEditBox();
                 return true;
             case SET_DISABLE_ACCOUNT_MANAGEMENT_KEY:
                 showSetDisableAccountManagementPrompt();
@@ -845,7 +868,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 .setView(dialogView)
                 .setPositiveButton(android.R.string.ok, (d, i) -> {
                     final int flags = evictKeyCheckBox.isChecked()
-                            ? DevicePolicyManager.FLAG_EVICT_CE_KEY : 0;
+                            ? DevicePolicyManager.FLAG_EVICT_CREDENTIAL_ENCRYPTION_KEY : 0;
                     final DevicePolicyManager dpm = lockParentCheckBox.isChecked()
                             ? mDevicePolicyManager.getParentProfileInstance(mAdminComponentName)
                             : mDevicePolicyManager;
@@ -2286,6 +2309,87 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                     : R.string.set_input_methods_successful;
             showToast(result ? successMsgId : R.string.set_input_methods_fail);
         }
+    }
+
+    @TargetApi(Build.VERSION_CODES.O)
+    private void setNotificationWhitelistEditBox() {
+        if (getActivity() == null || getActivity().isFinishing()) {
+            return;
+        }
+        View view = getActivity().getLayoutInflater().inflate(R.layout.simple_edittext, null);
+        final EditText input = (EditText) view.findViewById(R.id.input);
+        input.setHint(getString(R.string.set_notification_listener_text_hint));
+        List<String> enabledComponents = mDevicePolicyManager.
+                getPermittedCrossProfileNotificationListeners(mAdminComponentName);
+        if (enabledComponents == null) {
+            input.setText("null");
+        } else {
+            input.setText(TextUtils.join(", ", enabledComponents));
+        }
+
+        new AlertDialog.Builder(getActivity())
+                .setTitle(getString(R.string.set_notification_listener_text_hint))
+                .setView(view)
+                .setPositiveButton(android.R.string.ok,
+                        (DialogInterface dialog, int which) -> {
+                            String packageNames = input.getText().toString();
+                            if (packageNames.trim().equals("null")) {
+                                setPermittedNotificationListeners(null);
+                            } else {
+                                List<String> items = Arrays.asList(
+                                        packageNames.trim().split("\\s*,\\s*"));
+                                setPermittedNotificationListeners(items);
+                            }
+                            dialog.dismiss();
+                })
+                .setNegativeButton(android.R.string.cancel,
+                        (DialogInterface dialog, int which) -> dialog.dismiss())
+                .show();
+    }
+
+    /**
+     * Gets all the NotificationListenerServices and displays them in a prompt.
+     */
+    private class GetNotificationListenersTask extends GetAvailableComponentsTask<ResolveInfo> {
+        public GetNotificationListenersTask() {
+            super(getActivity(), R.string.set_notification_listeners);
+        }
+
+        @Override
+        protected List<ResolveInfo> doInBackground(Void... voids) {
+            return mPackageManager.queryIntentServices(
+                    new Intent(NotificationListenerService.SERVICE_INTERFACE),
+                    PackageManager.GET_META_DATA | PackageManager.MATCH_UNINSTALLED_PACKAGES);
+        }
+
+        @Override
+        protected List<ResolveInfo> getResolveInfoListFromAvailableComponents(
+                List<ResolveInfo> notificationListenerServices) {
+            return notificationListenerServices;
+        }
+
+        @Override
+        @TargetApi(Build.VERSION_CODES.O)
+        protected List<String> getPermittedComponentsList() {
+            return mDevicePolicyManager.
+                    getPermittedCrossProfileNotificationListeners(mAdminComponentName);
+        }
+
+        @Override
+        protected void setPermittedComponentsList(List<String> permittedNotificationListeners) {
+            setPermittedNotificationListeners(permittedNotificationListeners);
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.O)
+    private void setPermittedNotificationListeners(List<String> permittedNotificationListeners) {
+        boolean result = mDevicePolicyManager.
+                setPermittedCrossProfileNotificationListeners(
+                mAdminComponentName, permittedNotificationListeners);
+        int successMsgId = (permittedNotificationListeners == null)
+                ? R.string.all_notification_listeners_enabled
+                : R.string.set_notification_listeners_successful;
+        showToast(result ? successMsgId : R.string.set_notification_listeners_fail);
     }
 
     /**

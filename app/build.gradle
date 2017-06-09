@@ -9,7 +9,7 @@ ext {
     // exactly 1 digit
     versionMinor = 0
     // exactly 2 digits
-    versionBuild = 03
+    versionBuild = 04
 }
 
 android {
@@ -22,25 +22,12 @@ android {
         targetSdkVersion 26
         versionCode versionMajor * 1000 + versionMinor * 100 + versionBuild
         versionName "${versionMajor}.${versionMinor}.${versionBuild}"
-        jackOptions {
-          enabled true
-        }
     }
 
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-    }
-
-    productFlavors {
-        target25 {
-            targetSdkVersion 25
-        }
-
-        targetO {
-            targetSdkVersion 'O'
         }
     }
 
@@ -68,12 +55,20 @@ android {
             dirs 'libs'
         }
     }
+
+    // Enable lint checking in all build variants.
+    applicationVariants.all { variant ->
+        variant.outputs.each { output ->
+            def lintTask = tasks["lint${variant.name.capitalize()}"]
+            output.assemble.dependsOn lintTask
+        }
+    }
 }
 
 dependencies {
-    compile 'com.android.support:preference-v14:26.+'
-    compile 'com.android.support:recyclerview-v7:26.+'
-    compile 'com.android.support:support-v13:26.+'
+    compile 'com.android.support:preference-v14:26.0.0-SNAPSHOT'
+    compile 'com.android.support:recyclerview-v7:26.0.0-SNAPSHOT'
+    compile 'com.android.support:support-v13:26.0.0-SNAPSHOT'
     compile 'com.google.android.gms:play-services-safetynet:+'
     compile(name:'setup-wizard-lib-platform-release', ext:'aar')
 }
