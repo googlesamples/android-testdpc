@@ -11,7 +11,7 @@ ext {
 }
 
 android {
-    compileSdkVersion 'android-O'
+    compileSdkVersion 'android-26'
     buildToolsVersion '26.0.0-rc2'
 
     defaultConfig {
