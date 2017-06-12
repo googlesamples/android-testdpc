@@ -350,6 +350,7 @@
     <string name="disallow_unmute_microphone">Disallow unmute microphone</string>
     <string name="disallow_usb_file_transfer">Disallow usb file transfer</string>
     <string name="ensure_verify_apps">Ensure verify apps</string>
+    <string name="disallow_autofill">Disallow autofill</string>
     <string name="user_restriction_error_msg">Operation not allowed</string>
 
     <!-- Strings for select app -->
@@ -473,6 +474,16 @@
     <string name="set_input_methods_successful">The given list of input methods is enabled</string>
     <string name="set_input_methods_fail">Cannot disallow input methods enabled by the primary user</string>
     <string name="all_input_methods_enabled">All input methods are enabled.</string>
+
+    <!-- Notification listeners -->
+    <string name="notification_listeners_title">Notification Listener Services</string>
+    <string name="set_notification_listeners">Set notification listener services</string>
+    <string name="set_notification_listeners_successful">The given list of notification listeners is enabled</string>
+    <string name="set_notification_listeners_fail">Cannot add the notification listener list provided</string>
+    <string name="all_notification_listeners_enabled">All notification listeners are enabled.</string>
+    <string name="set_notification_listeners_text">Set notification listener services text</string>
+    <string name="set_notification_listener_text_title">Notification listener packages</string>
+    <string name="set_notification_listener_text_hint">Comma separated package list</string>
 
     <string name="loading_resuls">Loading\u2026</string>
 
@@ -792,4 +803,9 @@
     <string name="reset_password_no_token">No token</string>
     <string name="reset_password_foreground_notification">TestDPC reset password service running</string>
     <string name="reset_password_notification">Swipe away this notification to reset password</string>
+
+    <string name="package_changed_notification_title">Package change(s) are observed</string>
+    <string name="package_added_notification_text">%1$s is added</string>
+    <string name="package_removed_notification_text">%1$s is removed</string>
+
 </resources>

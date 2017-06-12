@@ -18,6 +18,7 @@ package com.afwsamples.testdpc.common;
 
 import android.annotation.TargetApi;
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.app.admin.DevicePolicyManager;
@@ -31,8 +32,10 @@ import android.os.Build;
 import android.os.Build.VERSION_CODES;
 import android.os.UserHandle;
 import android.os.UserManager;
+import android.support.annotation.RequiresApi;
 import android.support.v14.preference.PreferenceFragment;
 import android.support.v4.os.BuildCompat;
+import android.support.v7.app.NotificationCompat;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.widget.ImageView;
@@ -40,6 +43,7 @@ import android.widget.Toast;
 
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
+
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -53,23 +57,6 @@ import java.util.List;
 public class Util {
     private static final String TAG = "Util";
     private  static final int DEFAULT_BUFFER_SIZE = 4096;
-    public static final int BUGREPORT_NOTIFICATION_ID = 1;
-    public static final int PASSWORD_EXPIRATION_NOTIFICATION_ID = 2;
-    public static final int USER_ADDED_NOTIFICATION_ID = 3;
-    public static final int USER_REMOVED_NOTIFICATION_ID = 4;
-
-    public static void showNotification(Context context, int titleId, String msg,
-            int notificationId) {
-        NotificationManager mNotificationManager =
-                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        Notification notification = new Notification.Builder(context)
-                .setSmallIcon(R.drawable.ic_launcher)
-                .setContentTitle(context.getString(titleId))
-                .setContentText(msg)
-                .setStyle(new Notification.BigTextStyle().bigText(msg))
-                .build();
-        mNotificationManager.notify(notificationId, notification);
-    }
 
     /**
      * Format a friendly datetime for the current locale according to device policy documentation.

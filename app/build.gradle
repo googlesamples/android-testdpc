@@ -7,7 +7,7 @@ ext {
     // exactly 1 digit
     versionMinor = 0
     // exactly 2 digits
-    versionBuild = 03
+    versionBuild = 04
 }
 
 android {
@@ -26,17 +26,6 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-    }
-
-    flavorDimensions "api"
-    productFlavors {
-        target25 {
-            targetSdkVersion 25
-        }
-
-        targetO {
-            targetSdkVersion 'O'
         }
     }
 
@@ -59,6 +48,14 @@ android {
         }
         maven {
             url 'https://maven.google.com'
+        }
+    }
+
+    // Enable lint checking in all build variants.
+    applicationVariants.all { variant ->
+        variant.outputs.each { output ->
+            def lintTask = tasks["lint${variant.name.capitalize()}"]
+            output.assemble.dependsOn lintTask
         }
     }
 }

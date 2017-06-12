@@ -27,6 +27,7 @@ import android.os.UserManager;
 import android.util.Log;
 
 import com.afwsamples.testdpc.R;
+import com.afwsamples.testdpc.common.NotificationUtil;
 import com.afwsamples.testdpc.common.Util;
 
 public class DeviceOwnerService extends Service {
@@ -56,7 +57,7 @@ public class DeviceOwnerService extends Service {
         @Override
         public void notifyUserIsUnlocked(UserHandle callingUserHandle) throws RemoteException {
             long userSerialNumber = mUserManager.getSerialNumberForUser(callingUserHandle);
-            Util.showNotification(mContext, R.string.po_user_status,
+            NotificationUtil.showNotification(mContext, R.string.po_user_status,
                     mContext.getString(R.string.po_user_is_unlocked, userSerialNumber), 0);
             Log.d(TAG, "notifyUserIsUnlocked() called for user with serial " + userSerialNumber);
         }

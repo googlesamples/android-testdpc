@@ -44,7 +44,7 @@ import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.cosu.EnableCosuActivity;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -176,8 +176,9 @@ public class PostProvisioningTask {
         }
         String affiliationId = extras.getString(LaunchIntentUtil.EXTRA_AFFILIATION_ID);
         if (affiliationId != null) {
-            mDevicePolicyManager.setAffiliationIds(getComponentName(mContext),
-                    Arrays.asList(affiliationId));
+            mDevicePolicyManager.setAffiliationIds(
+                    getComponentName(mContext),
+                    Collections.singleton(affiliationId));
         }
     }
 
