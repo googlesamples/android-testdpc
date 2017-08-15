@@ -42,7 +42,7 @@ public class LaunchIntentUtil {
     public static boolean isSynchronousAuthLaunch(Intent launchIntent) {
         return launchIntent != null
                 && (launchIntent.getExtras() != null)
-                && (launchIntent.getExtras().get(EXTRA_IS_SETUP_WIZARD) != null);
+                && (launchIntent.getExtras().getBoolean(EXTRA_IS_SETUP_WIZARD));
     }
 
     /**
