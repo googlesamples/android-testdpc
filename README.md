@@ -13,7 +13,7 @@ This sample uses the Gradle build system. To build this project, use the "gradle
 Provisioning
 ------------
 
-You can find varioud kinds of provisioing methods [here](https://developers.google.com/android/work/prov-devices#Key_provisioning_differences_across_android_releases). Let's take a few of them as an example.
+You can find various kinds of provisioning methods [here](https://developers.google.com/android/work/prov-devices#Key_provisioning_differences_across_android_releases). Let's take a few of them as an example.
 
 #### QR code provisioing (Device Owner N+ only) ####
 1. Factory reset your device and tap the welcome screen in setup wizard 6 times.
