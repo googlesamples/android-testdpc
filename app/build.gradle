@@ -9,7 +9,7 @@ ext {
     // exactly 1 digit
     versionMinor = 0
     // exactly 2 digits
-    versionBuild = 04
+    versionBuild = 05
 }
 
 android {
@@ -66,9 +66,9 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:preference-v14:26.0.0-SNAPSHOT'
-    compile 'com.android.support:recyclerview-v7:26.0.0-SNAPSHOT'
-    compile 'com.android.support:support-v13:26.0.0-SNAPSHOT'
+    compile 'com.android.support:preference-v14:26.0.0'
+    compile 'com.android.support:recyclerview-v7:26.0.0'
+    compile 'com.android.support:support-v13:26.0.0'
     compile 'com.google.android.gms:play-services-safetynet:+'
     compile(name:'setup-wizard-lib-platform-release', ext:'aar')
 }
