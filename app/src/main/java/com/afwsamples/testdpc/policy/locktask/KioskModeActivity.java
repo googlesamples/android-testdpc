@@ -35,6 +35,8 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.os.BuildCompat;
+import android.util.ArrayMap;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -75,6 +77,13 @@ public class KioskModeActivity extends Activity {
     public static final String LOCKED_APP_PACKAGE_LIST
             = "com.afwsamples.testdpc.policy.locktask.LOCKED_APP_PACKAGE_LIST";
 
+    private static final String[] KIOSK_USER_RESTRICTIONS = {
+            DISALLOW_SAFE_BOOT,
+            DISALLOW_FACTORY_RESET,
+            DISALLOW_ADD_USER,
+            DISALLOW_MOUNT_PHYSICAL_MEDIA,
+            DISALLOW_ADJUST_VOLUME };
+
     private ComponentName mAdminComponentName;
     private ArrayList<String> mKioskPackages;
     private DevicePolicyManager mDevicePolicyManager;
@@ -98,6 +107,7 @@ public class KioskModeActivity extends Activity {
             }
             mKioskPackages.remove(getPackageName());
             mKioskPackages.add(getPackageName());
+
             setDefaultKioskPolicies(true);
         } else {
             // after a reboot there is no need to set the policies again
@@ -164,12 +174,17 @@ public class KioskModeActivity extends Activity {
     }
 
     private void setDefaultKioskPolicies(boolean active) {
-        // set user restrictions
-        setUserRestriction(DISALLOW_SAFE_BOOT, active);
-        setUserRestriction(DISALLOW_FACTORY_RESET, active);
-        setUserRestriction(DISALLOW_ADD_USER, active);
-        setUserRestriction(DISALLOW_MOUNT_PHYSICAL_MEDIA, active);
-        setUserRestriction(DISALLOW_ADJUST_VOLUME, active);
+        // restore or save previous configuration
+        if (active) {
+            saveCurrentConfiguration();
+            setUserRestriction(DISALLOW_SAFE_BOOT, active);
+            setUserRestriction(DISALLOW_FACTORY_RESET, active);
+            setUserRestriction(DISALLOW_ADD_USER, active);
+            setUserRestriction(DISALLOW_MOUNT_PHYSICAL_MEDIA, active);
+            setUserRestriction(DISALLOW_ADJUST_VOLUME, active);
+        } else {
+            restorePreviousConfiguration();
+        }
 
         // disable keyguard and status bar
         mDevicePolicyManager.setKeyguardDisabled(mAdminComponentName, active);
@@ -196,6 +211,33 @@ public class KioskModeActivity extends Activity {
             editor.remove(KIOSK_APPS_KEY);
         }
         editor.commit();
+    }
+
+    @TargetApi(Build.VERSION_CODES.N)
+    private void saveCurrentConfiguration() {
+        if (BuildCompat.isAtLeastN()) {
+            Bundle settingsBundle = mDevicePolicyManager.getUserRestrictions(mAdminComponentName);
+            SharedPreferences.Editor editor = getSharedPreferences(KIOSK_PREFERENCE_FILE,
+                    MODE_PRIVATE).edit();
+
+            for (String userRestriction : KIOSK_USER_RESTRICTIONS) {
+                boolean currentSettingValue = settingsBundle.getBoolean(userRestriction);
+                editor.putBoolean(userRestriction, currentSettingValue);
+            }
+            editor.commit();
+        }
+    }
+
+    private void restorePreviousConfiguration() {
+        if (BuildCompat.isAtLeastN()) {
+            SharedPreferences sharedPreferences = getSharedPreferences(KIOSK_PREFERENCE_FILE,
+                    MODE_PRIVATE);
+
+            for (String userRestriction : KIOSK_USER_RESTRICTIONS) {
+                boolean prevSettingValue = sharedPreferences.getBoolean(userRestriction, false);
+                setUserRestriction(userRestriction, prevSettingValue);
+            }
+        }
     }
 
     private class KioskAppsArrayAdapter extends ArrayAdapter<String> implements
