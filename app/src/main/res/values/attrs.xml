@@ -26,7 +26,7 @@
             <enum name="M" value="23" />
             <enum name="N" value="24" />
             <enum name="O" value="26" />
-            <enum name="O_MR1" value="10000" />
+            <enum name="O_MR1" value="27" />
             <!-- Build.VERSION_CODES.CUR_DEVELOPMENT, fill in the sdk int once it is finalized -->
         </attr>
 
