@@ -93,6 +93,9 @@ public class DpcPreferenceHelper {
      *         not yet assigned.
      */
     private int getDeviceSdkInt() {
+        if (BuildCompat.isAtLeastP()) {
+            return Build.VERSION_CODES.CUR_DEVELOPMENT;
+        }
         return Build.VERSION.SDK_INT;
     }
 
