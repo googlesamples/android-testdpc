@@ -103,12 +103,14 @@ public class PostProvisioningTask {
 
         // If TestDPC asked GmsCore to store its state in the FRP area before factory reset, the
         // state will be handed over to it during the next device setup.
-        if (BuildCompat.isAtLeastOMR1() && extras.containsKey(KEY_DEVICE_OWNER_STATE)) {
+        if (BuildCompat.isAtLeastOMR1()
+            && extras != null
+            && extras.containsKey(KEY_DEVICE_OWNER_STATE)) {
             Util.setPersistentDoStateWithApplicationRestriction(
-                    mContext,
-                    mDevicePolicyManager,
-                    DeviceAdminReceiver.getComponentName(mContext),
-                    extras.getString(KEY_DEVICE_OWNER_STATE));
+                mContext,
+                mDevicePolicyManager,
+                DeviceAdminReceiver.getComponentName(mContext),
+                extras.getString(KEY_DEVICE_OWNER_STATE));
         }
 
         // Hide the setup launcher when this app is the admin
