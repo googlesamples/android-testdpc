@@ -484,6 +484,10 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 SET_AUTO_TIME_REQUIRED_KEY);
         mSetAutoTimeRequiredPreference.setOnPreferenceChangeListener(this);
 
+        mSetDeviceOrganizationNamePreference =
+        (EditTextPreference) findPreference(SET_DEVICE_ORGANIZATION_NAME_KEY);
+        mSetDeviceOrganizationNamePreference.setOnPreferenceChangeListener(this);
+
         constrainSpecialCasePreferences();
 
         maybeDisableLockTaskPreferences();
