@@ -9,6 +9,7 @@ import static android.os.UserManager.DISALLOW_ADJUST_VOLUME;
 import static android.os.UserManager.DISALLOW_APPS_CONTROL;
 import static android.os.UserManager.DISALLOW_AUTOFILL;
 import static android.os.UserManager.DISALLOW_BLUETOOTH;
+import static android.os.UserManager.DISALLOW_BLUETOOTH_SHARING;
 import static android.os.UserManager.DISALLOW_CONFIG_BLUETOOTH;
 import static android.os.UserManager.DISALLOW_CONFIG_CELL_BROADCASTS;
 import static android.os.UserManager.DISALLOW_CONFIG_CREDENTIALS;
@@ -42,6 +43,7 @@ import static android.os.UserManager.DISALLOW_USB_FILE_TRANSFER;
 import static android.os.UserManager.ENSURE_VERIFY_APPS;
 
 public class UserRestriction {
+
     public String key;
     public int titleResId;
 
@@ -152,6 +154,9 @@ public class UserRestriction {
             new UserRestriction(
                     DISALLOW_AUTOFILL,
                     R.string.disallow_autofill),
+            new UserRestriction(
+                    DISALLOW_BLUETOOTH_SHARING,
+                    R.string.disallow_bluetooth_sharing)
     };
 
     /**
@@ -215,7 +220,8 @@ public class UserRestriction {
             DISALLOW_ADD_MANAGED_PROFILE,
             DISALLOW_BLUETOOTH,
             DISALLOW_REMOVE_MANAGED_PROFILE,
-            DISALLOW_AUTOFILL
+            DISALLOW_AUTOFILL,
+            DISALLOW_BLUETOOTH_SHARING
     };
 
 }
