@@ -16,6 +16,10 @@
 
 package com.afwsamples.testdpc.policy;
 
+import static android.os.UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES;
+
+import static com.afwsamples.testdpc.common.preference.DpcPreferenceHelper.NO_CUSTOM_CONSTRIANT;
+
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
@@ -134,9 +138,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static android.os.UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES;
-import static com.afwsamples.testdpc.common.preference.DpcPreferenceHelper.NO_CUSTOM_CONSTRIANT;
-
 /**
  * Provides several device management functions.
  *
@@ -230,6 +231,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String APP_STATUS_KEY = "app_status";
     private static final String SECURITY_PATCH_KEY = "security_patch";
     private static final String PASSWORD_COMPLIANT_KEY = "password_compliant";
+    private static final String SEPARATE_CHALLENGE_KEY = "separate_challenge";
     private static final String DISABLE_CAMERA_KEY = "disable_camera";
     private static final String DISABLE_KEYGUARD = "disable_keyguard";
     private static final String DISABLE_SCREEN_CAPTURE_KEY = "disable_screen_capture";
@@ -542,6 +544,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         updateStayOnWhilePluggedInPreference();
         updateInstallNonMarketAppsPreference();
         loadPasswordCompliant();
+        loadSeparateChallenge();
     }
 
     @Override
@@ -1248,7 +1251,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private void showWifiMacAddress() {
         final String macAddress = mDevicePolicyManager.getWifiMacAddress(mAdminComponentName);
         final String message = macAddress != null ? macAddress
-                : getResources().getString(R.string.show_wifi_mac_address_not_available_msg);
+                : getString(R.string.show_wifi_mac_address_not_available_msg);
         new AlertDialog.Builder(getActivity())
                 .setTitle(R.string.show_wifi_mac_address_title)
                 .setMessage(message)
@@ -1592,6 +1595,19 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         securityPatchPreference.setSummary(display);
     }
 
+    @TargetApi(Build.VERSION_CODES.O)
+    private void loadSeparateChallenge() {
+        final Preference separateChallengePreference = findPreference(SEPARATE_CHALLENGE_KEY);
+        if (!separateChallengePreference.isEnabled()) {
+            return;
+        }
+
+        final Boolean separate = !Util.isUsingUnifiedPassword(getActivity(), mAdminComponentName);
+        separateChallengePreference.setSummary(String.format(
+                getString(R.string.separate_challenge_summary),
+                Boolean.toString(separate)));
+    }
+
     @TargetApi(Build.VERSION_CODES.N)
     private void loadPasswordCompliant() {
         Preference passwordCompliantPreference = findPreference(PASSWORD_COMPLIANT_KEY);
@@ -1605,12 +1621,10 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             DevicePolicyManager parentDpm
                     = mDevicePolicyManager.getParentProfileInstance(mAdminComponentName);
             boolean parentCompliant = parentDpm.isActivePasswordSufficient();
-            summary = String.format(getResources()
-                    .getString(R.string.password_compliant_profile_summary),
+            summary = String.format(getString(R.string.password_compliant_profile_summary),
                     Boolean.toString(parentCompliant), Boolean.toString(compliant));
         } else {
-            summary = String.format(getResources()
-                    .getString(R.string.password_compliant_summary),
+            summary = String.format(getString(R.string.password_compliant_summary),
                     Boolean.toString(compliant));
         }
         passwordCompliantPreference.setSummary(summary);

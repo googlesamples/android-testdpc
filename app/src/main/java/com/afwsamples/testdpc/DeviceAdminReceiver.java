@@ -16,6 +16,8 @@
 
 package com.afwsamples.testdpc;
 
+import static com.afwsamples.testdpc.policy.PolicyManagementFragment.OVERRIDE_KEY_SELECTION_KEY;
+
 import android.annotation.TargetApi;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -38,6 +40,8 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.afwsamples.testdpc.common.NotificationUtil;
+import com.afwsamples.testdpc.common.Util;
+import com.afwsamples.testdpc.policy.UserRestriction;
 import com.afwsamples.testdpc.provision.PostProvisioningTask;
 
 import java.io.BufferedReader;
@@ -56,8 +60,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-
-import static com.afwsamples.testdpc.policy.PolicyManagementFragment.OVERRIDE_KEY_SELECTION_KEY;
 
 /**
  * Handles events related to the managed profile.
@@ -81,7 +83,7 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
         switch (intent.getAction()) {
             case ACTION_PASSWORD_REQUIREMENTS_CHANGED:
             case Intent.ACTION_BOOT_COMPLETED:
-                updatePasswordQualityNotification(context);
+                updatePasswordConstraintNotification(context);
                 break;
             default:
                super.onReceive(context, intent);
@@ -443,7 +445,7 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
     // @Override
     public void onPasswordChanged(Context context, Intent intent, UserHandle user) {
         if (Process.myUserHandle().equals(user)) {
-            updatePasswordQualityNotification(context);
+            updatePasswordConstraintNotification(context);
         }
     }
 
@@ -506,31 +508,65 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
         bw.close();
     }
 
-    private static void updatePasswordQualityNotification(Context context) {
-        DevicePolicyManager devicePolicyManager = (DevicePolicyManager) context.getSystemService(
+    private static void updatePasswordConstraintNotification(Context context) {
+        final DevicePolicyManager dpm = (DevicePolicyManager) context.getSystemService(
                 Context.DEVICE_POLICY_SERVICE);
+        final UserManager um = (UserManager) context.getSystemService(Context.USER_SERVICE);
 
-        if (!devicePolicyManager.isProfileOwnerApp(context.getPackageName())
-                && !devicePolicyManager.isDeviceOwnerApp(context.getPackageName())) {
+        if (!dpm.isProfileOwnerApp(context.getPackageName())
+                && !dpm.isDeviceOwnerApp(context.getPackageName())) {
             // Only try to update the notification if we are a profile or device owner.
             return;
         }
 
-        NotificationManager nm = (NotificationManager)
+        final NotificationManager nm = (NotificationManager)
                 context.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        if (!devicePolicyManager.isActivePasswordSufficient()) {
-            NotificationCompat.Builder warn = NotificationUtil.getNotificationBuilder(context);
+        final ArrayList<CharSequence> problems = new ArrayList<>();
+        if (!dpm.isActivePasswordSufficient()) {
+            problems.add(context.getText(R.string.password_not_compliant_title));
+        }
+
+        if (um.hasUserRestriction(UserRestriction.DISALLOW_UNIFIED_PASSWORD)
+                && Util.isManagedProfileOwner(context)
+                && Util.isUsingUnifiedPassword(context, getComponentName(context))) {
+            problems.add(context.getText(R.string.separate_challenge_required_title));
+        }
+
+        if (!problems.isEmpty()) {
+            final NotificationCompat.InboxStyle style = new NotificationCompat.InboxStyle();
+            style.setBigContentTitle(
+                    context.getText(R.string.set_new_password_notification_content));
+            for (final CharSequence problem : problems) {
+                style.addLine(problem);
+            }
+            final NotificationCompat.Builder warn =
+                    NotificationUtil.getNotificationBuilder(context);
             warn.setOngoing(true)
                     .setSmallIcon(R.drawable.ic_launcher)
-                    .setTicker(context.getText(R.string.password_not_compliant_title))
-                    .setContentTitle(context.getText(R.string.password_not_compliant_title))
-                    .setContentText(context.getText(R.string.password_not_compliant_content))
+                    .setStyle(style)
                     .setContentIntent(PendingIntent.getActivity(context, /*requestCode*/ -1,
                             new Intent(DevicePolicyManager.ACTION_SET_NEW_PASSWORD), /*flags*/ 0));
             nm.notify(CHANGE_PASSWORD_NOTIFICATION_ID, warn.getNotification());
         } else {
             nm.cancel(CHANGE_PASSWORD_NOTIFICATION_ID);
         }
+    }
+
+    /**
+     * Notify the admin receiver that something about the password has changed, e.g. quality
+     * constraints or separate challenge requirements.
+     *
+     * This has to be sent manually because the system server only sends broadcasts for changes to
+     * the actual password, not any of the constraints related it it.
+     *
+     * <p>May trigger a show/hide of the notification warning to change the password through
+     * Settings.
+     */
+    public static void sendPasswordRequirementsChanged(Context context) {
+        final Intent changedIntent =
+                new Intent(DeviceAdminReceiver.ACTION_PASSWORD_REQUIREMENTS_CHANGED);
+        changedIntent.setComponent(getComponentName(context));
+        context.sendBroadcast(changedIntent);
     }
 }

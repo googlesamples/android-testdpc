@@ -16,10 +16,19 @@
 
 package com.afwsamples.testdpc.policy.keyguard;
 
+import static android.app.admin.DevicePolicyManager.PASSWORD_QUALITY_ALPHABETIC;
+import static android.app.admin.DevicePolicyManager.PASSWORD_QUALITY_ALPHANUMERIC;
+import static android.app.admin.DevicePolicyManager.PASSWORD_QUALITY_COMPLEX;
+import static android.app.admin.DevicePolicyManager.PASSWORD_QUALITY_NUMERIC;
+import static android.app.admin.DevicePolicyManager.PASSWORD_QUALITY_NUMERIC_COMPLEX;
+import static android.app.admin.DevicePolicyManager.PASSWORD_QUALITY_SOMETHING;
+import static android.app.admin.DevicePolicyManager.PASSWORD_QUALITY_UNSPECIFIED;
+
+import static com.afwsamples.testdpc.common.preference.DpcPreferenceHelper.NO_CUSTOM_CONSTRIANT;
+
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.preference.EditTextPreference;
 import android.support.v7.preference.ListPreference;
@@ -30,23 +39,14 @@ import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.ProfileOrParentFragment;
 import com.afwsamples.testdpc.common.Util;
-import com.afwsamples.testdpc.common.preference.DpcPreferenceBase;
 import com.afwsamples.testdpc.common.preference.CustomConstraint;
+import com.afwsamples.testdpc.common.preference.DpcPreferenceBase;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
-
-import static android.app.admin.DevicePolicyManager.PASSWORD_QUALITY_ALPHABETIC;
-import static android.app.admin.DevicePolicyManager.PASSWORD_QUALITY_ALPHANUMERIC;
-import static android.app.admin.DevicePolicyManager.PASSWORD_QUALITY_COMPLEX;
-import static android.app.admin.DevicePolicyManager.PASSWORD_QUALITY_NUMERIC;
-import static android.app.admin.DevicePolicyManager.PASSWORD_QUALITY_NUMERIC_COMPLEX;
-import static android.app.admin.DevicePolicyManager.PASSWORD_QUALITY_SOMETHING;
-import static android.app.admin.DevicePolicyManager.PASSWORD_QUALITY_UNSPECIFIED;
-import static com.afwsamples.testdpc.common.preference.DpcPreferenceHelper.NO_CUSTOM_CONSTRIANT;
 
 /**
  * This fragment provides functionalities to set password constraint policies as a profile
@@ -253,7 +253,7 @@ public final class PasswordConstraintsFragment extends ProfileOrParentFragment i
         }
 
         preference.setSummary(summary);
-        sendPasswordRequirementsChanged();
+        DeviceAdminReceiver.sendPasswordRequirementsChanged(getActivity());
         return true;
     }
 
@@ -325,21 +325,5 @@ public final class PasswordConstraintsFragment extends ProfileOrParentFragment i
 
         byAdmin.setSummary(Util.formatTimestamp(getDpm().getPasswordExpiration(getAdmin())));
         byAll.setSummary(Util.formatTimestamp(getDpm().getPasswordExpiration(null)));
-    }
-
-    /**
-     * Notify the admin receiver that something about the password has changed - in this context,
-     * a minimum password requirement policy.
-     *
-     * This has to be sent manually because the system server only sends broadcasts for changes to
-     * the actual password, not any of the constraints related it it.
-     *
-     * <p>May trigger a show/hide of the notification warning to change the password through
-     * Settings.
-     */
-    private void sendPasswordRequirementsChanged() {
-        Intent changedIntent = new Intent(DeviceAdminReceiver.ACTION_PASSWORD_REQUIREMENTS_CHANGED);
-        changedIntent.setComponent(getAdmin());
-        getActivity().sendBroadcast(changedIntent);
     }
 }

@@ -1,8 +1,5 @@
 package com.afwsamples.testdpc.policy;
 
-import com.afwsamples.testdpc.R;
-import com.afwsamples.testdpc.common.ReflectionUtil;
-
 import static android.os.UserManager.ALLOW_PARENT_PROFILE_APP_LINKING;
 import static android.os.UserManager.DISALLOW_ADD_MANAGED_PROFILE;
 import static android.os.UserManager.DISALLOW_ADD_USER;
@@ -43,7 +40,12 @@ import static android.os.UserManager.DISALLOW_UNMUTE_MICROPHONE;
 import static android.os.UserManager.DISALLOW_USB_FILE_TRANSFER;
 import static android.os.UserManager.ENSURE_VERIFY_APPS;
 
+import com.afwsamples.testdpc.R;
+
 public class UserRestriction {
+
+    // TODO: remove it once available in SDK
+    public static final String DISALLOW_UNIFIED_PASSWORD = "no_unified_password";
 
     public String key;
     public int titleResId;
@@ -163,7 +165,8 @@ public class UserRestriction {
                     R.string.disallow_autofill),
             new UserRestriction(
                     DISALLOW_BLUETOOTH_SHARING,
-                    R.string.disallow_bluetooth_sharing)
+                    R.string.disallow_bluetooth_sharing),
+            new UserRestriction(DISALLOW_UNIFIED_PASSWORD, R.string.disallow_unified_password),
     };
 
     /**
@@ -199,7 +202,8 @@ public class UserRestriction {
      */
     public static final String[] MANAGED_PROFILE_ONLY_RESTRICTIONS = {
             ALLOW_PARENT_PROFILE_APP_LINKING,
-            DISALLOW_CROSS_PROFILE_COPY_PASTE
+            DISALLOW_CROSS_PROFILE_COPY_PASTE,
+            DISALLOW_UNIFIED_PASSWORD
     };
 
     /**
@@ -233,7 +237,7 @@ public class UserRestriction {
     };
 
     public static String[] PIC_PLUS_RESTRICTIONS = {
+            DISALLOW_UNIFIED_PASSWORD,
             DISALLOW_SYSTEM_ERROR_DIALOGS
     };
-
 }

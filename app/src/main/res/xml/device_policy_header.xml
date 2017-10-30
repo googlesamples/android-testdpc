@@ -222,7 +222,13 @@
             android:selectable="false"
             android:title="@string/password_compliant_title"
             testdpc:minSdkVersion="N" />
-
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="separate_challenge"
+            android:selectable="false"
+            android:title="@string/separate_challenge_title"
+            testdpc:admin="profileOwner"
+            testdpc:user="managedProfile"
+            testdpc:minSdkVersion="P" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="lock_screen_policy"
             android:title="@string/lock_screen_policy"

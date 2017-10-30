@@ -365,6 +365,7 @@
     <string name="disallow_usb_file_transfer">Disallow usb file transfer</string>
     <string name="ensure_verify_apps">Ensure verify apps</string>
     <string name="disallow_autofill">Disallow autofill</string>
+    <string name="disallow_unified_password">Require separate challenge</string>
     <string name="user_restriction_error_msg">Operation not allowed</string>
 
     <!-- Strings for select app -->
@@ -683,7 +684,8 @@
     <string name="password_min_nonletter">Minimum number of non-letters</string>
 
     <string name="password_not_compliant_title">Password is not compliant</string>
-    <string name="password_not_compliant_content">Touch to set a new lock screen password.</string>
+    <string name="separate_challenge_required_title">Separate work challenge required</string>
+    <string name="set_new_password_notification_content">Tap to set a new lock screen password</string>
 
     <string name="password_expiration">Password expiration</string>
     <string name="password_expiration_seconds">Password expiration (seconds)</string>
@@ -707,6 +709,9 @@
     <string name="password_compliant_title">Active password compliant</string>
     <string name="password_compliant_profile_summary">Personal: %1$s, Work: %2$s</string>
     <string name="password_compliant_summary">Compliant %1$s</string>
+
+    <string name="separate_challenge_title">Separate challenge</string>
+    <string name="separate_challenge_summary">Separate challenge enabled: %s</string>
 
     <!-- Strings for setting a new password -->
     <string name="reset_password">Reset password</string>

@@ -16,6 +16,8 @@
 
 package com.afwsamples.testdpc.policy;
 
+import static android.os.UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES;
+
 import android.app.AlertDialog;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
@@ -34,8 +36,6 @@ import com.afwsamples.testdpc.common.BaseSearchablePolicyPreferenceFragment;
 import com.afwsamples.testdpc.common.preference.DpcPreferenceBase;
 import com.afwsamples.testdpc.common.preference.DpcPreferenceHelper;
 import com.afwsamples.testdpc.common.preference.DpcSwitchPreference;
-
-import static android.os.UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES;
 
 public class UserRestrictionsDisplayFragment extends BaseSearchablePolicyPreferenceFragment
         implements Preference.OnPreferenceChangeListener {
@@ -106,6 +106,9 @@ public class UserRestrictionsDisplayFragment extends BaseSearchablePolicyPrefere
                 }
             }
             updateUserRestriction(restriction);
+            if (UserRestriction.DISALLOW_UNIFIED_PASSWORD.equals(restriction)) {
+                DeviceAdminReceiver.sendPasswordRequirementsChanged(getActivity());
+            }
             return true;
         } catch (SecurityException e) {
             Toast.makeText(getActivity(), R.string.user_restriction_error_msg,
