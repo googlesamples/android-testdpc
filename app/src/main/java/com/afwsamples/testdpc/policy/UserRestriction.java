@@ -1,6 +1,7 @@
 package com.afwsamples.testdpc.policy;
 
 import com.afwsamples.testdpc.R;
+import com.afwsamples.testdpc.common.ReflectionUtil;
 
 import static android.os.UserManager.ALLOW_PARENT_PROFILE_APP_LINKING;
 import static android.os.UserManager.DISALLOW_ADD_MANAGED_PROFILE;
@@ -52,6 +53,9 @@ public class UserRestriction {
         this.titleResId = titleResId;
     }
 
+    // TODO(68687253): Replace this hard-coded string with UserManager.DISALLOW_SYSTEM_ERROR_DIALOGS
+    private static final String DISALLOW_SYSTEM_ERROR_DIALOGS = "no_system_error_dialogs";
+
     public static final UserRestriction[] ALL_USER_RESTRICTIONS = {
             new UserRestriction(
                     ALLOW_PARENT_PROFILE_APP_LINKING,
@@ -91,6 +95,9 @@ public class UserRestriction {
             new UserRestriction(
                     DISALLOW_CREATE_WINDOWS,
                     R.string.disallow_create_windows),
+            new UserRestriction(
+                    DISALLOW_SYSTEM_ERROR_DIALOGS,
+                    R.string.disallow_system_error_dialogs),
             new UserRestriction(DISALLOW_CROSS_PROFILE_COPY_PASTE,
                     R.string.disallow_cross_profile_copy_paste),
             new UserRestriction(DISALLOW_DATA_ROAMING,
@@ -173,6 +180,7 @@ public class UserRestriction {
             DISALLOW_CONFIG_TETHERING,
             DISALLOW_CONFIG_WIFI,
             DISALLOW_CREATE_WINDOWS,
+            DISALLOW_SYSTEM_ERROR_DIALOGS,
             DISALLOW_DATA_ROAMING,
             DISALLOW_FACTORY_RESET,
             DISALLOW_FUN,
@@ -222,6 +230,10 @@ public class UserRestriction {
             DISALLOW_REMOVE_MANAGED_PROFILE,
             DISALLOW_AUTOFILL,
             DISALLOW_BLUETOOTH_SHARING
+    };
+
+    public static String[] PIC_PLUS_RESTRICTIONS = {
+            DISALLOW_SYSTEM_ERROR_DIALOGS
     };
 
 }

@@ -328,6 +328,7 @@
     <string name="disallow_config_vpn">Disallow config vpn</string>
     <string name="disallow_config_wifi">Disallow config Wi-Fi</string>
     <string name="disallow_create_windows">Disallow create windows</string>
+    <string name="disallow_system_error_dialogs">Disallow system error dialogs</string>
     <string name="disallow_cross_profile_copy_paste">Disallow cross-profile copy/paste</string>
     <string name="disallow_data_roaming">Disallow data roaming</string>
     <string name="disallow_debugging_features">Disallow debugging features</string>

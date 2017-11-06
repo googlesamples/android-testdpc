@@ -140,6 +140,11 @@ public class UserRestrictionsDisplayFragment extends BaseSearchablePolicyPrefere
             DpcPreferenceBase pref = (DpcPreferenceBase) findPreference(restriction);
             pref.setMinSdkVersion(Build.VERSION_CODES.O);
         }
+        for (String restriction: UserRestriction.PIC_PLUS_RESTRICTIONS) {
+            DpcPreferenceBase pref = (DpcPreferenceBase) findPreference(restriction);
+            // TODO: Replace the following version code with P when ready
+            pref.setMinSdkVersion(Build.VERSION_CODES.CUR_DEVELOPMENT);
+        }
         for (String restriction : UserRestriction.PRIMARY_USER_ONLY_RESTRICTIONS) {
             DpcPreferenceBase pref = (DpcPreferenceBase) findPreference(restriction);
             pref.setUserConstraint(DpcPreferenceHelper.USER_PRIMARY_USER);
