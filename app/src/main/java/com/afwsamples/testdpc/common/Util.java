@@ -23,6 +23,7 @@ import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
@@ -229,6 +230,22 @@ public class Util {
         broadcastIntent.setPackage(GMSCORE_PACKAGE);
         broadcastIntent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
         context.sendBroadcast(broadcastIntent);
+    }
+
+    /** @return Intent for the default home activity */
+    public static Intent getHomeIntent() {
+        final Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.addCategory(Intent.CATEGORY_HOME);
+        return intent;
+    }
+
+    /** @return IntentFilter for the default home activity */
+    public static IntentFilter getHomeIntentFilter() {
+        final IntentFilter filter = new IntentFilter(Intent.ACTION_MAIN);
+        filter.addCategory(Intent.CATEGORY_HOME);
+        filter.addCategory(Intent.CATEGORY_DEFAULT);
+        return filter;
     }
 
     private static DevicePolicyManager getDevicePolicyManager(Context context) {

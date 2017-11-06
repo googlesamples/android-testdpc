@@ -2462,14 +2462,21 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     }
 
     private void startKioskMode(String[] lockTaskArray) {
-        // start locked activity
-        Intent launchIntent = new Intent(getActivity(), KioskModeActivity.class);
-        launchIntent.putExtra(KioskModeActivity.LOCKED_APP_PACKAGE_LIST, lockTaskArray);
-        launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        final ComponentName customLauncher =
+                new ComponentName(getActivity(), KioskModeActivity.class);
+
+        // enable custom launcher (it's disabled by default in manifest)
         mPackageManager.setComponentEnabledSetting(
-                new ComponentName(mPackageName, KioskModeActivity.class.getName()),
+                customLauncher,
                 PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
                 PackageManager.DONT_KILL_APP);
+
+        // set custom launcher as default home activity
+        mDevicePolicyManager.addPersistentPreferredActivity(mAdminComponentName,
+                Util.getHomeIntentFilter(), customLauncher);
+        Intent launchIntent = Util.getHomeIntent();
+        launchIntent.putExtra(KioskModeActivity.LOCKED_APP_PACKAGE_LIST, lockTaskArray);
+
         startActivity(launchIntent);
         getActivity().finish();
     }

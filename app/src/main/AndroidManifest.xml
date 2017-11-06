@@ -86,7 +86,6 @@
                 android:name=".policy.locktask.KioskModeActivity"
                 android:label="@string/kiosk_mode"
                 android:launchMode="singleInstance"
-                android:lockTaskMode="if_whitelisted"
                 android:enabled="false">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
