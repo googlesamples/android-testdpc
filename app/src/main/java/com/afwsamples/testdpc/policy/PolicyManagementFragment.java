@@ -34,7 +34,6 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.content.pm.ServiceInfo;
 import android.net.ProxyInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -82,7 +81,6 @@ import com.afwsamples.testdpc.common.BaseSearchablePolicyPreferenceFragment;
 import com.afwsamples.testdpc.common.CertificateUtil;
 import com.afwsamples.testdpc.common.MediaDisplayFragment;
 import com.afwsamples.testdpc.common.Util;
-import com.afwsamples.testdpc.common.CertificateUtil;
 import com.afwsamples.testdpc.common.preference.DpcPreference;
 import com.afwsamples.testdpc.common.preference.DpcPreferenceBase;
 import com.afwsamples.testdpc.common.preference.DpcPreferenceHelper;
@@ -94,6 +92,7 @@ import com.afwsamples.testdpc.policy.keyguard.LockScreenPolicyFragment;
 import com.afwsamples.testdpc.policy.keyguard.PasswordConstraintsFragment;
 import com.afwsamples.testdpc.policy.locktask.KioskModeActivity;
 import com.afwsamples.testdpc.policy.locktask.LockTaskAppInfoArrayAdapter;
+import com.afwsamples.testdpc.policy.locktask.SetLockTaskFeaturesFragment;
 import com.afwsamples.testdpc.policy.networking.AlwaysOnVpnFragment;
 import com.afwsamples.testdpc.policy.networking.NetworkUsageStatsFragment;
 import com.afwsamples.testdpc.policy.resetpassword.ResetPasswordWithTokenFragment;
@@ -114,9 +113,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -274,6 +270,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String SET_ACCESSIBILITY_SERVICES_KEY = "set_accessibility_services";
     private static final String SET_ALWAYS_ON_VPN_KEY = "set_always_on_vpn";
     private static final String SET_GLOBAL_HTTP_PROXY_KEY = "set_global_http_proxy";
+    private static final String SET_LOCK_TASK_FEATURES_KEY = "set_lock_task_features";
     private static final String CLEAR_GLOBAL_HTTP_PROXY_KEY = "clear_global_http_proxy";
     private static final String SET_DEVICE_ORGANIZATION_NAME_KEY = "set_device_organization_name";
     private static final String SET_AUTO_TIME_REQUIRED_KEY = "set_auto_time_required";
@@ -374,6 +371,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         overrideKeySelectionPreference.setSummary(overrideKeySelectionPreference.getText());
         findPreference(MANAGE_LOCK_TASK_LIST_KEY).setOnPreferenceClickListener(this);
         findPreference(CHECK_LOCK_TASK_PERMITTED_KEY).setOnPreferenceClickListener(this);
+        findPreference(SET_LOCK_TASK_FEATURES_KEY).setOnPreferenceClickListener(this);
         findPreference(START_LOCK_TASK).setOnPreferenceClickListener(this);
         findPreference(STOP_LOCK_TASK).setOnPreferenceClickListener(this);
         findPreference(CREATE_MANAGED_PROFILE_KEY).setOnPreferenceClickListener(this);
@@ -512,10 +510,10 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     /**
      * Pre O, lock task APIs were only available to the Device Owner. From O, they are also
      * available to affiliated profile owners. The XML file sets a deviceowner|profileowner
-     * restriction for those restriciton so further restricting them, if necessary
+     * restriction for those restriction so further restricting them, if necessary
      */
     private void maybeDisableLockTaskPreferences() {
-        if (!BuildCompat.isAtLeastO()) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             String[] lockTaskPreferences = { MANAGE_LOCK_TASK_LIST_KEY,
                     CHECK_LOCK_TASK_PERMITTED_KEY, START_LOCK_TASK, STOP_LOCK_TASK };
             for (String preference : lockTaskPreferences) {
@@ -566,6 +564,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 return true;
             case CHECK_LOCK_TASK_PERMITTED_KEY:
                 showCheckLockTaskPermittedPrompt();
+                return true;
+            case SET_LOCK_TASK_FEATURES_KEY:
+                showFragment(new SetLockTaskFeaturesFragment());
                 return true;
             case RESET_PASSWORD_KEY:
                 if (BuildCompat.isAtLeastO()) {
