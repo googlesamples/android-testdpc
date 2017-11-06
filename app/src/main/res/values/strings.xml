@@ -296,7 +296,8 @@
     <string name="lock_task_feature_recents">Recents</string>
     <string name="lock_task_feature_global_actions">Global actions (power button menu)</string>
     <string name="lock_task_feature_keyguard">Keyguard</string>
-    <string name="start_lock_task">Start lock task mode</string>
+    <string name="start_lock_task">Self-start lock task mode</string>
+    <string name="relaunch_in_lock_task_title">Launch another activity in lock task mode</string>
     <string name="stop_lock_task">Stop lock task mode</string>
     <string name="lock_task_unavailable">Cannot set lock task packages: This user is not affiliated</string>
 

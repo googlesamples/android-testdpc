@@ -20,6 +20,7 @@ import android.accessibilityservice.AccessibilityServiceInfo;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.ActivityOptions;
 import android.app.AlertDialog;
 import android.app.DialogFragment;
 import android.app.Fragment;
@@ -80,6 +81,7 @@ import com.afwsamples.testdpc.common.AppInfoArrayAdapter;
 import com.afwsamples.testdpc.common.BaseSearchablePolicyPreferenceFragment;
 import com.afwsamples.testdpc.common.CertificateUtil;
 import com.afwsamples.testdpc.common.MediaDisplayFragment;
+import com.afwsamples.testdpc.common.ReflectionUtil;
 import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.common.preference.DpcPreference;
 import com.afwsamples.testdpc.common.preference.DpcPreferenceBase;
@@ -259,6 +261,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String REBOOT_KEY = "reboot";
     private static final String REENABLE_KEYGUARD = "reenable_keyguard";
     private static final String REENABLE_STATUS_BAR = "reenable_status_bar";
+    private static final String RELAUNCH_IN_LOCK_TASK = "relaunch_in_lock_task";
     private static final String REMOVE_ALL_CERTIFICATES_KEY = "remove_all_ca_certificates";
     private static final String REMOVE_DEVICE_OWNER_KEY = "remove_device_owner";
     private static final String REMOVE_KEY_CERTIFICATE_KEY = "remove_key_certificate";
@@ -373,6 +376,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(CHECK_LOCK_TASK_PERMITTED_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_LOCK_TASK_FEATURES_KEY).setOnPreferenceClickListener(this);
         findPreference(START_LOCK_TASK).setOnPreferenceClickListener(this);
+        findPreference(RELAUNCH_IN_LOCK_TASK).setOnPreferenceClickListener(this);
         findPreference(STOP_LOCK_TASK).setOnPreferenceClickListener(this);
         findPreference(CREATE_MANAGED_PROFILE_KEY).setOnPreferenceClickListener(this);
         findPreference(CREATE_AND_MANAGE_USER_KEY).setOnPreferenceClickListener(this);
@@ -580,7 +584,12 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 lockNow();
                 return true;
             case START_LOCK_TASK:
+                // Uses {@link Activity#startLockTask}
                 getActivity().startLockTask();
+                return true;
+            case RELAUNCH_IN_LOCK_TASK:
+                // Uses {@link ActivityOptions#setLockTaskMode}
+                relaunchInLockTaskMode();
                 return true;
             case STOP_LOCK_TASK:
                 try {
@@ -2459,6 +2468,26 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         FragmentManager fragmentManager = getFragmentManager();
         fragmentManager.beginTransaction().addToBackStack(PolicyManagementFragment.class.getName())
                 .replace(R.id.container, fragment, tag).commit();
+    }
+
+    @TargetApi(Build.VERSION_CODES.CUR_DEVELOPMENT)
+    private void relaunchInLockTaskMode() {
+        final Intent intent = new Intent(getActivity(), getActivity().getClass());
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        final ActivityOptions options = ActivityOptions.makeBasic();
+        try {
+            ReflectionUtil.invoke(options, "setLockTaskMode", new Class[]{boolean.class}, true);
+        } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
+            Log.e(TAG, "Failed to invoke ActivityOptions.setLockTaskMode()", e);
+        }
+
+        try {
+            startActivity(intent, options.toBundle());
+            getActivity().finish();
+        } catch (SecurityException e) {
+            showToast("You must first whitelist the TestDPC package for LockTask");
+        }
     }
 
     private void startKioskMode(String[] lockTaskArray) {

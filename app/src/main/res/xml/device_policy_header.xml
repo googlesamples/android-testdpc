@@ -275,6 +275,11 @@
             testdpc:admin="deviceOwner|profileOwner"
             testdpc:minSdkVersion="M" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="relaunch_in_lock_task"
+            android:title="@string/relaunch_in_lock_task_title"
+            testdpc:admin="deviceOwner|profileOwner"
+            testdpc:minSdkVersion="P" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="stop_lock_task"
             android:title="@string/stop_lock_task"
             testdpc:admin="deviceOwner|profileOwner"
