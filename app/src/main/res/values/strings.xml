@@ -289,6 +289,13 @@
     <string name="check_lock_task_permitted_result_permitted">Lock task is permitted.</string>
     <string name="check_lock_task_permitted_result_not_permitted">Lock task is not permitted.
     </string>
+    <string name="set_lock_task_features_title">Set lock task features</string>
+    <string name="lock_task_feature_system_info">System info</string>
+    <string name="lock_task_feature_notifications">Notifications</string>
+    <string name="lock_task_feature_home">Home</string>
+    <string name="lock_task_feature_recents">Recents</string>
+    <string name="lock_task_feature_global_actions">Global actions (power button menu)</string>
+    <string name="lock_task_feature_keyguard">Keyguard</string>
     <string name="start_lock_task">Start lock task mode</string>
     <string name="stop_lock_task">Stop lock task mode</string>
     <string name="lock_task_unavailable">Cannot set lock task packages: This user is not affiliated</string>

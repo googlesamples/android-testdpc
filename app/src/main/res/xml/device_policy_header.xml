@@ -265,6 +265,11 @@
             testdpc:admin="deviceOwner|profileOwner"
             testdpc:minSdkVersion="L" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="set_lock_task_features"
+            android:title="@string/set_lock_task_features_title"
+            testdpc:admin="deviceOwner|profileOwner"
+            testdpc:minSdkVersion="P" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="start_lock_task"
             android:title="@string/start_lock_task"
             testdpc:admin="deviceOwner|profileOwner"
