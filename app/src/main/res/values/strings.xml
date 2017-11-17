@@ -378,6 +378,12 @@
     <string name="disallow_autofill">Disallow autofill</string>
     <string name="disallow_unified_password">Require separate challenge</string>
     <string name="disallow_user_switch">Disallow user switch</string>
+    <string name="disallow_config_location_mode">Disallow config location mode</string>
+    <string name="disallow_airplane_mode">Disallow airplane mode</string>
+    <string name="disallow_config_brightness">Disallow config brightness</string>
+    <string name="disallow_config_date_time">Disallow config date time</string>
+    <string name="disallow_config_screen_timeout">Disallow config screen timeout</string>
+    <string name="disallow_config_ambient_display">Disallow config ambient display</string>
     <string name="user_restriction_error_msg">Operation not allowed</string>
 
     <!-- Strings for select app -->

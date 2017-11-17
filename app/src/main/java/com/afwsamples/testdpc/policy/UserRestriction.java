@@ -11,6 +11,7 @@ import static android.os.UserManager.DISALLOW_BLUETOOTH_SHARING;
 import static android.os.UserManager.DISALLOW_CONFIG_BLUETOOTH;
 import static android.os.UserManager.DISALLOW_CONFIG_CELL_BROADCASTS;
 import static android.os.UserManager.DISALLOW_CONFIG_CREDENTIALS;
+import static android.os.UserManager.DISALLOW_CONFIG_DATE_TIME;
 import static android.os.UserManager.DISALLOW_CONFIG_MOBILE_NETWORKS;
 import static android.os.UserManager.DISALLOW_CONFIG_TETHERING;
 import static android.os.UserManager.DISALLOW_CONFIG_VPN;
@@ -44,6 +45,11 @@ import static android.os.UserManager.ENSURE_VERIFY_APPS;
 import com.afwsamples.testdpc.R;
 
 public class UserRestriction {
+    public static final String DISALLOW_CONFIG_LOCATION_MODE = "no_config_location_mode";
+    public static final String DISALLOW_AIRPLANE_MODE = "no_airplane_mode";
+    public static final String DISALLOW_CONFIG_BRIGHTNESS = "no_config_brightness";
+    public static final String DISALLOW_CONFIG_SCREEN_TIMEOUT = "no_config_screen_timeout";
+    public static final String DISALLOW_CONFIG_AMBIENT_DISPLAY = "no_config_ambient_display";
 
     // TODO: remove it once available in SDK
     public static final String DISALLOW_UNIFIED_PASSWORD = "no_unified_password";
@@ -169,6 +175,24 @@ public class UserRestriction {
                     R.string.disallow_bluetooth_sharing),
             new UserRestriction(DISALLOW_UNIFIED_PASSWORD, R.string.disallow_unified_password),
             new UserRestriction(DISALLOW_USER_SWITCH, R.string.disallow_user_switch),
+            new UserRestriction(
+                    DISALLOW_CONFIG_LOCATION_MODE,
+                    R.string.disallow_config_location_mode),
+            new UserRestriction(
+                    DISALLOW_AIRPLANE_MODE,
+                    R.string.disallow_airplane_mode),
+            new UserRestriction(
+                    DISALLOW_CONFIG_BRIGHTNESS,
+                    R.string.disallow_config_brightness),
+            new UserRestriction(
+                    DISALLOW_CONFIG_DATE_TIME,
+                    R.string.disallow_config_date_time),
+            new UserRestriction(
+                    DISALLOW_CONFIG_SCREEN_TIMEOUT,
+                    R.string.disallow_config_screen_timeout),
+            new UserRestriction(
+                    DISALLOW_CONFIG_AMBIENT_DISPLAY,
+                    R.string.disallow_config_ambient_display),
     };
 
     /**
@@ -196,7 +220,8 @@ public class UserRestriction {
             DISALLOW_SAFE_BOOT,
             DISALLOW_SMS,
             DISALLOW_UNMUTE_MICROPHONE,
-            DISALLOW_USB_FILE_TRANSFER
+            DISALLOW_USB_FILE_TRANSFER,
+            DISALLOW_AIRPLANE_MODE
     };
 
     /**
@@ -248,6 +273,12 @@ public class UserRestriction {
     public static String[] PIC_PLUS_RESTRICTIONS = {
             DISALLOW_UNIFIED_PASSWORD,
             DISALLOW_SYSTEM_ERROR_DIALOGS,
-            DISALLOW_USER_SWITCH
+            DISALLOW_USER_SWITCH,
+            DISALLOW_CONFIG_LOCATION_MODE,
+            DISALLOW_AIRPLANE_MODE,
+            DISALLOW_CONFIG_DATE_TIME,
+            DISALLOW_CONFIG_BRIGHTNESS,
+            DISALLOW_CONFIG_SCREEN_TIMEOUT,
+            DISALLOW_CONFIG_AMBIENT_DISPLAY
     };
 }
