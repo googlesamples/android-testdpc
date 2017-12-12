@@ -469,6 +469,11 @@
             android:title="@string/reboot"
             testdpc:admin="deviceOwner"
             testdpc:minSdkVersion="N" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="persistent_device_owner"
+            android:title="@string/persistent_device_owner"
+            testdpc:admin="deviceOwner"
+            testdpc:minSdkVersion="O_MR1" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/safetynet_preference_title">

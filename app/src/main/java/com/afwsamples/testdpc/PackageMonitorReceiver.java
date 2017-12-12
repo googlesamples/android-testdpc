@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.support.v7.app.NotificationCompat;
 import android.support.v7.app.NotificationCompat.Builder;
 import android.text.TextUtils;
-
 import com.afwsamples.testdpc.common.NotificationUtil;
 
 public class PackageMonitorReceiver extends BroadcastReceiver {
@@ -37,6 +36,7 @@ public class PackageMonitorReceiver extends BroadcastReceiver {
             .setContentText(notificationBody)
             .setStyle(new NotificationCompat.BigTextStyle().bigText(notificationBody))
             .setDefaults(Notification.DEFAULT_LIGHTS)
+            .setOnlyAlertOnce(true)
             .build();
         NotificationManager notificationManager =
             (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
