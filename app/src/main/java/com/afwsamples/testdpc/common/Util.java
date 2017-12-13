@@ -17,9 +17,6 @@
 package com.afwsamples.testdpc.common;
 
 import android.annotation.TargetApi;
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.app.Service;
 import android.app.admin.DevicePolicyManager;
 import android.content.ActivityNotFoundException;
@@ -33,10 +30,8 @@ import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.UserHandle;
 import android.os.UserManager;
-import android.support.annotation.RequiresApi;
 import android.support.v14.preference.PreferenceFragment;
 import android.support.v4.os.BuildCompat;
-import android.support.v7.app.NotificationCompat;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.widget.ImageView;
