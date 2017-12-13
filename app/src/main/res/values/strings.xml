@@ -683,6 +683,21 @@
     <string name="password_min_symbols">Minimum number of symbols</string>
     <string name="password_min_nonletter">Minimum number of non-letters</string>
 
+    <!-- String for password blacklist -->
+    <string name="password_blacklist">Password blacklist</string>
+    <string name="password_blacklist_manual">Set password blacklist</string>
+    <string name="password_blacklist_load_file">Load password blacklist from file</string>
+    <string name="password_blacklist_load_file_summary">Must be one password per line</string>
+    <string name="password_blacklist_clear">Clear password blacklist</string>
+    <string name="password_blacklist_no_blacklist">No blacklist to clear</string>
+
+    <string name="password_blacklist_manager_title">Password blacklist manager</string>
+    <string name="password_blacklist_add">Enter restricted password</string>
+    <string name="password_blacklist_add_empty_error">Cannot add empty item to blacklist</string>
+    <string name="password_blacklist_load_failed">Failed to load blacklist file</string>
+    <string name="password_blacklist_save_failed">Failed to save password blacklist</string>
+    <string name="password_blacklist_saved">Saved password blacklist</string>
+
     <string name="password_not_compliant_title">Password is not compliant</string>
     <string name="separate_challenge_required_title">Separate work challenge required</string>
     <string name="set_new_password_notification_content">Tap to set a new lock screen password</string>

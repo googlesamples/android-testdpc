@@ -165,12 +165,17 @@ public class Util {
 
     public static void showFileViewerForImportingCertificate(PreferenceFragment fragment,
             int requestCode) {
-        Intent certIntent = new Intent(Intent.ACTION_GET_CONTENT);
-        certIntent.setTypeAndNormalize("*/*");
+        showFilePicker(fragment, "*/*", requestCode);
+    }
+
+    public static void showFilePicker(PreferenceFragment fragment, String type, int requestCode) {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setTypeAndNormalize(type);
         try {
-            fragment.startActivityForResult(certIntent, requestCode);
+            fragment.startActivityForResult(intent, requestCode);
         } catch (ActivityNotFoundException e) {
-            Log.e(TAG, "showFileViewerForImportingCertificate: ", e);
+            Log.e(TAG, "showFilePicker: ", e);
         }
     }
 
