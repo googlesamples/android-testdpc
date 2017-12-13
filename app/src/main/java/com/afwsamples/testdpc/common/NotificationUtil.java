@@ -8,7 +8,7 @@ import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.support.annotation.StringRes;
 import android.support.v4.os.BuildCompat;
-import android.support.v7.app.NotificationCompat;
+import android.support.v4.app.NotificationCompat;
 
 import com.afwsamples.testdpc.R;
 
@@ -37,8 +37,8 @@ public class NotificationUtil {
         if (BuildCompat.isAtLeastO()) {
             createDefaultNotificationChannel(context);
         }
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-        builder.setChannelId(DEFAULT_CHANNEL_ID);
+        NotificationCompat.Builder builder
+                = new NotificationCompat.Builder(context, DEFAULT_CHANNEL_ID);
         return builder;
     }
 

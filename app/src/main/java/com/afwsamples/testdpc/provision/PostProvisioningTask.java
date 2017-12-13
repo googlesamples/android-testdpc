@@ -37,6 +37,7 @@ import android.support.v4.os.BuildCompat;
 import android.util.Log;
 
 import com.afwsamples.testdpc.AddAccountActivity;
+import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.EnableDeviceOwnerActivity;
 import com.afwsamples.testdpc.EnableProfileActivity;
 import com.afwsamples.testdpc.common.LaunchIntentUtil;
@@ -66,6 +67,8 @@ public class PostProvisioningTask {
             "com.afwsamples.testdpc.SetupManagementLaunchActivity";
     private static final String POST_PROV_PREFS = "post_prov_prefs";
     private static final String KEY_POST_PROV_DONE = "key_post_prov_done";
+    private static final String KEY_DEVICE_OWNER_STATE =
+          "android.app.extra.PERSISTENT_DEVICE_OWNER_STATE";
 
     private final Context mContext;
     private final DevicePolicyManager mDevicePolicyManager;
@@ -96,6 +99,18 @@ public class PostProvisioningTask {
                 EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE);
         if (BuildCompat.isAtLeastO()) {
             maybeSetAffiliationIds(extras);
+        }
+
+        // If TestDPC asked GmsCore to store its state in the FRP area before factory reset, the
+        // state will be handed over to it during the next device setup.
+        if (BuildCompat.isAtLeastOMR1()
+            && extras != null
+            && extras.containsKey(KEY_DEVICE_OWNER_STATE)) {
+            Util.setPersistentDoStateWithApplicationRestriction(
+                mContext,
+                mDevicePolicyManager,
+                DeviceAdminReceiver.getComponentName(mContext),
+                extras.getString(KEY_DEVICE_OWNER_STATE));
         }
 
         // Hide the setup launcher when this app is the admin

@@ -17,7 +17,6 @@
 package com.afwsamples.testdpc;
 
 import android.annotation.TargetApi;
-import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.admin.DevicePolicyManager;
@@ -33,13 +32,12 @@ import android.os.Process;
 import android.os.UserHandle;
 import android.os.UserManager;
 import android.preference.PreferenceManager;
-import android.support.v7.app.NotificationCompat;
+import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.afwsamples.testdpc.common.NotificationUtil;
-import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.provision.PostProvisioningTask;
 
 import java.io.BufferedReader;

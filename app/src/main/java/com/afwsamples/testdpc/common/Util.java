@@ -17,9 +17,6 @@
 package com.afwsamples.testdpc.common;
 
 import android.annotation.TargetApi;
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.app.Service;
 import android.app.admin.DevicePolicyManager;
 import android.content.ActivityNotFoundException;
@@ -30,12 +27,11 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Build.VERSION_CODES;
+import android.os.Bundle;
 import android.os.UserHandle;
 import android.os.UserManager;
-import android.support.annotation.RequiresApi;
 import android.support.v14.preference.PreferenceFragment;
 import android.support.v4.os.BuildCompat;
-import android.support.v7.app.NotificationCompat;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.widget.ImageView;
@@ -56,7 +52,12 @@ import java.util.List;
  */
 public class Util {
     private static final String TAG = "Util";
-    private  static final int DEFAULT_BUFFER_SIZE = 4096;
+    private static final int DEFAULT_BUFFER_SIZE = 4096;
+
+    private static final String BROADCAST_ACTION_FRP_CONFIG_CHANGED =
+        "com.google.android.gms.auth.FRP_CONFIG_CHANGED";
+    private static final String GMSCORE_PACKAGE = "com.google.android.gms";
+    private static final String PERSISTENT_DEVICE_OWNER_STATE = "persistentDeviceOwnerState";
 
     /**
      * Format a friendly datetime for the current locale according to device policy documentation.
@@ -192,6 +193,42 @@ public class Util {
             Log.e(TAG, "installCaCertificate: ", e);
         }
         return false;
+    }
+
+    /**
+     * Returns the persistent device owner state which has been set by the device owner as an app
+     * restriction on GmsCore or null if there is no such restriction set.
+     */
+    @TargetApi(VERSION_CODES.O)
+    public static String getPersistentDoStateFromApplicationRestriction(
+            DevicePolicyManager dpm, ComponentName admin) {
+        Bundle restrictions = dpm.getApplicationRestrictions(admin, GMSCORE_PACKAGE);
+        return restrictions.getString(PERSISTENT_DEVICE_OWNER_STATE);
+    }
+
+    /**
+     * Sets the persistent device owner state by setting a special app restriction on GmsCore and
+     * notifies GmsCore about the change by sending a broadcast.
+     *
+     * @param state The device owner state to be preserved across factory resets. If null, the
+     * persistent device owner state and the corresponding restiction are cleared.
+     */
+    @TargetApi(VERSION_CODES.O)
+    public static void setPersistentDoStateWithApplicationRestriction(
+            Context context, DevicePolicyManager dpm, ComponentName admin, String state) {
+        Bundle restrictions = dpm.getApplicationRestrictions(admin, GMSCORE_PACKAGE);
+        if (state == null) {
+            // Clear the restriction
+            restrictions.remove(PERSISTENT_DEVICE_OWNER_STATE);
+        } else {
+            // Set the restriction
+            restrictions.putString(PERSISTENT_DEVICE_OWNER_STATE, state);
+        }
+        dpm.setApplicationRestrictions(admin, GMSCORE_PACKAGE, restrictions);
+        Intent broadcastIntent = new Intent(BROADCAST_ACTION_FRP_CONFIG_CHANGED);
+        broadcastIntent.setPackage(GMSCORE_PACKAGE);
+        broadcastIntent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
+        context.sendBroadcast(broadcastIntent);
     }
 
     private static DevicePolicyManager getDevicePolicyManager(Context context) {
