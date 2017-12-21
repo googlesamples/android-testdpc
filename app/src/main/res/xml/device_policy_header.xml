@@ -384,25 +384,65 @@
 
     <PreferenceCategory android:title="@string/user_management">
         <com.afwsamples.testdpc.common.preference.DpcPreference
-                android:key="create_managed_profile"
-                android:title="@string/create_managed_profile"
-                testdpc:admin="deviceOwner"
-                testdpc:minSdkVersion="O" />
+            android:key="create_managed_profile"
+            android:title="@string/create_managed_profile"
+            testdpc:admin="deviceOwner"
+            testdpc:user="primaryUser"
+            testdpc:minSdkVersion="O" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="create_and_manage_user"
             android:title="@string/create_and_manage_user"
+            testdpc:admin="deviceOwner"
             testdpc:user="primaryUser"
             testdpc:minSdkVersion="L" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="remove_user"
             android:title="@string/remove_user"
+            testdpc:admin="deviceOwner"
             testdpc:user="primaryUser"
             testdpc:minSdkVersion="L" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="switch_user"
+            android:title="@string/switch_user"
+            testdpc:admin="deviceOwner"
+            testdpc:user="primaryUser"
+            testdpc:minSdkVersion="P" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="stop_user"
+            android:title="@string/stop_user"
+            testdpc:admin="deviceOwner"
+            testdpc:user="primaryUser"
+            testdpc:minSdkVersion="P" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="logout_user"
+            android:title="@string/logout_user"
+            testdpc:admin="deviceOwner|profileOwner"
+            testdpc:user="secondaryUser"
+            testdpc:minSdkVersion="P" />
+        <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
+            android:key="enable_logout"
+            android:title="@string/enable_logout"
+            testdpc:admin="deviceOwner"
+            testdpc:user="primaryUser"
+            testdpc:minSdkVersion="P" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="set_affiliation_ids"
             android:title="@string/manage_affiliation_ids"
             testdpc:admin="deviceOwner|profileOwner"
+            testdpc:user="any"
             testdpc:minSdkVersion="O" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="affiliated_user"
+            android:title="@string/affiliated_user"
+            testdpc:admin="any"
+            testdpc:user="any"
+            testdpc:minSdkVersion="P" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="ephemeral_user"
+            android:title="@string/ephemeral_user"
+            testdpc:admin="deviceOwner|profileOwner"
+            testdpc:user="any"
+            testdpc:minSdkVersion="P" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/user_restrictions_management_title">

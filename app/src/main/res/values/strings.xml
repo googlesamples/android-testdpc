@@ -72,6 +72,8 @@
     <string name="provisioning_params_logo">Logo: </string>
     <string name="provisioning_params_select">Select</string>
     <string name="error_opening_image_file">Error opening image file</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 
     <string name="work_profile">Work profile</string>
     <string name="personal_profile">Personal profile</string>
@@ -366,6 +368,7 @@
     <string name="ensure_verify_apps">Ensure verify apps</string>
     <string name="disallow_autofill">Disallow autofill</string>
     <string name="disallow_unified_password">Require separate challenge</string>
+    <string name="disallow_user_switch">Disallow user switch</string>
     <string name="user_restriction_error_msg">Operation not allowed</string>
 
     <!-- Strings for select app -->
@@ -522,13 +525,28 @@
     <string name="create_and_manage_user">Create and manage user</string>
     <string name="create_managed_profile">Create managed profile</string>
     <string name="skip_setup_wizard">Skip setup wizard</string>
-    <string name="remove_user">Remove user</string>
+    <string name="make_user_ephemeral">Make user ephemeral</string>
+    <string name="start_user_in_background">Start user in background</string>
     <string name="user_created">Successfully created user with serial number %1$d.</string>
+    <string name="user_string">User %1$d</string>
     <string name="enter_username_hint">Enter a username</string>
     <string name="failed_to_create_user">Failed to create user.</string>
     <string name="enter_user_id">Enter a user serial number</string>
+    <string name="remove_user">Remove user</string>
     <string name="user_removed">User removed.</string>
     <string name="failed_to_remove_user">Failed to remove user.</string>
+    <string name="switch_user">Switch user</string>
+    <string name="user_switched">User switched.</string>
+    <string name="failed_to_switch_user">Failed to switch user.</string>
+    <string name="stop_user">Stop user</string>
+    <string name="user_stopped">User stopped.</string>
+    <string name="failed_to_stop_user">Failed to stop user.</string>
+    <string name="logout_user">Logout user</string>
+    <string name="user_logouted">User logouted.</string>
+    <string name="failed_to_logout_user">Failed to logout user.</string>
+    <string name="enable_logout">Enable logout</string>
+    <string name="affiliated_user">Affiliated user</string>
+    <string name="ephemeral_user">Ephemeral user</string>
     <string name="on_user_added_title">User Created</string>
     <string name="on_user_removed_title">User Removed</string>
     <string name="on_user_added_message">User created with serial number %1$d.</string>
@@ -537,7 +555,8 @@
     <!-- Affiliation ids -->
     <string name="manage_affiliation_ids">Manage affiliation ids</string>
     <string name="enter_affiliation_id">Enter affiliation id</string>
-    <string name="affiliation_id_empty_error">Affiliation id cannot be empty</string>
+    <string name="affiliation_id_empty_error">Affiliation id cannot be empty</string>>
+    <string name="require_affiliated_user">Requires user to be affiliated</string>
 
     <!-- Strings for block uninstall -->
     <string name="block_uninstallation_title">Block uninstallation</string>

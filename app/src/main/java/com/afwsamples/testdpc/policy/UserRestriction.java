@@ -38,6 +38,7 @@ import static android.os.UserManager.DISALLOW_SMS;
 import static android.os.UserManager.DISALLOW_UNINSTALL_APPS;
 import static android.os.UserManager.DISALLOW_UNMUTE_MICROPHONE;
 import static android.os.UserManager.DISALLOW_USB_FILE_TRANSFER;
+import static android.os.UserManager.DISALLOW_USER_SWITCH;
 import static android.os.UserManager.ENSURE_VERIFY_APPS;
 
 import com.afwsamples.testdpc.R;
@@ -167,6 +168,7 @@ public class UserRestriction {
                     DISALLOW_BLUETOOTH_SHARING,
                     R.string.disallow_bluetooth_sharing),
             new UserRestriction(DISALLOW_UNIFIED_PASSWORD, R.string.disallow_unified_password),
+            new UserRestriction(DISALLOW_USER_SWITCH, R.string.disallow_user_switch),
     };
 
     /**
@@ -195,6 +197,13 @@ public class UserRestriction {
             DISALLOW_SMS,
             DISALLOW_UNMUTE_MICROPHONE,
             DISALLOW_USB_FILE_TRANSFER
+    };
+
+    /**
+     * User restrictions that cannot be set by profile owners. Applied to all users.
+     */
+    public static final String[] DEVICE_OWNER_ONLY_RESTRICTIONS = {
+            DISALLOW_USER_SWITCH
     };
 
     /**
@@ -238,6 +247,7 @@ public class UserRestriction {
 
     public static String[] PIC_PLUS_RESTRICTIONS = {
             DISALLOW_UNIFIED_PASSWORD,
-            DISALLOW_SYSTEM_ERROR_DIALOGS
+            DISALLOW_SYSTEM_ERROR_DIALOGS,
+            DISALLOW_USER_SWITCH
     };
 }

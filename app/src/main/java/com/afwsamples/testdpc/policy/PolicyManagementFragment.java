@@ -86,6 +86,7 @@ import com.afwsamples.testdpc.common.BaseSearchablePolicyPreferenceFragment;
 import com.afwsamples.testdpc.common.CertificateUtil;
 import com.afwsamples.testdpc.common.MediaDisplayFragment;
 import com.afwsamples.testdpc.common.ReflectionUtil;
+import com.afwsamples.testdpc.common.UserArrayAdapter;
 import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.common.preference.DpcPreference;
 import com.afwsamples.testdpc.common.preference.DpcPreferenceBase;
@@ -166,8 +167,13 @@ import java.util.Set;
  * <li> {@link DevicePolicyManager#setAccountManagementDisabled(android.content.ComponentName,
  *             String, boolean)} </li>
  * <li> {@link DevicePolicyManager#getAccountTypesWithManagementDisabled()} </li>
- * <li> {@link DevicePolicyManager#removeUser(android.content.ComponentName,
-               android.os.UserHandle)} </li>
+ * <li> {@link DevicePolicyManager#removeUser(ComponentName, UserHandle)} </li>
+ * <li> {@link DevicePolicyManager#switchUser(ComponentName, UserHandle)} </li>
+ * <li> {@link DevicePolicyManager#stopUser(ComponentName, UserHandle)} </li>
+ * <li> {@link DevicePolicyManager#setLogoutEnabled(ComponentName, boolean)} </li>
+ * <li> {@link DevicePolicyManager#isLogoutEnabled()} </li>
+ * <li> {@link DevicePolicyManager#isAffiliatedUser()} </li>
+ * <li> {@link DevicePolicyManager#isEphemeralUser(ComponentName)} </li>
  * <li> {@link DevicePolicyManager#setUninstallBlocked(android.content.ComponentName, String,
  *             boolean)} </li>
  * <li> {@link DevicePolicyManager#isUninstallBlocked(android.content.ComponentName, String)} </li>
@@ -268,6 +274,12 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String REMOVE_DEVICE_OWNER_KEY = "remove_device_owner";
     private static final String REMOVE_KEY_CERTIFICATE_KEY = "remove_key_certificate";
     private static final String REMOVE_USER_KEY = "remove_user";
+    private static final String SWITCH_USER_KEY = "switch_user";
+    private static final String STOP_USER_KEY = "stop_user";
+    private static final String LOGOUT_USER_KEY = "logout_user";
+    private static final String ENABLE_LOGOUT_KEY ="enable_logout";
+    private static final String AFFILIATED_USER_KEY = "affiliated_user";
+    private static final String EPHEMERAL_USER_KEY = "ephemeral_user";
     private static final String REQUEST_BUGREPORT_KEY = "request_bugreport";
     private static final String REQUEST_PROCESS_LOGS = "request_process_logs";
     private static final String RESET_PASSWORD_KEY = "reset_password";
@@ -339,6 +351,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private SwitchPreference mEnableProcessLoggingPreference;
     private SwitchPreference mEnableNetworkLoggingPreference;
     private SwitchPreference mSetAutoTimeRequiredPreference;
+    private DpcSwitchPreference mEnableLogoutPreference;
     private DpcPreference mRequestLogsPreference;
     private Preference mSetDeviceOrganizationNamePreference;
 
@@ -383,6 +396,12 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(CREATE_MANAGED_PROFILE_KEY).setOnPreferenceClickListener(this);
         findPreference(CREATE_AND_MANAGE_USER_KEY).setOnPreferenceClickListener(this);
         findPreference(REMOVE_USER_KEY).setOnPreferenceClickListener(this);
+        findPreference(SWITCH_USER_KEY).setOnPreferenceClickListener(this);
+        findPreference(STOP_USER_KEY).setOnPreferenceClickListener(this);
+        findPreference(LOGOUT_USER_KEY).setOnPreferenceClickListener(this);
+        mEnableLogoutPreference = (DpcSwitchPreference) findPreference(ENABLE_LOGOUT_KEY);
+        mEnableLogoutPreference.setOnPreferenceChangeListener(this);
+
         findPreference(SET_AFFILIATION_IDS_KEY).setOnPreferenceClickListener(this);
         mDisableCameraSwitchPreference = (SwitchPreference) findPreference(DISABLE_CAMERA_KEY);
         findPreference(CAPTURE_IMAGE_KEY).setOnPreferenceClickListener(this);
@@ -545,6 +564,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         updateInstallNonMarketAppsPreference();
         loadPasswordCompliant();
         loadSeparateChallenge();
+        loadUserStatus();
     }
 
     @Override
@@ -662,6 +682,15 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 return true;
             case REMOVE_USER_KEY:
                 showRemoveUserPrompt();
+                return true;
+            case SWITCH_USER_KEY:
+                showSwitchUserPrompt();
+                return true;
+            case STOP_USER_KEY:
+                showStopUserPrompt();
+                return true;
+            case LOGOUT_USER_KEY:
+                logoutUser();
                 return true;
             case SET_AFFILIATION_IDS_KEY:
                 showFragment(new AffiliationIdsFragment());
@@ -963,6 +992,10 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             case SET_DEVICE_ORGANIZATION_NAME_KEY:
                 mDevicePolicyManager.setOrganizationName(mAdminComponentName, (String) newValue);
                 mSetDeviceOrganizationNamePreference.setSummary((String) newValue);
+                return true;
+            case ENABLE_LOGOUT_KEY:
+                mDevicePolicyManager.setLogoutEnabled(mAdminComponentName, (Boolean) newValue);
+                reloadEnableLogout();
                 return true;
         }
         return false;
@@ -1448,6 +1481,10 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         userNameEditText.setHint(R.string.enter_username_hint);
         final CheckBox skipSetupWizardCheckBox = (CheckBox) dialogView.findViewById(
                 R.id.skip_setup_wizard_checkbox);
+        final CheckBox makeUserEphemeralCheckBox = (CheckBox) dialogView.findViewById(
+            R.id.make_user_ephemeral_checkbox);
+        final CheckBox startUserInBackgroundCheckBox = (CheckBox) dialogView.findViewById(
+            R.id.start_user_in_background_checkbox);
 
         new AlertDialog.Builder(getActivity())
                 .setTitle(R.string.create_and_manage_user)
@@ -1457,8 +1494,16 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                     public void onClick(DialogInterface dialogInterface, int i) {
                         String name = userNameEditText.getText().toString();
                         if (!TextUtils.isEmpty(name)) {
-                            int flags = skipSetupWizardCheckBox.isChecked()
-                                    ? DevicePolicyManager.SKIP_SETUP_WIZARD : 0;
+                            int flags = 0;
+                            if (skipSetupWizardCheckBox.isChecked()){
+                                flags |= DevicePolicyManager.SKIP_SETUP_WIZARD;
+                            }
+                            if (makeUserEphemeralCheckBox.isChecked()){
+                                flags |= DevicePolicyManager.MAKE_USER_EPHEMERAL;
+                            }
+                            if (startUserInBackgroundCheckBox.isChecked()){
+                                flags |= DevicePolicyManager.START_USER_IN_BACKGROUND;
+                            }
 
                             UserHandle userHandle = mDevicePolicyManager.createAndManageUser(
                                     mAdminComponentName,
@@ -1485,7 +1530,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
      * For user removal:
      * Shows a prompt for a user serial number. The associated user will be removed.
      */
-    private void showRemoveUserPrompt() {
+    private void showRemoveUserPromptLegacy() {
         if (getActivity() == null || getActivity().isFinishing()) {
             return;
         }
@@ -1517,6 +1562,88 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                     }
                 })
                 .show();
+    }
+
+    /**
+     * For user removal:
+     * If the device is P or above, shows a prompt for choosing a user to be removed. Otherwise,
+     * shows a prompt for user to enter a serial number, as
+     * {@link DevicePolicyManager#getSecondaryUsers} is not available.
+     */
+    private void showRemoveUserPrompt() {
+        if (BuildCompat.isAtLeastP()) {
+            showChooseUserPrompt(R.string.remove_user, userHandle -> {
+                boolean success =
+                        mDevicePolicyManager.removeUser(mAdminComponentName, userHandle);
+                showToast(success ? R.string.user_removed : R.string.failed_to_remove_user);
+            });
+        } else {
+            showRemoveUserPromptLegacy();
+        }
+    }
+
+    /**
+     * For user switch:
+     * Shows a prompt for choosing a user to be switched to.
+     */
+    @TargetApi(28)
+    private void showSwitchUserPrompt() {
+        showChooseUserPrompt(R.string.switch_user, userHandle -> {
+            boolean success =
+                    mDevicePolicyManager.switchUser(mAdminComponentName, userHandle);
+            showToast(success ? R.string.user_switched : R.string.failed_to_switch_user);
+        });
+    }
+
+    /**
+     * For user stop:
+     * Shows a prompt for choosing a user to be stopped.
+     */
+    @TargetApi(28)
+    private void showStopUserPrompt() {
+        showChooseUserPrompt(R.string.stop_user, userHandle -> {
+            boolean success =
+                    mDevicePolicyManager.stopUser(mAdminComponentName, userHandle);
+            showToast(success ? R.string.user_stopped : R.string.failed_to_stop_user);
+        });
+    }
+
+    private interface UserCallback {
+        void onUserChosen(UserHandle userHandle);
+    }
+
+    /**
+     * Shows a prompt for choosing a user. The callback will be invoked with chosen user.
+     */
+    @TargetApi(28)
+    private void showChooseUserPrompt(int titleResId, UserCallback callback) {
+        if (getActivity() == null || getActivity().isFinishing()) {
+            return;
+        }
+        View view = LayoutInflater.from(getActivity()).inflate(R.layout.simple_edittext, null);
+        final EditText input = view.findViewById(R.id.input);
+        input.setHint(R.string.enter_user_id);
+        input.setRawInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED);
+
+        List<UserHandle> secondaryUsers =
+                mDevicePolicyManager.getSecondaryUsers(mAdminComponentName);
+        UserArrayAdapter userArrayAdapter =
+                new UserArrayAdapter(getActivity(), R.id.user_name, secondaryUsers);
+        new AlertDialog.Builder(getActivity())
+                .setTitle(titleResId)
+                .setAdapter(
+                        userArrayAdapter,
+                        (dialog, position) -> callback.onUserChosen(secondaryUsers.get(position)))
+                .show();
+    }
+
+    /**
+     * Logout the current user.
+     */
+    @TargetApi(28)
+    private void logoutUser() {
+        boolean success = mDevicePolicyManager.logoutUser(mAdminComponentName);
+        showToast(success ? R.string.user_logouted : R.string.failed_to_logout_user);
     }
 
     /**
@@ -1628,6 +1755,25 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                     Boolean.toString(compliant));
         }
         passwordCompliantPreference.setSummary(summary);
+    }
+
+    @TargetApi(28)
+    private void loadUserStatus() {
+        Preference affiliatedUserPreference = findPreference(AFFILIATED_USER_KEY);
+        Preference ephemeralUserPreference = findPreference(EPHEMERAL_USER_KEY);
+        DpcPreference logoutUserPreference = (DpcPreference) findPreference(LOGOUT_USER_KEY);
+        boolean isAffiliatedUser = isAffiliatedUser();
+        boolean isEphemeralUser = mDevicePolicyManager.isEphemeralUser(mAdminComponentName);
+        affiliatedUserPreference.setSummary(isAffiliatedUser ? R.string.yes : R.string.no);
+        ephemeralUserPreference.setSummary(isEphemeralUser ? R.string.yes : R.string.no);
+        logoutUserPreference.setCustomConstraint(
+                () -> isAffiliatedUser ? NO_CUSTOM_CONSTRIANT : R.string.require_affiliated_user);
+        reloadEnableLogout();
+    }
+
+    @TargetApi(28)
+    private void reloadEnableLogout() {
+        mEnableLogoutPreference.setChecked(mDevicePolicyManager.isLogoutEnabled());
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -2546,6 +2692,15 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private void showSetupManagement() {
         Intent intent = new Intent(getActivity(), SetupManagementActivity.class);
         getActivity().startActivity(intent);
+    }
+
+    @TargetApi(28)
+    private boolean isAffiliatedUser() {
+        try {
+            return (boolean) ReflectionUtil.invoke(mDevicePolicyManager, "isAffiliatedUser");
+        } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
+            return false;
+        }
     }
 
     abstract class ManageLockTaskListCallback {
