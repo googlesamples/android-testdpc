@@ -279,6 +279,10 @@
     <string name="unsuspend_apps_empty">No apps are currently suspended.</string>
     <string name="unsuspend_apps_success">%s is no longer suspended.</string>
     <string name="unsuspend_apps_failure">%s cannot be unsuspended.</string>
+    <string name="clear_app_data_title">Clear app data</string>
+    <string name="clear_app_data_empty">No apps available.</string>
+    <string name="clear_app_data_success">%s data is now cleared.</string>
+    <string name="clear_app_data_failure">%s data cannot be cleared.</string>
 
     <!-- Strings for lock task -->
     <string name="lock_task_title">Lock task</string>
