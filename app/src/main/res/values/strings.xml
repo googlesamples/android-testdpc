@@ -60,6 +60,10 @@
     <string name="add_account_skip">Skip</string>
     <string name="add_account_dialog_title">Account name:</string>
     <string name="fail_to_add_account">Failed to add account</string>
+    <string name="remove_account">Remove account</string>
+    <string name="success_remove_account">Account removed: %s</string>
+    <string name="fail_to_remove_account">Failed to add account: %s</string>
+    <string name="no_accounts_available">No accounts available.</string>
     <string name="icon">Icon</string>
     <string name="manage_apps">Manage applications</string>
     <string name="reset">Reset</string>
@@ -555,6 +559,7 @@
     <string name="on_user_removed_title">User Removed</string>
     <string name="on_user_added_message">User created with serial number %1$d.</string>
     <string name="on_user_removed_message">User with serial number %1$d removed.</string>
+    <string name="no_secondary_users_available">No secondary users available.</string>
 
     <!-- Affiliation ids -->
     <string name="manage_affiliation_ids">Manage affiliation ids</string>
