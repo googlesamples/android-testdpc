@@ -45,6 +45,7 @@ import android.os.AsyncTask;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.UserHandle;
 import android.os.UserManager;
 import android.provider.MediaStore;
@@ -138,6 +139,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Provides several device management functions.
@@ -311,6 +313,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     private static final String UNHIDE_APPS_KEY = "unhide_apps";
     private static final String UNSUSPEND_APPS_KEY = "unsuspend_apps";
+    private static final String CLEAR_APP_DATA_KEY = "clear_app_data";
     private static final String WIPE_DATA_KEY = "wipe_data";
     private static final String PERSISTENT_DEVICE_OWNER_KEY = "persistent_device_owner";
     private static final String CREATE_WIFI_CONFIGURATION_KEY = "create_wifi_configuration";
@@ -464,6 +467,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(UNHIDE_APPS_KEY).setOnPreferenceClickListener(this);
         findPreference(SUSPEND_APPS_KEY).setOnPreferenceClickListener(this);
         findPreference(UNSUSPEND_APPS_KEY).setOnPreferenceClickListener(this);
+        findPreference(CLEAR_APP_DATA_KEY).setOnPreferenceClickListener(this);
         findPreference(MANAGE_APP_RESTRICTIONS_KEY).setOnPreferenceClickListener(this);
         findPreference(GENERIC_DELEGATION_KEY).setOnPreferenceClickListener(this);
         findPreference(APP_RESTRICTIONS_MANAGING_PACKAGE_KEY).setOnPreferenceClickListener(this);
@@ -721,6 +725,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 return true;
             case UNSUSPEND_APPS_KEY:
                 showSuspendAppsPrompt(true);
+                return true;
+            case CLEAR_APP_DATA_KEY:
+                showClearAppDataPrompt();
                 return true;
             case MANAGE_APP_RESTRICTIONS_KEY:
                 showFragment(new ManageAppRestrictionsFragment());
@@ -2346,6 +2353,47 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                         }
                     })
                     .show();
+        }
+    }
+
+
+
+    /**
+     * Shows an alert dialog which displays a list of apps. Clicking an app in the dialog clear the
+     * app data.
+     */
+    @TargetApi(28)
+    private void showClearAppDataPrompt() {
+        final List<String> packageNameList =
+                getAllInstalledApplicationsSorted()
+                        .stream()
+                        .map(applicationInfo -> applicationInfo.packageName)
+                        .collect(Collectors.toList());
+        if (packageNameList.isEmpty()) {
+            showToast(R.string.clear_app_data_empty);
+        } else {
+            AppInfoArrayAdapter appInfoArrayAdapter = new AppInfoArrayAdapter(getActivity(),
+                    R.id.pkg_name, packageNameList, true);
+            new AlertDialog.Builder(getActivity())
+                    .setTitle(getString(R.string.clear_app_data_title))
+                    .setAdapter(
+                            appInfoArrayAdapter,
+                            (dialog, position) ->
+                                    clearApplicationUserData(packageNameList.get(position)))
+                    .show();
+        }
+    }
+
+    @TargetApi(28)
+    private void clearApplicationUserData(String packageName) {
+        if (!mDevicePolicyManager.clearApplicationUserData(
+                mAdminComponentName,
+                packageName,
+                (packageName2, succeed) -> showToast(
+                        succeed ? R.string.clear_app_data_success : R.string.clear_app_data_failure,
+                        packageName),
+                new Handler(getContext().getMainLooper()))) {
+            showToast(R.string.clear_app_data_failure, packageName);
         }
     }
 
