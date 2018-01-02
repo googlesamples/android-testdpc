@@ -354,7 +354,10 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private SwitchPreference mEnableProcessLoggingPreference;
     private SwitchPreference mEnableNetworkLoggingPreference;
     private SwitchPreference mSetAutoTimeRequiredPreference;
+    private DpcPreference mLogoutUserPreference;
     private DpcSwitchPreference mEnableLogoutPreference;
+    private Preference mAffiliatedUserPreference;
+    private Preference mEphemeralUserPreference;
     private DpcPreference mRequestLogsPreference;
     private Preference mSetDeviceOrganizationNamePreference;
 
@@ -401,11 +404,15 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(REMOVE_USER_KEY).setOnPreferenceClickListener(this);
         findPreference(SWITCH_USER_KEY).setOnPreferenceClickListener(this);
         findPreference(STOP_USER_KEY).setOnPreferenceClickListener(this);
-        findPreference(LOGOUT_USER_KEY).setOnPreferenceClickListener(this);
         mEnableLogoutPreference = (DpcSwitchPreference) findPreference(ENABLE_LOGOUT_KEY);
         mEnableLogoutPreference.setOnPreferenceChangeListener(this);
-
+        mLogoutUserPreference = (DpcPreference) findPreference(LOGOUT_USER_KEY);
+        mLogoutUserPreference.setOnPreferenceClickListener(this);
+        mLogoutUserPreference.setCustomConstraint(
+                () -> isAffiliatedUser() ? NO_CUSTOM_CONSTRIANT : R.string.require_affiliated_user);
         findPreference(SET_AFFILIATION_IDS_KEY).setOnPreferenceClickListener(this);
+        mAffiliatedUserPreference = findPreference(AFFILIATED_USER_KEY);
+        mEphemeralUserPreference = findPreference(EPHEMERAL_USER_KEY);
         mDisableCameraSwitchPreference = (SwitchPreference) findPreference(DISABLE_CAMERA_KEY);
         findPreference(CAPTURE_IMAGE_KEY).setOnPreferenceClickListener(this);
         findPreference(CAPTURE_VIDEO_KEY).setOnPreferenceClickListener(this);
@@ -520,6 +527,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         maybeDisableLockTaskPreferences();
         loadAppStatus();
         loadSecurityPatch();
+        loadIsEphemeralUserUi();
         reloadCameraDisableUi();
         reloadScreenCaptureDisableUi();
         reloadMuteAudioUi();
@@ -527,6 +535,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         reloadEnableProcessLoggingUi();
         reloadEnableNetworkLoggingUi();
         reloadSetAutoTimeRequiredUi();
+        reloadEnableLogoutUi();
     }
 
     private void constrainSpecialCasePreferences() {
@@ -568,7 +577,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         updateInstallNonMarketAppsPreference();
         loadPasswordCompliant();
         loadSeparateChallenge();
-        loadUserStatus();
+        reloadAffiliatedApis();
     }
 
     @Override
@@ -1002,7 +1011,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 return true;
             case ENABLE_LOGOUT_KEY:
                 mDevicePolicyManager.setLogoutEnabled(mAdminComponentName, (Boolean) newValue);
-                reloadEnableLogout();
+                reloadEnableLogoutUi();
                 return true;
         }
         return false;
@@ -1764,23 +1773,28 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         passwordCompliantPreference.setSummary(summary);
     }
 
+
     @TargetApi(28)
-    private void loadUserStatus() {
-        Preference affiliatedUserPreference = findPreference(AFFILIATED_USER_KEY);
-        Preference ephemeralUserPreference = findPreference(EPHEMERAL_USER_KEY);
-        DpcPreference logoutUserPreference = (DpcPreference) findPreference(LOGOUT_USER_KEY);
-        boolean isAffiliatedUser = isAffiliatedUser();
-        boolean isEphemeralUser = mDevicePolicyManager.isEphemeralUser(mAdminComponentName);
-        affiliatedUserPreference.setSummary(isAffiliatedUser ? R.string.yes : R.string.no);
-        ephemeralUserPreference.setSummary(isEphemeralUser ? R.string.yes : R.string.no);
-        logoutUserPreference.setCustomConstraint(
-                () -> isAffiliatedUser ? NO_CUSTOM_CONSTRIANT : R.string.require_affiliated_user);
-        reloadEnableLogout();
+    private void reloadEnableLogoutUi() {
+        if (mEnableLogoutPreference.isEnabled()) {
+            mEnableLogoutPreference.setChecked(mDevicePolicyManager.isLogoutEnabled());
+        }
     }
 
     @TargetApi(28)
-    private void reloadEnableLogout() {
-        mEnableLogoutPreference.setChecked(mDevicePolicyManager.isLogoutEnabled());
+    private void reloadAffiliatedApis() {
+        if (mAffiliatedUserPreference.isEnabled()) {
+            mAffiliatedUserPreference.setSummary(isAffiliatedUser() ? R.string.yes : R.string.no);
+        }
+        mLogoutUserPreference.refreshEnabledState();
+    }
+
+    @TargetApi(28)
+    private void loadIsEphemeralUserUi() {
+        if (mEphemeralUserPreference.isEnabled()) {
+            boolean isEphemeralUser = mDevicePolicyManager.isEphemeralUser(mAdminComponentName);
+            mEphemeralUserPreference.setSummary(isEphemeralUser ? R.string.yes : R.string.no);
+        }
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
