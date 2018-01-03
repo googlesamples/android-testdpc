@@ -21,6 +21,10 @@ import static android.os.UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES;
 import static com.afwsamples.testdpc.common.preference.DpcPreferenceHelper.NO_CUSTOM_CONSTRIANT;
 
 import android.accessibilityservice.AccessibilityServiceInfo;
+import android.accounts.Account;
+import android.accounts.AccountManager;
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -82,6 +86,7 @@ import com.afwsamples.testdpc.AddAccountActivity;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.SetupManagementActivity;
+import com.afwsamples.testdpc.common.AccountArrayAdapter;
 import com.afwsamples.testdpc.common.AppInfoArrayAdapter;
 import com.afwsamples.testdpc.common.BaseSearchablePolicyPreferenceFragment;
 import com.afwsamples.testdpc.common.CertificateUtil;
@@ -255,6 +260,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String GET_DISABLE_ACCOUNT_MANAGEMENT_KEY
             = "get_disable_account_management";
     private static final String ADD_ACCOUNT_KEY = "add_account";
+    private static final String REMOVE_ACCOUNT_KEY = "remove_account";
     private static final String HIDE_APPS_KEY = "hide_apps";
     private static final String INSTALL_CA_CERTIFICATE_KEY = "install_ca_certificate";
     private static final String INSTALL_KEY_CERTIFICATE_KEY = "install_key_certificate";
@@ -342,6 +348,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private ComponentName mAdminComponentName;
     private UserManager mUserManager;
     private TelephonyManager mTelephonyManager;
+    private AccountManager mAccountManager;
 
     private SwitchPreference mDisableCameraSwitchPreference;
     private SwitchPreference mDisableScreenCaptureSwitchPreference;
@@ -377,6 +384,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         mUserManager = (UserManager) getActivity().getSystemService(Context.USER_SERVICE);
         mTelephonyManager = (TelephonyManager) getActivity()
                 .getSystemService(Context.TELEPHONY_SERVICE);
+        mAccountManager = AccountManager.get(getActivity());
         mPackageManager = getActivity().getPackageManager();
         mPackageName = getActivity().getPackageName();
 
@@ -465,6 +473,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(SET_DISABLE_ACCOUNT_MANAGEMENT_KEY).setOnPreferenceClickListener(this);
         findPreference(GET_DISABLE_ACCOUNT_MANAGEMENT_KEY).setOnPreferenceClickListener(this);
         findPreference(ADD_ACCOUNT_KEY).setOnPreferenceClickListener(this);
+        findPreference(REMOVE_ACCOUNT_KEY).setOnPreferenceClickListener(this);
         findPreference(BLOCK_UNINSTALLATION_BY_PKG_KEY).setOnPreferenceClickListener(this);
         findPreference(BLOCK_UNINSTALLATION_LIST_KEY).setOnPreferenceClickListener(this);
         findPreference(ENABLE_SYSTEM_APPS_KEY).setOnPreferenceClickListener(this);
@@ -686,6 +695,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 return true;
             case ADD_ACCOUNT_KEY:
                 getActivity().startActivity(new Intent(getActivity(), AddAccountActivity.class));
+                return true;
+            case REMOVE_ACCOUNT_KEY:
+                chooseAccount();
                 return true;
             case CREATE_MANAGED_PROFILE_KEY:
                 showSetupManagement();
@@ -1636,21 +1648,22 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         if (getActivity() == null || getActivity().isFinishing()) {
             return;
         }
-        View view = LayoutInflater.from(getActivity()).inflate(R.layout.simple_edittext, null);
-        final EditText input = view.findViewById(R.id.input);
-        input.setHint(R.string.enter_user_id);
-        input.setRawInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED);
 
         List<UserHandle> secondaryUsers =
                 mDevicePolicyManager.getSecondaryUsers(mAdminComponentName);
-        UserArrayAdapter userArrayAdapter =
-                new UserArrayAdapter(getActivity(), R.id.user_name, secondaryUsers);
-        new AlertDialog.Builder(getActivity())
-                .setTitle(titleResId)
-                .setAdapter(
-                        userArrayAdapter,
-                        (dialog, position) -> callback.onUserChosen(secondaryUsers.get(position)))
-                .show();
+        if (secondaryUsers.isEmpty()) {
+            showToast(R.string.no_secondary_users_available);
+        } else {
+            UserArrayAdapter userArrayAdapter =
+                    new UserArrayAdapter(getActivity(), R.id.user_name, secondaryUsers);
+            new AlertDialog.Builder(getActivity())
+                    .setTitle(titleResId)
+                    .setAdapter(
+                            userArrayAdapter,
+                            (dialog, position) ->
+                                    callback.onUserChosen(secondaryUsers.get(position)))
+                    .show();
+        }
     }
 
     /**
@@ -2763,6 +2776,45 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
             return false;
         }
+    }
+
+    private void chooseAccount() {
+        if (getActivity() == null || getActivity().isFinishing()) {
+            return;
+        }
+
+        List<Account> accounts = Arrays.asList(mAccountManager.getAccounts());
+        if (accounts.isEmpty()) {
+            showToast(R.string.no_accounts_available);
+        } else {
+            AccountArrayAdapter accountArrayAdapter =
+                    new AccountArrayAdapter(getActivity(), R.id.account_name, accounts);
+            new AlertDialog.Builder(getActivity())
+                    .setTitle(R.string.remove_account)
+                    .setAdapter(
+                            accountArrayAdapter,
+                            (dialog, position) -> removeAccount(accounts.get(position)))
+                    .show();
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP_MR1)
+    private void removeAccount(Account account) {
+        mAccountManager.removeAccount(account, getActivity(), future -> {
+            try {
+                Bundle result = future.getResult();
+                boolean success = result.getBoolean(AccountManager.KEY_BOOLEAN_RESULT);
+                if (success) {
+                    showToast(R.string.success_remove_account, account);
+                } else {
+                    showToast(R.string.fail_to_remove_account, account);
+                }
+            } catch (OperationCanceledException | IOException | AuthenticatorException e) {
+                Log.e(TAG, "Failed to remove account: "  + account, e);
+                showToast(R.string.fail_to_remove_account, account);
+            }
+
+        }, null);
     }
 
     abstract class ManageLockTaskListCallback {

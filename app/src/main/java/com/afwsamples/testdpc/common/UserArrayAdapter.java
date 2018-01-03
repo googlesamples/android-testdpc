@@ -40,12 +40,12 @@ public class UserArrayAdapter extends ArrayAdapter<UserHandle> {
     private static final String TAG = "UserArrayAdapter";
 
     private UserManager mUserManager;
-    private Resources mResouces;
+    private Resources mResources;
 
     public UserArrayAdapter(Context context, int resource, List<UserHandle> userHandleList) {
         super(context, resource, userHandleList);
         mUserManager = context.getSystemService(UserManager.class);
-        mResouces = context.getResources();
+        mResources = context.getResources();
     }
 
     @Override
@@ -55,9 +55,9 @@ public class UserArrayAdapter extends ArrayAdapter<UserHandle> {
                     false);
         }
 
-        final TextView pkgNameTextView = convertView.findViewById(R.id.user_name);
-        pkgNameTextView.setText(
-                mResouces.getString(
+        final TextView userNameTextView = convertView.findViewById(R.id.user_name);
+        userNameTextView.setText(
+                mResources.getString(
                         R.string.user_string,
                         mUserManager.getSerialNumberForUser(getItem(position))));
         return convertView;
