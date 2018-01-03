@@ -65,6 +65,9 @@ public class UserRestriction {
     // TODO(68687253): Replace this hard-coded string with UserManager.DISALLOW_SYSTEM_ERROR_DIALOGS
     private static final String DISALLOW_SYSTEM_ERROR_DIALOGS = "no_system_error_dialogs";
 
+    //TODO: Replace with UserManager.DISALLOW_SHARE_INTO_MANAGED_PROFILE
+    private static final String DISALLOW_SHARE_INTO_MANAGED_PROFILE = "no_sharing_into_profile";
+
     public static final UserRestriction[] ALL_USER_RESTRICTIONS = {
             new UserRestriction(
                     ALLOW_PARENT_PROFILE_APP_LINKING,
@@ -193,6 +196,9 @@ public class UserRestriction {
             new UserRestriction(
                     DISALLOW_CONFIG_AMBIENT_DISPLAY,
                     R.string.disallow_config_ambient_display),
+            new UserRestriction(
+                    DISALLOW_SHARE_INTO_MANAGED_PROFILE,
+                    R.string.disallow_share_into_work_profile),
     };
 
     /**
@@ -237,7 +243,8 @@ public class UserRestriction {
     public static final String[] MANAGED_PROFILE_ONLY_RESTRICTIONS = {
             ALLOW_PARENT_PROFILE_APP_LINKING,
             DISALLOW_CROSS_PROFILE_COPY_PASTE,
-            DISALLOW_UNIFIED_PASSWORD
+            DISALLOW_UNIFIED_PASSWORD,
+            DISALLOW_SHARE_INTO_MANAGED_PROFILE,
     };
 
     /**
@@ -279,6 +286,7 @@ public class UserRestriction {
             DISALLOW_CONFIG_DATE_TIME,
             DISALLOW_CONFIG_BRIGHTNESS,
             DISALLOW_CONFIG_SCREEN_TIMEOUT,
-            DISALLOW_CONFIG_AMBIENT_DISPLAY
+            DISALLOW_CONFIG_AMBIENT_DISPLAY,
+            DISALLOW_SHARE_INTO_MANAGED_PROFILE,
     };
 }
