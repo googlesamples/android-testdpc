@@ -1510,9 +1510,13 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         final CheckBox skipSetupWizardCheckBox = (CheckBox) dialogView.findViewById(
                 R.id.skip_setup_wizard_checkbox);
         final CheckBox makeUserEphemeralCheckBox = (CheckBox) dialogView.findViewById(
-            R.id.make_user_ephemeral_checkbox);
+                R.id.make_user_ephemeral_checkbox);
         final CheckBox startUserInBackgroundCheckBox = (CheckBox) dialogView.findViewById(
-            R.id.start_user_in_background_checkbox);
+                R.id.start_user_in_background_checkbox);
+        if (!BuildCompat.isAtLeastP()) {
+            makeUserEphemeralCheckBox.setEnabled(false);
+            startUserInBackgroundCheckBox.setEnabled(false);
+        }
 
         new AlertDialog.Builder(getActivity())
                 .setTitle(R.string.create_and_manage_user)
