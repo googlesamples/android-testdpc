@@ -2419,7 +2419,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 (packageName2, succeed) -> showToast(
                         succeed ? R.string.clear_app_data_success : R.string.clear_app_data_failure,
                         packageName),
-                new Handler(getContext().getMainLooper()))) {
+                getActivity()::runOnUiThread)) {
             showToast(R.string.clear_app_data_failure, packageName);
         }
     }
