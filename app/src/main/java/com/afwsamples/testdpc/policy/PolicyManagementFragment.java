@@ -49,7 +49,6 @@ import android.os.AsyncTask;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.UserHandle;
 import android.os.UserManager;
 import android.provider.MediaStore;
@@ -91,10 +90,8 @@ import com.afwsamples.testdpc.common.AppInfoArrayAdapter;
 import com.afwsamples.testdpc.common.BaseSearchablePolicyPreferenceFragment;
 import com.afwsamples.testdpc.common.CertificateUtil;
 import com.afwsamples.testdpc.common.MediaDisplayFragment;
-import com.afwsamples.testdpc.common.ReflectionUtil;
 import com.afwsamples.testdpc.common.UserArrayAdapter;
 import com.afwsamples.testdpc.common.Util;
-import com.afwsamples.testdpc.common.preference.CustomConstraint;
 import com.afwsamples.testdpc.common.preference.DpcPreference;
 import com.afwsamples.testdpc.common.preference.DpcPreferenceBase;
 import com.afwsamples.testdpc.common.preference.DpcPreferenceHelper;
@@ -385,8 +382,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private Uri mImageUri;
     private Uri mVideoUri;
 
-    private CustomConstraint affiliatedUserAfterPConstraint;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         mAdminComponentName = DeviceAdminReceiver.getComponentName(getActivity());
@@ -402,15 +397,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         mImageUri = getStorageUri("image.jpg");
         mVideoUri = getStorageUri("video.mp4");
 
-        affiliatedUserAfterPConstraint =
-                () ->  BuildCompat.isAtLeastP()
-                        ? (isAffiliatedUser()
-                                ? NO_CUSTOM_CONSTRIANT
-                                : R.string.require_affiliated_user)
-                        : (mDevicePolicyManager.isDeviceOwnerApp(mPackageName)
-                                ? NO_CUSTOM_CONSTRIANT
-                                : R.string.requires_device_owner);
-
         super.onCreate(savedInstanceState);
     }
 
@@ -424,11 +410,11 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         overrideKeySelectionPreference.setSummary(overrideKeySelectionPreference.getText());
         mManageLockTaskListPreference = (DpcPreference) findPreference(MANAGE_LOCK_TASK_LIST_KEY);
         mManageLockTaskListPreference.setOnPreferenceClickListener(this);
-        mManageLockTaskListPreference.setCustomConstraint(affiliatedUserAfterPConstraint);
+        mManageLockTaskListPreference.setCustomConstraint(this::validateAffiliatedUserAfterP);
         findPreference(CHECK_LOCK_TASK_PERMITTED_KEY).setOnPreferenceClickListener(this);
         mSetLockTaskFeaturesPreference = (DpcPreference) findPreference(SET_LOCK_TASK_FEATURES_KEY);
         mSetLockTaskFeaturesPreference.setOnPreferenceClickListener(this);
-        mSetLockTaskFeaturesPreference.setCustomConstraint(affiliatedUserAfterPConstraint);
+        mSetLockTaskFeaturesPreference.setCustomConstraint(this::validateAffiliatedUserAfterP);
         findPreference(START_LOCK_TASK).setOnPreferenceClickListener(this);
         findPreference(RELAUNCH_IN_LOCK_TASK).setOnPreferenceClickListener(this);
         findPreference(STOP_LOCK_TASK).setOnPreferenceClickListener(this);
@@ -441,8 +427,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         mEnableLogoutPreference.setOnPreferenceChangeListener(this);
         mLogoutUserPreference = (DpcPreference) findPreference(LOGOUT_USER_KEY);
         mLogoutUserPreference.setOnPreferenceClickListener(this);
-        mLogoutUserPreference.setCustomConstraint(
-                () -> isAffiliatedUser() ? NO_CUSTOM_CONSTRIANT : R.string.require_affiliated_user);
+        mLogoutUserPreference.setCustomConstraint(this::validateAffiliatedUserAfterP);
         findPreference(SET_AFFILIATION_IDS_KEY).setOnPreferenceClickListener(this);
         mAffiliatedUserPreference = findPreference(AFFILIATED_USER_KEY);
         mEphemeralUserPreference = findPreference(EPHEMERAL_USER_KEY);
@@ -469,16 +454,16 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(DELEGATED_CERT_INSTALLER_KEY).setOnPreferenceClickListener(this);
         mDisableStatusBarPreference = (DpcPreference) findPreference(DISABLE_STATUS_BAR);
         mDisableStatusBarPreference.setOnPreferenceClickListener(this);
-        mDisableStatusBarPreference.setCustomConstraint(affiliatedUserAfterPConstraint);
+        mDisableStatusBarPreference.setCustomConstraint(this::validateAffiliatedUserAfterP);
         mReenableStatusBarPreference = (DpcPreference) findPreference(REENABLE_STATUS_BAR);
         mReenableStatusBarPreference.setOnPreferenceClickListener(this);
-        mReenableStatusBarPreference.setCustomConstraint(affiliatedUserAfterPConstraint);
+        mReenableStatusBarPreference.setCustomConstraint(this::validateAffiliatedUserAfterP);
         mDisableKeyguardPreference = (DpcPreference) findPreference(DISABLE_KEYGUARD);
         mDisableKeyguardPreference.setOnPreferenceClickListener(this);
-        mDisableKeyguardPreference.setCustomConstraint(affiliatedUserAfterPConstraint);
+        mDisableKeyguardPreference.setCustomConstraint(this::validateAffiliatedUserAfterP);
         mReenableKeyguardPreference = (DpcPreference) findPreference(REENABLE_KEYGUARD);
         mReenableKeyguardPreference.setOnPreferenceClickListener(this);
-        mReenableKeyguardPreference.setCustomConstraint(affiliatedUserAfterPConstraint);
+        mReenableKeyguardPreference.setCustomConstraint(this::validateAffiliatedUserAfterP);
         findPreference(START_KIOSK_MODE).setOnPreferenceClickListener(this);
         mStayOnWhilePluggedInSwitchPreference = (SwitchPreference) findPreference(
                 STAY_ON_WHILE_PLUGGED_IN);
@@ -1834,7 +1819,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     @TargetApi(28)
     private void reloadAffiliatedApis() {
         if (mAffiliatedUserPreference.isEnabled()) {
-            mAffiliatedUserPreference.setSummary(isAffiliatedUser() ? R.string.yes : R.string.no);
+            mAffiliatedUserPreference.setSummary(
+                    mDevicePolicyManager.isAffiliatedUser() ? R.string.yes : R.string.no);
         }
         mManageLockTaskListPreference.refreshEnabledState();
         mSetLockTaskFeaturesPreference.refreshEnabledState();
@@ -2748,17 +2734,13 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 .replace(R.id.container, fragment, tag).commit();
     }
 
-    @TargetApi(Build.VERSION_CODES.CUR_DEVELOPMENT)
+    @TargetApi(28)
     private void relaunchInLockTaskMode() {
         final Intent intent = new Intent(getActivity(), getActivity().getClass());
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
         final ActivityOptions options = ActivityOptions.makeBasic();
-        try {
-            ReflectionUtil.invoke(options, "setLockTaskMode", new Class[]{boolean.class}, true);
-        } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
-            Log.e(TAG, "Failed to invoke ActivityOptions.setLockTaskMode()", e);
-        }
+        options.setLockTaskMode(true);
 
         try {
             startActivity(intent, options.toBundle());
@@ -2812,15 +2794,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         getActivity().startActivity(intent);
     }
 
-    @TargetApi(28)
-    private boolean isAffiliatedUser() {
-        try {
-            return (boolean) ReflectionUtil.invoke(mDevicePolicyManager, "isAffiliatedUser");
-        } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
-            return false;
-        }
-    }
-
     private void chooseAccount() {
         if (getActivity() == null || getActivity().isFinishing()) {
             return;
@@ -2858,6 +2831,23 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             }
 
         }, null);
+    }
+
+    @TargetApi(28)
+    private int validateAffiliatedUserAfterP() {
+        if (BuildCompat.isAtLeastP()) {
+            if (mDevicePolicyManager.isAffiliatedUser()) {
+                return NO_CUSTOM_CONSTRIANT;
+            } else {
+                return R.string.require_affiliated_user;
+            }
+        } else {
+            if (mDevicePolicyManager.isDeviceOwnerApp(mPackageName)) {
+               return NO_CUSTOM_CONSTRIANT;
+            } else {
+                return R.string.requires_device_owner;
+            }
+        }
     }
 
     abstract class ManageLockTaskListCallback {
