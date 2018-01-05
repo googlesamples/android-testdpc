@@ -104,6 +104,7 @@
     <string name="primary_user">primary user</string>
     <string name="secondary_user">secondary user</string>
     <string name="managed_profile">managed profile</string>
+    <string name="requires_device_owner">Requires device owner</string>
 
     <string name="not_for_parent_profile">Not applicable to parent profile</string>
     <string name="user_restricted">Disallowed by user restriction</string>

@@ -94,6 +94,7 @@ import com.afwsamples.testdpc.common.MediaDisplayFragment;
 import com.afwsamples.testdpc.common.ReflectionUtil;
 import com.afwsamples.testdpc.common.UserArrayAdapter;
 import com.afwsamples.testdpc.common.Util;
+import com.afwsamples.testdpc.common.preference.CustomConstraint;
 import com.afwsamples.testdpc.common.preference.DpcPreference;
 import com.afwsamples.testdpc.common.preference.DpcPreferenceBase;
 import com.afwsamples.testdpc.common.preference.DpcPreferenceHelper;
@@ -354,6 +355,11 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private SwitchPreference mDisableScreenCaptureSwitchPreference;
     private SwitchPreference mMuteAudioSwitchPreference;
 
+    private DpcPreference mDisableStatusBarPreference;
+    private DpcPreference mReenableStatusBarPreference;
+    private DpcPreference mDisableKeyguardPreference;
+    private DpcPreference mReenableKeyguardPreference;
+
     private SwitchPreference mStayOnWhilePluggedInSwitchPreference;
     private DpcSwitchPreference mInstallNonMarketAppsPreference;
 
@@ -362,6 +368,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private SwitchPreference mEnableNetworkLoggingPreference;
     private SwitchPreference mSetAutoTimeRequiredPreference;
     private DpcPreference mLogoutUserPreference;
+    private DpcPreference mManageLockTaskListPreference;
+    private DpcPreference mSetLockTaskFeaturesPreference;
+
     private DpcSwitchPreference mEnableLogoutPreference;
     private Preference mAffiliatedUserPreference;
     private Preference mEphemeralUserPreference;
@@ -375,6 +384,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     private Uri mImageUri;
     private Uri mVideoUri;
+
+    private CustomConstraint affiliatedUserAfterPConstraint;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -390,6 +401,16 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
         mImageUri = getStorageUri("image.jpg");
         mVideoUri = getStorageUri("video.mp4");
+
+        affiliatedUserAfterPConstraint =
+                () ->  BuildCompat.isAtLeastP()
+                        ? (isAffiliatedUser()
+                                ? NO_CUSTOM_CONSTRIANT
+                                : R.string.require_affiliated_user)
+                        : (mDevicePolicyManager.isDeviceOwnerApp(mPackageName)
+                                ? NO_CUSTOM_CONSTRIANT
+                                : R.string.requires_device_owner);
+
         super.onCreate(savedInstanceState);
     }
 
@@ -401,9 +422,13 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 (EditTextPreference) findPreference(OVERRIDE_KEY_SELECTION_KEY);
         overrideKeySelectionPreference.setOnPreferenceChangeListener(this);
         overrideKeySelectionPreference.setSummary(overrideKeySelectionPreference.getText());
-        findPreference(MANAGE_LOCK_TASK_LIST_KEY).setOnPreferenceClickListener(this);
+        mManageLockTaskListPreference = (DpcPreference) findPreference(MANAGE_LOCK_TASK_LIST_KEY);
+        mManageLockTaskListPreference.setOnPreferenceClickListener(this);
+        mManageLockTaskListPreference.setCustomConstraint(affiliatedUserAfterPConstraint);
         findPreference(CHECK_LOCK_TASK_PERMITTED_KEY).setOnPreferenceClickListener(this);
-        findPreference(SET_LOCK_TASK_FEATURES_KEY).setOnPreferenceClickListener(this);
+        mSetLockTaskFeaturesPreference = (DpcPreference) findPreference(SET_LOCK_TASK_FEATURES_KEY);
+        mSetLockTaskFeaturesPreference.setOnPreferenceClickListener(this);
+        mSetLockTaskFeaturesPreference.setCustomConstraint(affiliatedUserAfterPConstraint);
         findPreference(START_LOCK_TASK).setOnPreferenceClickListener(this);
         findPreference(RELAUNCH_IN_LOCK_TASK).setOnPreferenceClickListener(this);
         findPreference(STOP_LOCK_TASK).setOnPreferenceClickListener(this);
@@ -442,10 +467,18 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(CLEAR_GLOBAL_HTTP_PROXY_KEY).setOnPreferenceClickListener(this);
         findPreference(NETWORK_STATS_KEY).setOnPreferenceClickListener(this);
         findPreference(DELEGATED_CERT_INSTALLER_KEY).setOnPreferenceClickListener(this);
-        findPreference(DISABLE_STATUS_BAR).setOnPreferenceClickListener(this);
-        findPreference(REENABLE_STATUS_BAR).setOnPreferenceClickListener(this);
-        findPreference(DISABLE_KEYGUARD).setOnPreferenceClickListener(this);
-        findPreference(REENABLE_KEYGUARD).setOnPreferenceClickListener(this);
+        mDisableStatusBarPreference = (DpcPreference) findPreference(DISABLE_STATUS_BAR);
+        mDisableStatusBarPreference.setOnPreferenceClickListener(this);
+        mDisableStatusBarPreference.setCustomConstraint(affiliatedUserAfterPConstraint);
+        mReenableStatusBarPreference = (DpcPreference) findPreference(REENABLE_STATUS_BAR);
+        mReenableStatusBarPreference.setOnPreferenceClickListener(this);
+        mReenableStatusBarPreference.setCustomConstraint(affiliatedUserAfterPConstraint);
+        mDisableKeyguardPreference = (DpcPreference) findPreference(DISABLE_KEYGUARD);
+        mDisableKeyguardPreference.setOnPreferenceClickListener(this);
+        mDisableKeyguardPreference.setCustomConstraint(affiliatedUserAfterPConstraint);
+        mReenableKeyguardPreference = (DpcPreference) findPreference(REENABLE_KEYGUARD);
+        mReenableKeyguardPreference.setOnPreferenceClickListener(this);
+        mReenableKeyguardPreference.setCustomConstraint(affiliatedUserAfterPConstraint);
         findPreference(START_KIOSK_MODE).setOnPreferenceClickListener(this);
         mStayOnWhilePluggedInSwitchPreference = (SwitchPreference) findPreference(
                 STAY_ON_WHILE_PLUGGED_IN);
@@ -1803,7 +1836,13 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         if (mAffiliatedUserPreference.isEnabled()) {
             mAffiliatedUserPreference.setSummary(isAffiliatedUser() ? R.string.yes : R.string.no);
         }
+        mManageLockTaskListPreference.refreshEnabledState();
+        mSetLockTaskFeaturesPreference.refreshEnabledState();
         mLogoutUserPreference.refreshEnabledState();
+        mDisableStatusBarPreference.refreshEnabledState();
+        mReenableStatusBarPreference.refreshEnabledState();
+        mDisableKeyguardPreference.refreshEnabledState();
+        mReenableKeyguardPreference.refreshEnabledState();
     }
 
     @TargetApi(28)

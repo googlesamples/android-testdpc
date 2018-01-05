@@ -354,22 +354,26 @@
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="disable_status_bar"
             android:title="@string/disable_status_bar"
-            testdpc:user="primaryUser"
+            testdpc:admin="deviceOwner|profileOwner"
+            testdpc:user="notManagedProfile"
             testdpc:minSdkVersion="M" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="reenable_status_bar"
             android:title="@string/reenable_status_bar"
-            testdpc:user="primaryUser"
+            testdpc:admin="deviceOwner|profileOwner"
+            testdpc:user="notManagedProfile"
             testdpc:minSdkVersion="M" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="disable_keyguard"
             android:title="@string/disable_keyguard"
-            testdpc:user="primaryUser"
+            testdpc:admin="deviceOwner|profileOwner"
+            testdpc:user="notManagedProfile"
             testdpc:minSdkVersion="M" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="reenable_keyguard"
             android:title="@string/reenable_keyguard"
-            testdpc:user="primaryUser"
+            testdpc:admin="deviceOwner|profileOwner"
+            testdpc:user="notManagedProfile"
             testdpc:minSdkVersion="M" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="start_kiosk_mode"
