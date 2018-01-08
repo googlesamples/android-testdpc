@@ -552,4 +552,12 @@
             android:title="@string/attest_preference_title"
             testdpc:minSdkVersion="L" />
     </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/cross_profile_section">
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="cross_profile_apps"
+            android:title="@string/cross_profile_apps_api"
+            testdpc:admin="any"
+            testdpc:minSdkVersion="P"/>
+    </PreferenceCategory>
 </PreferenceScreen>

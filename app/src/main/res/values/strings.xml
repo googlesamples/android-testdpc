@@ -877,4 +877,10 @@
     <string name="package_added_notification_text">%1$s is added</string>
     <string name="package_removed_notification_text">%1$s is removed</string>
 
+    <string name="cross_profile_section">Cross profile</string>
+    <string name="cross_profile_apps_api">Demonstrate CrossProfileApps API</string>
+    <string name="cross_profile_apps_api_explanation">By using the CrossProfileApps APIs, apps can start an instance in another profile, provided that the app is also installed in that profile.</string>
+    <string name="cross_profile_apps_available">TestDPC is installed in another profile, tap the icon to launch it in that profile.</string>
+    <string name="cross_profile_apps_not_available">TestDPC is not installed in another profile, try installing it and come back to here.</string>
+
 </resources>
