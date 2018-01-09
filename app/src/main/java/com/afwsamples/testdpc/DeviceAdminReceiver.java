@@ -28,6 +28,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Binder;
 import android.os.Build;
 import android.os.ParcelFileDescriptor;
 import android.os.Process;
@@ -449,6 +450,12 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
         }
     }
 
+    @Override
+    public void onEnabled(Context context, Intent intent) {
+        UserManager userManager = (UserManager) context.getSystemService(Context.USER_SERVICE);
+        long serialNumber = userManager.getSerialNumberForUser(Binder.getCallingUserHandle());
+        Log.i(TAG, "Device admin enabled in user with serial number: " + serialNumber);
+    }
 
     private static File logFile(Context context) {
         File parent = context.getDir(LOGS_DIR, Context.MODE_PRIVATE);

@@ -91,6 +91,7 @@ import com.afwsamples.testdpc.common.AppInfoArrayAdapter;
 import com.afwsamples.testdpc.common.BaseSearchablePolicyPreferenceFragment;
 import com.afwsamples.testdpc.common.CertificateUtil;
 import com.afwsamples.testdpc.common.MediaDisplayFragment;
+import com.afwsamples.testdpc.common.ReflectionUtil;
 import com.afwsamples.testdpc.common.UserArrayAdapter;
 import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.common.preference.DpcPreference;
@@ -282,6 +283,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String REMOVE_KEY_CERTIFICATE_KEY = "remove_key_certificate";
     private static final String REMOVE_USER_KEY = "remove_user";
     private static final String SWITCH_USER_KEY = "switch_user";
+    private static final String START_USER_IN_BACKGROUND_KEY = "start_user_in_background";
     private static final String STOP_USER_KEY = "stop_user";
     private static final String LOGOUT_USER_KEY = "logout_user";
     private static final String ENABLE_LOGOUT_KEY ="enable_logout";
@@ -424,6 +426,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(CREATE_AND_MANAGE_USER_KEY).setOnPreferenceClickListener(this);
         findPreference(REMOVE_USER_KEY).setOnPreferenceClickListener(this);
         findPreference(SWITCH_USER_KEY).setOnPreferenceClickListener(this);
+        findPreference(START_USER_IN_BACKGROUND_KEY).setOnPreferenceClickListener(this);
         findPreference(STOP_USER_KEY).setOnPreferenceClickListener(this);
         mEnableLogoutPreference = (DpcSwitchPreference) findPreference(ENABLE_LOGOUT_KEY);
         mEnableLogoutPreference.setOnPreferenceChangeListener(this);
@@ -731,6 +734,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 return true;
             case SWITCH_USER_KEY:
                 showSwitchUserPrompt();
+                return true;
+            case START_USER_IN_BACKGROUND_KEY:
+                showStartUserInBackgroundPrompt();
                 return true;
             case STOP_USER_KEY:
                 showStopUserPrompt();
@@ -1535,11 +1541,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 R.id.skip_setup_wizard_checkbox);
         final CheckBox makeUserEphemeralCheckBox = (CheckBox) dialogView.findViewById(
                 R.id.make_user_ephemeral_checkbox);
-        final CheckBox startUserInBackgroundCheckBox = (CheckBox) dialogView.findViewById(
-                R.id.start_user_in_background_checkbox);
         if (!BuildCompat.isAtLeastP()) {
             makeUserEphemeralCheckBox.setEnabled(false);
-            startUserInBackgroundCheckBox.setEnabled(false);
         }
 
         new AlertDialog.Builder(getActivity())
@@ -1556,9 +1559,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                             }
                             if (makeUserEphemeralCheckBox.isChecked()){
                                 flags |= DevicePolicyManager.MAKE_USER_EPHEMERAL;
-                            }
-                            if (startUserInBackgroundCheckBox.isChecked()){
-                                flags |= DevicePolicyManager.START_USER_IN_BACKGROUND;
                             }
 
                             UserHandle userHandle = mDevicePolicyManager.createAndManageUser(
@@ -1648,6 +1648,29 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             boolean success =
                     mDevicePolicyManager.switchUser(mAdminComponentName, userHandle);
             showToast(success ? R.string.user_switched : R.string.failed_to_switch_user);
+        });
+    }
+
+    /**
+     * For starting user in background:
+     * Shows a prompt for choosing a user to be started in background.
+     */
+    @TargetApi(28)
+    private void showStartUserInBackgroundPrompt() {
+        showChooseUserPrompt(R.string.start_user_in_background, userHandle -> {
+            boolean success = false;
+            try {
+                success = (boolean) ReflectionUtil.invoke(
+                        mDevicePolicyManager,
+                        "startUserInBackground",
+                        mAdminComponentName,
+                        userHandle);
+            } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
+                Log.e(TAG,"Can't invoke startUserInBackground", e);
+            }
+            showToast(success
+                    ? R.string.user_started_in_background
+                    : R.string.failed_to_start_user_in_background);
         });
     }
 
