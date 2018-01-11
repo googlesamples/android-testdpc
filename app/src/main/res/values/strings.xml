@@ -563,6 +563,9 @@
     <string name="user_logouted">User logouted.</string>
     <string name="failed_to_logout_user">Failed to logout user.</string>
     <string name="enable_logout">Enable logout</string>
+    <string name="set_user_session_message">Set user session message</string>
+    <string name="enter_start_session_message">Enter start session message</string>
+    <string name="enter_end_session_message">Enter end session message</string>
     <string name="affiliated_user">Affiliated user</string>
     <string name="ephemeral_user">Ephemeral user</string>
     <string name="on_user_added_title">User Created</string>
