@@ -73,7 +73,9 @@ public class CrossProfileAppsFragment extends Fragment {
         mDescriptionTextView.setText(R.string.cross_profile_apps_available);
         mSwitchProfileImageView.setOnClickListener(
                 view -> startMainActivity(
-                        new ComponentName(getActivity(), LaunchActivity.class), userHandle));
+                        new ComponentName(getActivity(),
+                            PolicyManagementActivity.class),
+                            userHandle));
     }
 
     private void startMainActivity(ComponentName componentName, UserHandle userHandle) {

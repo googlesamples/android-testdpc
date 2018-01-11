@@ -29,14 +29,12 @@ import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.os.BuildCompat;
-import android.util.ArrayMap;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,7 +46,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.afwsamples.testdpc.DeviceAdminReceiver;
-import com.afwsamples.testdpc.LaunchActivity;
+import com.afwsamples.testdpc.PolicyManagementActivity;
 import com.afwsamples.testdpc.R;
 
 import java.util.ArrayList;
@@ -166,7 +164,7 @@ public class KioskModeActivity extends Activity {
                 PackageManager.COMPONENT_ENABLED_STATE_DEFAULT,
                 PackageManager.DONT_KILL_APP);
         finish();
-        startActivity(new Intent(this, LaunchActivity.class));
+        startActivity(new Intent(this, PolicyManagementActivity.class));
     }
 
     private void setUserRestriction(String restriction, boolean disallow) {

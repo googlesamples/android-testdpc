@@ -30,9 +30,11 @@ import android.os.RemoteException;
 import android.os.UserHandle;
 import android.support.annotation.Nullable;
 import android.util.Log;
+
 import com.afwsamples.testdpc.DeviceAdminReceiver;
-import com.afwsamples.testdpc.LaunchActivity;
+import com.afwsamples.testdpc.PolicyManagementActivity;
 import com.afwsamples.testdpc.common.Util;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 
@@ -75,7 +77,7 @@ public class ProfileOwnerService extends Service {
         @Override
         public void setLauncherIconHidden(boolean hidden) throws RemoteException {
             mPm.setComponentEnabledSetting(
-                    new ComponentName(mContext, LaunchActivity.class),
+                    new ComponentName(mContext, PolicyManagementActivity.class),
                     hidden ? COMPONENT_ENABLED_STATE_DISABLED : COMPONENT_ENABLED_STATE_DEFAULT,
                     DONT_KILL_APP);
         }
@@ -83,7 +85,7 @@ public class ProfileOwnerService extends Service {
         @Override
         public boolean isLauncherIconHidden() throws RemoteException {
             return mPm.getComponentEnabledSetting(
-                    new ComponentName(mContext, LaunchActivity.class))
+                    new ComponentName(mContext, PolicyManagementActivity.class))
                     == COMPONENT_ENABLED_STATE_DISABLED;
         }
 
