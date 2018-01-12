@@ -9,6 +9,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.os.BuildCompat;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -16,6 +17,7 @@ import android.widget.ListView;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 
+import com.afwsamples.testdpc.common.ReflectionUtil;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -71,6 +73,16 @@ public class ProcessLogsFragment extends ListFragment {
             for (SecurityEvent event : logs) {
                 StringBuilder sb = new StringBuilder();
                 sb.append(getStringEventTagFromId(event.getTag()));
+                if (BuildCompat.isAtLeastP()) {
+                    long id;
+                    try {
+                        id = (long) ReflectionUtil.invoke(event, "getId");
+                    } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
+                        Log.e(TAG, "Can't invoke getId()", e);
+                        id = 0;
+                    }
+                    sb.append(" (id: " + id + ")");
+                }
                 sb.append(" (").append(new Date(TimeUnit.NANOSECONDS.toMillis(
                         event.getTimeNanos()))).append("): ");
                 printData(sb, event.getData());
