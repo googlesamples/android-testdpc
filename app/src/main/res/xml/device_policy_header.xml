@@ -521,6 +521,11 @@
             testdpc:admin="deviceOwner"
             testdpc:minSdkVersion="O" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="request_network_logs"
+            android:title="@string/request_network_logs"
+            testdpc:admin="deviceOwner"
+            testdpc:minSdkVersion="O" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="request_bugreport"
             android:title="@string/request_bugreport"
             testdpc:admin="deviceOwner"

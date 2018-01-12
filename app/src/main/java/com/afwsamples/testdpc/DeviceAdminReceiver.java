@@ -73,6 +73,8 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
     public static final String ACTION_PASSWORD_REQUIREMENTS_CHANGED =
             "com.afwsamples.testdpc.policy.PASSWORD_REQUIREMENTS_CHANGED";
 
+    public static final String NETWORK_LOGS_FILE_PREFIX = "network_logs_";
+
     private static final String LOGS_DIR = "logs";
 
     private static final String FAILED_PASSWORD_LOG_FILE =
@@ -129,7 +131,7 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
         if (events == null) {
             Log.e(TAG, "Failed to retrieve network logs batch with batchToken: " + batchToken);
             Toast.makeText(context,
-                    context.getString(R.string.on_network_logs_available_failure, batchToken),
+                    context.getString(R.string.on_network_logs_available_token_failure, batchToken),
                     Toast.LENGTH_LONG)
                     .show();
             return;
@@ -155,23 +157,25 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
         } else {
             events.forEach(event -> loggedEvents.add(event.toString()));
         }
-        new EventSavingTask(context, loggedEvents).execute();
+        new EventSavingTask(context, batchToken, loggedEvents).execute();
     }
 
     private static class EventSavingTask extends AsyncTask<Void, Void, Void> {
 
         private Context mContext;
+        private long mBatchToken;
         private List<String> mLoggedEvents;
 
-        public EventSavingTask(Context context, ArrayList<String> loggedEvents) {
+        public EventSavingTask(Context context, long batchToken, ArrayList<String> loggedEvents) {
             mContext = context;
+            mBatchToken = batchToken;
             mLoggedEvents = loggedEvents;
         }
 
         @Override
         protected Void doInBackground(Void... params) {
-            String filename = "network_logs_"
-                    + new Date().toString().replaceAll("\\s+","_") + ".txt";
+            Date timestamp = new Date();
+            String filename = NETWORK_LOGS_FILE_PREFIX + mBatchToken + "_" + timestamp.getTime() + ".txt";
             File file = new File(mContext.getExternalFilesDir(null), filename);
             try (OutputStream os = new FileOutputStream(file)) {
                 for (String event : mLoggedEvents) {

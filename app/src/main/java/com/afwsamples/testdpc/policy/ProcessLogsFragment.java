@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2018 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.afwsamples.testdpc.policy;
 
 import android.annotation.TargetApi;
@@ -13,13 +29,10 @@ import android.support.v4.os.BuildCompat;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
-
 import com.afwsamples.testdpc.common.ReflectionUtil;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -56,12 +69,6 @@ public class ProcessLogsFragment extends ListFragment {
             Log.e(TAG, "Exception thrown when trying to retrieve security logs", e);
             mAdapter.add(getString(R.string.exception_retrieving_process_logs));
         }
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        mAdapter = null;
     }
 
     private void processEvents(List<SecurityEvent> logs) {

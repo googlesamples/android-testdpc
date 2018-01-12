@@ -108,6 +108,7 @@
 
     <string name="not_for_parent_profile">Not applicable to parent profile</string>
     <string name="user_restricted">Disallowed by user restriction</string>
+    <string name="requires_network_logs">Requires network logging to be enabled</string>
     <string name="requires_process_logs">Requires process logging to be enabled</string>
     <string name="not_for_password_quality">Not applicable to current password quality</string>
 
@@ -488,8 +489,11 @@
 
     <!-- Network logging -->
     <string name="enable_network_logging">Enable network logging</string>
+    <string name="request_network_logs">Request network logs</string>
+    <string name="on_network_logs_available">Test DPC: Network logs ready to be retrieved</string>
     <string name="on_network_logs_available_success">Test DPC: Network logs batch %d retrieved</string>
-    <string name="on_network_logs_available_failure">Test DPC: Could not retrieve network logs batch %d</string>
+    <string name="on_network_logs_available_failure">Test DPC: Could not retrieve network logs</string>
+    <string name="on_network_logs_available_token_failure">Test DPC: Could not retrieve network logs batch %d</string>
 
     <!-- Accessibility -->
     <string name="accessibility_title">Accessibility</string>
