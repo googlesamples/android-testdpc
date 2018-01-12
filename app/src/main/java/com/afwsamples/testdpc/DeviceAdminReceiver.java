@@ -35,11 +35,13 @@ import android.os.UserHandle;
 import android.os.UserManager;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.os.BuildCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.afwsamples.testdpc.common.NotificationUtil;
+import com.afwsamples.testdpc.common.ReflectionUtil;
 import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.policy.UserRestriction;
 import com.afwsamples.testdpc.provision.PostProvisioningTask;
@@ -138,7 +140,20 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
                 .show();
 
         ArrayList<String> loggedEvents = new ArrayList<String>();
-        events.forEach(event -> loggedEvents.add(event.toString()));
+        if (BuildCompat.isAtLeastP()) {
+            for (NetworkEvent event : events) {
+                long id;
+                try {
+                    id = (long) ReflectionUtil.invoke(event, "getId");
+                } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
+                    Log.e(TAG, "Can't invoke getId()", e);
+                    id = 0;
+                }
+                loggedEvents.add("(id:" + id + ")" + event.toString());
+            }
+        } else {
+            events.forEach(event -> loggedEvents.add(event.toString()));
+        }
         new EventSavingTask(context, loggedEvents).execute();
     }
 
