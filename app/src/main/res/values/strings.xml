@@ -622,6 +622,10 @@
     <string name="system_update_policy_window_start_label">Maintenance window start:</string>
     <string name="system_update_policy_window_end_label">Maintenance window end:</string>
     <string name="system_update_policy_set_policy">Set new policy</string>
+    <string name="system_update_policy_window_freeze_period_label">Freeze Periods:</string>
+    <string name="system_update_policy_add_freeze_period">Add new period</string>
+    <string name="system_update_policy_pick_start_free_period_title">Pick start of freeze period</string>
+    <string name="system_update_policy_pick_end_free_period_title">Pick end of freeze period</string>
 
     <!-- Strings for pending update info checking -->
     <string name="system_update_pending">Check pending system update</string>
