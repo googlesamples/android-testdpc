@@ -30,12 +30,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
         <CheckBox android:id="@+id/skip_setup_wizard_checkbox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/skip_setup_wizard"/>
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:text="@string/skip_setup_wizard"/>
         <CheckBox android:id="@+id/make_user_ephemeral_checkbox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/make_user_ephemeral"/>
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:text="@string/make_user_ephemeral"/>
+        <CheckBox android:id="@+id/leave_all_system_apps_enabled_checkbox"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:text="@string/leave_all_system_apps_enabled"/>
     </LinearLayout>
 </ScrollView>

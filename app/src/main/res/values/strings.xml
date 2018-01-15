@@ -255,11 +255,11 @@
 
     <!-- Strings for managing apps -->
     <string name="apps_management_title">Apps management</string>
+    <string name="package_name_hints">Package name</string>
+    <string name="package_name_error">Package not found: %s</string>
     <string name="enable_system_apps_title">Enable system apps</string>
     <string name="enable_system_apps_by_package_name">Enable a system app by package name</string>
-    <string name="enable_system_apps_by_package_name_hints">Package name</string>
     <string name="enable_system_apps_by_package_name_success_msg">%s is enabled.</string>
-    <string name="enable_system_apps_by_package_name_error">Package not found.</string>
     <string name="enable_system_apps_by_intent">Enable a system app by intent</string>
     <string name="enable_system_apps_failure_msg">Failed to enable system apps that receive the
         given intent
@@ -267,6 +267,10 @@
     <string name="enable_system_apps_attempt_msg">Enabled system apps that receive the given intent
     </string>
     <string name="no_disabled_system_apps">All system apps have been enabled.</string>
+    <string name="install_existing_packages_title">Install existing package</string>
+    <string name="install_existing_packages_by_package_title">Install existing package by package</string>
+    <string name="install_existing_packages_success_msg">%s is installed.</string>
+    <string name="no_uninstalled_apps">All cached apps have been installed.</string>
     <string name="enable">Enable</string>
     <string name="invalid_system_apps_action">Invalid action</string>
     <string name="hide_apps_title">Hide apps</string>
@@ -290,6 +294,9 @@
     <string name="clear_app_data_empty">No apps available.</string>
     <string name="clear_app_data_success">%s data is now cleared.</string>
     <string name="clear_app_data_failure">%s data cannot be cleared.</string>
+    <string name="keep_uninstalled_packages">Keep uninstalled packages</string>
+    <string name="enter_package_name">Enter package name</string>
+    <string name="package_name_empty_error">Package name cannot be empty</string>>
 
     <!-- Strings for lock task -->
     <string name="lock_task_title">Lock task</string>
@@ -545,6 +552,7 @@
     <string name="start_user_in_background">Start user in background</string>
     <string name="user_started_in_background">User started in background.</string>
     <string name="failed_to_start_user_in_background">Failed to start user in background.</string>
+    <string name="leave_all_system_apps_enabled">Leave all system apps enabled</string>
     <string name="user_created">Successfully created user with serial number %1$d.</string>
     <string name="user_string">User %1$d</string>
     <string name="enter_username_hint">Enter a username</string>
