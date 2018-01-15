@@ -545,6 +545,14 @@
             testdpc:minSdkVersion="O_MR1" />
     </PreferenceCategory>
 
+    <PreferenceCategory android:title="@string/printing_settings">
+        <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
+            android:key="enable_printing"
+            android:title="@string/printing_enabled"
+            testdpc:admin="deviceOwner|profileOwner"
+            testdpc:minSdkVersion="P" />
+    </PreferenceCategory>
+
     <PreferenceCategory android:title="@string/safetynet_preference_title">
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="safetynet_attest"
