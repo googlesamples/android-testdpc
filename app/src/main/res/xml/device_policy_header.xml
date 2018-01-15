@@ -421,6 +421,12 @@
             testdpc:user="primaryUser"
             testdpc:minSdkVersion="P" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
+                android:key="start_user_in_background"
+                android:title="@string/start_user_in_background"
+                testdpc:admin="deviceOwner"
+                testdpc:user="primaryUser"
+                testdpc:minSdkVersion="P" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="stop_user"
             android:title="@string/stop_user"
             testdpc:admin="deviceOwner"

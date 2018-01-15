@@ -543,6 +543,8 @@
     <string name="skip_setup_wizard">Skip setup wizard</string>
     <string name="make_user_ephemeral">Make user ephemeral</string>
     <string name="start_user_in_background">Start user in background</string>
+    <string name="user_started_in_background">User started in background.</string>
+    <string name="failed_to_start_user_in_background">Failed to start user in background.</string>
     <string name="user_created">Successfully created user with serial number %1$d.</string>
     <string name="user_string">User %1$d</string>
     <string name="enter_username_hint">Enter a username</string>
