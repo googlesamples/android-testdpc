@@ -94,6 +94,7 @@ import com.afwsamples.testdpc.common.MediaDisplayFragment;
 import com.afwsamples.testdpc.common.ReflectionUtil;
 import com.afwsamples.testdpc.common.UserArrayAdapter;
 import com.afwsamples.testdpc.common.Util;
+import com.afwsamples.testdpc.common.preference.DpcEditTextPreference;
 import com.afwsamples.testdpc.common.preference.DpcPreference;
 import com.afwsamples.testdpc.common.preference.DpcPreferenceBase;
 import com.afwsamples.testdpc.common.preference.DpcPreferenceHelper;
@@ -289,6 +290,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String STOP_USER_KEY = "stop_user";
     private static final String LOGOUT_USER_KEY = "logout_user";
     private static final String ENABLE_LOGOUT_KEY ="enable_logout";
+    private static final String SET_USER_SESSION_MESSAGE_KEY = "set_user_session_message";
     private static final String AFFILIATED_USER_KEY = "affiliated_user";
     private static final String EPHEMERAL_USER_KEY = "ephemeral_user";
     private static final String REQUEST_BUGREPORT_KEY = "request_bugreport";
@@ -438,6 +440,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(STOP_USER_KEY).setOnPreferenceClickListener(this);
         mEnableLogoutPreference = (DpcSwitchPreference) findPreference(ENABLE_LOGOUT_KEY);
         mEnableLogoutPreference.setOnPreferenceChangeListener(this);
+        findPreference(SET_USER_SESSION_MESSAGE_KEY).setOnPreferenceClickListener(this);
         mLogoutUserPreference = (DpcPreference) findPreference(LOGOUT_USER_KEY);
         mLogoutUserPreference.setOnPreferenceClickListener(this);
         mLogoutUserPreference.setCustomConstraint(this::validateAffiliatedUserAfterP);
@@ -768,6 +771,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 return true;
             case LOGOUT_USER_KEY:
                 logoutUser();
+                return true;
+            case SET_USER_SESSION_MESSAGE_KEY:
+                showFragment(new SetUserSessionMessageFragment());
                 return true;
             case SET_AFFILIATION_IDS_KEY:
                 showFragment(new ManageAffiliationIdsFragment());

@@ -453,6 +453,12 @@
             testdpc:user="primaryUser"
             testdpc:minSdkVersion="P" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="set_user_session_message"
+            android:title="@string/set_user_session_message"
+            testdpc:admin="deviceOwner"
+            testdpc:user="primaryUser"
+            testdpc:minSdkVersion="P" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="set_affiliation_ids"
             android:title="@string/manage_affiliation_ids"
             testdpc:admin="deviceOwner|profileOwner"
