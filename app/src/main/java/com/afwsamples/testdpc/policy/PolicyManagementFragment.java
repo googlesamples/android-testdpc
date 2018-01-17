@@ -212,6 +212,7 @@ import java.util.stream.Collectors;
  * <li> {@link DevicePolicyManager#setShortSupportMessage(ComponentName, CharSequence)} </li>
  * <li> {@link DevicePolicyManager#setLongSupportMessage(ComponentName, CharSequence)} </li>
  * <li> {@link UserManager#DISALLOW_CONFIG_WIFI} </li>
+ * <li> {@link DevicePolicyManager#installExistingPackage(ComponentName, String)} </li>
  * </ul>
  */
 public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFragment implements
@@ -256,6 +257,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String ENABLE_SYSTEM_APPS_BY_PACKAGE_NAME_KEY
             = "enable_system_apps_by_package_name";
     private static final String ENABLE_SYSTEM_APPS_KEY = "enable_system_apps";
+    private static final String INSTALL_EXISTING_PACKAGE_KEY = "install_existing_packages";
     private static final String GET_CA_CERTIFICATES_KEY = "get_ca_certificates";
     private static final String GET_DISABLE_ACCOUNT_MANAGEMENT_KEY
             = "get_disable_account_management";
@@ -322,6 +324,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String UNHIDE_APPS_KEY = "unhide_apps";
     private static final String UNSUSPEND_APPS_KEY = "unsuspend_apps";
     private static final String CLEAR_APP_DATA_KEY = "clear_app_data";
+    private static final String KEEP_UNINSTALLED_PACKAGES = "keep_uninstalled_packages";
     private static final String WIPE_DATA_KEY = "wipe_data";
     private static final String PERSISTENT_DEVICE_OWNER_KEY = "persistent_device_owner";
     private static final String CREATE_WIFI_CONFIGURATION_KEY = "create_wifi_configuration";
@@ -352,6 +355,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private UserManager mUserManager;
     private TelephonyManager mTelephonyManager;
     private AccountManager mAccountManager;
+
+    private DpcPreference mInstallExistingPackagePreference;
+    private DpcPreference mKeepUninstalledPackagesPreference;
 
     private SwitchPreference mDisableCameraSwitchPreference;
     private SwitchPreference mDisableScreenCaptureSwitchPreference;
@@ -510,11 +516,19 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(ENABLE_SYSTEM_APPS_KEY).setOnPreferenceClickListener(this);
         findPreference(ENABLE_SYSTEM_APPS_BY_PACKAGE_NAME_KEY).setOnPreferenceClickListener(this);
         findPreference(ENABLE_SYSTEM_APPS_BY_INTENT_KEY).setOnPreferenceClickListener(this);
+        mInstallExistingPackagePreference =
+                (DpcPreference) findPreference(INSTALL_EXISTING_PACKAGE_KEY);
+        mInstallExistingPackagePreference.setOnPreferenceClickListener(this);
+        mInstallExistingPackagePreference.setCustomConstraint(this::validateAffiliatedUserAfterP);
         findPreference(HIDE_APPS_KEY).setOnPreferenceClickListener(this);
         findPreference(UNHIDE_APPS_KEY).setOnPreferenceClickListener(this);
         findPreference(SUSPEND_APPS_KEY).setOnPreferenceClickListener(this);
         findPreference(UNSUSPEND_APPS_KEY).setOnPreferenceClickListener(this);
         findPreference(CLEAR_APP_DATA_KEY).setOnPreferenceClickListener(this);
+        mKeepUninstalledPackagesPreference =
+                (DpcPreference) findPreference(KEEP_UNINSTALLED_PACKAGES);
+        mKeepUninstalledPackagesPreference.setOnPreferenceClickListener(this);
+        mKeepUninstalledPackagesPreference.setCustomConstraint(this::validateAffiliatedUserAfterP);
         findPreference(MANAGE_APP_RESTRICTIONS_KEY).setOnPreferenceClickListener(this);
         findPreference(GENERIC_DELEGATION_KEY).setOnPreferenceClickListener(this);
         findPreference(APP_RESTRICTIONS_MANAGING_PACKAGE_KEY).setOnPreferenceClickListener(this);
@@ -756,7 +770,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 logoutUser();
                 return true;
             case SET_AFFILIATION_IDS_KEY:
-                showFragment(new AffiliationIdsFragment());
+                showFragment(new ManageAffiliationIdsFragment());
                 return true;
             case BLOCK_UNINSTALLATION_BY_PKG_KEY:
                 showBlockUninstallationByPackageNamePrompt();
@@ -773,6 +787,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             case ENABLE_SYSTEM_APPS_BY_INTENT_KEY:
                 showFragment(new EnableSystemAppsByIntentFragment());
                 return true;
+            case INSTALL_EXISTING_PACKAGE_KEY:
+                showInstallExistingPackagePrompt();
+                return true;
             case HIDE_APPS_KEY:
                 showHideAppsPrompt(false);
                 return true;
@@ -787,6 +804,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 return true;
             case CLEAR_APP_DATA_KEY:
                 showClearAppDataPrompt();
+                return true;
+            case KEEP_UNINSTALLED_PACKAGES:
+                showFragment(new ManageKeepUninstalledPackagesFragment());
                 return true;
             case MANAGE_APP_RESTRICTIONS_KEY:
                 showFragment(new ManageAppRestrictionsFragment());
@@ -1557,8 +1577,11 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 R.id.skip_setup_wizard_checkbox);
         final CheckBox makeUserEphemeralCheckBox = (CheckBox) dialogView.findViewById(
                 R.id.make_user_ephemeral_checkbox);
+        final CheckBox leaveAllSystemAppsEnabled = (CheckBox) dialogView.findViewById(
+                R.id.leave_all_system_apps_enabled_checkbox);
         if (!BuildCompat.isAtLeastP()) {
             makeUserEphemeralCheckBox.setEnabled(false);
+            leaveAllSystemAppsEnabled.setEnabled(false);
         }
 
         new AlertDialog.Builder(getActivity())
@@ -1575,6 +1598,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                             }
                             if (makeUserEphemeralCheckBox.isChecked()){
                                 flags |= DevicePolicyManager.MAKE_USER_EPHEMERAL;
+                            }
+                            if (leaveAllSystemAppsEnabled.isChecked()) {
+                                flags |= DevicePolicyManager.LEAVE_ALL_SYSTEM_APPS_ENABLED;
                             }
 
                             UserHandle userHandle = mDevicePolicyManager.createAndManageUser(
@@ -1867,6 +1893,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             mAffiliatedUserPreference.setSummary(
                     mDevicePolicyManager.isAffiliatedUser() ? R.string.yes : R.string.no);
         }
+        mInstallExistingPackagePreference.refreshEnabledState();
+        mKeepUninstalledPackagesPreference.refreshEnabledState();
         mManageLockTaskListPreference.refreshEnabledState();
         mSetLockTaskFeaturesPreference.refreshEnabledState();
         mLogoutUserPreference.refreshEnabledState();
@@ -1950,7 +1978,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         LinearLayout inputContainer = (LinearLayout) getActivity().getLayoutInflater()
                 .inflate(R.layout.simple_edittext, null);
         final EditText editText = (EditText) inputContainer.findViewById(R.id.input);
-        editText.setHint(getString(R.string.enable_system_apps_by_package_name_hints));
+        editText.setHint(getString(R.string.package_name_hints));
 
         new AlertDialog.Builder(getActivity())
                 .setTitle(getString(R.string.enable_system_apps_title))
@@ -1964,7 +1992,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                             showToast(R.string.enable_system_apps_by_package_name_success_msg,
                                     packageName);
                         } catch (IllegalArgumentException e) {
-                            showToast(R.string.enable_system_apps_by_package_name_error);
+                            showToast(R.string.package_name_error);
                         } finally {
                             dialog.dismiss();
                         }
@@ -2332,6 +2360,35 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                     })
                     .show();
         }
+    }
+
+    /**
+     * Shows a prompt to ask for package name which is used to install an existing package.
+     */
+    @TargetApi(28)
+    private void showInstallExistingPackagePrompt() {
+        if (getActivity() == null || getActivity().isFinishing()) {
+            return;
+        }
+        LinearLayout inputContainer = (LinearLayout) getActivity().getLayoutInflater()
+                .inflate(R.layout.simple_edittext, null);
+        final EditText editText = inputContainer.findViewById(R.id.input);
+        editText.setHint(getString(R.string.package_name_hints));
+
+        new AlertDialog.Builder(getActivity())
+                .setTitle(getString(R.string.install_existing_packages_title))
+                .setView(inputContainer)
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                    final String packageName = editText.getText().toString();
+                    boolean success = mDevicePolicyManager.installExistingPackage(
+                            mAdminComponentName, packageName);
+                    showToast(success ? R.string.install_existing_packages_success_msg
+                                    : R.string.package_name_error,
+                            packageName);
+                    dialog.dismiss();
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
     }
 
     /**

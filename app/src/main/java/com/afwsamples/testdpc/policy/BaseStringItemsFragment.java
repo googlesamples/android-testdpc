@@ -18,13 +18,10 @@ package com.afwsamples.testdpc.policy;
 
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
-import android.app.admin.DevicePolicyManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.StringRes;
-import android.support.v4.util.ArraySet;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,36 +31,33 @@ import android.widget.EditText;
 import android.widget.SpinnerAdapter;
 import android.widget.Toast;
 
-import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.BaseManageComponentFragment;
 import com.afwsamples.testdpc.common.EditDeleteArrayAdapter;
-import com.afwsamples.testdpc.common.Util;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 /**
- * Allows the user to see / edit / delete affiliation ids.
- * See {@link DevicePolicyManager#setAffiliationIds(ComponentName, Set)}
+ * Base fragment for allowing he user to see / edit / delete a list of strings.
  */
-public class AffiliationIdsFragment extends BaseManageComponentFragment<Void>
+public abstract class BaseStringItemsFragment extends BaseManageComponentFragment<Void>
         implements EditDeleteArrayAdapter.OnEditButtonClickListener<String> {
 
-    private List<String> mAffiliationIds = new ArrayList<>();
-    private List<String> mLastAffiliationIds = new ArrayList<>();
-    private DevicePolicyManager mDevicePolicyManager;
-    private ComponentName mAdminComponent;
-    private EditDeleteArrayAdapter<String> mAffiliationIdsArrayAdapter;
+    private final int mFragmentTitleResId;
+    private final int mDialogTitleResId;
+    private final int mEmptyItemResId;
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    private List<String> mItems = new ArrayList<>();
+    private List<String> mLastItems = new ArrayList<>();
+    private EditDeleteArrayAdapter<String> mItemArrayAdapter;
 
-        mDevicePolicyManager = (DevicePolicyManager) getActivity().getSystemService(
-                Context.DEVICE_POLICY_SERVICE);
-        mAdminComponent = DeviceAdminReceiver.getComponentName(getActivity());
+    public BaseStringItemsFragment(int fragmentTitleResId, int dialogTitleResId,
+            int emptyItemResId) {
+        mFragmentTitleResId = fragmentTitleResId;
+        mDialogTitleResId = dialogTitleResId;
+        mEmptyItemResId = emptyItemResId;
     }
 
     @Override
@@ -79,7 +73,7 @@ public class AffiliationIdsFragment extends BaseManageComponentFragment<Void>
     @Override
     public void onResume() {
         super.onResume();
-        getActivity().getActionBar().setTitle(R.string.manage_affiliation_ids);
+        getActivity().getActionBar().setTitle(mFragmentTitleResId);
     }
 
     @Override
@@ -93,24 +87,22 @@ public class AffiliationIdsFragment extends BaseManageComponentFragment<Void>
 
     @Override
     protected BaseAdapter createListAdapter() {
-        mAffiliationIdsArrayAdapter = new AffiliationIdEntryArrayAdapter(
-                getActivity(), mAffiliationIds, this);
-        return mAffiliationIdsArrayAdapter;
+        mItemArrayAdapter = new ItemEntryArrayAdapter(
+                getActivity(), mItems, this);
+        return mItemArrayAdapter;
     }
 
     @Override
     protected void resetConfig() {
-        mAffiliationIdsArrayAdapter.clear();
-        mAffiliationIdsArrayAdapter.addAll(mLastAffiliationIds);
+        mItemArrayAdapter.clear();
+        mItemArrayAdapter.addAll(mLastItems);
     }
 
     @Override
     @TargetApi(Build.VERSION_CODES.O)
     protected void saveConfig() {
-        mDevicePolicyManager.setAffiliationIds(
-                DeviceAdminReceiver.getComponentName(getActivity()),
-                new ArraySet<>(mAffiliationIds));
-        mLastAffiliationIds = new ArrayList<>(mAffiliationIds);
+        saveItems(mItems);
+        mLastItems = new ArrayList<>(mItems);
     }
 
     @Override
@@ -121,9 +113,9 @@ public class AffiliationIdsFragment extends BaseManageComponentFragment<Void>
     @Override
     @TargetApi(Build.VERSION_CODES.O)
     protected void loadDefault() {
-        mAffiliationIdsArrayAdapter.clear();
-        mAffiliationIdsArrayAdapter.addAll(mDevicePolicyManager.getAffiliationIds(mAdminComponent));
-        mLastAffiliationIds = new ArrayList<>(mAffiliationIds);
+        mItemArrayAdapter.clear();
+        mItemArrayAdapter.addAll(loadItems());
+        mLastItems = new ArrayList<>(mItems);
     }
 
     @Override
@@ -135,7 +127,7 @@ public class AffiliationIdsFragment extends BaseManageComponentFragment<Void>
         }
 
         final AlertDialog dialog = new AlertDialog.Builder(getActivity())
-                .setTitle(R.string.enter_affiliation_id)
+                .setTitle(mDialogTitleResId)
                 .setView(view)
                 .setPositiveButton(android.R.string.ok, null)
                 .setNegativeButton(android.R.string.cancel, null)
@@ -143,26 +135,30 @@ public class AffiliationIdsFragment extends BaseManageComponentFragment<Void>
         dialog.setOnShowListener(
                 dialogInterface -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(
                         okButtonView -> {
-                            String affiliationId = input.getText().toString();
-                            if (TextUtils.isEmpty(affiliationId)) {
-                                showToast(R.string.affiliation_id_empty_error);
+                            String item = input.getText().toString();
+                            if (TextUtils.isEmpty(item)) {
+                                showToast(mEmptyItemResId);
                                 return;
                             }
                             if (existingEntry != null) {
-                                mAffiliationIdsArrayAdapter.remove(existingEntry);
+                                mItemArrayAdapter.remove(existingEntry);
                             }
-                            mAffiliationIdsArrayAdapter.add(affiliationId);
+                            mItemArrayAdapter.add(item);
                             dialog.dismiss();
                         }));
         dialog.show();
     }
 
+    protected abstract void saveItems(List<String> items);
+
+    protected abstract Collection<String> loadItems();
+
     private void showToast(@StringRes int stringResId) {
         Toast.makeText(getActivity(), stringResId, Toast.LENGTH_LONG).show();
     }
 
-    static class AffiliationIdEntryArrayAdapter extends EditDeleteArrayAdapter<String> {
-        AffiliationIdEntryArrayAdapter(
+    static class ItemEntryArrayAdapter extends EditDeleteArrayAdapter<String> {
+        ItemEntryArrayAdapter(
                 Context context,
                 List<String> entries,
                 OnEditButtonClickListener onEditButtonClickListener) {
