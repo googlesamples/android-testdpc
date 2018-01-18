@@ -26,6 +26,7 @@ import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -54,7 +55,8 @@ public class ManageKeepUninstalledPackagesFragment extends BaseStringItemsFragme
     @TargetApi(28)
     @Override
     protected Collection<String> loadItems() {
-        return mDevicePolicyManager.getKeepUninstalledPackages(mAdminComponent);
+        List<String> packages = mDevicePolicyManager.getKeepUninstalledPackages(mAdminComponent);
+        return packages == null ? Collections.emptyList() : packages;
     }
 
     @TargetApi(28)
