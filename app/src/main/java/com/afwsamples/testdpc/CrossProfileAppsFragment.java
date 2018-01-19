@@ -72,20 +72,9 @@ public class CrossProfileAppsFragment extends Fragment {
                 mCrossProfileApps.getProfileSwitchingIcon(userHandle));
         mDescriptionTextView.setText(R.string.cross_profile_apps_available);
         mSwitchProfileImageView.setOnClickListener(
-                view -> startMainActivity(
+                view -> mCrossProfileApps.startMainActivity(
                         new ComponentName(getActivity(),
                             PolicyManagementActivity.class),
                             userHandle));
-    }
-
-    private void startMainActivity(ComponentName componentName, UserHandle userHandle) {
-        try {
-            ReflectionUtil.invoke(mCrossProfileApps,
-                    "startMainActivity",
-                    componentName,
-                    userHandle);
-        } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
-            Log.e(TAG, "startMainActivity: ", e);
-        }
     }
 }

@@ -121,6 +121,7 @@ import com.afwsamples.testdpc.profilepolicy.apprestrictions.ManageAppRestriction
 import com.afwsamples.testdpc.profilepolicy.delegation.DelegationFragment;
 import com.afwsamples.testdpc.profilepolicy.permission.ManageAppPermissionsFragment;
 import com.afwsamples.testdpc.safetynet.SafetyNetFragment;
+import com.afwsamples.testdpc.util.MainThreadExecutor;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -2584,10 +2585,10 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         if (!mDevicePolicyManager.clearApplicationUserData(
                 mAdminComponentName,
                 packageName,
-                (packageName2, succeed) -> showToast(
+                new MainThreadExecutor(),
+                (__, succeed) -> showToast(
                         succeed ? R.string.clear_app_data_success : R.string.clear_app_data_failure,
-                        packageName),
-                getActivity()::runOnUiThread)) {
+                        packageName))) {
             showToast(R.string.clear_app_data_failure, packageName);
         }
     }
