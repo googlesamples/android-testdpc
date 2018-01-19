@@ -252,6 +252,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String DISABLE_SCREEN_CAPTURE_KEY = "disable_screen_capture";
     private static final String DISABLE_STATUS_BAR = "disable_status_bar";
     private static final String ENABLE_BACKUP_SERVICE = "enable_backup_service";
+    private static final String ENABLE_PRINTING = "enable_printing";
     private static final String ENABLE_PROCESS_LOGGING = "enable_process_logging";
     private static final String ENABLE_NETWORK_LOGGING = "enable_network_logging";
     private static final String ENABLE_SYSTEM_APPS_BY_INTENT_KEY = "enable_system_apps_by_intent";
@@ -374,6 +375,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private DpcSwitchPreference mInstallNonMarketAppsPreference;
 
     private SwitchPreference mEnableBackupServicePreference;
+    private SwitchPreference mEnablePrintingPreference;
     private SwitchPreference mEnableProcessLoggingPreference;
     private SwitchPreference mEnableNetworkLoggingPreference;
     private SwitchPreference mSetAutoTimeRequiredPreference;
@@ -489,6 +491,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(REMOVE_DEVICE_OWNER_KEY).setOnPreferenceClickListener(this);
         mEnableBackupServicePreference = (SwitchPreference) findPreference(ENABLE_BACKUP_SERVICE);
         mEnableBackupServicePreference.setOnPreferenceChangeListener(this);
+        mEnablePrintingPreference = (SwitchPreference) findPreference(ENABLE_PRINTING);
+        mEnablePrintingPreference.setOnPreferenceChangeListener(this);
         findPreference(REQUEST_BUGREPORT_KEY).setOnPreferenceClickListener(this);
         mEnableProcessLoggingPreference = (SwitchPreference) findPreference(ENABLE_PROCESS_LOGGING);
         mEnableProcessLoggingPreference.setOnPreferenceChangeListener(this);
@@ -590,6 +594,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         reloadScreenCaptureDisableUi();
         reloadMuteAudioUi();
         reloadEnableBackupServiceUi();
+        reloadEnablePrintingUi();
         reloadEnableProcessLoggingUi();
         reloadEnableNetworkLoggingUi();
         reloadSetAutoTimeRequiredUi();
@@ -1042,6 +1047,10 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 setBackupServiceEnabled((Boolean) newValue);
                 reloadEnableBackupServiceUi();
                 return true;
+            case ENABLE_PRINTING:
+                setPrintingEnabled((Boolean) newValue);
+                reloadEnablePrintingUi();
+                return true;
             case ENABLE_PROCESS_LOGGING:
                 setSecurityLoggingEnabled((Boolean) newValue);
                 reloadEnableProcessLoggingUi();
@@ -1126,6 +1135,17 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void setScreenCaptureDisabled(boolean disabled) {
         mDevicePolicyManager.setScreenCaptureDisabled(mAdminComponentName, disabled);
+    }
+
+    @TargetApi(Build.VERSION_CODES.P)
+    private void setPrintingEnabled(boolean enabled) {
+        try {
+            ReflectionUtil.invoke(mDevicePolicyManager, "setPrintingEnabled",
+                    new Class<?>[] {ComponentName.class, boolean.class},
+                    mAdminComponentName, enabled);
+        } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
+            Log.e(TAG, "Failed to invoke DevicePolicyManager.setPrintingEnabled", e);
+        }
     }
 
     @TargetApi(Build.VERSION_CODES.O)
@@ -1948,6 +1968,16 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         if (mEnableBackupServicePreference.isEnabled()) {
             mEnableBackupServicePreference.setChecked(mDevicePolicyManager.isBackupServiceEnabled(
                     mAdminComponentName));
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.P)
+    private void reloadEnablePrintingUi() {
+        try {
+            mEnablePrintingPreference.setChecked(
+                    (Boolean) ReflectionUtil.invoke(mDevicePolicyManager, "isPrintingEnabled"));
+        } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
+            Log.e(TAG, "Failed to retrieve printing policies from DevicePolicyManager", e);
         }
     }
 

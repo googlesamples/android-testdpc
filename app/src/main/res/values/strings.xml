@@ -139,6 +139,10 @@
     <string name="set_persistent_device_owner_label">Set</string>
     <string name="clear_persistent_device_owner_label">Clear</string>
 
+    <!-- Strings for printing settings -->
+    <string name="printing_settings">Printing settings</string>
+    <string name="printing_enabled">Printing enabled</string>
+
     <!-- Strings for device reboot -->
     <string name="reboot">Reboot device</string>
     <string name="reboot_error_msg">Cannot reboot device during an ongoing call.</string>
