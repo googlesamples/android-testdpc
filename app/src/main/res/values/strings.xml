@@ -684,6 +684,18 @@
     <string name="trust_agent_features">Trust agent features</string>
     <string name="set_trust_agent_config">Set trust agent config</string>
 
+    <!-- Strings for set system settings -->
+    <string name="set_system_setting">Set system settings</string>
+    <string name="auto_brightness">Auto brightness</string>
+    <string name="set_screen_brightness">Set screen brightness</string>
+    <string name="set_screen_brightness_hint">Between 0 and 255</string>
+    <string name="no_screen_brightness">Screen brightness value is not specified</string>
+    <string name="invalid_screen_brightness">Screen brightness value is invalid</string>
+    <string name="set_screen_off_timeout">Set screen off timeout(in seconds)</string>
+    <string name="set_screen_off_timeout_hint">In seconds</string>
+    <string name="no_screen_off_timeout">Screen off timeout is not specified</string>
+    <string name="invalid_screen_off_timeout">Screen off timeout is invalid</string>
+
     <!-- Strings for screen lock policies -->
     <string name="lock_category">Lock screen</string>
 
