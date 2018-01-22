@@ -706,6 +706,16 @@
     <string name="trust_agent_features">Trust agent features</string>
     <string name="set_trust_agent_config">Set trust agent config</string>
 
+    <!-- Strings for set time -->
+    <string name="set_time_manage">Set time and timezone</string>
+    <string name="set_time">Set time(Unix timestamp in milliseconds)</string>
+    <string name="no_set_time">Time not specified</string>
+    <string name="invalid_set_time">Incorrect time</string>
+    <string name="set_time_zone">Set timezone</string>
+    <string name="set_time_zone_hint">Example: "America/New_York", "America/Los_Angeles"</string>
+    <string name="no_timezone">Timezone not specified</string>
+    <string name="invalid_timezone">Timezone id not valid</string>
+
     <!-- Strings for set system settings -->
     <string name="set_system_setting">Set system settings</string>
     <string name="auto_brightness">Auto brightness</string>

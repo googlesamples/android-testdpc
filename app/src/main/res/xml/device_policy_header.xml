@@ -36,6 +36,19 @@
             testdpc:minSdkVersion="L" />
     </PreferenceCategory>
 
+    <PreferenceCategory android:title="@string/set_time_manage">
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="set_time"
+            android:title="@string/set_time"
+            testdpc:admin="deviceOwner"
+            testdpc:minSdkVersion="P" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="set_time_zone"
+            android:title="@string/set_time_zone"
+            testdpc:admin="deviceOwner"
+            testdpc:minSdkVersion="P" />
+    </PreferenceCategory>
+
     <PreferenceCategory android:title="@string/set_system_setting">
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="set_screen_brightness"

@@ -141,11 +141,13 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 /**
@@ -351,6 +353,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String AUTO_BRIGHTNESS_KEY = "auto_brightness";
     private static final String SET_SCREEN_OFF_TIMEOUT_KEY = "set_screen_off_timeout";
 
+    private static final String SET_TIME_KEY = "set_time";
+    private static final String SET_TIME_ZONE_KEY = "set_time_zone";
 
     private static final String BATTERY_PLUGGED_ANY = Integer.toString(
             BatteryManager.BATTERY_PLUGGED_AC |
@@ -582,6 +586,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         mAutoBrightnessPreference = (DpcSwitchPreference) findPreference(AUTO_BRIGHTNESS_KEY);
         mAutoBrightnessPreference.setOnPreferenceChangeListener(this);
         findPreference(SET_SCREEN_OFF_TIMEOUT_KEY).setOnPreferenceClickListener(this);
+
+        findPreference(SET_TIME_KEY).setOnPreferenceClickListener(this);
+        findPreference(SET_TIME_ZONE_KEY).setOnPreferenceClickListener(this);
 
         DpcPreference bindDeviceAdminPreference =
                 (DpcPreference) findPreference(BIND_DEVICE_ADMIN_POLICIES);
@@ -981,6 +988,17 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 return true;
             case TRANSFER_OWNERSHIP_KEY:
                 showFragment(new PickTransferComponentFragment());
+                return true;
+            case SET_TIME_KEY:
+                // Disable auto time before we could set time manually.
+                mDevicePolicyManager.setGlobalSetting(mAdminComponentName,
+                        Settings.Global.AUTO_TIME, "0");
+                showSetTimeDialog();
+                return true;
+            case SET_TIME_ZONE_KEY:
+                mDevicePolicyManager.setGlobalSetting(mAdminComponentName,
+                        Settings.Global.AUTO_TIME_ZONE, "0");
+                showSetTimeZoneDialog();
                 return true;
         }
         return false;
@@ -3052,6 +3070,81 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                     mDevicePolicyManager.setSystemSetting(mAdminComponentName,
                             Settings.System.SCREEN_OFF_TIMEOUT,
                             Integer.toString(screenTimeoutVaue * 1000));
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    /**
+     * Shows a dialog that asks the user for a timestamp, then sets the system time to this value.
+     */
+    @TargetApi(28)
+    private void showSetTimeDialog() {
+        if (getActivity() == null || getActivity().isFinishing()) {
+            return;
+        }
+
+        final View dialogView = getActivity().getLayoutInflater().inflate(
+                R.layout.simple_edittext, null);
+        final EditText timeEditText = (EditText) dialogView.findViewById(
+                R.id.input);
+        final String currentTime = Long.toString(System.currentTimeMillis());
+        timeEditText.setText(currentTime);
+
+        new AlertDialog.Builder(getActivity())
+                .setTitle(R.string.set_time)
+                .setView(dialogView)
+                .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
+                    final String newTimeString = timeEditText.getText().toString();
+                    if (newTimeString.isEmpty()) {
+                        showToast(R.string.no_set_time);
+                        return;
+                    }
+                    long newTime = 0;
+                    try {
+                        newTime = Long.parseLong(newTimeString);
+                    } catch (NumberFormatException e) {
+                        showToast(R.string.invalid_set_time);
+                        return;
+                    }
+                    mDevicePolicyManager.setTime(mAdminComponentName, newTime);
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    /**
+     * Shows a dialog that asks the user for a timezone id, then sets the system timezone to
+     * this value.
+     */
+    @TargetApi(28)
+    private void showSetTimeZoneDialog() {
+        if (getActivity() == null || getActivity().isFinishing()) {
+            return;
+        }
+
+        final View dialogView = getActivity().getLayoutInflater().inflate(
+                R.layout.simple_edittext, null);
+        final EditText timezoneEditText = (EditText) dialogView.findViewById(
+                R.id.input);
+        final String currentTimezone = Calendar.getInstance().getTimeZone().getID();
+        timezoneEditText.setText(currentTimezone);
+
+        new AlertDialog.Builder(getActivity())
+                .setTitle(R.string.set_time_zone)
+                .setView(dialogView)
+                .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
+                    final String newTimezone = timezoneEditText.getText().toString();
+                    if (newTimezone.isEmpty()) {
+                        showToast(R.string.no_timezone);
+                        return;
+                    }
+                    final String[] ids = TimeZone.getAvailableIDs();
+                    if (!Arrays.asList(ids).contains(newTimezone)) {
+                        showToast(R.string.invalid_timezone);
+                        return;
+                    }
+                    mDevicePolicyManager.setTimeZone(mAdminComponentName, newTimezone);
                 })
                 .setNegativeButton(android.R.string.cancel, null)
                 .show();
