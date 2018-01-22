@@ -346,6 +346,10 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String BIND_DEVICE_ADMIN_POLICIES = "bind_device_admin_policies";
     private static final String CROSS_PROFILE_APPS = "cross_profile_apps";
 
+    private static final String SET_SCREEN_BRIGHTNESS_KEY = "set_screen_brightness";
+    private static final String AUTO_BRIGHTNESS_KEY = "auto_brightness";
+    private static final String SET_SCREEN_OFF_TIMEOUT_KEY = "set_screen_off_timeout";
+
     private static final String BATTERY_PLUGGED_ANY = Integer.toString(
             BatteryManager.BATTERY_PLUGGED_AC |
             BatteryManager.BATTERY_PLUGGED_USB |
@@ -390,6 +394,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private DpcPreference mRequestNetworkLogsPreference;
     private DpcPreference mRequestProcessLogsPreference;
     private Preference mSetDeviceOrganizationNamePreference;
+
+    private DpcSwitchPreference mAutoBrightnessPreference;
 
     private GetAccessibilityServicesTask mGetAccessibilityServicesTask = null;
     private GetInputMethodsTask mGetInputMethodsTask = null;
@@ -569,6 +575,11 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(SET_PROFILE_PARENT_NEW_PASSWORD).setOnPreferenceClickListener(this);
         findPreference(CROSS_PROFILE_APPS).setOnPreferenceClickListener(this);
 
+        findPreference(SET_SCREEN_BRIGHTNESS_KEY).setOnPreferenceClickListener(this);
+        mAutoBrightnessPreference = (DpcSwitchPreference) findPreference(AUTO_BRIGHTNESS_KEY);
+        mAutoBrightnessPreference.setOnPreferenceChangeListener(this);
+        findPreference(SET_SCREEN_OFF_TIMEOUT_KEY).setOnPreferenceClickListener(this);
+
         DpcPreference bindDeviceAdminPreference =
                 (DpcPreference) findPreference(BIND_DEVICE_ADMIN_POLICIES);
         bindDeviceAdminPreference.setCustomConstraint(
@@ -600,6 +611,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         reloadEnableNetworkLoggingUi();
         reloadSetAutoTimeRequiredUi();
         reloadEnableLogoutUi();
+        reloadAutoBrightnessUi();
     }
 
     private void constrainSpecialCasePreferences() {
@@ -958,6 +970,12 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             case CROSS_PROFILE_APPS:
                 showFragment(new CrossProfileAppsFragment());
                 return true;
+            case SET_SCREEN_BRIGHTNESS_KEY:
+                showSetScreenBrightnessDialog();
+                return true;
+            case SET_SCREEN_OFF_TIMEOUT_KEY:
+                showSetScreenOffTimeoutDialog();
+                return true;
         }
         return false;
     }
@@ -1102,6 +1120,10 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 mDevicePolicyManager.setLogoutEnabled(mAdminComponentName, (Boolean) newValue);
                 reloadEnableLogoutUi();
                 return true;
+            case AUTO_BRIGHTNESS_KEY:
+                mDevicePolicyManager.setSystemSetting(mAdminComponentName,
+                        Settings.System.SCREEN_BRIGHTNESS_MODE, newValue.equals(true) ? "1" : "0");
+                reloadAutoBrightnessUi();
         }
         return false;
     }
@@ -1911,6 +1933,15 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private void reloadEnableLogoutUi() {
         if (mEnableLogoutPreference.isEnabled()) {
             mEnableLogoutPreference.setChecked(mDevicePolicyManager.isLogoutEnabled());
+        }
+    }
+
+    @TargetApi(28)
+    private void reloadAutoBrightnessUi() {
+        if (mAutoBrightnessPreference.isEnabled()) {
+            final String brightnessMode = Settings.System.getString(
+                    getActivity().getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE);
+            mAutoBrightnessPreference.setChecked(Integer.parseInt(brightnessMode) == 1);
         }
     }
 
@@ -2932,6 +2963,92 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private void showSetupManagement() {
         Intent intent = new Intent(getActivity(), SetupManagementActivity.class);
         getActivity().startActivity(intent);
+    }
+
+    /**
+     * Shows a dialog that asks the user for a screen brightness value, then sets the screen
+     * brightness to these values.
+     */
+    @TargetApi(28)
+    private void showSetScreenBrightnessDialog() {
+        if (getActivity() == null || getActivity().isFinishing()) {
+            return;
+        }
+
+        final View dialogView = getActivity().getLayoutInflater().inflate(
+                R.layout.simple_edittext, null);
+        final EditText brightnessEditText = (EditText) dialogView.findViewById(
+                R.id.input);
+        final String oldBrightness = Settings.System.getString(
+                getActivity().getContentResolver(), Settings.System.SCREEN_BRIGHTNESS);
+        brightnessEditText.setHint(R.string.set_screen_brightness_hint);
+        if (!TextUtils.isEmpty(oldBrightness)) {
+            brightnessEditText.setText(oldBrightness);
+        }
+
+        new AlertDialog.Builder(getActivity())
+                .setTitle(R.string.set_screen_brightness)
+                .setView(dialogView)
+                .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
+                    final String brightness = brightnessEditText.getText().toString();
+                    if (brightness.isEmpty()) {
+                        showToast(R.string.no_screen_brightness);
+                        return;
+                    }
+                    final int brightnessValue = Integer.parseInt(brightness);
+                    if (brightnessValue > 255 || brightnessValue < 0) {
+                        showToast(R.string.invalid_screen_brightness);
+                        return;
+                    }
+                    mDevicePolicyManager.setSystemSetting(mAdminComponentName,
+                            Settings.System.SCREEN_BRIGHTNESS, brightness);
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    /**
+     * Shows a dialog that asks the user for a screen off timeout value, then sets this value as
+     * screen off timeout.
+     */
+    @TargetApi(28)
+    private void showSetScreenOffTimeoutDialog() {
+        if (getActivity() == null || getActivity().isFinishing()) {
+            return;
+        }
+
+        final View dialogView = getActivity().getLayoutInflater().inflate(
+                R.layout.simple_edittext, null);
+        final EditText timeoutEditText = (EditText) dialogView.findViewById(
+                R.id.input);
+        final String oldTimeout = Settings.System.getString(
+                getActivity().getContentResolver(), Settings.System.SCREEN_OFF_TIMEOUT);
+        final int oldTimeoutValue = Integer.parseInt(oldTimeout);
+        timeoutEditText.setHint(R.string.set_screen_off_timeout_hint);
+        if (!TextUtils.isEmpty(oldTimeout)) {
+            timeoutEditText.setText(Integer.toString(oldTimeoutValue / 1000));
+        }
+
+        new AlertDialog.Builder(getActivity())
+                .setTitle(R.string.set_screen_off_timeout)
+                .setView(dialogView)
+                .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
+                    final String screenTimeout = timeoutEditText.getText().toString();
+                    if (screenTimeout.isEmpty()) {
+                        showToast(R.string.no_screen_off_timeout);
+                        return;
+                    }
+                    final int screenTimeoutVaue = Integer.parseInt(screenTimeout);
+                    if (screenTimeoutVaue < 0) {
+                        showToast(R.string.invalid_screen_off_timeout);
+                        return;
+                    }
+                    mDevicePolicyManager.setSystemSetting(mAdminComponentName,
+                            Settings.System.SCREEN_OFF_TIMEOUT,
+                            Integer.toString(screenTimeoutVaue * 1000));
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
     }
 
     private void chooseAccount() {
