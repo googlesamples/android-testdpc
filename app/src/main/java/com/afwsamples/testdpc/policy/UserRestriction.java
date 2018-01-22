@@ -12,6 +12,11 @@ import static android.os.UserManager.DISALLOW_CONFIG_BLUETOOTH;
 import static android.os.UserManager.DISALLOW_CONFIG_CELL_BROADCASTS;
 import static android.os.UserManager.DISALLOW_CONFIG_CREDENTIALS;
 import static android.os.UserManager.DISALLOW_CONFIG_DATE_TIME;
+import static android.os.UserManager.DISALLOW_CONFIG_LOCATION_MODE;
+import static android.os.UserManager.DISALLOW_AIRPLANE_MODE;
+import static android.os.UserManager.DISALLOW_CONFIG_BRIGHTNESS;
+import static android.os.UserManager.DISALLOW_CONFIG_SCREEN_TIMEOUT;
+import static android.os.UserManager.DISALLOW_AMBIENT_DISPLAY;
 import static android.os.UserManager.DISALLOW_CONFIG_MOBILE_NETWORKS;
 import static android.os.UserManager.DISALLOW_CONFIG_TETHERING;
 import static android.os.UserManager.DISALLOW_CONFIG_VPN;
@@ -45,12 +50,6 @@ import static android.os.UserManager.ENSURE_VERIFY_APPS;
 import com.afwsamples.testdpc.R;
 
 public class UserRestriction {
-    public static final String DISALLOW_CONFIG_LOCATION_MODE = "no_config_location_mode";
-    public static final String DISALLOW_AIRPLANE_MODE = "no_airplane_mode";
-    public static final String DISALLOW_CONFIG_BRIGHTNESS = "no_config_brightness";
-    public static final String DISALLOW_CONFIG_SCREEN_TIMEOUT = "no_config_screen_timeout";
-    public static final String DISALLOW_CONFIG_AMBIENT_DISPLAY = "no_config_ambient_display";
-
     // TODO: remove it once available in SDK
     public static final String DISALLOW_UNIFIED_PASSWORD = "no_unified_password";
 
@@ -194,7 +193,7 @@ public class UserRestriction {
                     DISALLOW_CONFIG_SCREEN_TIMEOUT,
                     R.string.disallow_config_screen_timeout),
             new UserRestriction(
-                    DISALLOW_CONFIG_AMBIENT_DISPLAY,
+                    DISALLOW_AMBIENT_DISPLAY,
                     R.string.disallow_config_ambient_display),
             new UserRestriction(
                     DISALLOW_SHARE_INTO_MANAGED_PROFILE,
@@ -252,7 +251,12 @@ public class UserRestriction {
      */
     public static String[] NON_MANAGED_PROFILE_RESTRICTIONS = {
             DISALLOW_REMOVE_USER,
-            DISALLOW_SET_WALLPAPER
+            DISALLOW_SET_WALLPAPER,
+            DISALLOW_CONFIG_DATE_TIME,
+            DISALLOW_AIRPLANE_MODE,
+            DISALLOW_CONFIG_SCREEN_TIMEOUT,
+            DISALLOW_CONFIG_BRIGHTNESS,
+            DISALLOW_AMBIENT_DISPLAY
     };
 
     /**
@@ -286,7 +290,7 @@ public class UserRestriction {
             DISALLOW_CONFIG_DATE_TIME,
             DISALLOW_CONFIG_BRIGHTNESS,
             DISALLOW_CONFIG_SCREEN_TIMEOUT,
-            DISALLOW_CONFIG_AMBIENT_DISPLAY,
+            DISALLOW_AMBIENT_DISPLAY,
             DISALLOW_SHARE_INTO_MANAGED_PROFILE,
     };
 }
