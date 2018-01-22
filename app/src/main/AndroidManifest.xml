@@ -109,10 +109,15 @@
             <meta-data
                     android:name="android.app.device_admin"
                     android:resource="@xml/device_admin_receiver"/>
+            <meta-data
+                android:name="android.app.support_transfer_ownership"
+                android:value="true"/>
             <intent-filter>
                 <action android:name="android.app.action.DEVICE_ADMIN_ENABLED"/>
                 <action android:name="android.app.action.PROFILE_PROVISIONING_COMPLETE"/>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.app.action.PROFILE_OWNER_CHANGED"/>
+                <action android:name="android.app.action.DEVICE_OWNER_CHANGED"/>
             </intent-filter>
         </receiver>
 

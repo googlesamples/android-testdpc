@@ -19,6 +19,10 @@ public class NotificationUtil {
     public static final int PASSWORD_EXPIRATION_NOTIFICATION_ID = 2;
     public static final int USER_ADDED_NOTIFICATION_ID = 3;
     public static final int USER_REMOVED_NOTIFICATION_ID = 4;
+    public static final int PROFILE_OWNER_CHANGED_ID = 5;
+    public static final int DEVICE_OWNER_CHANGED_ID = 6;
+    public static final int TRANSFER_OWNERSHIP_COMPLETE_ID = 7;
+    public static final int TRANSFER_AFFILIATED_PROFILE_OWNERSHIP_COMPLETE_ID = 8;
 
     public static void showNotification(
             Context context, @StringRes int titleId, String msg, int notificationId) {
