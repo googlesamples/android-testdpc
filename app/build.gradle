@@ -71,5 +71,7 @@ dependencies {
     compile 'com.android.support:support-v13:27.0.2'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.google.android.gms:play-services-safetynet:+'
-    compile(name:'setup-wizard-lib-platform-release', ext:'aar')
+    compile(name: 'setup-wizard-lib-platform-release', ext: 'aar')
+    compile 'org.bouncycastle:bcpkix-jdk15on:1.56'
+    compile 'org.bouncycastle:bcprov-jdk15on:1.56'
 }

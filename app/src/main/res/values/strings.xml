@@ -427,6 +427,12 @@
     <string name="certificate_add_failed">\"%s\" certificate could not be installed.</string>
     <string name="not_a_key_certificate">The selected certificate is not a private key certificate.
     </string>
+    <string name="generate_key_and_certificate">Generate a private/public key pair</string>
+    <string name="key_generation_successful">Key and certificate generated successfully</string>
+    <string name="key_generation_failed">FAILED key generation</string>
+    <string name="test_key_usage">Test signing/validation with a key</string>
+    <string name="key_usage_successful">Successfully signed with %1$s</string>
+    <string name="key_usage_failed">FAILED utilizing key for signature/verification</string>
     <string name="install_ca_certificate">Install a CA certificate</string>
     <string name="install_ca_successfully">The selected CA certificate is installed.</string>
     <string name="install_ca_fail">The selected CA certificate is not installed.</string>
@@ -435,6 +441,8 @@
     <string name="installed_ca_title">Installed CA certificates</string>
     <string name="remove_all_ca_certificates">Remove all CA certificates</string>
     <string name="all_ca_certificates_removed">All CA certificates have been removed.</string>
+    <string name="user_selectability_description">User-selectability</string>
+    <string name="user_selectability_checkbox">Make user-selectable</string>
 
     <!-- Strings for app restrictions -->
     <string name="manage_app_restrictions">Manage app restrictions</string>

@@ -172,6 +172,14 @@
             android:title="@string/key_override_alias"
             testdpc:minSdkVersion="M" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="generate_key_and_certificate"
+            android:title="@string/generate_key_and_certificate"
+            testdpc:minSdkVersion="P" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="test_key_usability"
+            android:title="@string/test_key_usage"
+            testdpc:minSdkVersion="L" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="install_ca_certificate"
             android:title="@string/install_ca_certificate"
             testdpc:minSdkVersion="L" />

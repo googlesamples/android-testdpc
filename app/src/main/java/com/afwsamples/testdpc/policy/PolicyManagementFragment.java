@@ -16,10 +16,6 @@
 
 package com.afwsamples.testdpc.policy;
 
-import static android.os.UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES;
-
-import static com.afwsamples.testdpc.common.preference.DpcPreferenceHelper.NO_CUSTOM_CONSTRIANT;
-
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.accounts.Account;
 import android.accounts.AccountManager;
@@ -53,9 +49,14 @@ import android.os.UserHandle;
 import android.os.UserManager;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.security.AttestedKeyPair;
 import android.security.KeyChain;
 import android.security.KeyChainAliasCallback;
+import android.security.KeyChainException;
+import android.security.keystore.KeyGenParameterSpec;
+import android.security.keystore.KeyProperties;
 import android.service.notification.NotificationListenerService;
+import android.support.annotation.RequiresApi;
 import android.support.annotation.StringRes;
 import android.support.v14.preference.SwitchPreference;
 import android.support.v4.content.FileProvider;
@@ -94,7 +95,6 @@ import com.afwsamples.testdpc.common.MediaDisplayFragment;
 import com.afwsamples.testdpc.common.ReflectionUtil;
 import com.afwsamples.testdpc.common.UserArrayAdapter;
 import com.afwsamples.testdpc.common.Util;
-import com.afwsamples.testdpc.common.preference.DpcEditTextPreference;
 import com.afwsamples.testdpc.common.preference.DpcPreference;
 import com.afwsamples.testdpc.common.preference.DpcPreferenceBase;
 import com.afwsamples.testdpc.common.preference.DpcPreferenceHelper;
@@ -111,6 +111,7 @@ import com.afwsamples.testdpc.policy.networking.AlwaysOnVpnFragment;
 import com.afwsamples.testdpc.policy.networking.NetworkUsageStatsFragment;
 import com.afwsamples.testdpc.policy.resetpassword.ResetPasswordWithTokenFragment;
 import com.afwsamples.testdpc.policy.systemupdatepolicy.SystemUpdatePolicyFragment;
+import com.afwsamples.testdpc.policy.utils.CertificateUtils;
 import com.afwsamples.testdpc.policy.wifimanagement.WifiConfigCreationDialog;
 import com.afwsamples.testdpc.policy.wifimanagement.WifiEapTlsCreateDialogFragment;
 import com.afwsamples.testdpc.policy.wifimanagement.WifiModificationFragment;
@@ -123,14 +124,20 @@ import com.afwsamples.testdpc.profilepolicy.permission.ManageAppPermissionsFragm
 import com.afwsamples.testdpc.safetynet.SafetyNetFragment;
 import com.afwsamples.testdpc.util.MainThreadExecutor;
 
+import org.bouncycastle.operator.OperatorCreationException;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.InvalidKeyException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.Signature;
+import java.security.SignatureException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
@@ -147,6 +154,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import javax.security.auth.x500.X500Principal;
+
+import static android.os.UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES;
+import static com.afwsamples.testdpc.common.preference.DpcPreferenceHelper.NO_CUSTOM_CONSTRIANT;
 
 /**
  * Provides several device management functions.
@@ -261,6 +273,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             = "enable_system_apps_by_package_name";
     private static final String ENABLE_SYSTEM_APPS_KEY = "enable_system_apps";
     private static final String INSTALL_EXISTING_PACKAGE_KEY = "install_existing_packages";
+    private static final String GENERATE_KEY_CERTIFICATE_KEY = "generate_key_and_certificate";
     private static final String GET_CA_CERTIFICATES_KEY = "get_ca_certificates";
     private static final String GET_DISABLE_ACCOUNT_MANAGEMENT_KEY
             = "get_disable_account_management";
@@ -324,6 +337,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String SUSPEND_APPS_KEY = "suspend_apps";
     private static final String SYSTEM_UPDATE_POLICY_KEY = "system_update_policy";
     private static final String SYSTEM_UPDATE_PENDING_KEY = "system_update_pending";
+    private static final String TEST_KEY_USABILITY_KEY = "test_key_usability";
 
     private static final String UNHIDE_APPS_KEY = "unhide_apps";
     private static final String UNSUSPEND_APPS_KEY = "unsuspend_apps";
@@ -541,7 +555,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(GENERIC_DELEGATION_KEY).setOnPreferenceClickListener(this);
         findPreference(APP_RESTRICTIONS_MANAGING_PACKAGE_KEY).setOnPreferenceClickListener(this);
         findPreference(INSTALL_KEY_CERTIFICATE_KEY).setOnPreferenceClickListener(this);
+        findPreference(GENERATE_KEY_CERTIFICATE_KEY).setOnPreferenceClickListener(this);
         findPreference(REMOVE_KEY_CERTIFICATE_KEY).setOnPreferenceClickListener(this);
+        findPreference(TEST_KEY_USABILITY_KEY).setOnPreferenceClickListener(this);
         findPreference(INSTALL_CA_CERTIFICATE_KEY).setOnPreferenceClickListener(this);
         findPreference(GET_CA_CERTIFICATES_KEY).setOnPreferenceClickListener(this);
         findPreference(REMOVE_ALL_CERTIFICATES_KEY).setOnPreferenceClickListener(this);
@@ -842,6 +858,12 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             case REMOVE_KEY_CERTIFICATE_KEY:
                 choosePrivateKeyForRemoval();
                 return true;
+            case GENERATE_KEY_CERTIFICATE_KEY:
+                showPromptForGeneratedKeyAlias("generated-rsa-testdpc-1");
+                return true;
+            case TEST_KEY_USABILITY_KEY:
+                testKeyCanBeUsedForSigning();
+                return true;
             case INSTALL_CA_CERTIFICATE_KEY:
                 Util.showFileViewerForImportingCertificate(this,
                         INSTALL_CA_CERTIFICATE_REQUEST_CODE);
@@ -960,6 +982,22 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 return true;
         }
         return false;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    private void testKeyCanBeUsedForSigning() {
+        KeyChain.choosePrivateKeyAlias(getActivity(), new KeyChainAliasCallback() {
+            @Override
+            public void alias(String alias) {
+                if (alias == null) {
+                    // No value was chosen.
+                    showToast("No key chosen.");
+                    return;
+                }
+
+                new SignAndVerifyTask().execute(alias);
+            }
+        }, null, null, null, null);
     }
 
     @TargetApi(Build.VERSION_CODES.O)
@@ -1179,6 +1217,131 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             }
         }
     }
+
+    @TargetApi(28)
+    private boolean installKeyPair(final PrivateKey key, final Certificate cert, final String alias,
+                                   boolean isUserSelectable) {
+        if (BuildCompat.isAtLeastP()) {
+            return mDevicePolicyManager.installKeyPair(
+                    mAdminComponentName, key, new Certificate[]{cert}, alias, false,
+                    isUserSelectable);
+        } else {
+            if (!isUserSelectable) {
+                throw new IllegalArgumentException(
+                        "Cannot set key as non-user-selectable prior to P");
+            }
+            return mDevicePolicyManager.installKeyPair(mAdminComponentName, key, cert, alias);
+        }
+    }
+
+    class GenerateKeyAndCertificateTask extends AsyncTask<Void, Integer, Boolean> {
+        final String mAlias;
+        final boolean mIsUserSelectable;
+
+        GenerateKeyAndCertificateTask(String mAlias, boolean mIsUserSelectable) {
+            this.mAlias = mAlias;
+            this.mIsUserSelectable = mIsUserSelectable;
+        }
+
+        @TargetApi(28)
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+            try {
+                KeyGenParameterSpec keySpec = new KeyGenParameterSpec.Builder(mAlias,
+                        KeyProperties.PURPOSE_SIGN | KeyProperties.PURPOSE_VERIFY)
+                        .setKeySize(2048)
+                        .setDigests(KeyProperties.DIGEST_SHA256)
+                        .setSignaturePaddings(KeyProperties.SIGNATURE_PADDING_RSA_PSS,
+                                KeyProperties.SIGNATURE_PADDING_RSA_PKCS1)
+                        .build();
+                AttestedKeyPair keyPair = mDevicePolicyManager.generateKeyPair(
+                        mAdminComponentName, "RSA", keySpec, 0);
+
+                if (keyPair == null) {
+                    return false;
+                }
+
+                X500Principal subject = new X500Principal("CN=TestDPC, O=Android, C=US");
+                // Self-signed certificate: Same subject and issuer.
+                X509Certificate selfSigned = CertificateUtils.createCertificate(
+                        keyPair.getKeyPair(), subject, subject);
+
+                List<Certificate> certs = new ArrayList<Certificate>();
+                certs.add(selfSigned);
+
+                return mDevicePolicyManager.setKeyPairCertificate(
+                        mAdminComponentName, mAlias, certs, mIsUserSelectable);
+            } catch (CertificateException e) {
+                Log.e(TAG, "Failed to create certificate", e);
+            } catch (OperatorCreationException e) {
+                Log.e(TAG, "Failed to create certificate", e);
+            } catch (IOException e) {
+                Log.e(TAG, "Failed to encode certificate", e);
+            }
+
+            return false;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            if (result.booleanValue()) {
+                showToast(R.string.key_generation_successful, mAlias);
+            } else {
+                showToast(R.string.key_generation_failed, mAlias);
+            }
+        }
+    }
+
+    private void generateKeyPair(final String alias, boolean isUserSelectable) {
+        new GenerateKeyAndCertificateTask(alias, isUserSelectable).execute();
+    }
+
+    class SignAndVerifyTask extends AsyncTask<String, Integer, String> {
+        @Override
+        protected String doInBackground(String... aliases) {
+            String alias = aliases[0];
+            try {
+                final String algorithmIdentifier = "SHA256withRSA";
+                PrivateKey privateKey = KeyChain.getPrivateKey(getContext(), alias);
+
+                byte[] data = new String("hello").getBytes();
+                Signature signer = Signature.getInstance(algorithmIdentifier);
+                signer.initSign(privateKey);
+                signer.update(data);
+                byte[] signature = signer.sign();
+
+                X509Certificate cert = KeyChain.getCertificateChain(getContext(), alias)[0];
+                PublicKey publicKey = cert.getPublicKey();
+                Signature verifier = Signature.getInstance(algorithmIdentifier);
+                verifier.initVerify(publicKey);
+                verifier.update(data);
+                if (verifier.verify(signature)) {
+                    return cert.getSubjectX500Principal().getName();
+                }
+            } catch (KeyChainException e) {
+                Log.e(TAG, "Error getting key", e);
+            } catch (InterruptedException e) {
+                Log.e(TAG, "Interrupted while getting the key", e);
+            } catch (NoSuchAlgorithmException e) {
+                e.printStackTrace();
+            } catch (SignatureException e) {
+                Log.e(TAG, "Failed signing with key", e);
+            } catch (InvalidKeyException e) {
+                Log.e(TAG, "Provided alias resolves to an invalid key", e);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            if (result != null) {
+                showToast(R.string.key_usage_successful, result);
+            } else {
+                showToast(R.string.key_usage_failed);
+            }
+        }
+    };
+
 
     /**
      * Dispatches an intent to capture image or video.
@@ -2144,6 +2307,11 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             input.selectAll();
         }
 
+        final CheckBox userSelectableCheckbox = passwordInputView.findViewById(
+                R.id.alias_user_selectable);
+        userSelectableCheckbox.setEnabled(BuildCompat.isAtLeastP());
+        userSelectableCheckbox.setChecked(!BuildCompat.isAtLeastP());
+
         new AlertDialog.Builder(getActivity())
                 .setTitle(getString(R.string.certificate_alias_prompt_title))
                 .setView(passwordInputView)
@@ -2151,8 +2319,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String alias = input.getText().toString();
-                        if (mDevicePolicyManager.installKeyPair(mAdminComponentName, key,
-                                certificate, alias) == true) {
+                        boolean isUserSelectable = userSelectableCheckbox.isChecked();
+                        if (installKeyPair(key, certificate, alias, isUserSelectable) == true) {
                             showToast(R.string.certificate_added, alias);
                         } else {
                             showToast(R.string.certificate_add_failed, alias);
@@ -2168,6 +2336,44 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 })
                 .show();
     }
+
+    /**
+     * Shows a prompt to ask for the certificate alias. A key will be generated for this alias.
+     *
+     * @param alias A name that represents the certificate in the profile.
+     */
+    private void showPromptForGeneratedKeyAlias(String alias) {
+        if (getActivity() == null || getActivity().isFinishing()) {
+            return;
+        }
+
+        View aliasNamingView = getActivity().getLayoutInflater().inflate(
+                R.layout.certificate_alias_prompt, null);
+        final EditText input = (EditText) aliasNamingView.findViewById(R.id.alias_input);
+        if (!TextUtils.isEmpty(alias)) {
+            input.setText(alias);
+            input.selectAll();
+        }
+
+        final CheckBox userSelectableCheckbox = aliasNamingView.findViewById(
+                R.id.alias_user_selectable);
+        userSelectableCheckbox.setChecked(!BuildCompat.isAtLeastP());
+
+        new AlertDialog.Builder(getActivity())
+                .setTitle(getString(R.string.certificate_alias_prompt_title))
+                .setView(aliasNamingView)
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String alias = input.getText().toString();
+                        boolean isUserSelectable = userSelectableCheckbox.isChecked();
+                        generateKeyPair(alias, isUserSelectable);
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
 
     /**
      * Selects a private/public key pair to uninstall, using the system dialog to choose
