@@ -67,6 +67,14 @@
             testdpc:minSdkVersion="P" />
     </PreferenceCategory>
 
+    <PreferenceCategory android:title="@string/override_apn_title">
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="manage_override_apn"
+            android:title="@string/manage_override_apn"
+            testdpc:admin="deviceOwner"
+            testdpc:minSdkVersion="P" />
+    </PreferenceCategory>
+
     <PreferenceCategory android:title="@string/account_management_title">
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="set_disable_account_management"
