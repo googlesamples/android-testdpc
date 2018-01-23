@@ -132,6 +132,11 @@
             android:key="manage_app_restrictions"
             android:title="@string/manage_app_restrictions"
             testdpc:minSdkVersion="L" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="disable_metered_data"
+            android:title="@string/metered_data_restriction"
+            testdpc:admin="deviceOwner|profileOwner"
+            testdpc:minSdkVersion="P" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/delegation_title">

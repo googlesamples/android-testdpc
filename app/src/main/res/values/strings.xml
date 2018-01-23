@@ -446,6 +446,11 @@
     <string name="plus">+</string>
     <string name="app_restrictions_managing_package">App restrictions manager</string>
 
+    <!-- Strings for metered data restriction -->
+    <string name="metered_data_restriction">Disable metered data</string>
+    <string name="update_pkgs">Update</string>
+    <string name="metered_data_restriction_failed_pkgs">Couldn\'t restrict %s</string>
+
     <!-- Strings for delegation -->
     <string name="delegation_title">Delegation</string>
     <string name="generic_delegation">Generic delegation</string>
