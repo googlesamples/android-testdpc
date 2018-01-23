@@ -94,7 +94,6 @@ import com.afwsamples.testdpc.common.MediaDisplayFragment;
 import com.afwsamples.testdpc.common.ReflectionUtil;
 import com.afwsamples.testdpc.common.UserArrayAdapter;
 import com.afwsamples.testdpc.common.Util;
-import com.afwsamples.testdpc.common.preference.DpcEditTextPreference;
 import com.afwsamples.testdpc.common.preference.DpcPreference;
 import com.afwsamples.testdpc.common.preference.DpcPreferenceBase;
 import com.afwsamples.testdpc.common.preference.DpcPreferenceHelper;
@@ -122,6 +121,7 @@ import com.afwsamples.testdpc.profilepolicy.delegation.DelegationFragment;
 import com.afwsamples.testdpc.profilepolicy.permission.ManageAppPermissionsFragment;
 import com.afwsamples.testdpc.safetynet.SafetyNetFragment;
 import com.afwsamples.testdpc.util.MainThreadExecutor;
+import com.afwsamples.testdpc.transferownership.PickTransferComponentFragment;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -336,6 +336,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             = "create_eap_tls_wifi_configuration";
     private static final String WIFI_CONFIG_LOCKDOWN_ENABLE_KEY = "enable_wifi_config_lockdown";
     private static final String MODIFY_WIFI_CONFIGURATION_KEY = "modify_wifi_configuration";
+    private static final String TRANSFER_OWNERSHIP_KEY = "transfer_ownership_to_component";
     private static final String TAG_WIFI_CONFIG_CREATION = "wifi_config_creation";
     private static final String WIFI_CONFIG_LOCKDOWN_ON = "1";
     private static final String WIFI_CONFIG_LOCKDOWN_OFF = "0";
@@ -349,6 +350,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String SET_SCREEN_BRIGHTNESS_KEY = "set_screen_brightness";
     private static final String AUTO_BRIGHTNESS_KEY = "auto_brightness";
     private static final String SET_SCREEN_OFF_TIMEOUT_KEY = "set_screen_off_timeout";
+
 
     private static final String BATTERY_PLUGGED_ANY = Integer.toString(
             BatteryManager.BATTERY_PLUGGED_AC |
@@ -558,6 +560,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(CREATE_EAP_TLS_WIFI_CONFIGURATION_KEY).setOnPreferenceClickListener(this);
         findPreference(WIFI_CONFIG_LOCKDOWN_ENABLE_KEY).setOnPreferenceChangeListener(this);
         findPreference(MODIFY_WIFI_CONFIGURATION_KEY).setOnPreferenceClickListener(this);
+        findPreference(TRANSFER_OWNERSHIP_KEY).setOnPreferenceClickListener(this);
         findPreference(SHOW_WIFI_MAC_ADDRESS_KEY).setOnPreferenceClickListener(this);
         mInstallNonMarketAppsPreference = (DpcSwitchPreference) findPreference(
                 INSTALL_NONMARKET_APPS_KEY);
@@ -975,6 +978,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 return true;
             case SET_SCREEN_OFF_TIMEOUT_KEY:
                 showSetScreenOffTimeoutDialog();
+                return true;
+            case TRANSFER_OWNERSHIP_KEY:
+                showFragment(new PickTransferComponentFragment());
                 return true;
         }
         return false;

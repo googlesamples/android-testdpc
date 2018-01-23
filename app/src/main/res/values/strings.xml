@@ -852,6 +852,22 @@
     <string name="unable_disable_keyguard">Unable to disable keyguard</string>
     <string name="unable_enable_keyguard">Unable to enable keyguard</string>
 
+    <!-- Transfer ownership -->
+    <string name="transfer_ownership">Transfer ownership</string>
+    <string name="transfer_ownership_to_component">Transfer ownership to component</string>
+    <string name="transfer">Transfer</string>
+    <string name="transfer_ownership_component_to_transfer_to">Component to transfer to:</string>
+    <string name="transfer_ownership_example_package_name_example_component">example.package.name/example.class.name</string>
+    <string name="transfer_ownership_suitable_components_found_on_this_deivce">Suitable components found on this deivce:</string>
+    <string name="transfer_ownership_result_of_the_transfer_success_or_exception_log">Result of the transfer (success or exception log):</string>
+    <string name="transfer_ownership_invalid_target_format">Target component name has invalid format. Expecting \"example.package.name/example.class.name\".</string>
+    <string name="transfer_ownership_profile_owner_changed_title">Profile Owner changed</string>
+    <string name="transfer_ownership_device_owner_changed_title">Device Owner changed</string>
+    <string name="transfer_ownership_complete_title">Transfer of ownership is complete</string>
+    <string name="transfer_ownership_complete_message">The new owner is %1$s</string>
+    <string name="transfer_ownership_affiliated_complete_title">Transfer of affiliated profile ownership is complete</string>
+    <string name="transfer_ownership_affiliated_complete_message">The transferred user is %1$s</string>
+
     <!-- SefetyNet -->
     <string name="safetynet_preference_title">SafetyNet</string>
     <string name="attest_preference_title">SafetyNet Attestation</string>

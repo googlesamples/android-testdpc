@@ -31,6 +31,7 @@ import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Build;
 import android.os.ParcelFileDescriptor;
+import android.os.PersistableBundle;
 import android.os.Process;
 import android.os.UserHandle;
 import android.os.UserManager;
@@ -89,6 +90,12 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
             case ACTION_PASSWORD_REQUIREMENTS_CHANGED:
             case Intent.ACTION_BOOT_COMPLETED:
                 updatePasswordConstraintNotification(context);
+                break;
+            case DevicePolicyManager.ACTION_PROFILE_OWNER_CHANGED:
+                onProfileOwnerChanged(context);
+                break;
+            case DevicePolicyManager.ACTION_DEVICE_OWNER_CHANGED:
+                onDeviceOwnerChanged(context);
                 break;
             default:
                super.onReceive(context, intent);
@@ -594,5 +601,40 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
                 new Intent(DeviceAdminReceiver.ACTION_PASSWORD_REQUIREMENTS_CHANGED);
         changedIntent.setComponent(getComponentName(context));
         context.sendBroadcast(changedIntent);
+    }
+
+    private void onProfileOwnerChanged(Context context) {
+        Log.i(TAG, "onProfileOwnerChanged");
+        NotificationUtil.showNotification(context,
+                R.string.transfer_ownership_profile_owner_changed_title,
+                context.getString(R.string.transfer_ownership_profile_owner_changed_title),
+                NotificationUtil.PROFILE_OWNER_CHANGED_ID);
+    }
+
+    private void onDeviceOwnerChanged(Context context) {
+        Log.i(TAG, "onDeviceOwnerChanged");
+        NotificationUtil.showNotification(context,
+                R.string.transfer_ownership_device_owner_changed_title,
+                context.getString(R.string.transfer_ownership_device_owner_changed_title),
+                NotificationUtil.DEVICE_OWNER_CHANGED_ID);
+    }
+
+    @TargetApi(Build.VERSION_CODES.P)
+    public void onTransferOwnershipComplete(Context context, PersistableBundle bundle) {
+        Log.i(TAG, "onTransferOwnershipComplete");
+        NotificationUtil.showNotification(context,
+                R.string.transfer_ownership_complete_title,
+                context.getString(R.string.transfer_ownership_complete_message,
+                        getComponentName(context)),
+                NotificationUtil.TRANSFER_OWNERSHIP_COMPLETE_ID);
+    }
+
+    @TargetApi(Build.VERSION_CODES.P)
+    public void onTransferAffiliatedProfileOwnershipComplete(Context context, UserHandle user) {
+        Log.i(TAG, "onTransferAffiliatedProfileOwnershipComplete");
+        NotificationUtil.showNotification(context,
+                R.string.transfer_ownership_affiliated_complete_title,
+                context.getString(R.string.transfer_ownership_affiliated_complete_message, user),
+                NotificationUtil.TRANSFER_AFFILIATED_PROFILE_OWNERSHIP_COMPLETE_ID);
     }
 }
