@@ -250,6 +250,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String SEPARATE_CHALLENGE_KEY = "separate_challenge";
     private static final String DISABLE_CAMERA_KEY = "disable_camera";
     private static final String DISABLE_KEYGUARD = "disable_keyguard";
+    private static final String DISABLE_METERED_DATA_KEY = "disable_metered_data";
     private static final String DISABLE_SCREEN_CAPTURE_KEY = "disable_screen_capture";
     private static final String DISABLE_STATUS_BAR = "disable_status_bar";
     private static final String ENABLE_BACKUP_SERVICE = "enable_backup_service";
@@ -538,6 +539,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         mKeepUninstalledPackagesPreference.setOnPreferenceClickListener(this);
         mKeepUninstalledPackagesPreference.setCustomConstraint(this::validateAffiliatedUserAfterP);
         findPreference(MANAGE_APP_RESTRICTIONS_KEY).setOnPreferenceClickListener(this);
+        findPreference(DISABLE_METERED_DATA_KEY).setOnPreferenceClickListener(this);
         findPreference(GENERIC_DELEGATION_KEY).setOnPreferenceClickListener(this);
         findPreference(APP_RESTRICTIONS_MANAGING_PACKAGE_KEY).setOnPreferenceClickListener(this);
         findPreference(INSTALL_KEY_CERTIFICATE_KEY).setOnPreferenceClickListener(this);
@@ -822,6 +824,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 return true;
             case MANAGE_APP_RESTRICTIONS_KEY:
                 showFragment(new ManageAppRestrictionsFragment());
+                return true;
+            case DISABLE_METERED_DATA_KEY:
+                showSetMeteredDataPrompt();
                 return true;
             case GENERIC_DELEGATION_KEY:
                 showFragment(new DelegationFragment());
@@ -2552,7 +2557,51 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         }
     }
 
+    /**
+     * Shows an alert dialog with a list of packages with metered data disabled.
+     */
+    @TargetApi(28)
+    private void showSetMeteredDataPrompt() {
+        final Activity activity = getActivity();
+        if (activity == null || activity.isFinishing()) {
+            return;
+        }
 
+        final List<ApplicationInfo> applicationInfos
+                = mPackageManager.getInstalledApplications(0 /* flags */);
+        final List<ResolveInfo> resolveInfos = new ArrayList<>();
+        Collections.sort(applicationInfos,
+                new ApplicationInfo.DisplayNameComparator(mPackageManager));
+        for (ApplicationInfo applicationInfo : applicationInfos) {
+            final ResolveInfo resolveInfo = new ResolveInfo();
+            resolveInfo.resolvePackageName = applicationInfo.packageName;
+            resolveInfos.add(resolveInfo);
+        }
+        final MeteredDataRestrictionInfoAdapter meteredDataRestrictionInfoAdapter
+                = new MeteredDataRestrictionInfoAdapter(getActivity(),
+                        resolveInfos, getMeteredDataRestrictedPkgs());
+        final ListView listView = new ListView(activity);
+        listView.setAdapter(meteredDataRestrictionInfoAdapter);
+        listView.setOnItemClickListener((parent, view, pos, id)
+                -> meteredDataRestrictionInfoAdapter.onItemClick(parent, view, pos, id));
+
+        new AlertDialog.Builder(activity)
+                .setTitle(R.string.metered_data_restriction)
+                .setView(listView)
+                .setPositiveButton(R.string.update_pkgs, meteredDataRestrictionInfoAdapter)
+                .setNegativeButton(R.string.close, null /* Nothing to do */)
+                .show();
+    }
+
+    private List<String> getMeteredDataRestrictedPkgs() {
+        try {
+            return (List<String>) ReflectionUtil.invoke(mDevicePolicyManager,
+                    "getMeteredDataDisabled", mAdminComponentName);
+        } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
+            Log.e(TAG, "Can't invoke getMeteredDataDisabled", e);
+            return new ArrayList<>();
+        }
+    }
 
     /**
      * Shows an alert dialog which displays a list of apps. Clicking an app in the dialog clear the
