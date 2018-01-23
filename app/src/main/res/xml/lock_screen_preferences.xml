@@ -15,7 +15,7 @@
 -->
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:testdpc="http://schemas.android.com/apk/res/com.afwsamples.testdpc">
+    xmlns:testdpc="http://schemas.android.com/apk/res-auto">
     <PreferenceCategory android:title="@string/lock_screen_message">
         <com.afwsamples.testdpc.common.preference.DpcEditTextPreference
             android:defaultValue=""

@@ -82,6 +82,7 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.afwsamples.testdpc.AddAccountActivity;
+import com.afwsamples.testdpc.BuildConfig;
 import com.afwsamples.testdpc.CrossProfileAppsFragment;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
@@ -1231,7 +1232,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         // Create the folder if it doesn't exist.
         file.getParentFile().mkdirs();
         return FileProvider.getUriForFile(getActivity(),
-                "com.afwsamples.testdpc.fileprovider", file);
+                BuildConfig.APPLICATION_ID + ".fileprovider", file);
     }
 
     /**

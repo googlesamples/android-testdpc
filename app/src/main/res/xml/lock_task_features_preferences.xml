@@ -16,7 +16,7 @@
 
 <PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:testdpc="http://schemas.android.com/apk/res/com.afwsamples.testdpc"
+    xmlns:testdpc="http://schemas.android.com/apk/res-auto"
     android:title="@string/set_lock_task_features_title">
 
     <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
