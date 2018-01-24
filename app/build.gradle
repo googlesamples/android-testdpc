@@ -35,8 +35,8 @@ android {
         main {
 
         }
-        clone {
-            applicationIdSuffix ".clone"
+        replica {
+            applicationIdSuffix ".replica"
         }
     }
 
