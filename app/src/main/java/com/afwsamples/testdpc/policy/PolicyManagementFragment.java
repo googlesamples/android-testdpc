@@ -373,7 +373,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private AccountManager mAccountManager;
 
     private DpcPreference mInstallExistingPackagePreference;
-    private DpcPreference mKeepUninstalledPackagesPreference;
 
     private SwitchPreference mDisableCameraSwitchPreference;
     private SwitchPreference mDisableScreenCaptureSwitchPreference;
@@ -547,10 +546,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(SUSPEND_APPS_KEY).setOnPreferenceClickListener(this);
         findPreference(UNSUSPEND_APPS_KEY).setOnPreferenceClickListener(this);
         findPreference(CLEAR_APP_DATA_KEY).setOnPreferenceClickListener(this);
-        mKeepUninstalledPackagesPreference =
-                (DpcPreference) findPreference(KEEP_UNINSTALLED_PACKAGES);
-        mKeepUninstalledPackagesPreference.setOnPreferenceClickListener(this);
-        mKeepUninstalledPackagesPreference.setCustomConstraint(this::validateAffiliatedUserAfterP);
+        findPreference(KEEP_UNINSTALLED_PACKAGES).setOnPreferenceClickListener(this);
         findPreference(MANAGE_APP_RESTRICTIONS_KEY).setOnPreferenceClickListener(this);
         findPreference(DISABLE_METERED_DATA_KEY).setOnPreferenceClickListener(this);
         findPreference(GENERIC_DELEGATION_KEY).setOnPreferenceClickListener(this);
@@ -1982,7 +1978,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                     mDevicePolicyManager.isAffiliatedUser() ? R.string.yes : R.string.no);
         }
         mInstallExistingPackagePreference.refreshEnabledState();
-        mKeepUninstalledPackagesPreference.refreshEnabledState();
         mManageLockTaskListPreference.refreshEnabledState();
         mSetLockTaskFeaturesPreference.refreshEnabledState();
         mLogoutUserPreference.refreshEnabledState();

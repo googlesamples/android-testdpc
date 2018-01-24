@@ -127,6 +127,7 @@
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="keep_uninstalled_packages"
             android:title="@string/keep_uninstalled_packages"
+            testdpc:admin="deviceOwner"
             testdpc:minSdkVersion="P" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="manage_app_restrictions"
