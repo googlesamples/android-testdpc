@@ -4,7 +4,7 @@ import android.annotation.TargetApi;
 import android.app.Fragment;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.pm.crossprofile.CrossProfileApps;
+import android.content.pm.CrossProfileApps;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.UserHandle;
