@@ -194,7 +194,7 @@ public class UserRestriction {
                     R.string.disallow_config_screen_timeout),
             new UserRestriction(
                     DISALLOW_AMBIENT_DISPLAY,
-                    R.string.disallow_config_ambient_display),
+                    R.string.disallow_ambient_display),
             new UserRestriction(
                     DISALLOW_SHARE_INTO_MANAGED_PROFILE,
                     R.string.disallow_share_into_work_profile),
