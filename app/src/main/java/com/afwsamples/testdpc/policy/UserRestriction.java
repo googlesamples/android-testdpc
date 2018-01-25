@@ -52,6 +52,7 @@ public class UserRestriction {
     // TODO: remove it once available in SDK
     public static final String DISALLOW_UNIFIED_PASSWORD = "no_unified_password";
     public static final String DISALLOW_CONFIG_LOCATION = "no_config_location";
+    public static final String DISALLOW_PRINTING= "no_printing";
 
     public String key;
     public int titleResId;
@@ -198,6 +199,9 @@ public class UserRestriction {
             new UserRestriction(
                     DISALLOW_SHARE_INTO_MANAGED_PROFILE,
                     R.string.disallow_share_into_work_profile),
+            new UserRestriction(
+                    DISALLOW_PRINTING,
+                    R.string.disallow_printing),
     };
 
     /**
@@ -292,5 +296,6 @@ public class UserRestriction {
             DISALLOW_CONFIG_SCREEN_TIMEOUT,
             DISALLOW_AMBIENT_DISPLAY,
             DISALLOW_SHARE_INTO_MANAGED_PROFILE,
+            DISALLOW_PRINTING,
     };
 }

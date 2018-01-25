@@ -139,10 +139,6 @@
     <string name="set_persistent_device_owner_label">Set</string>
     <string name="clear_persistent_device_owner_label">Clear</string>
 
-    <!-- Strings for printing settings -->
-    <string name="printing_settings">Printing settings</string>
-    <string name="printing_enabled">Printing enabled</string>
-
     <!-- Strings for device reboot -->
     <string name="reboot">Reboot device</string>
     <string name="reboot_error_msg">Cannot reboot device during an ongoing call.</string>
@@ -430,6 +426,7 @@
     <string name="disallow_config_screen_timeout">Disallow config screen timeout</string>
     <string name="disallow_ambient_display">Disallow ambient display</string>
     <string name="disallow_share_into_work_profile">Disallow sharing data into the profile</string>
+    <string name="disallow_printing">Disallow printing</string>
     <string name="user_restriction_error_msg">Operation not allowed</string>
 
     <!-- Strings for select app -->
