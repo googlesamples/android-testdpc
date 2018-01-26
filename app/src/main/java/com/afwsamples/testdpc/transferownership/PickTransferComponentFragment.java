@@ -105,8 +105,10 @@ public class PickTransferComponentFragment extends Fragment {
         Log.i(getClass().getName(), "Transferring ownership from " + source
                 + " to target " + target);
         try {
+            PersistableBundle persistableBundle = new PersistableBundle();
+            persistableBundle.putString("random_key", "random_value");
             com.afwsamples.testdpc.common.ReflectionUtil.invoke(mDevicePolicyManager,
-                    "transferOwnership", source, target, new PersistableBundle());
+                    "transferOwnership", source, target, persistableBundle);
             return "Success!";
         } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
             Throwable cause = e.getCause();
