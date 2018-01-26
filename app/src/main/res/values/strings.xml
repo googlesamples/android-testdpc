@@ -827,6 +827,7 @@
     <string name="dont_require_password_on_boot">Do not require password to start user in future</string>
     <string name="password_reset_success">Password has been reset</string>
     <string name="password_reset_failed">Failed to reset password</string>
+    <string name="do_not_allow_other_admins_change_password">Do not allow other admins to change the password again until the user has entered it.</string>
 
     <!-- Strings for trust agent -->
     <string name="saved_trust_agent_config">Saved trust agent configuration</string>
