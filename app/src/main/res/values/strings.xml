@@ -502,6 +502,8 @@
 
     <!-- Backup and Restore for Device Owner -->
     <string name="enable_backup_service">Enable backup service</string>
+    <string name="mandatory_backups">Make backups mandatory</string>
+    <string name="mandatory_backup_account">Select mandatory backup account</string>
 
     <!-- Enterprise process logging -->
     <string name="enable_process_logging">Enable process logging</string>
