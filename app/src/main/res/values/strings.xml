@@ -212,6 +212,39 @@
     <string name="disable_cross_profile_caller_id">Disable cross-profile caller ID</string>
     <string name="disable_cross_profile_contacts_search">Disable cross-profile contacts search</string>
 
+    <!-- Strings for APN -->
+    <string name="override_apn_title">Override APN management</string>
+    <string name="manage_override_apn">Manage override APNs</string>
+    <string name="insert_override_apn">Insert override APN</string>
+    <string name="insert_override_apn_error">Fail to insert override APN, format incorrect</string>
+    <string name="remove_override_apn">Remove all override APNs</string>
+    <string name="enable_override_apn">Enable override APNs</string>
+    <string name="apn_entry_name">Entry name</string>
+    <string name="apn_apn_name">APN name</string>
+    <string name="apn_proxy">Proxy</string>
+    <string name="apn_port">Port</string>
+    <string name="apn_mmsc">MMSC</string>
+    <string name="apn_mmsproxy">MMS Proxy</string>
+    <string name="apn_mmsport">MMS Port</string>
+    <string name="apn_user">User</string>
+    <string name="apn_password">Password</string>
+    <string name="apn_auth_type">Authentication type</string>
+    <string name="apn_type">Type</string>
+    <string name="apn_numeric">Numeric(MCC+MNC)</string>
+    <string name="apn_protocol">Protocol</string>
+    <string name="apn_roaming_protocol">Roaming protocol</string>
+    <string name="apn_carrier_enabled">Carrier enabled</string>
+    <string name="apn_network_bitmask">Network bitmask</string>
+    <string name="apn_mvno_type">MVNO type</string>
+    <string name="apn_auth_type_hint">0:None, 1:PAP, 2:CHAP, 3:PAP_OR_CHAP</string>
+    <string name="apn_numeric_hint">Numeric=MCC+MNC</string>
+    <string name="apn_carrier_enabled_hint">0 for false, 1 for true</string>
+    <string name="apn_no_entry_name">Entry name is not specified</string>
+    <string name="apn_no_apn_name">APN name is not specified</string>
+    <string name="apn_wrong_url">Cannot parse mmsc</string>
+    <string name="apn_wrong_inetaddress">Cannot parse proxy or mmsproxy</string>
+    <string name="apn_wrong_port">Cannot parse port or mmsport</string>
+
     <!-- Strings for wifi management -->
     <string name="wifi_management_title">WI-FI management</string>
     <string name="create_wifi_configuration">Create WI-FI configuration</string>

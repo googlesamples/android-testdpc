@@ -16,6 +16,9 @@
 
 package com.afwsamples.testdpc.policy;
 
+import static android.os.UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES;
+import static com.afwsamples.testdpc.common.preference.DpcPreferenceHelper.NO_CUSTOM_CONSTRIANT;
+
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.accounts.Account;
 import android.accounts.AccountManager;
@@ -82,7 +85,6 @@ import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
-
 import com.afwsamples.testdpc.AddAccountActivity;
 import com.afwsamples.testdpc.BuildConfig;
 import com.afwsamples.testdpc.CrossProfileAppsFragment;
@@ -124,11 +126,8 @@ import com.afwsamples.testdpc.profilepolicy.apprestrictions.ManageAppRestriction
 import com.afwsamples.testdpc.profilepolicy.delegation.DelegationFragment;
 import com.afwsamples.testdpc.profilepolicy.permission.ManageAppPermissionsFragment;
 import com.afwsamples.testdpc.safetynet.SafetyNetFragment;
-import com.afwsamples.testdpc.util.MainThreadExecutor;
 import com.afwsamples.testdpc.transferownership.PickTransferComponentFragment;
-
-import org.bouncycastle.operator.OperatorCreationException;
-
+import com.afwsamples.testdpc.util.MainThreadExecutor;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -159,11 +158,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
-
 import javax.security.auth.x500.X500Principal;
-
-import static android.os.UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES;
-import static com.afwsamples.testdpc.common.preference.DpcPreferenceHelper.NO_CUSTOM_CONSTRIANT;
+import org.bouncycastle.operator.OperatorCreationException;
 
 /**
  * Provides several device management functions.
@@ -238,6 +234,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
     // Tag for creating this fragment. This tag can be used to retrieve this fragment.
     public static final String FRAGMENT_TAG = "PolicyManagementFragment";
+
+    public static final String LOG_TAG = "TestDPC";
 
     private static final int INSTALL_KEY_CERTIFICATE_REQUEST_CODE = 7689;
     private static final int INSTALL_CA_CERTIFICATE_REQUEST_CODE = 7690;
@@ -380,6 +378,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     private static final String SET_TIME_KEY = "set_time";
     private static final String SET_TIME_ZONE_KEY = "set_time_zone";
+
+    private static final String MANAGE_OVERRIDE_APN_KEY = "manage_override_apn";
 
     private static final String BATTERY_PLUGGED_ANY = Integer.toString(
             BatteryManager.BATTERY_PLUGGED_AC |
@@ -619,6 +619,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
         findPreference(SET_TIME_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_TIME_ZONE_KEY).setOnPreferenceClickListener(this);
+
+        findPreference(MANAGE_OVERRIDE_APN_KEY).setOnPreferenceClickListener(this);
 
         DpcPreference bindDeviceAdminPreference =
                 (DpcPreference) findPreference(BIND_DEVICE_ADMIN_POLICIES);
@@ -1040,6 +1042,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                         Settings.Global.AUTO_TIME_ZONE, "0");
                 showSetTimeZoneDialog();
                 return true;
+            case MANAGE_OVERRIDE_APN_KEY:
+                showFragment(new OverrideApnFragment());
+                return true;
         }
         return false;
     }
@@ -1213,6 +1218,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 mDevicePolicyManager.setSystemSetting(mAdminComponentName,
                         Settings.System.SCREEN_BRIGHTNESS_MODE, newValue.equals(true) ? "1" : "0");
                 reloadAutoBrightnessUi();
+                return true;
         }
         return false;
     }
