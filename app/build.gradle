@@ -22,6 +22,7 @@ android {
         targetSdkVersion 28
         versionCode versionMajor * 1000 + versionMinor * 100 + versionBuild
         versionName "${versionMajor}.${versionMinor}.${versionBuild}"
+        multiDexEnabled true
     }
 
     buildTypes {
@@ -75,6 +76,7 @@ android {
 }
 
 dependencies {
+    compile 'com.android.support:multidex:1.0.1'
     compile 'com.android.support:preference-v14:27.0.2'
     compile 'com.android.support:recyclerview-v7:27.0.2'
     compile 'com.android.support:support-v13:27.0.2'
@@ -83,4 +85,5 @@ dependencies {
     compile(name: 'setup-wizard-lib-platform-release', ext: 'aar')
     compile 'org.bouncycastle:bcpkix-jdk15on:1.56'
     compile 'org.bouncycastle:bcprov-jdk15on:1.56'
+    compile 'com.google.guava:guava:23.6-android'
 }
