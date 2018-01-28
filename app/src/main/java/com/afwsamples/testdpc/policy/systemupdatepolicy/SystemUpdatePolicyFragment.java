@@ -17,25 +17,37 @@
 package com.afwsamples.testdpc.policy.systemupdatepolicy;
 
 import android.annotation.TargetApi;
+import android.app.DatePickerDialog;
 import android.app.Fragment;
 import android.app.TimePickerDialog;
-import android.app.TimePickerDialog.OnTimeSetListener;
 import android.app.admin.DevicePolicyManager;
 import android.app.admin.SystemUpdatePolicy;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
+import android.support.v4.os.BuildCompat;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.RadioGroup;
-import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
+import com.afwsamples.testdpc.common.ReflectionUtil;
+
+import java.lang.reflect.InvocationTargetException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -50,20 +62,47 @@ import com.afwsamples.testdpc.R;
 public class SystemUpdatePolicyFragment extends Fragment implements View.OnClickListener,
         RadioGroup.OnCheckedChangeListener {
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    static class Period {
+        LocalDate mStart;
+        LocalDate mEnd;
+
+        public Period(Integer start, Integer end) {
+            int currentYear = LocalDate.now().getYear();
+            mStart = LocalDate.ofYearDay(2001, start).withYear(currentYear);
+            mEnd = LocalDate.ofYearDay(2001, end).withYear(end >= start ? currentYear : currentYear + 1);
+        }
+
+        public Period(LocalDate startDate, LocalDate endDate) {
+            mStart = startDate;
+            mEnd = endDate;
+        }
+
+        @Override
+        public String toString() {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd");
+            return mStart.format(formatter) + " - " + mEnd.format(formatter);
+        }
+
+        public Pair<Integer, Integer> toIntegers() {
+            return new Pair<>(mStart.withYear(2001).getDayOfYear(),
+                    mEnd.withYear(2001).getDayOfYear());
+        }
+    }
+
     private EditText mCurrentSystemUpdatePolicy;
-
     private RadioGroup mSystemUpdatePolicySelection;
-
     private LinearLayout mMaintenanceWindowDetails;
-
     private Button mSetMaintenanceWindowStart;
-
     private Button mSetMaintenanceWindowEnd;
+    private LinearLayout mFreezePeriodPanel;
+    private ListView mFreezePeriodList;
 
     private DevicePolicyManager mDpm;
-
     private int mMaintenanceStart;
     private int mMaintenanceEnd;
+    private ArrayList<Period> mFreezePeriods = new ArrayList<>();
+    private FreezePeriodAdapter mFreezePeriodAdapter;
 
     @Override
     public void onResume() {
@@ -72,6 +111,43 @@ public class SystemUpdatePolicyFragment extends Fragment implements View.OnClick
         reloadSystemUpdatePolicy();
     }
 
+    class FreezePeriodAdapter extends ArrayAdapter<Period> {
+        public ArrayList<Period> mData;
+
+        public FreezePeriodAdapter(Context context, ArrayList<Period> periods) {
+            super(context, 0, periods);
+            this.mData = periods;
+        }
+
+        @RequiresApi(api = Build.VERSION_CODES.O)
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            Period currentPeriod = getItem(position);
+            if (convertView == null) {
+                convertView = LayoutInflater.from(getContext()).inflate(R.layout.freeze_period_row,
+                        parent, false);
+            }
+            Button textView = convertView.findViewById(R.id.string_period);
+            textView.setText(currentPeriod.toString());
+            textView.setTag(mData.get(position));
+            textView.setOnClickListener(view -> {
+                final Period period = (Period) view.getTag();
+                promptToSetFreezePeriod((LocalDate startDate, LocalDate endDate) -> {
+                    period.mStart = startDate;
+                    period.mEnd = endDate;
+                    mFreezePeriodAdapter.notifyDataSetChanged();
+                }, period.mStart, period.mEnd);
+            });
+            View deleteButton = convertView.findViewById(R.id.delete_period);
+            deleteButton.setTag(mData.get(position));
+            deleteButton.setOnClickListener(view -> {
+                Period period = (Period) view.getTag();
+                mData.remove(period);
+                FreezePeriodAdapter.this.notifyDataSetChanged();
+            });
+            return convertView;
+        }
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -84,41 +160,42 @@ public class SystemUpdatePolicyFragment extends Fragment implements View.OnClick
             Bundle savedInstanceState) {
         View view = layoutInflater.inflate(R.layout.system_update_policy, null);
 
-        mCurrentSystemUpdatePolicy = (EditText) view.findViewById(
-                R.id.system_update_policy_current);
-        mSystemUpdatePolicySelection = (RadioGroup) view.findViewById(
-                R.id.system_update_policy_selection);
-        mMaintenanceWindowDetails = (LinearLayout) view.findViewById(
-                R.id.system_update_policy_windowed_details);
-        mSetMaintenanceWindowStart = (Button) view.findViewById(
-                R.id.system_update_policy_window_start);
-        mSetMaintenanceWindowEnd = (Button) view.findViewById(R.id.system_update_policy_window_end);
+        mCurrentSystemUpdatePolicy = view.findViewById(R.id.system_update_policy_current);
+        mSystemUpdatePolicySelection = view.findViewById(R.id.system_update_policy_selection);
+        mMaintenanceWindowDetails = view.findViewById(R.id.system_update_policy_windowed_details);
+        mSetMaintenanceWindowStart = view.findViewById(R.id.system_update_policy_window_start);
+        mSetMaintenanceWindowEnd = view.findViewById(R.id.system_update_policy_window_end);
+        mFreezePeriodPanel = view.findViewById(R.id.system_update_policy_blackout_periods);
+        mFreezePeriodList = view.findViewById(R.id.system_update_policy_blackout_period_list);
+
+        mFreezePeriodAdapter = new FreezePeriodAdapter(getContext(), mFreezePeriods);
+        mFreezePeriodList.setAdapter(mFreezePeriodAdapter);
 
         mSetMaintenanceWindowStart.setOnClickListener(this);
         mSetMaintenanceWindowEnd.setOnClickListener(this);
         view.findViewById(R.id.system_update_policy_set).setOnClickListener(this);
+        view.findViewById(R.id.system_update_policy_btn_add_period).setOnClickListener(this);
 
         mSystemUpdatePolicySelection.setOnCheckedChangeListener(this);
 
+        mFreezePeriodPanel.setVisibility(BuildCompat.isAtLeastP() ? View.VISIBLE : View.GONE);
         return view;
     }
 
     private void selectTime(final boolean isWindowStart) {
         int defaultMinutes = isWindowStart ? mMaintenanceStart : mMaintenanceEnd;
-        TimePickerDialog timePicker = new TimePickerDialog(getActivity(), new OnTimeSetListener() {
-                @Override
-                public void onTimeSet(TimePicker arg0, int hour, int minutes) {
-                    if (isWindowStart) {
-                        mMaintenanceStart = hour * 60 + minutes;
-                    } else {
-                        mMaintenanceEnd = hour * 60 + minutes;
-                    }
-                    updateMaintenanceWindowDisplay();
-                }
+        TimePickerDialog timePicker = new TimePickerDialog(getActivity(), (picker, hour, minutes) -> {
+            if (isWindowStart) {
+                mMaintenanceStart = hour * 60 + minutes;
+            } else {
+                mMaintenanceEnd = hour * 60 + minutes;
+            }
+            updateMaintenanceWindowDisplay();
         }, defaultMinutes / 60, defaultMinutes % 60, true);
         timePicker.show();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -129,13 +206,55 @@ public class SystemUpdatePolicyFragment extends Fragment implements View.OnClick
                 selectTime(false);
                 break;
             case R.id.system_update_policy_set:
-                setSystemUpdatePolicy();
-                reloadSystemUpdatePolicy();
+                if (setSystemUpdatePolicy()) {
+                    reloadSystemUpdatePolicy();
+                }
                 break;
+            case R.id.system_update_policy_btn_add_period:
+                promptToSetFreezePeriod((LocalDate startDate, LocalDate endDate) -> {
+                    Period period = new Period(startDate, endDate);
+                    mFreezePeriods.add(period);
+                    mFreezePeriodAdapter.notifyDataSetChanged();
+                }, LocalDate.now(), LocalDate.now());
         }
     }
 
-    private void setSystemUpdatePolicy() {
+    interface FreezePeriodPickResult {
+        void onResult(LocalDate startDate, LocalDate endDate);
+    }
+
+    interface DatePickResult {
+        void onResult(LocalDate pickedDate);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void showDatePicker(LocalDate hint, int titleResId, DatePickResult resultCallback) {
+        DatePickerDialog picker = new DatePickerDialog(getActivity(),
+                (pickerObj, year, month, day) -> {
+                    final LocalDate pickedDate = LocalDate.of(year, month + 1, day);
+                    resultCallback.onResult(pickedDate);
+                }, hint.getYear(), hint.getMonth().getValue() - 1, hint.getDayOfMonth());
+        picker.setTitle(getString(titleResId));
+        picker.show();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void promptToSetFreezePeriod(FreezePeriodPickResult callback, final LocalDate startDate,
+                                         final LocalDate endDate) {
+        showDatePicker(startDate, R.string.system_update_policy_pick_start_free_period_title,
+                pickedStartDate -> {
+                    LocalDate proposedEndDate = endDate;
+                    if (proposedEndDate.compareTo(pickedStartDate) < 0) {
+                        proposedEndDate = pickedStartDate;
+                    }
+                    showDatePicker(proposedEndDate,
+                            R.string.system_update_policy_pick_end_free_period_title,
+                            pickedEndDate -> callback.onResult(pickedStartDate, pickedEndDate));
+                });
+    }
+
+    @TargetApi(Build.VERSION_CODES.P)
+    private boolean setSystemUpdatePolicy() {
         SystemUpdatePolicy newPolicy;
         switch (mSystemUpdatePolicySelection.getCheckedRadioButtonId()) {
             case R.id.system_update_policy_automatic:
@@ -152,7 +271,35 @@ public class SystemUpdatePolicyFragment extends Fragment implements View.OnClick
             default:
                 newPolicy = null;
         }
-        mDpm.setSystemUpdatePolicy(DeviceAdminReceiver.getComponentName(getActivity()), newPolicy);
+        try {
+            if (BuildCompat.isAtLeastP() && newPolicy != null && mFreezePeriods.size() != 0) {
+                List<Pair<Integer, Integer>> periods = new ArrayList<>(mFreezePeriods.size());
+                for (Period p : mFreezePeriods) {
+                    periods.add(p.toIntegers());
+                }
+                ReflectionUtil.invoke(newPolicy, "setFreezePeriods",
+                        new Class[]{List.class}, periods);
+            }
+            mDpm.setSystemUpdatePolicy(DeviceAdminReceiver.getComponentName(getActivity()),
+                    newPolicy);
+            Toast.makeText(getContext(), "Policy set successfully", Toast.LENGTH_SHORT).show();
+            return true;
+        } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof InvocationTargetException) {
+                if (cause.getCause().getClass().getSimpleName().equals(
+                        "ValidationFailedException")) {
+                    cause = cause.getCause();
+                }
+            }
+            cause.printStackTrace();
+            Toast.makeText(getContext(), "Fail to set policy: " + cause.getMessage(),
+                    Toast.LENGTH_LONG).show();
+        } catch (IllegalArgumentException e) {
+            Toast.makeText(getContext(), "setSystemUpdatePolicy fails: " + e.getMessage(),
+                    Toast.LENGTH_LONG).show();
+        }
+        return false;
     }
 
     private String formatMinutes(int minutes) {
@@ -164,6 +311,7 @@ public class SystemUpdatePolicyFragment extends Fragment implements View.OnClick
         mSetMaintenanceWindowEnd.setText(formatMinutes(mMaintenanceEnd));
     }
 
+    @TargetApi(Build.VERSION_CODES.P)
     private void reloadSystemUpdatePolicy() {
         SystemUpdatePolicy policy = mDpm.getSystemUpdatePolicy();
         String policyDescription = "Unknown";
@@ -172,6 +320,7 @@ public class SystemUpdatePolicyFragment extends Fragment implements View.OnClick
             policyDescription = "None";
             mSystemUpdatePolicySelection.check(R.id.system_update_policy_none);
             mMaintenanceWindowDetails.setVisibility(View.INVISIBLE);
+            mFreezePeriodPanel.setVisibility(View.GONE);
         } else {
             switch (policy.getPolicyType()) {
                 case SystemUpdatePolicy.TYPE_INSTALL_AUTOMATIC:
@@ -196,6 +345,21 @@ public class SystemUpdatePolicyFragment extends Fragment implements View.OnClick
                     mMaintenanceWindowDetails.setVisibility(View.INVISIBLE);
                     break;
             }
+            if (BuildCompat.isAtLeastP()) {
+                try {
+                    List<Pair<Integer, Integer>> freezePeriods = (List<Pair<Integer, Integer>>)
+                            ReflectionUtil.invoke(policy, "getFreezePeriods");
+                    mFreezePeriods.clear();
+                    for (Pair<Integer, Integer> period : freezePeriods) {
+                        Period p = new Period(period.first, period.second);
+                        mFreezePeriods.add(p);
+                    }
+                    mFreezePeriodAdapter.notifyDataSetChanged();
+                } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
+                    e.printStackTrace();
+                }
+                mFreezePeriodPanel.setVisibility(View.VISIBLE);
+            }
         }
         mCurrentSystemUpdatePolicy.setText(policyDescription);
     }
@@ -207,6 +371,11 @@ public class SystemUpdatePolicyFragment extends Fragment implements View.OnClick
             mMaintenanceWindowDetails.setVisibility(View.VISIBLE);
         } else {
             mMaintenanceWindowDetails.setVisibility(View.INVISIBLE);
+        }
+        if (checkedId == R.id.system_update_policy_none || !BuildCompat.isAtLeastP()) {
+            mFreezePeriodPanel.setVisibility(View.GONE);
+        } else {
+            mFreezePeriodPanel.setVisibility(View.VISIBLE);
         }
     }
 }
