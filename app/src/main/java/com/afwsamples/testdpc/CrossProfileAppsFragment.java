@@ -3,20 +3,14 @@ package com.afwsamples.testdpc;
 import android.annotation.TargetApi;
 import android.app.Fragment;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.pm.CrossProfileApps;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.UserHandle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.afwsamples.testdpc.common.ReflectionUtil;
-
 import java.util.List;
 
 // TODO: Replace it with P.
@@ -28,7 +22,7 @@ public class CrossProfileAppsFragment extends Fragment {
     private TextView mSwitchProfileTextView;
     private TextView mDescriptionTextView;
     private ImageView mSwitchProfileImageView;
-    private Object mCrossProfileApps;
+    private CrossProfileApps mCrossProfileApps;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -43,7 +37,7 @@ public class CrossProfileAppsFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mCrossProfileApps = getActivity().getSystemService(Context.CROSS_PROFILE_APPS_SERVICE);
+        mCrossProfileApps = getActivity().getSystemService(CrossProfileApps.class);
     }
 
     @Override
@@ -53,18 +47,11 @@ public class CrossProfileAppsFragment extends Fragment {
     }
 
     private void refreshUi() {
-        try {
-            List<UserHandle> targetUserProfiles =
-                    (List<UserHandle>) ReflectionUtil.invoke(
-                            mCrossProfileApps,
-                            "getTargetUserProfiles");
-            if (targetUserProfiles.isEmpty()) {
-                showNoTargetUserUi();
-            } else {
-                showHasTargetUserUi(targetUserProfiles.get(0));
-            }
-        } catch (ReflectionUtil.ReflectionIsTemporaryException ex) {
-            Log.e(TAG, "Failed to call CrossProfileApps API: ", ex);
+        List<UserHandle> targetUserProfiles = mCrossProfileApps.getTargetUserProfiles();
+        if (targetUserProfiles.isEmpty()) {
+            showNoTargetUserUi();
+        } else {
+            showHasTargetUserUi(targetUserProfiles.get(0));
         }
     }
 
@@ -75,24 +62,14 @@ public class CrossProfileAppsFragment extends Fragment {
         mSwitchProfileImageView.setOnClickListener(null);
     }
 
-    private void showHasTargetUserUi(UserHandle userHandle)
-            throws ReflectionUtil.ReflectionIsTemporaryException {
-        mSwitchProfileTextView.setText((String)
-                ReflectionUtil.invoke(
-                        mCrossProfileApps, "getProfileSwitchingLabel", userHandle));
-        mSwitchProfileImageView.setImageDrawable((Drawable) ReflectionUtil.invoke(
-                mCrossProfileApps, "getProfileSwitchingIconDrawable", userHandle));
+    private void showHasTargetUserUi(UserHandle userHandle) {
+        mSwitchProfileTextView.setText(mCrossProfileApps.getProfileSwitchingLabel(userHandle));
+        mSwitchProfileImageView.setImageDrawable(
+            mCrossProfileApps.getProfileSwitchingIconDrawable(userHandle));
         mDescriptionTextView.setText(R.string.cross_profile_apps_available);
         mSwitchProfileImageView.setOnClickListener(
-                view -> {
-                    try {
-                        ReflectionUtil.invoke(
-                                mCrossProfileApps, "startMainActivity",
-                                new ComponentName(getActivity(), PolicyManagementActivity.class),
-                                userHandle);
-                    } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
-                        e.printStackTrace();
-                    }
-                });
+            view ->
+                mCrossProfileApps.startMainActivity(
+                    new ComponentName(getActivity(), PolicyManagementActivity.class), userHandle));
     }
 }
