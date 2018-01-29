@@ -38,7 +38,7 @@
         <TextView android:id="@+id/selected_logo_value"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="ic_launcher"
+                android:text=""
                 android:layout_gravity="center_vertical"
                 android:paddingEnd="@dimen/params_padding_start_end" />
         <ImageView android:id="@+id/preview_logo"
@@ -48,8 +48,7 @@
                 android:maxWidth="@dimen/params_preview_logo_max_width"
                 android:maxHeight="@dimen/params_preview_logo_max_height"
                 android:scaleType="fitCenter"
-                android:adjustViewBounds="true"
-                android:src="@drawable/ic_launcher" />
+                android:adjustViewBounds="true"/>
         <View
                 android:layout_width="0dp"
                 android:layout_height="match_parent"

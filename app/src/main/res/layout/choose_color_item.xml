@@ -36,14 +36,12 @@
         <TextView android:id="@+id/selected_color_value"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@color/teal"
                 android:layout_gravity="center_vertical"
                 android:paddingEnd="@dimen/params_padding_start_end" />
         <ImageView android:id="@+id/preview_color"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_circle"
-                android:tint="@color/teal"
                 android:layout_gravity="center_vertical" />
         <View
                 android:layout_width="0dp"
