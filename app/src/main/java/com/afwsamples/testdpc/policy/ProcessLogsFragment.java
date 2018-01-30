@@ -42,6 +42,30 @@ public class ProcessLogsFragment extends ListFragment {
 
     private static final String TAG = "ProcessLogsFragment";
 
+    // TODO: remove when it lands in the SDK:
+    private static final int TAG_OS_STARTUP = 210009;
+    private static final int TAG_OS_SHUTDOWN = 210010;
+    private static final int TAG_LOGGING_STARTED = 210011;
+    private static final int TAG_LOGGING_STOPPED = 210012;
+    private static final int TAG_MEDIA_MOUNTED = 210013;
+    private static final int TAG_MEDIA_UNMOUNTED = 210014;
+    private static final int TAG_LOG_BUFFER_SIZE_CRITICAL = 210015;
+    private static final int TAG_PASSWORD_EXPIRATION_SET = 210016;
+    private static final int TAG_PASSWORD_COMPLEXITY_SET = 210017;
+    private static final int TAG_PASSWORD_HISTORY_LENGTH_SET = 210018;
+    private static final int TAG_MAX_SCREEN_LOCK_TIMEOUT_SET = 210019;
+    private static final int TAG_MAX_PASSWORD_ATTEMPTS_SET = 210020;
+    private static final int TAG_KEYGUARD_DISABLED_FEATURES_SET = 210021;
+    private static final int TAG_REMOTE_LOCK = 210022;
+    private static final int TAG_WIPE_FAILED = 210023;
+    private static final int TAG_KEY_GENERATED = 210024;
+    private static final int TAG_KEY_IMPORTED = 210025;
+    private static final int TAG_KEY_DESTROYED = 210026;
+    private static final int TAG_USER_RESTRICTION_ADDED = 210027;
+    private static final int TAG_USER_RESTRICTION_REMOVED = 210028;
+    private static final int TAG_CERT_AUTHORITY_INSTALLED = 210029;
+    private static final int TAG_CERT_AUTHORITY_REMOVED = 210030;
+
     private ArrayList<String> mLogs = new ArrayList<String>();
     private ArrayAdapter<String> mAdapter;
 
@@ -127,8 +151,74 @@ public class ProcessLogsFragment extends ListFragment {
             case SecurityLog.TAG_KEYGUARD_SECURED:
                 eventTag = "KEYGUARD_SECURED";
                 break;
+            case TAG_OS_STARTUP:
+                eventTag = "OS_STARTUP";
+                break;
+            case TAG_OS_SHUTDOWN:
+                eventTag = "OS_SHUTDOWN";
+                break;
+            case TAG_LOGGING_STARTED:
+                eventTag = "LOGGING_STARTED";
+                break;
+            case TAG_LOGGING_STOPPED:
+                eventTag = "LOGGING_STOPPED";
+                break;
+            case TAG_MEDIA_MOUNTED:
+                eventTag = "MEDIA_MOUNTED";
+                break;
+            case TAG_MEDIA_UNMOUNTED:
+                eventTag = "MEDIA_UNMOUNTED";
+                break;
+            case TAG_LOG_BUFFER_SIZE_CRITICAL:
+                eventTag = "LOG_BUFFER_SIZE_CRITICAL";
+                break;
+            case TAG_PASSWORD_EXPIRATION_SET:
+                eventTag = "PASSWORD_EXPIRATION_SET";
+                break;
+            case TAG_PASSWORD_COMPLEXITY_SET:
+                eventTag = "PASSWORD_COMPLEXITY_SET";
+                break;
+            case TAG_PASSWORD_HISTORY_LENGTH_SET:
+                eventTag = "PASSWORD_HISTORY_LENGTH_SET";
+                break;
+            case TAG_MAX_SCREEN_LOCK_TIMEOUT_SET:
+                eventTag = "MAX_SCREEN_LOCK_TIMEOUT_SET";
+                break;
+            case TAG_MAX_PASSWORD_ATTEMPTS_SET:
+                eventTag = "MAX_PASSWORD_ATTEMPTS_SET";
+                break;
+            case TAG_KEYGUARD_DISABLED_FEATURES_SET:
+                eventTag = "KEYGUARD_DISABLED_FEATURES_SET";
+                break;
+            case TAG_REMOTE_LOCK:
+                eventTag = "REMOTE_LOCK";
+                break;
+            case TAG_WIPE_FAILED:
+                eventTag = "WIPE_FAILED";
+                break;
+            case TAG_KEY_GENERATED:
+                eventTag = "KEY_GENERATED";
+                break;
+            case TAG_KEY_IMPORTED:
+                eventTag = "KEY_IMPORTED";
+                break;
+            case TAG_KEY_DESTROYED:
+                eventTag = "KEY_DESTROYED";
+                break;
+            case TAG_USER_RESTRICTION_ADDED:
+                eventTag = "USER_RESTRICTION_ADDED";
+                break;
+            case TAG_USER_RESTRICTION_REMOVED:
+                eventTag = "USER_RESTRICTION_REMOVED";
+                break;
+            case TAG_CERT_AUTHORITY_INSTALLED:
+                eventTag = "CERT_AUTHORITY_INSTALLED";
+                break;
+            case TAG_CERT_AUTHORITY_REMOVED:
+                eventTag = "CERT_AUTHORITY_REMOVED";
+                break;
             default:
-                eventTag = "UNKNOWN";
+                eventTag = "UNKNOWN(" + eventId + ")";
         }
         return eventTag;
     }
