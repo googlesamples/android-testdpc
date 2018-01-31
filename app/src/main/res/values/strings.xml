@@ -109,7 +109,7 @@
     <string name="not_for_parent_profile">Not applicable to parent profile</string>
     <string name="user_restricted">Disallowed by user restriction</string>
     <string name="requires_network_logs">Requires network logging to be enabled</string>
-    <string name="requires_process_logs">Requires process logging to be enabled</string>
+    <string name="requires_security_logs">Requires security logging to be enabled</string>
     <string name="not_for_password_quality">Not applicable to current password quality</string>
 
     <string name="this_is_a_device_owner">This app is the device owner.</string>
@@ -549,12 +549,12 @@
     <string name="mandatory_backups">Make backups mandatory</string>
     <string name="mandatory_backup_account">Select mandatory backup account</string>
 
-    <!-- Enterprise process logging -->
-    <string name="enable_process_logging">Enable process logging</string>
-    <string name="request_process_logs">Request process logs</string>
-    <string name="failed_to_retrieve_process_logs">Failed to retrieve process logs, they were probably accessed less than 2 hours ago</string>
-    <string name="exception_retrieving_process_logs">Not allowed to retrieve process logs, SecurityException thrown</string>
-    <string name="process_logs_retrieved_message">---- Logs retrieved  %s ----</string>
+    <!-- Enterprise security logging -->
+    <string name="enable_security_logging">Enable security logging</string>
+    <string name="request_security_logs">Request security logs</string>
+    <string name="failed_to_retrieve_security_logs">Failed to retrieve security logs, they were probably accessed less than 2 hours ago</string>
+    <string name="exception_retrieving_security_logs">Not allowed to retrieve security logs, SecurityException thrown</string>
+    <string name="security_logs_retrieved_message">---- Logs retrieved  %s ----</string>
     <string name="on_security_logs_available">Test DPC: Security logs ready to be retrieved</string>
 
     <!-- Network logging -->

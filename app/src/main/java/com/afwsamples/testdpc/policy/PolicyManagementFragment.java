@@ -263,7 +263,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String DISABLE_SCREEN_CAPTURE_KEY = "disable_screen_capture";
     private static final String DISABLE_STATUS_BAR = "disable_status_bar";
     private static final String ENABLE_BACKUP_SERVICE = "enable_backup_service";
-    private static final String ENABLE_PROCESS_LOGGING = "enable_process_logging";
+    private static final String ENABLE_SECURITY_LOGGING = "enable_security_logging";
     private static final String ENABLE_NETWORK_LOGGING = "enable_network_logging";
     private static final String ENABLE_SYSTEM_APPS_BY_INTENT_KEY = "enable_system_apps_by_intent";
     private static final String ENABLE_SYSTEM_APPS_BY_PACKAGE_NAME_KEY
@@ -314,7 +314,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String EPHEMERAL_USER_KEY = "ephemeral_user";
     private static final String REQUEST_BUGREPORT_KEY = "request_bugreport";
     private static final String REQUEST_NETWORK_LOGS = "request_network_logs";
-    private static final String REQUEST_PROCESS_LOGS = "request_process_logs";
+    private static final String REQUEST_SECURITY_LOGS = "request_security_logs";
     private static final String RESET_PASSWORD_KEY = "reset_password";
     private static final String LOCK_NOW_KEY = "lock_now";
     private static final String SET_ACCESSIBILITY_SERVICES_KEY = "set_accessibility_services";
@@ -410,7 +410,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     private SwitchPreference mEnableBackupServicePreference;
     private SwitchPreference mMandatoryBackupsPreference;
-    private SwitchPreference mEnableProcessLoggingPreference;
+    private SwitchPreference mEnableSecurityLoggingPreference;
     private SwitchPreference mEnableNetworkLoggingPreference;
     private SwitchPreference mSetAutoTimeRequiredPreference;
     private DpcPreference mLogoutUserPreference;
@@ -421,7 +421,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private Preference mAffiliatedUserPreference;
     private Preference mEphemeralUserPreference;
     private DpcPreference mRequestNetworkLogsPreference;
-    private DpcPreference mRequestProcessLogsPreference;
+    private DpcPreference mRequestSecurityLogsPreference;
     private Preference mSetDeviceOrganizationNamePreference;
 
     private DpcSwitchPreference mAutoBrightnessPreference;
@@ -530,14 +530,15 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         mMandatoryBackupsPreference = (SwitchPreference) findPreference(MANDATORY_BACKUPS);
         mMandatoryBackupsPreference.setOnPreferenceChangeListener(this);
         findPreference(REQUEST_BUGREPORT_KEY).setOnPreferenceClickListener(this);
-        mEnableProcessLoggingPreference = (SwitchPreference) findPreference(ENABLE_PROCESS_LOGGING);
-        mEnableProcessLoggingPreference.setOnPreferenceChangeListener(this);
-        mRequestProcessLogsPreference = (DpcPreference) findPreference(REQUEST_PROCESS_LOGS);
-        mRequestProcessLogsPreference.setOnPreferenceClickListener(this);
-        mRequestProcessLogsPreference.setCustomConstraint(
+        mEnableSecurityLoggingPreference =
+            (SwitchPreference) findPreference(ENABLE_SECURITY_LOGGING);
+        mEnableSecurityLoggingPreference.setOnPreferenceChangeListener(this);
+        mRequestSecurityLogsPreference = (DpcPreference) findPreference(REQUEST_SECURITY_LOGS);
+        mRequestSecurityLogsPreference.setOnPreferenceClickListener(this);
+        mRequestSecurityLogsPreference.setCustomConstraint(
                 () -> isSecurityLoggingEnabled()
                         ? NO_CUSTOM_CONSTRIANT
-                        : R.string.requires_process_logs);
+                        : R.string.requires_security_logs);
         mEnableNetworkLoggingPreference = (SwitchPreference) findPreference(ENABLE_NETWORK_LOGGING);
         mEnableNetworkLoggingPreference.setOnPreferenceChangeListener(this);
         mRequestNetworkLogsPreference = (DpcPreference) findPreference(REQUEST_NETWORK_LOGS);
@@ -642,7 +643,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         reloadMuteAudioUi();
         reloadEnableBackupServiceUi();
         reloadMandatoryBackupsUi();
-        reloadEnableProcessLoggingUi();
+        reloadEnableSecurityLoggingUi();
         reloadEnableNetworkLoggingUi();
         reloadSetAutoTimeRequiredUi();
         reloadEnableLogoutUi();
@@ -760,8 +761,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             case REQUEST_NETWORK_LOGS:
                 showFragment(new NetworkLogsFragment());
                 return true;
-            case REQUEST_PROCESS_LOGS:
-                showFragment(new ProcessLogsFragment());
+            case REQUEST_SECURITY_LOGS:
+                showFragment(new SecurityLogsFragment());
                 return true;
             case SET_ACCESSIBILITY_SERVICES_KEY:
                 // Avoid starting the same task twice.
@@ -1155,9 +1156,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                     setupMandatoryBackups(null);
                     return true;
                 }
-            case ENABLE_PROCESS_LOGGING:
+            case ENABLE_SECURITY_LOGGING:
                 setSecurityLoggingEnabled((Boolean) newValue);
-                reloadEnableProcessLoggingUi();
+                reloadEnableSecurityLoggingUi();
                 return true;
             case ENABLE_NETWORK_LOGGING:
                 mDevicePolicyManager.setNetworkLoggingEnabled(mAdminComponentName,
@@ -2102,12 +2103,12 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     }
 
     @TargetApi(Build.VERSION_CODES.N)
-    private void reloadEnableProcessLoggingUi() {
-        if (mEnableProcessLoggingPreference.isEnabled()) {
-            boolean isProcessLoggingEnabled = mDevicePolicyManager.isSecurityLoggingEnabled(
-                    mAdminComponentName);
-            mEnableProcessLoggingPreference.setChecked(isProcessLoggingEnabled);
-            mRequestProcessLogsPreference.refreshEnabledState();
+    private void reloadEnableSecurityLoggingUi() {
+        if (mEnableSecurityLoggingPreference.isEnabled()) {
+            boolean securityLoggingEnabled =
+                mDevicePolicyManager.isSecurityLoggingEnabled(mAdminComponentName);
+            mEnableSecurityLoggingPreference.setChecked(securityLoggingEnabled);
+            mRequestSecurityLogsPreference.refreshEnabledState();
         }
     }
 

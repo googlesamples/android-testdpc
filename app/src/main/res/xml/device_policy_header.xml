@@ -573,13 +573,13 @@
             testdpc:admin="deviceOwner"
             testdpc:minSdkVersion="L" />
         <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
-            android:key="enable_process_logging"
-            android:title="@string/enable_process_logging"
+            android:key="enable_security_logging"
+            android:title="@string/enable_security_logging"
             testdpc:admin="deviceOwner"
             testdpc:minSdkVersion="N" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
-            android:key="request_process_logs"
-            android:title="@string/request_process_logs"
+            android:key="request_security_logs"
+            android:title="@string/request_security_logs"
             testdpc:admin="deviceOwner"
             testdpc:minSdkVersion="N" />
         <com.afwsamples.testdpc.common.preference.DpcSwitchPreference

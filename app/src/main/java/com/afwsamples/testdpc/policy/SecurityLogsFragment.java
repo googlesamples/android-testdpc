@@ -38,7 +38,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @TargetApi(Build.VERSION_CODES.N)
-public class ProcessLogsFragment extends ListFragment {
+public class SecurityLogsFragment extends ListFragment {
 
     private static final String TAG = "ProcessLogsFragment";
 
@@ -65,6 +65,7 @@ public class ProcessLogsFragment extends ListFragment {
     private static final int TAG_USER_RESTRICTION_REMOVED = 210028;
     private static final int TAG_CERT_AUTHORITY_INSTALLED = 210029;
     private static final int TAG_CERT_AUTHORITY_REMOVED = 210030;
+    private static final int TAG_CRYPTO_SELF_TEST_COMPLETED = 210031;
 
     private ArrayList<String> mLogs = new ArrayList<String>();
     private ArrayAdapter<String> mAdapter;
@@ -86,19 +87,19 @@ public class ProcessLogsFragment extends ListFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mAdapter.add(getString(R.string.process_logs_retrieved_message, new Date().toString()));
+        mAdapter.add(getString(R.string.security_logs_retrieved_message, new Date().toString()));
         try {
             processEvents(mDevicePolicyManager.retrieveSecurityLogs(mAdminName));
         } catch (SecurityException e) {
             Log.e(TAG, "Exception thrown when trying to retrieve security logs", e);
-            mAdapter.add(getString(R.string.exception_retrieving_process_logs));
+            mAdapter.add(getString(R.string.exception_retrieving_security_logs));
         }
     }
 
     private void processEvents(List<SecurityEvent> logs) {
         if (logs == null) {
             Log.w(TAG, "logs == null, are you polling too early?");
-            mAdapter.add(getString(R.string.failed_to_retrieve_process_logs));
+            mAdapter.add(getString(R.string.failed_to_retrieve_security_logs));
         } else {
             Log.d(TAG, "Incoming logs size: " + logs.size());
             for (SecurityEvent event : logs) {
@@ -119,13 +120,13 @@ public class ProcessLogsFragment extends ListFragment {
                 printData(sb, event.getData());
                 mAdapter.add(sb.toString());
             }
-            ListView listView = ProcessLogsFragment.this.getListView();
+            ListView listView = SecurityLogsFragment.this.getListView();
             listView.setSelection(listView.getCount() - 1);
         }
     }
 
     private String getStringEventTagFromId(int eventId) {
-        String eventTag;
+        final String eventTag;
         switch (eventId) {
             case SecurityLog.TAG_ADB_SHELL_INTERACTIVE:
                 eventTag = "ADB_SHELL_INTERACTIVE";
@@ -216,6 +217,9 @@ public class ProcessLogsFragment extends ListFragment {
                 break;
             case TAG_CERT_AUTHORITY_REMOVED:
                 eventTag = "CERT_AUTHORITY_REMOVED";
+                break;
+            case TAG_CRYPTO_SELF_TEST_COMPLETED:
+                eventTag = "CRYPTO_SELF_TEST_COMPLETED";
                 break;
             default:
                 eventTag = "UNKNOWN(" + eventId + ")";
