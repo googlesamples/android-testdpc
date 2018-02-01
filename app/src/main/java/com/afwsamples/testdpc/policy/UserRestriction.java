@@ -12,7 +12,6 @@ import static android.os.UserManager.DISALLOW_CONFIG_BLUETOOTH;
 import static android.os.UserManager.DISALLOW_CONFIG_CELL_BROADCASTS;
 import static android.os.UserManager.DISALLOW_CONFIG_CREDENTIALS;
 import static android.os.UserManager.DISALLOW_CONFIG_DATE_TIME;
-import static android.os.UserManager.DISALLOW_CONFIG_LOCATION_MODE;
 import static android.os.UserManager.DISALLOW_AIRPLANE_MODE;
 import static android.os.UserManager.DISALLOW_CONFIG_BRIGHTNESS;
 import static android.os.UserManager.DISALLOW_CONFIG_SCREEN_TIMEOUT;
@@ -52,6 +51,7 @@ import com.afwsamples.testdpc.R;
 public class UserRestriction {
     // TODO: remove it once available in SDK
     public static final String DISALLOW_UNIFIED_PASSWORD = "no_unified_password";
+    public static final String DISALLOW_CONFIG_LOCATION = "no_config_location";
 
     public String key;
     public int titleResId;
@@ -178,8 +178,8 @@ public class UserRestriction {
             new UserRestriction(DISALLOW_UNIFIED_PASSWORD, R.string.disallow_unified_password),
             new UserRestriction(DISALLOW_USER_SWITCH, R.string.disallow_user_switch),
             new UserRestriction(
-                    DISALLOW_CONFIG_LOCATION_MODE,
-                    R.string.disallow_config_location_mode),
+                    DISALLOW_CONFIG_LOCATION,
+                    R.string.disallow_config_location),
             new UserRestriction(
                     DISALLOW_AIRPLANE_MODE,
                     R.string.disallow_airplane_mode),
@@ -285,7 +285,7 @@ public class UserRestriction {
             DISALLOW_UNIFIED_PASSWORD,
             DISALLOW_SYSTEM_ERROR_DIALOGS,
             DISALLOW_USER_SWITCH,
-            DISALLOW_CONFIG_LOCATION_MODE,
+            DISALLOW_CONFIG_LOCATION,
             DISALLOW_AIRPLANE_MODE,
             DISALLOW_CONFIG_DATE_TIME,
             DISALLOW_CONFIG_BRIGHTNESS,
