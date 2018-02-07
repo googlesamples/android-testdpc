@@ -463,6 +463,13 @@
     <string name="test_key_usage">Test signing/validation with a key</string>
     <string name="key_usage_successful">Successfully signed with %1$s</string>
     <string name="key_usage_failed">FAILED utilizing key for signature/verification</string>
+    <string name="attestation_details_header">Attestation record details:</string>
+    <string name="attestation_challenge_description">Attestation challenge:</string>
+    <string name="device_serial_number_description">Serial number from certificate:</string>
+    <string name="device_imei_description">IMEI from certificate:</string>
+    <string name="device_meid_description">MEID from certificate:</string>
+    <string name="attestation_chain_length_description">Attestation chain length:</string>
+    <string name="attestation_root_description">Attestation root:</string>
     <string name="install_ca_certificate">Install a CA certificate</string>
     <string name="install_ca_successfully">The selected CA certificate is installed.</string>
     <string name="install_ca_fail">The selected CA certificate is not installed.</string>
@@ -473,6 +480,13 @@
     <string name="all_ca_certificates_removed">All CA certificates have been removed.</string>
     <string name="user_selectability_description">User-selectability</string>
     <string name="user_selectability_checkbox">Make user-selectable</string>
+    <string name="key_attestation_description">Key Attestation options</string>
+    <string name="key_attestation_checkbox">Include key attestation challenge</string>
+    <string name="device_id_attestation_description">Device ID attestation options</string>
+    <string name="brand_attestation_checkbox">Include brand attestation only</string>
+    <string name="serial_num_attestation_checkbox">Include device serial number</string>
+    <string name="imei_attestation_checkbox">Include device IMEI</string>
+    <string name="meid_attestation_checkbox">Include device MEID</string>
 
     <!-- Strings for app restrictions -->
     <string name="manage_app_restrictions">Manage app restrictions</string>
