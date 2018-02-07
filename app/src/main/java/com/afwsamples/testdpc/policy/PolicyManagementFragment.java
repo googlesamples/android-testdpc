@@ -149,6 +149,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 
 import static android.os.UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES;
@@ -381,6 +382,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     public static final String GMSCORE_PACKAGE = "com.google.android.gms";
     public static final String GMSCORE_BACKUP_TRANSPORT =
             "com.google.android.gms.backup.BackupTransportService";
+
+    private static final int USER_OPERATION_ERROR_UNKNOWN = 1;
+    private static final int USER_OPERATION_SUCCESS = 0;
 
     private DevicePolicyManager mDevicePolicyManager;
     private PackageManager mPackageManager;
@@ -1844,9 +1848,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     @TargetApi(28)
     private void showStartUserInBackgroundPrompt() {
         showChooseUserPrompt(R.string.start_user_in_background, userHandle -> {
-            boolean success = false;
+            int status = USER_OPERATION_ERROR_UNKNOWN;
             try {
-                success = (boolean) ReflectionUtil.invoke(
+                status = (int) ReflectionUtil.invoke(
                         mDevicePolicyManager,
                         "startUserInBackground",
                         mAdminComponentName,
@@ -1854,7 +1858,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
                 Log.e(TAG,"Can't invoke startUserInBackground", e);
             }
-            showToast(success
+            showToast(status == USER_OPERATION_SUCCESS
                     ? R.string.user_started_in_background
                     : R.string.failed_to_start_user_in_background);
         });
@@ -1867,9 +1871,18 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     @TargetApi(28)
     private void showStopUserPrompt() {
         showChooseUserPrompt(R.string.stop_user, userHandle -> {
-            boolean success =
-                    mDevicePolicyManager.stopUser(mAdminComponentName, userHandle);
-            showToast(success ? R.string.user_stopped : R.string.failed_to_stop_user);
+            int status = USER_OPERATION_ERROR_UNKNOWN;
+            try {
+                status = (int) ReflectionUtil.invoke(
+                        mDevicePolicyManager,
+                        "stopUser",
+                        mAdminComponentName,
+                        userHandle);
+            } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
+                Log.e(TAG,"Can't invoke stopUser", e);
+            }
+            showToast(status == USER_OPERATION_SUCCESS ? R.string.user_stopped
+                    : R.string.failed_to_stop_user);
         });
     }
 
@@ -1908,8 +1921,17 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
      */
     @TargetApi(28)
     private void logoutUser() {
-        boolean success = mDevicePolicyManager.logoutUser(mAdminComponentName);
-        showToast(success ? R.string.user_logouted : R.string.failed_to_logout_user);
+        int status = USER_OPERATION_ERROR_UNKNOWN;
+        try {
+            status = (int) ReflectionUtil.invoke(
+                    mDevicePolicyManager,
+                    "logoutUser",
+                    mAdminComponentName);
+        } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
+            Log.e(TAG,"Can't invoke logoutUser", e);
+        }
+        showToast(status == USER_OPERATION_SUCCESS ? R.string.user_logouted
+                : R.string.failed_to_logout_user);
     }
 
     /**
@@ -2826,14 +2848,21 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     @TargetApi(28)
     private void clearApplicationUserData(String packageName) {
-        if (!mDevicePolicyManager.clearApplicationUserData(
-                mAdminComponentName,
-                packageName,
-                new MainThreadExecutor(),
-                (__, succeed) -> showToast(
-                        succeed ? R.string.clear_app_data_success : R.string.clear_app_data_failure,
-                        packageName))) {
-            showToast(R.string.clear_app_data_failure, packageName);
+        try {
+            ReflectionUtil.invoke(
+                    mDevicePolicyManager, "clearApplicationUserData",
+                    new Class[]{ComponentName.class, String.class, Executor.class,
+                            DevicePolicyManager.OnClearApplicationUserDataListener.class},
+                    mAdminComponentName,
+                    packageName,
+                    new MainThreadExecutor(),
+                    (DevicePolicyManager.OnClearApplicationUserDataListener)
+                            (__, succeed) -> showToast(
+                                    succeed ? R.string.clear_app_data_success
+                                            : R.string.clear_app_data_failure,
+                                    packageName));
+        } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
+            Log.e(LOG_TAG, "cannot invoke clearApplicationUserData", e);
         }
     }
 
