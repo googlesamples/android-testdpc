@@ -66,8 +66,10 @@ public class SecurityLogsFragment extends ListFragment {
     private static final int TAG_CERT_AUTHORITY_INSTALLED = 210029;
     private static final int TAG_CERT_AUTHORITY_REMOVED = 210030;
     private static final int TAG_CRYPTO_SELF_TEST_COMPLETED = 210031;
+    private static final int TAG_KEY_INTEGRITY_VIOLATION = 210032;
+    private static final int TAG_CERT_VALIDATION_FAILURE = 210033;
 
-    private ArrayList<String> mLogs = new ArrayList<String>();
+    private final ArrayList<String> mLogs = new ArrayList<>();
     private ArrayAdapter<String> mAdapter;
 
     private DevicePolicyManager mDevicePolicyManager;
@@ -220,6 +222,12 @@ public class SecurityLogsFragment extends ListFragment {
                 break;
             case TAG_CRYPTO_SELF_TEST_COMPLETED:
                 eventTag = "CRYPTO_SELF_TEST_COMPLETED";
+                break;
+            case TAG_KEY_INTEGRITY_VIOLATION:
+                eventTag = "KEY_INTEGRITY_VIOLATION";
+                break;
+            case TAG_CERT_VALIDATION_FAILURE:
+                eventTag = "CERT_VALIDATION_FAILURE";
                 break;
             default:
                 eventTag = "UNKNOWN(" + eventId + ")";
