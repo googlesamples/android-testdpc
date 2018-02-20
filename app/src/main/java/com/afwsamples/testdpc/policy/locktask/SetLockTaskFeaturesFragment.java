@@ -16,6 +16,7 @@
 
 package com.afwsamples.testdpc.policy.locktask;
 
+import android.annotation.TargetApi;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
@@ -24,13 +25,10 @@ import android.support.v7.preference.Preference;
 import android.util.ArrayMap;
 import android.util.Log;
 import android.widget.Toast;
-
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.BaseSearchablePolicyPreferenceFragment;
-import com.afwsamples.testdpc.common.ReflectionUtil;
 import com.afwsamples.testdpc.common.preference.DpcSwitchPreference;
-
 import java.util.Map;
 
 /**
@@ -47,78 +45,6 @@ public class SetLockTaskFeaturesFragment
 
     private static final String TAG = "SetLockTaskFeatures";
 
-    /*
-     * Replace the following int constants LOCK_TASK_FEATURE_* with
-     * {@code import static android.app.admin.DevicePolicyManager.LOCK_TASK_FEATURE_*} when P SDK
-     * is finalized.
-     */
-    private static final int LOCK_TASK_FEATURE_SYSTEM_INFO;
-    static {
-        int flag = 0;
-        try {
-            flag = ReflectionUtil.intConstant(
-                    DevicePolicyManager.class, "LOCK_TASK_FEATURE_SYSTEM_INFO");
-        } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
-        } finally {
-            LOCK_TASK_FEATURE_SYSTEM_INFO = flag;
-        }
-    }
-    private static final int LOCK_TASK_FEATURE_NOTIFICATIONS;
-    static {
-        int flag = 0;
-        try {
-            flag = ReflectionUtil.intConstant(
-                    DevicePolicyManager.class, "LOCK_TASK_FEATURE_NOTIFICATIONS");
-        } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
-        } finally {
-            LOCK_TASK_FEATURE_NOTIFICATIONS = flag;
-        }
-    }
-    private static final int LOCK_TASK_FEATURE_HOME;
-    static {
-        int flag = 0;
-        try {
-            flag = ReflectionUtil.intConstant(
-                    DevicePolicyManager.class, "LOCK_TASK_FEATURE_HOME");
-        } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
-        } finally {
-            LOCK_TASK_FEATURE_HOME = flag;
-        }
-    }
-    private static final int LOCK_TASK_FEATURE_RECENTS;
-    static {
-        int flag = 0;
-        try {
-            flag = ReflectionUtil.intConstant(
-                    DevicePolicyManager.class, "LOCK_TASK_FEATURE_RECENTS");
-        } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
-        } finally {
-            LOCK_TASK_FEATURE_RECENTS = flag;
-        }
-    }
-    private static final int LOCK_TASK_FEATURE_GLOBAL_ACTIONS;
-    static {
-        int flag = 0;
-        try {
-            flag = ReflectionUtil.intConstant(
-                    DevicePolicyManager.class, "LOCK_TASK_FEATURE_GLOBAL_ACTIONS");
-        } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
-        } finally {
-            LOCK_TASK_FEATURE_GLOBAL_ACTIONS = flag;
-        }
-    }
-    private static final int LOCK_TASK_FEATURE_KEYGUARD;
-    static {
-        int flag = 0;
-        try {
-            flag = ReflectionUtil.intConstant(
-                    DevicePolicyManager.class, "LOCK_TASK_FEATURE_KEYGUARD");
-        } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
-        } finally {
-            LOCK_TASK_FEATURE_KEYGUARD = flag;
-        }
-    }
-
     /* Preference keys. Must be consistent with lock_task_features_preferences.xml */
     private static final String KEY_SYSTEM_INFO = "lock_task_feature_system_info";
     private static final String KEY_NOTIFICATIONS = "lock_task_feature_notifications";
@@ -130,12 +56,12 @@ public class SetLockTaskFeaturesFragment
     /** Maps from preference keys to {@link DevicePolicyManager#setLockTaskFeatures}'s flags. */
     private static final ArrayMap<String, Integer> FEATURE_FLAGS = new ArrayMap<>();
     static {
-        FEATURE_FLAGS.put(KEY_SYSTEM_INFO, LOCK_TASK_FEATURE_SYSTEM_INFO);
-        FEATURE_FLAGS.put(KEY_NOTIFICATIONS, LOCK_TASK_FEATURE_NOTIFICATIONS);
-        FEATURE_FLAGS.put(KEY_HOME, LOCK_TASK_FEATURE_HOME);
-        FEATURE_FLAGS.put(KEY_RECENTS, LOCK_TASK_FEATURE_RECENTS);
-        FEATURE_FLAGS.put(KEY_GLOBAL_ACTIONS, LOCK_TASK_FEATURE_GLOBAL_ACTIONS);
-        FEATURE_FLAGS.put(KEY_KEYGUARD, LOCK_TASK_FEATURE_KEYGUARD);
+        FEATURE_FLAGS.put(KEY_SYSTEM_INFO, DevicePolicyManager.LOCK_TASK_FEATURE_SYSTEM_INFO);
+        FEATURE_FLAGS.put(KEY_NOTIFICATIONS, DevicePolicyManager.LOCK_TASK_FEATURE_NOTIFICATIONS);
+        FEATURE_FLAGS.put(KEY_HOME, DevicePolicyManager.LOCK_TASK_FEATURE_HOME);
+        FEATURE_FLAGS.put(KEY_RECENTS, DevicePolicyManager.LOCK_TASK_FEATURE_RECENTS);
+        FEATURE_FLAGS.put(KEY_GLOBAL_ACTIONS, DevicePolicyManager.LOCK_TASK_FEATURE_GLOBAL_ACTIONS);
+        FEATURE_FLAGS.put(KEY_KEYGUARD, DevicePolicyManager.LOCK_TASK_FEATURE_KEYGUARD);
     }
 
     private DevicePolicyManager mDpm;
@@ -203,29 +129,13 @@ public class SetLockTaskFeaturesFragment
         return true;
     }
 
-    /**
-     * Helper method for {@link DevicePolicyManager#getLockTaskFeatures}. Replace reflection by
-     * direct method call when P SDK is finalized.
-     */
+    @TargetApi(28)
     private int getLockTaskFeatures() {
-        try {
-            return (int) ReflectionUtil.invoke(mDpm, "getLockTaskFeatures", mAdmin);
-        } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
-            Log.e(TAG, "Can't invoke getLockTaskFeatures()", e);
-            return 0;
-        }
+        return mDpm.getLockTaskFeatures(mAdmin);
     }
 
-    /**
-     * Helper method for {@link DevicePolicyManager#setLockTaskFeatures}. Replace reflection by
-     * direct method call when P SDK is finalized.
-     */
+    @TargetApi(28)
     private void setLockTaskFeatures(int flags) {
-        try {
-            ReflectionUtil.invoke(mDpm, "setLockTaskFeatures",
-                    new Class[]{ComponentName.class, int.class}, mAdmin, flags);
-        } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
-            Log.e(TAG, "Can't invoke setLockTaskFeatures()", e);
-        }
+       mDpm.setLockTaskFeatures(mAdmin, flags);
     }
 }

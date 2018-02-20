@@ -257,20 +257,4 @@ public class Util {
         return (DevicePolicyManager)context.getSystemService(Service.DEVICE_POLICY_SERVICE);
     }
 
-    // TODO: nuke this when available in the SDK.
-    @TargetApi(VERSION_CODES.O)
-    public static Boolean isUsingUnifiedPassword(Context context, ComponentName admin) {
-        if (!BuildCompat.isAtLeastP()) {
-            return false;
-        }
-        final DevicePolicyManager dpm = getDevicePolicyManager(context);
-
-        boolean unified = false;
-        try {
-            unified = (Boolean) ReflectionUtil.invoke(dpm, "isUsingUnifiedPassword", admin);
-        } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
-            Log.e(TAG, "Reflection call failed", e);
-        }
-        return unified;
-    }
 }

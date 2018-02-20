@@ -15,6 +15,7 @@
  */
 package com.afwsamples.testdpc.policy;
 
+import android.annotation.TargetApi;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -26,7 +27,6 @@ import android.widget.Toast;
 
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
-import com.afwsamples.testdpc.common.ReflectionUtil;
 import com.afwsamples.testdpc.common.ToggleComponentsArrayAdapter;
 
 import java.util.ArrayList;
@@ -96,19 +96,15 @@ public class MeteredDataRestrictionInfoAdapter extends ToggleComponentsArrayAdap
         }
     }
 
+    @TargetApi(28)
     private void setMeteredDataRestrictedPkgs(List<String> pkgNames) {
-        try {
-            final List<String> excludedPkgs = (List<String>) ReflectionUtil.invoke(
-                    mDevicePolicyManager, "setMeteredDataDisabled",
-                    new Class[] {ComponentName.class, List.class},
-                    DeviceAdminReceiver.getComponentName(mContext), pkgNames);
-            if (!excludedPkgs.isEmpty()) {
-                Toast.makeText(mContext, mContext.getString(
-                        R.string.metered_data_restriction_failed_pkgs, excludedPkgs),
-                        Toast.LENGTH_LONG).show();
-            }
-        } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
-            Log.e(TAG, "Can't invoke setMeteredDataDisabled", e);
+        final List<String> excludedPkgs = mDevicePolicyManager.setMeteredDataDisabled(
+            DeviceAdminReceiver.getComponentName(mContext), pkgNames);
+
+        if (!excludedPkgs.isEmpty()) {
+            Toast.makeText(mContext, mContext.getString(
+                R.string.metered_data_restriction_failed_pkgs, excludedPkgs),
+                Toast.LENGTH_LONG).show();
         }
     }
 }

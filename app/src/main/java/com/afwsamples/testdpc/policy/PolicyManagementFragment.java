@@ -2011,14 +2011,14 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         securityPatchPreference.setSummary(display);
     }
 
-    @TargetApi(Build.VERSION_CODES.O)
+    @TargetApi(28)
     private void loadSeparateChallenge() {
         final Preference separateChallengePreference = findPreference(SEPARATE_CHALLENGE_KEY);
         if (!separateChallengePreference.isEnabled()) {
             return;
         }
 
-        final Boolean separate = !Util.isUsingUnifiedPassword(getActivity(), mAdminComponentName);
+        final Boolean separate = !mDevicePolicyManager.isUsingUnifiedPassword(mAdminComponentName);
         separateChallengePreference.setSummary(String.format(
                 getString(R.string.separate_challenge_summary),
                 Boolean.toString(separate)));
@@ -2811,14 +2811,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 .show();
     }
 
+    @TargetApi(28)
     private List<String> getMeteredDataRestrictedPkgs() {
-        try {
-            return (List<String>) ReflectionUtil.invoke(mDevicePolicyManager,
-                    "getMeteredDataDisabled", mAdminComponentName);
-        } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
-            Log.e(TAG, "Can't invoke getMeteredDataDisabled", e);
-            return new ArrayList<>();
-        }
+        return mDevicePolicyManager.getMeteredDataDisabled(mAdminComponentName);
     }
 
     /**

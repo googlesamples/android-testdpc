@@ -31,7 +31,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
-import com.afwsamples.testdpc.common.ReflectionUtil;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -108,14 +107,7 @@ public class SecurityLogsFragment extends ListFragment {
                 StringBuilder sb = new StringBuilder();
                 sb.append(getStringEventTagFromId(event.getTag()));
                 if (BuildCompat.isAtLeastP()) {
-                    long id;
-                    try {
-                        id = (long) ReflectionUtil.invoke(event, "getId");
-                    } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
-                        Log.e(TAG, "Can't invoke getId()", e);
-                        id = 0;
-                    }
-                    sb.append(" (id: " + id + ")");
+                    sb.append(" (id: " + getEventId(event) + ")");
                 }
                 sb.append(" (").append(new Date(TimeUnit.NANOSECONDS.toMillis(
                         event.getTimeNanos()))).append("): ");
@@ -125,6 +117,11 @@ public class SecurityLogsFragment extends ListFragment {
             ListView listView = SecurityLogsFragment.this.getListView();
             listView.setSelection(listView.getCount() - 1);
         }
+    }
+
+    @TargetApi(28)
+    private long getEventId(SecurityEvent event) {
+        return event.getId();
     }
 
     private String getStringEventTagFromId(int eventId) {

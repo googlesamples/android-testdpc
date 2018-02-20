@@ -313,27 +313,19 @@ public class SetupManagementFragment extends Fragment implements
         return true;
     }
 
-    // TODO: replace with O SDK API
-    private static final String EXTRA_PROVISIONING_DISCLAIMERS =
-            "android.app.extra.PROVISIONING_DISCLAIMERS";
-    private static final String EXTRA_PROVISIONING_DISCLAIMER_HEADER =
-            "android.app.extra.PROVISIONING_DISCLAIMER_HEADER";
-    private static final String EXTRA_PROVISIONING_DISCLAIMER_CONTENT =
-            "android.app.extra.PROVISIONING_DISCLAIMER_CONTENT";
-
     private void specifyDefaultDisclaimers(Intent intent) {
         if (BuildCompat.isAtLeastO()) {
             Bundle emmBundle = new Bundle();
-            emmBundle.putString(EXTRA_PROVISIONING_DISCLAIMER_HEADER,
+            emmBundle.putString(DevicePolicyManager.EXTRA_PROVISIONING_DISCLAIMER_HEADER,
                     getString(R.string.default_disclaimer_emm_name));
-            emmBundle.putParcelable(EXTRA_PROVISIONING_DISCLAIMER_CONTENT,
+            emmBundle.putParcelable(DevicePolicyManager.EXTRA_PROVISIONING_DISCLAIMER_CONTENT,
                     resourceToUri(getActivity(), R.raw.emm_disclaimer));
             Bundle companyBundle = new Bundle();
-            companyBundle.putString(EXTRA_PROVISIONING_DISCLAIMER_HEADER,
+            companyBundle.putString(DevicePolicyManager.EXTRA_PROVISIONING_DISCLAIMER_HEADER,
                     getString(R.string.default_disclaimer_company_name));
-            companyBundle.putParcelable(EXTRA_PROVISIONING_DISCLAIMER_CONTENT,
+            companyBundle.putParcelable(DevicePolicyManager.EXTRA_PROVISIONING_DISCLAIMER_CONTENT,
                     resourceToUri(getActivity(), R.raw.company_disclaimer));
-            intent.putExtra(EXTRA_PROVISIONING_DISCLAIMERS,
+            intent.putExtra(DevicePolicyManager.EXTRA_PROVISIONING_DISCLAIMERS,
                     new Bundle[] { emmBundle, companyBundle });
         }
     }

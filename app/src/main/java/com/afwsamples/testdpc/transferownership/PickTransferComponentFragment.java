@@ -16,6 +16,7 @@
 
 package com.afwsamples.testdpc.transferownership;
 
+import android.annotation.TargetApi;
 import android.app.Fragment;
 import android.app.admin.DeviceAdminReceiver;
 import android.app.admin.DevicePolicyManager;
@@ -37,16 +38,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-
 import com.afwsamples.testdpc.R;
-import com.afwsamples.testdpc.common.ReflectionUtil;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
+@TargetApi(28)
 public class PickTransferComponentFragment extends Fragment {
 
     private DevicePolicyManager mDevicePolicyManager;
@@ -107,10 +106,9 @@ public class PickTransferComponentFragment extends Fragment {
         try {
             PersistableBundle persistableBundle = new PersistableBundle();
             persistableBundle.putString("random_key", "random_value");
-            com.afwsamples.testdpc.common.ReflectionUtil.invoke(mDevicePolicyManager,
-                    "transferOwnership", source, target, persistableBundle);
+            mDevicePolicyManager.transferOwnership(source, target, persistableBundle);
             return "Success!";
-        } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
+        } catch (Exception e) {
             Throwable cause = e.getCause();
             if (cause instanceof InvocationTargetException) {
                 return getStackTrace(((InvocationTargetException) cause).getTargetException());
