@@ -3154,7 +3154,25 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
         final ActivityOptions options = ActivityOptions.makeBasic();
-        options.setLockTaskMode(true);
+        try {
+            ReflectionUtil.invoke(
+                    options,
+                    "setLockTaskMode",
+                    new Class[]{boolean.class},
+                    true);
+        } catch (ReflectionUtil.ReflectionIsTemporaryException e1) {
+            // API name was recently changed, so we should be robust enough to support both.
+            // This workaround can be removed once the new API name is in the SDK prebuilt.
+            try {
+                ReflectionUtil.invoke(
+                        options,
+                        "setLockTaskEnabled",
+                        new Class[]{boolean.class},
+                        true);
+            } catch (ReflectionUtil.ReflectionIsTemporaryException e2) {
+                Log.e(TAG, "Unable to set lock task activity option.", e2);
+            }
+        }
 
         try {
             startActivity(intent, options.toBundle());
