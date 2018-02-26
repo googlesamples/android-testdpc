@@ -345,7 +345,7 @@
     <string name="lock_task_feature_system_info">System info</string>
     <string name="lock_task_feature_notifications">Notifications</string>
     <string name="lock_task_feature_home">Home</string>
-    <string name="lock_task_feature_recents">Recents</string>
+    <string name="lock_task_feature_overview">Overview</string>
     <string name="lock_task_feature_global_actions">Global actions (power button menu)</string>
     <string name="lock_task_feature_keyguard">Keyguard</string>
     <string name="start_lock_task">Self-start lock task mode</string>

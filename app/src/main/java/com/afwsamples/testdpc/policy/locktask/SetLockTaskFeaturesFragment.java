@@ -16,6 +16,12 @@
 
 package com.afwsamples.testdpc.policy.locktask;
 
+import static android.app.admin.DevicePolicyManager.LOCK_TASK_FEATURE_GLOBAL_ACTIONS;
+import static android.app.admin.DevicePolicyManager.LOCK_TASK_FEATURE_HOME;
+import static android.app.admin.DevicePolicyManager.LOCK_TASK_FEATURE_KEYGUARD;
+import static android.app.admin.DevicePolicyManager.LOCK_TASK_FEATURE_NOTIFICATIONS;
+import static android.app.admin.DevicePolicyManager.LOCK_TASK_FEATURE_SYSTEM_INFO;
+
 import android.annotation.TargetApi;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
@@ -28,6 +34,7 @@ import android.widget.Toast;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.BaseSearchablePolicyPreferenceFragment;
+import com.afwsamples.testdpc.common.ReflectionUtil;
 import com.afwsamples.testdpc.common.preference.DpcSwitchPreference;
 import java.util.Map;
 
@@ -49,19 +56,31 @@ public class SetLockTaskFeaturesFragment
     private static final String KEY_SYSTEM_INFO = "lock_task_feature_system_info";
     private static final String KEY_NOTIFICATIONS = "lock_task_feature_notifications";
     private static final String KEY_HOME = "lock_task_feature_home";
-    private static final String KEY_RECENTS = "lock_task_feature_recents";
+    private static final String KEY_OVERVIEW = "lock_task_feature_overview";
     private static final String KEY_GLOBAL_ACTIONS = "lock_task_feature_global_actions";
     private static final String KEY_KEYGUARD = "lock_task_feature_keyguard";
+
+    private static final int LOCK_TASK_FEATURE_OVERVIEW;
+    static {
+        int flag = 1 << 3;
+        try {
+            flag = ReflectionUtil.intConstant(
+                DevicePolicyManager.class, "LOCK_TASK_FEATURE_OVERVIEW");
+        } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
+        } finally {
+            LOCK_TASK_FEATURE_OVERVIEW = flag;
+        }
+    }
 
     /** Maps from preference keys to {@link DevicePolicyManager#setLockTaskFeatures}'s flags. */
     private static final ArrayMap<String, Integer> FEATURE_FLAGS = new ArrayMap<>();
     static {
-        FEATURE_FLAGS.put(KEY_SYSTEM_INFO, DevicePolicyManager.LOCK_TASK_FEATURE_SYSTEM_INFO);
-        FEATURE_FLAGS.put(KEY_NOTIFICATIONS, DevicePolicyManager.LOCK_TASK_FEATURE_NOTIFICATIONS);
-        FEATURE_FLAGS.put(KEY_HOME, DevicePolicyManager.LOCK_TASK_FEATURE_HOME);
-        FEATURE_FLAGS.put(KEY_RECENTS, DevicePolicyManager.LOCK_TASK_FEATURE_RECENTS);
-        FEATURE_FLAGS.put(KEY_GLOBAL_ACTIONS, DevicePolicyManager.LOCK_TASK_FEATURE_GLOBAL_ACTIONS);
-        FEATURE_FLAGS.put(KEY_KEYGUARD, DevicePolicyManager.LOCK_TASK_FEATURE_KEYGUARD);
+        FEATURE_FLAGS.put(KEY_SYSTEM_INFO, LOCK_TASK_FEATURE_SYSTEM_INFO);
+        FEATURE_FLAGS.put(KEY_NOTIFICATIONS, LOCK_TASK_FEATURE_NOTIFICATIONS);
+        FEATURE_FLAGS.put(KEY_HOME, LOCK_TASK_FEATURE_HOME);
+        FEATURE_FLAGS.put(KEY_OVERVIEW, LOCK_TASK_FEATURE_OVERVIEW);
+        FEATURE_FLAGS.put(KEY_GLOBAL_ACTIONS, LOCK_TASK_FEATURE_GLOBAL_ACTIONS);
+        FEATURE_FLAGS.put(KEY_KEYGUARD, LOCK_TASK_FEATURE_KEYGUARD);
     }
 
     private DevicePolicyManager mDpm;
@@ -94,6 +113,7 @@ public class SetLockTaskFeaturesFragment
             DpcSwitchPreference pref = (DpcSwitchPreference) findPreference(entry.getKey());
             pref.setChecked((enabledFeatures & entry.getValue()) != 0);
         }
+        enforceEnablingRestrictions(enabledFeatures);
     }
 
     @Override
@@ -105,14 +125,19 @@ public class SetLockTaskFeaturesFragment
         }
 
         final int flagsBefore = getLockTaskFeatures();
-        final int flagsAfter = (Boolean) val
+        int flagsAfter = (Boolean) val
                 ? flagsBefore | FEATURE_FLAGS.get(key)
                 : flagsBefore & ~FEATURE_FLAGS.get(key);
+        if ((flagsAfter & LOCK_TASK_FEATURE_HOME) == 0) {
+            // Disable OVERVIEW when HOME is disabled
+            flagsAfter &= ~LOCK_TASK_FEATURE_OVERVIEW;
+        }
         if (flagsAfter != flagsBefore) {
             Log.i(TAG, "LockTask feature flags changing from 0x" + Integer.toHexString(flagsBefore)
                     + " to 0x" + Integer.toHexString(flagsAfter));
             try {
                 setLockTaskFeatures(flagsAfter);
+                enforceEnablingRestrictions(flagsAfter);
                 return true;
             } catch (SecurityException e) {
                 Log.e(TAG, "setLockTaskFeatures() can only be called by DO and affiliated PO");
@@ -127,6 +152,14 @@ public class SetLockTaskFeaturesFragment
     @Override
     public boolean isAvailable(Context context) {
         return true;
+    }
+
+    private void enforceEnablingRestrictions(int enabledFeatures) {
+        DpcSwitchPreference pref = (DpcSwitchPreference) findPreference(KEY_OVERVIEW);
+        pref.setEnabled((enabledFeatures & LOCK_TASK_FEATURE_HOME) != 0);
+        if (!pref.isEnabled() && pref.isChecked()) {
+            pref.setChecked(false);
+        }
     }
 
     @TargetApi(28)

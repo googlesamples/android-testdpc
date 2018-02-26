@@ -1344,6 +1344,11 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         launcherIntent.addCategory(Intent.CATEGORY_LAUNCHER);
         final List<ResolveInfo> primaryUserAppList = mPackageManager
                 .queryIntentActivities(launcherIntent, 0);
+        Intent homeIntent = new Intent(Intent.ACTION_MAIN);
+        homeIntent.addCategory(Intent.CATEGORY_HOME);
+        // Also show the default launcher in this list
+        final ResolveInfo defaultLauncher = mPackageManager.resolveActivity(homeIntent, 0);
+        primaryUserAppList.add(defaultLauncher);
         if (primaryUserAppList.isEmpty()) {
             showToast(R.string.no_primary_app_available);
         } else {
