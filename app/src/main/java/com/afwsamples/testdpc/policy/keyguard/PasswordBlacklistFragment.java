@@ -32,13 +32,10 @@ import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.SpinnerAdapter;
 import android.widget.Toast;
-
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.BaseManageComponentFragment;
 import com.afwsamples.testdpc.common.EditDeleteArrayAdapter;
-import com.afwsamples.testdpc.common.ReflectionUtil;
-
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -181,32 +178,14 @@ public class PasswordBlacklistFragment extends BaseManageComponentFragment<Void>
         }
     }
 
+    @TargetApi(28)
     static boolean setBlacklist(DevicePolicyManager dpm, ComponentName admin, String name,
                                 List<String> blacklist) {
-        Class<?>[] parameterTypes = new Class<?>[3];
-        parameterTypes[0] = ComponentName.class;
-        parameterTypes[1] = String.class;
-        parameterTypes[2] = List.class;
-
-        try {
-            return (Boolean) ReflectionUtil.invoke(dpm, "setPasswordBlacklist",
-                    parameterTypes, admin, name, blacklist);
-        } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
-            e.printStackTrace();
-            return false;
-        }
+        return dpm.setPasswordBlacklist(admin, name, blacklist);
     }
 
+    @TargetApi(28)
     static String getBlacklistName(DevicePolicyManager dpm, ComponentName admin) {
-        Class<?>[] parameterTypes = new Class<?>[1];
-        parameterTypes[0] = ComponentName.class;
-
-        try {
-            return (String) ReflectionUtil.invoke(dpm, "getPasswordBlacklistName",
-                    parameterTypes, admin);
-        } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
-            e.printStackTrace();
-            return null;
-        }
+        return dpm.getPasswordBlacklistName(admin);
     }
 }

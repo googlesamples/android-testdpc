@@ -44,8 +44,8 @@
         testdpc:minSdkVersion="P" />
 
     <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
-        android:key="lock_task_feature_recents"
-        android:title="@string/lock_task_feature_recents"
+        android:key="lock_task_feature_overview"
+        android:title="@string/lock_task_feature_overview"
         android:persistent="false"
         android:defaultValue="false"
         testdpc:admin="deviceOwner|profileOwner"

@@ -21,19 +21,15 @@ import android.app.Fragment;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
-import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
-import com.afwsamples.testdpc.common.ReflectionUtil;
 
-@TargetApi(Build.VERSION_CODES.N)
+@TargetApi(28)
 public class SetUserSessionMessageFragment extends Fragment
         implements View.OnClickListener {
     private static final String TAG = "SetUserSessionMessage";
@@ -61,18 +57,8 @@ public class SetUserSessionMessageFragment extends Fragment
         root.findViewById(R.id.clear_message).setOnClickListener(this);
         mStartSessionMessage = root.findViewById(R.id.start_session_message_view);
         mEndSessionMessage = root.findViewById(R.id.end_session_message_view);
-        try {
-            mStartSessionMessage.setText((CharSequence) ReflectionUtil.invoke(
-                    mDevicePolicyManager, "getStartUserSessionMessage", mComponentName));
-        } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
-            Log.e(TAG, "cannot invoke getStartUserSessionMessage", e);
-        }
-        try {
-            mEndSessionMessage.setText((CharSequence) ReflectionUtil.invoke(
-                    mDevicePolicyManager, "getEndUserSessionMessage", mComponentName));
-        } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
-            Log.e(TAG, "cannot invoke getEndUserSessionMessage", e);
-        }
+        mStartSessionMessage.setText(mDevicePolicyManager.getStartUserSessionMessage(mComponentName));
+        mEndSessionMessage.setText(mDevicePolicyManager.getEndUserSessionMessage(mComponentName));
         return root;
     }
 
@@ -91,25 +77,7 @@ public class SetUserSessionMessageFragment extends Fragment
                 break;
         }
 
-        try {
-            ReflectionUtil.invoke(
-                    mDevicePolicyManager,
-                    "setStartUserSessionMessage",
-                    new Class<?>[]{ComponentName.class, CharSequence.class},
-                    mComponentName,
-                    startSessionMessage);
-        } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
-            Log.e(TAG, "cannot invoke setStartUserSessionMessage", e);
-        }
-        try {
-            ReflectionUtil.invoke(
-                    mDevicePolicyManager,
-                    "setEndUserSessionMessage",
-                    new Class<?>[]{ComponentName.class, CharSequence.class},
-                    mComponentName,
-                    endSessionMessage);
-        } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
-            Log.e(TAG, "cannot invoke setEndUserSessionMessage", e);
-        }
+        mDevicePolicyManager.setStartUserSessionMessage(mComponentName, startSessionMessage);
+        mDevicePolicyManager.setEndUserSessionMessage(mComponentName, endSessionMessage);
     }
 }

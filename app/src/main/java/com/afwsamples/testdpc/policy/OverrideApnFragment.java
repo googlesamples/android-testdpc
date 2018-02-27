@@ -23,7 +23,6 @@ import android.app.AlertDialog;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v14.preference.SwitchPreference;
 import android.support.v7.preference.Preference;
@@ -36,8 +35,6 @@ import android.widget.Toast;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.BaseSearchablePolicyPreferenceFragment;
-import com.afwsamples.testdpc.common.ReflectionUtil;
-import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -106,12 +103,7 @@ public class OverrideApnFragment extends BaseSearchablePolicyPreferenceFragment 
         switch (key) {
             case ENABLE_OVERRIDE_APN_KEY:
                 boolean enabled = (boolean) newValue;
-                try {
-                    ReflectionUtil.invoke(mDevicePolicyManager, "setOverrideApnsEnabled",
-                            new Class[]{ComponentName.class, boolean.class}, mAdminComponentName, enabled);
-                } catch (Exception e) {
-                    Log.e(LOG_TAG, "setOverrideApnsEnabled not implemented", e);
-                }
+                mDevicePolicyManager.setOverrideApnsEnabled(mAdminComponentName, enabled);
                 reloadEnableOverrideApnUi();
                 return true;
         }
@@ -201,15 +193,7 @@ public class OverrideApnFragment extends BaseSearchablePolicyPreferenceFragment 
                             networkbitmask,
                             mvnoTypeEditText.getText().toString()
                     );
-                    int insertedId = -1;
-                    try {
-                        insertedId = (int) ReflectionUtil.invoke(mDevicePolicyManager,
-                                "addOverrideApn",
-                                new Class[]{ComponentName.class, ApnSetting.class},
-                                mAdminComponentName, apn);
-                    } catch (Exception e) {
-                        Log.e(LOG_TAG, "addOverrideApn method not implemented", e);
-                    }
+                    int insertedId = mDevicePolicyManager.addOverrideApn(mAdminComponentName, apn);
                     if (insertedId == -1) {
                         showToast(R.string.insert_override_apn_error);
                     } else {
@@ -221,18 +205,10 @@ public class OverrideApnFragment extends BaseSearchablePolicyPreferenceFragment 
     }
 
     private void onRemoveOverrideApn() {
-        try {
-            List<ApnSetting> apnSettings = (List<ApnSetting>)ReflectionUtil.invoke(mDevicePolicyManager,
-                    "getOverrideApns",
-                    new Class[]{ComponentName.class},
-                    mAdminComponentName);
-            for(ApnSetting apn : apnSettings) {
-                ReflectionUtil.invoke(mDevicePolicyManager, "removeOverrideApn",
-                        new Class[]{ComponentName.class, int.class},
-                        mAdminComponentName, apn.getId());
-            }
-        } catch (Exception e) {
-            Log.e(LOG_TAG, "removeOverrideApn method not implemented", e);
+        List<ApnSetting> apnSettings =
+            mDevicePolicyManager.getOverrideApns(mAdminComponentName);
+        for (ApnSetting apn : apnSettings) {
+            mDevicePolicyManager.removeOverrideApn(mAdminComponentName, apn.getId());
         }
     }
 
@@ -249,33 +225,25 @@ public class OverrideApnFragment extends BaseSearchablePolicyPreferenceFragment 
             String user, String password, int authType, List<String> types, String protocol,
             String roamingProtocol, boolean carrierEnabled, int networkTypeBitmask,
             String mvnoType) {
-        try {
             ApnSetting.Builder builder = new ApnSetting.Builder();
-            Method setNetworkTypeBitmask = ApnSetting.Builder.class.getMethod(
-                "setNetworkTypeBitmask", new Class[]{int.class});
-            setNetworkTypeBitmask.invoke(builder, networkTypeBitmask);
-
-            return builder.setOperatorNumeric(operatorNumeric)
-                .setEntryName(entryName)
-                .setApnName(apnName)
-                .setProxy(proxy)
-                .setPort(port)
-                .setMmsc(mmsc)
-                .setMmsProxy(mmsProxy)
-                .setMmsPort(mmsPort)
-                .setUser(user)
-                .setPassword(password)
-                .setAuthType(authType)
-                .setTypes(types)
-                .setProtocol(protocol)
-                .setRoamingProtocol(roamingProtocol)
-                .setCarrierEnabled(carrierEnabled)
-                .setMvnoType(mvnoType)
-                .build();
-        } catch (Exception e) {
-            Log.e(LOG_TAG, "setNetworkTypeBitmask not implemented.", e);
-        }
-        return null;
+        return builder.setOperatorNumeric(operatorNumeric)
+            .setEntryName(entryName)
+            .setApnName(apnName)
+            .setProxy(proxy)
+            .setPort(port)
+            .setMmsc(mmsc)
+            .setMmsProxy(mmsProxy)
+            .setMmsPort(mmsPort)
+            .setUser(user)
+            .setPassword(password)
+            .setAuthType(authType)
+            .setTypes(types)
+            .setProtocol(protocol)
+            .setRoamingProtocol(roamingProtocol)
+            .setCarrierEnabled(carrierEnabled)
+            .setMvnoType(mvnoType)
+            .setNetworkTypeBitmask(networkTypeBitmask)
+            .build();
     }
 
     private URL URLFromString(String url) {
@@ -314,15 +282,7 @@ public class OverrideApnFragment extends BaseSearchablePolicyPreferenceFragment 
     }
 
     private void reloadEnableOverrideApnUi() {
-        boolean enabled = false;
-        try {
-            enabled = (boolean)ReflectionUtil.invoke(mDevicePolicyManager,
-                    "isOverrideApnEnabled",
-                    new Class[]{ComponentName.class}, mAdminComponentName);
-        } catch (Exception e) {
-            Log.e(LOG_TAG, "setOverrideApnEnabled not implemented", e);
-            showToast("setOverrideApnEnabled not implemented");
-        }
+        boolean enabled = mDevicePolicyManager.isOverrideApnEnabled(mAdminComponentName);
         if (mEnableOverrideApnPreference.isEnabled()) {
             mEnableOverrideApnPreference.setChecked(enabled);
         }

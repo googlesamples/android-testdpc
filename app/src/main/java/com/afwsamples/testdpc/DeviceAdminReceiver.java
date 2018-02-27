@@ -41,13 +41,10 @@ import android.support.v4.os.BuildCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
-
 import com.afwsamples.testdpc.common.NotificationUtil;
-import com.afwsamples.testdpc.common.ReflectionUtil;
 import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.policy.UserRestriction;
 import com.afwsamples.testdpc.provision.PostProvisioningTask;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -149,17 +146,10 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
                 Toast.LENGTH_LONG)
                 .show();
 
-        ArrayList<String> loggedEvents = new ArrayList<String>();
+        ArrayList<String> loggedEvents = new ArrayList<>();
         if (BuildCompat.isAtLeastP()) {
             for (NetworkEvent event : events) {
-                long id;
-                try {
-                    id = (long) ReflectionUtil.invoke(event, "getId");
-                } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
-                    Log.e(TAG, "Can't invoke getId()", e);
-                    id = 0;
-                }
-                loggedEvents.add("(id:" + id + ")" + event.toString());
+                loggedEvents.add(event.toString());
             }
         } else {
             events.forEach(event -> loggedEvents.add(event.toString()));
@@ -562,7 +552,7 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
 
         if (um.hasUserRestriction(UserRestriction.DISALLOW_UNIFIED_PASSWORD)
                 && Util.isManagedProfileOwner(context)
-                && Util.isUsingUnifiedPassword(context, getComponentName(context))) {
+                && isUsingUnifiedPassword(context)) {
             problems.add(context.getText(R.string.separate_challenge_required_title));
         }
 
@@ -584,6 +574,15 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
         } else {
             nm.cancel(CHANGE_PASSWORD_NOTIFICATION_ID);
         }
+    }
+
+    @TargetApi(28)
+    private static Boolean isUsingUnifiedPassword(Context context) {
+        if (!BuildCompat.isAtLeastP()) {
+            return false;
+        }
+        final DevicePolicyManager dpm = context.getSystemService(DevicePolicyManager.class);
+        return dpm.isUsingUnifiedPassword(getComponentName(context));
     }
 
     /**
