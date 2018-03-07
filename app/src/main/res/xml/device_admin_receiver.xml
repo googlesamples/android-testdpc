@@ -16,6 +16,7 @@
 -->
 
 <device-admin>
+    <support-transfer-ownership/>
     <uses-policies>
         <limit-password/>
         <watch-login/>
