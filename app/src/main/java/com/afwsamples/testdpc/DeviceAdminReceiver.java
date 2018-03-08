@@ -286,24 +286,36 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
     @TargetApi(Build.VERSION_CODES.O)
     @Override
     public void onUserAdded(Context context, Intent intent, UserHandle newUser) {
-        UserManager userManager = (UserManager) context.getSystemService(Context.USER_SERVICE);
-        String message = context.getString(R.string.on_user_added_message,
-                userManager.getSerialNumberForUser(newUser));
-        Log.i(TAG, message);
-        NotificationUtil.showNotification(context, R.string.on_user_added_title,
-                message,
-                NotificationUtil.USER_ADDED_NOTIFICATION_ID);
+        handleUserAction(context, newUser, R.string.on_user_added_title,
+                R.string.on_user_added_message, NotificationUtil.USER_ADDED_NOTIFICATION_ID);
     }
 
     @TargetApi(Build.VERSION_CODES.O)
     @Override
     public void onUserRemoved(Context context, Intent intent, UserHandle removedUser) {
-        UserManager userManager = (UserManager) context.getSystemService(Context.USER_SERVICE);
-        String message = context.getString(R.string.on_user_removed_message,
-                userManager.getSerialNumberForUser(removedUser));
-        Log.i(TAG, message);
-        NotificationUtil.showNotification(context, R.string.on_user_removed_title, message,
-                NotificationUtil.USER_REMOVED_NOTIFICATION_ID);
+        handleUserAction(context, removedUser, R.string.on_user_removed_title,
+                R.string.on_user_removed_message, NotificationUtil.USER_REMOVED_NOTIFICATION_ID);
+    }
+
+    @TargetApi(Build.VERSION_CODES.P)
+    @Override
+    public void onUserStarted(Context context, Intent intent, UserHandle startedUser) {
+        handleUserAction(context, startedUser, R.string.on_user_started_title,
+                R.string.on_user_started_message, NotificationUtil.USER_STARTED_NOTIFICATION_ID);
+    }
+
+    @TargetApi(Build.VERSION_CODES.P)
+    @Override
+    public void onUserStopped(Context context, Intent intent, UserHandle stoppedUser) {
+        handleUserAction(context, stoppedUser, R.string.on_user_stopped_title,
+                R.string.on_user_stopped_message, NotificationUtil.USER_STOPPED_NOTIFICATION_ID);
+    }
+
+    @TargetApi(Build.VERSION_CODES.P)
+    @Override
+    public void onUserSwitched(Context context, Intent intent, UserHandle switchedUser) {
+        handleUserAction(context, switchedUser, R.string.on_user_switched_title,
+                R.string.on_user_switched_message, NotificationUtil.USER_SWITCHED_NOTIFICATION_ID);
     }
 
     @TargetApi(Build.VERSION_CODES.M)
@@ -635,5 +647,14 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
                 R.string.transfer_ownership_affiliated_complete_title,
                 context.getString(R.string.transfer_ownership_affiliated_complete_message, user),
                 NotificationUtil.TRANSFER_AFFILIATED_PROFILE_OWNERSHIP_COMPLETE_ID);
+    }
+
+    private void handleUserAction(Context context, UserHandle userHandle, int titleResId,
+            int messageResId, int notificationId) {
+        UserManager userManager = (UserManager) context.getSystemService(Context.USER_SERVICE);
+        String message = context.getString(messageResId,
+                userManager.getSerialNumberForUser(userHandle));
+        Log.i(TAG, message);
+        NotificationUtil.showNotification(context, titleResId, message, notificationId);
     }
 }
