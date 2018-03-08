@@ -645,8 +645,14 @@
     <string name="ephemeral_user">Ephemeral user</string>
     <string name="on_user_added_title">User Created</string>
     <string name="on_user_removed_title">User Removed</string>
+    <string name="on_user_started_title">User Started</string>
+    <string name="on_user_stopped_title">User Stopped</string>
+    <string name="on_user_switched_title">User Switched</string>
     <string name="on_user_added_message">User created with serial number %1$d.</string>
     <string name="on_user_removed_message">User with serial number %1$d removed.</string>
+    <string name="on_user_started_message">User with serial number %1$d started.</string>
+    <string name="on_user_stopped_message">User with serial number %1$d stopped.</string>
+    <string name="on_user_switched_message">User with serial number %1$d switched.</string>
     <string name="no_secondary_users_available">No secondary users available.</string>
 
     <!-- Affiliation ids -->
