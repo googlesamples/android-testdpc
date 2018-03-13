@@ -41,7 +41,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-@TargetApi(Build.VERSION_CODES.N)
+@TargetApi(28)
 public class PasswordBlacklistFragment extends BaseManageComponentFragment<Void>
         implements EditDeleteArrayAdapter.OnEditButtonClickListener<String> {
 

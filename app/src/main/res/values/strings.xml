@@ -95,7 +95,7 @@
     <!-- Reasons for disabling preferences -->
     <string name="requires_android_api_level">Requires API level
         <xliff:g id="api level">%d</xliff:g></string>
-    <string name="requires_preview_release">Requires the Android O preview release</string>
+    <string name="requires_preview_release">Requires the Android P preview release</string>
     <string name="requires">Requires\u0020</string>
     <string name="requires_delimiter">,\u0020</string>
     <string name="requires_or">\u0020or\u0020</string>
@@ -645,8 +645,14 @@
     <string name="ephemeral_user">Ephemeral user</string>
     <string name="on_user_added_title">User Created</string>
     <string name="on_user_removed_title">User Removed</string>
+    <string name="on_user_started_title">User Started</string>
+    <string name="on_user_stopped_title">User Stopped</string>
+    <string name="on_user_switched_title">User Switched</string>
     <string name="on_user_added_message">User created with serial number %1$d.</string>
     <string name="on_user_removed_message">User with serial number %1$d removed.</string>
+    <string name="on_user_started_message">User with serial number %1$d started.</string>
+    <string name="on_user_stopped_message">User with serial number %1$d stopped.</string>
+    <string name="on_user_switched_message">User with serial number %1$d switched.</string>
     <string name="no_secondary_users_available">No secondary users available.</string>
 
     <!-- Affiliation ids -->

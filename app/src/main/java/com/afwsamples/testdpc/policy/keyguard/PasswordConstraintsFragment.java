@@ -24,6 +24,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.os.BuildCompat;
 import android.support.v7.preference.EditTextPreference;
 import android.support.v7.preference.ListPreference;
 import android.support.v7.preference.Preference;
@@ -211,7 +212,9 @@ public final class PasswordConstraintsFragment extends ProfileOrParentFragment i
 
         // Settings that may have been changed by other users need updating.
         updateExpirationTimes();
-        refreshBlacklistPreferences();
+        if (BuildCompat.isAtLeastP()) {
+            refreshBlacklistPreferences();
+        }
     }
 
     @Override

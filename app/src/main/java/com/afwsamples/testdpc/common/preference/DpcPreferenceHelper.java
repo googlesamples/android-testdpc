@@ -220,8 +220,8 @@ public class DpcPreferenceHelper {
      */
     private CharSequence findConstraintViolation() {
         if (getDeviceSdkInt() < mMinSdkVersion) {
-            // FIXME: Remove this special checking once O is out.
-            if (mMinSdkVersion >= 26) {
+            // FIXME: Remove this special checking once P is out.
+            if (mMinSdkVersion > 27) {
                 return mContext.getString(R.string.requires_preview_release);
             }
             return mContext.getString(R.string.requires_android_api_level, mMinSdkVersion);
