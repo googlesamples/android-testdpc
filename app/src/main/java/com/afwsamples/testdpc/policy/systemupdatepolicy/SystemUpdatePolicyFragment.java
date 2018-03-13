@@ -38,10 +38,10 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioGroup;
 import android.widget.Toast;
+
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
-import com.afwsamples.testdpc.common.ReflectionUtil;
-import java.lang.reflect.InvocationTargetException;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -251,7 +251,7 @@ public class SystemUpdatePolicyFragment extends Fragment implements View.OnClick
                 });
     }
 
-    @TargetApi(Build.VERSION_CODES.P)
+    @TargetApi(28)
     private boolean setSystemUpdatePolicy() {
         SystemUpdatePolicy newPolicy;
         switch (mSystemUpdatePolicySelection.getCheckedRadioButtonId()) {
@@ -269,33 +269,21 @@ public class SystemUpdatePolicyFragment extends Fragment implements View.OnClick
             default:
                 newPolicy = null;
         }
-        try {
-            if (BuildCompat.isAtLeastP() && newPolicy != null && mFreezePeriods.size() != 0) {
-                List<Pair<Integer, Integer>> periods = new ArrayList<>(mFreezePeriods.size());
-                for (Period p : mFreezePeriods) {
-                    periods.add(p.toIntegers());
-                }
-                ReflectionUtil.invoke(newPolicy, "setFreezePeriods",
-                        new Class[]{List.class}, periods);
+        if (BuildCompat.isAtLeastP() && newPolicy != null && mFreezePeriods.size() != 0) {
+            List<Pair<Integer, Integer>> periods = new ArrayList<>(mFreezePeriods.size());
+            for (Period p : mFreezePeriods) {
+                periods.add(p.toIntegers());
             }
-            mDpm.setSystemUpdatePolicy(DeviceAdminReceiver.getComponentName(getActivity()),
-                    newPolicy);
-            Toast.makeText(getContext(), "Policy set successfully", Toast.LENGTH_SHORT).show();
-            return true;
-        } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
-            Throwable cause = e.getCause();
-            if (cause instanceof InvocationTargetException) {
-                if (cause.getCause().getClass().getSimpleName().equals(
-                        "ValidationFailedException")) {
-                    cause = cause.getCause();
-                }
+            try {
+                newPolicy.setFreezePeriods(periods);
+                mDpm.setSystemUpdatePolicy(DeviceAdminReceiver.getComponentName(getActivity()),
+                        newPolicy);
+                Toast.makeText(getContext(), "Policy set successfully", Toast.LENGTH_LONG).show();
+                return true;
+            } catch (IllegalArgumentException e) {
+                Toast.makeText(getContext(), "Failed to set system update policy: " + e.getMessage(),
+                        Toast.LENGTH_LONG).show();
             }
-            cause.printStackTrace();
-            Toast.makeText(getContext(), "Fail to set policy: " + cause.getMessage(),
-                    Toast.LENGTH_LONG).show();
-        } catch (IllegalArgumentException e) {
-            Toast.makeText(getContext(), "setSystemUpdatePolicy fails: " + e.getMessage(),
-                    Toast.LENGTH_LONG).show();
         }
         return false;
     }
@@ -309,7 +297,7 @@ public class SystemUpdatePolicyFragment extends Fragment implements View.OnClick
         mSetMaintenanceWindowEnd.setText(formatMinutes(mMaintenanceEnd));
     }
 
-    @TargetApi(Build.VERSION_CODES.P)
+    @TargetApi(28)
     private void reloadSystemUpdatePolicy() {
         SystemUpdatePolicy policy = mDpm.getSystemUpdatePolicy();
         String policyDescription = "Unknown";
@@ -344,18 +332,13 @@ public class SystemUpdatePolicyFragment extends Fragment implements View.OnClick
                     break;
             }
             if (BuildCompat.isAtLeastP()) {
-                try {
-                    List<Pair<Integer, Integer>> freezePeriods = (List<Pair<Integer, Integer>>)
-                            ReflectionUtil.invoke(policy, "getFreezePeriods");
-                    mFreezePeriods.clear();
-                    for (Pair<Integer, Integer> period : freezePeriods) {
-                        Period p = new Period(period.first, period.second);
-                        mFreezePeriods.add(p);
-                    }
-                    mFreezePeriodAdapter.notifyDataSetChanged();
-                } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
-                    e.printStackTrace();
+                List<Pair<Integer, Integer>> freezePeriods = policy.getFreezePeriods();
+                mFreezePeriods.clear();
+                for (Pair<Integer, Integer> period : freezePeriods) {
+                    Period p = new Period(period.first, period.second);
+                    mFreezePeriods.add(p);
                 }
+                mFreezePeriodAdapter.notifyDataSetChanged();
                 mFreezePeriodPanel.setVisibility(View.VISIBLE);
             }
         }
