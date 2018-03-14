@@ -13,7 +13,7 @@ ext {
 }
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 'android-P'
     buildToolsVersion "28.0.0"
 
     defaultConfig {
@@ -36,7 +36,7 @@ android {
     productFlavors {
         targetP {
             dimension 'targetSdk'
-            targetSdkVersion 28
+            targetSdkVersion 'P'
         }
         targetO {
             dimension 'targetSdk'
