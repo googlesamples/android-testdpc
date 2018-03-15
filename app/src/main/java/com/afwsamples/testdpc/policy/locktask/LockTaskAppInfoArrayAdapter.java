@@ -24,6 +24,7 @@ import android.text.TextUtils;
 import com.afwsamples.testdpc.common.ToggleComponentsArrayAdapter;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 /**
@@ -48,18 +49,19 @@ public class LockTaskAppInfoArrayAdapter extends ToggleComponentsArrayAdapter {
     }
 
     /**
-     * Invoke to get a list of the permitted lock tasks.
+     * Invoke to get a list of the permitted lock task packages. Duplicate package names are removed
+     * while their order is preserved.
      */
     public String[] getLockTaskList() {
-        ArrayList<String> lockTaskEnabledArrayList = new ArrayList<String>();
+        LinkedHashSet<String> lockTaskPackages = new LinkedHashSet<>();
         int size = getCount();
         for (int i = 0; i < size; i++) {
             if (mIsComponentCheckedList.get(i)) {
-                lockTaskEnabledArrayList.add(getItem(i).activityInfo.packageName);
+                lockTaskPackages.add(getItem(i).activityInfo.packageName);
             }
         }
-        String[] lockTaskEnabledArray = new String[lockTaskEnabledArrayList.size()];
-        return lockTaskEnabledArrayList.toArray(lockTaskEnabledArray);
+        // Remove duplicates, preserving order
+        return lockTaskPackages.toArray(new String[0]);
     }
 
     @Override

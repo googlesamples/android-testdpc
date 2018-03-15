@@ -40,6 +40,7 @@ limitations under the License.
         android:layout_alignParentLeft="true"
         android:layout_marginTop="32dp"
         android:orientation="vertical">
+
         <RadioButton android:id="@+id/system_update_policy_automatic"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -59,12 +60,39 @@ limitations under the License.
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/system_update_policy_none"/>
+
     </RadioGroup>
+
+    <LinearLayout
+        android:id="@+id/system_update_policy_blackout_periods"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/system_update_policy_selection"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/system_update_policy_window_freeze_period_label" />
+
+        <Button
+            android:id="@+id/system_update_policy_btn_add_period"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/system_update_policy_add_freeze_period" />
+
+        <ListView
+            android:id="@+id/system_update_policy_blackout_period_list"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:fadeScrollbars="false"
+            android:scrollbars="vertical" />
+    </LinearLayout>
 
     <LinearLayout android:id="@+id/system_update_policy_windowed_details"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/system_update_policy_selection"
+        android:layout_below="@+id/system_update_policy_blackout_periods"
         android:layout_alignParentLeft="true"
         android:orientation="vertical">
 
@@ -94,4 +122,5 @@ limitations under the License.
         android:layout_alignParentLeft="true"
         android:layout_marginTop="48dip"
         android:text="@string/system_update_policy_set_policy" />
+
 </RelativeLayout>

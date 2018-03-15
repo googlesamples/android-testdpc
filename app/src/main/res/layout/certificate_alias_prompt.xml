@@ -36,4 +36,15 @@
             android:ellipsize="end"
             android:inputType="text"/>
 
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/user_selectability_description"/>
+
+    <CheckBox
+        android:id="@+id/alias_user_selectable"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/user_selectability_checkbox"/>
+
 </LinearLayout>

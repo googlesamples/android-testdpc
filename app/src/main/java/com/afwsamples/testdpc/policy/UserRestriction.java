@@ -1,7 +1,5 @@
 package com.afwsamples.testdpc.policy;
 
-import com.afwsamples.testdpc.R;
-
 import static android.os.UserManager.ALLOW_PARENT_PROFILE_APP_LINKING;
 import static android.os.UserManager.DISALLOW_ADD_MANAGED_PROFILE;
 import static android.os.UserManager.DISALLOW_ADD_USER;
@@ -9,9 +7,15 @@ import static android.os.UserManager.DISALLOW_ADJUST_VOLUME;
 import static android.os.UserManager.DISALLOW_APPS_CONTROL;
 import static android.os.UserManager.DISALLOW_AUTOFILL;
 import static android.os.UserManager.DISALLOW_BLUETOOTH;
+import static android.os.UserManager.DISALLOW_BLUETOOTH_SHARING;
 import static android.os.UserManager.DISALLOW_CONFIG_BLUETOOTH;
 import static android.os.UserManager.DISALLOW_CONFIG_CELL_BROADCASTS;
 import static android.os.UserManager.DISALLOW_CONFIG_CREDENTIALS;
+import static android.os.UserManager.DISALLOW_CONFIG_DATE_TIME;
+import static android.os.UserManager.DISALLOW_AIRPLANE_MODE;
+import static android.os.UserManager.DISALLOW_CONFIG_BRIGHTNESS;
+import static android.os.UserManager.DISALLOW_CONFIG_SCREEN_TIMEOUT;
+import static android.os.UserManager.DISALLOW_AMBIENT_DISPLAY;
 import static android.os.UserManager.DISALLOW_CONFIG_MOBILE_NETWORKS;
 import static android.os.UserManager.DISALLOW_CONFIG_TETHERING;
 import static android.os.UserManager.DISALLOW_CONFIG_VPN;
@@ -39,9 +43,17 @@ import static android.os.UserManager.DISALLOW_SMS;
 import static android.os.UserManager.DISALLOW_UNINSTALL_APPS;
 import static android.os.UserManager.DISALLOW_UNMUTE_MICROPHONE;
 import static android.os.UserManager.DISALLOW_USB_FILE_TRANSFER;
+import static android.os.UserManager.DISALLOW_USER_SWITCH;
 import static android.os.UserManager.ENSURE_VERIFY_APPS;
 
+import com.afwsamples.testdpc.R;
+
 public class UserRestriction {
+    // TODO: remove it once available in SDK
+    public static final String DISALLOW_UNIFIED_PASSWORD = "no_unified_password";
+    public static final String DISALLOW_CONFIG_LOCATION = "no_config_location";
+    public static final String DISALLOW_PRINTING= "no_printing";
+
     public String key;
     public int titleResId;
 
@@ -49,6 +61,12 @@ public class UserRestriction {
         this.key = key;
         this.titleResId = titleResId;
     }
+
+    // TODO(68687253): Replace this hard-coded string with UserManager.DISALLOW_SYSTEM_ERROR_DIALOGS
+    private static final String DISALLOW_SYSTEM_ERROR_DIALOGS = "no_system_error_dialogs";
+
+    //TODO: Replace with UserManager.DISALLOW_SHARE_INTO_MANAGED_PROFILE
+    private static final String DISALLOW_SHARE_INTO_MANAGED_PROFILE = "no_sharing_into_profile";
 
     public static final UserRestriction[] ALL_USER_RESTRICTIONS = {
             new UserRestriction(
@@ -89,6 +107,9 @@ public class UserRestriction {
             new UserRestriction(
                     DISALLOW_CREATE_WINDOWS,
                     R.string.disallow_create_windows),
+            new UserRestriction(
+                    DISALLOW_SYSTEM_ERROR_DIALOGS,
+                    R.string.disallow_system_error_dialogs),
             new UserRestriction(DISALLOW_CROSS_PROFILE_COPY_PASTE,
                     R.string.disallow_cross_profile_copy_paste),
             new UserRestriction(DISALLOW_DATA_ROAMING,
@@ -152,6 +173,35 @@ public class UserRestriction {
             new UserRestriction(
                     DISALLOW_AUTOFILL,
                     R.string.disallow_autofill),
+            new UserRestriction(
+                    DISALLOW_BLUETOOTH_SHARING,
+                    R.string.disallow_bluetooth_sharing),
+            new UserRestriction(DISALLOW_UNIFIED_PASSWORD, R.string.disallow_unified_password),
+            new UserRestriction(DISALLOW_USER_SWITCH, R.string.disallow_user_switch),
+            new UserRestriction(
+                    DISALLOW_CONFIG_LOCATION,
+                    R.string.disallow_config_location),
+            new UserRestriction(
+                    DISALLOW_AIRPLANE_MODE,
+                    R.string.disallow_airplane_mode),
+            new UserRestriction(
+                    DISALLOW_CONFIG_BRIGHTNESS,
+                    R.string.disallow_config_brightness),
+            new UserRestriction(
+                    DISALLOW_CONFIG_DATE_TIME,
+                    R.string.disallow_config_date_time),
+            new UserRestriction(
+                    DISALLOW_CONFIG_SCREEN_TIMEOUT,
+                    R.string.disallow_config_screen_timeout),
+            new UserRestriction(
+                    DISALLOW_AMBIENT_DISPLAY,
+                    R.string.disallow_ambient_display),
+            new UserRestriction(
+                    DISALLOW_SHARE_INTO_MANAGED_PROFILE,
+                    R.string.disallow_share_into_work_profile),
+            new UserRestriction(
+                    DISALLOW_PRINTING,
+                    R.string.disallow_printing),
     };
 
     /**
@@ -168,6 +218,7 @@ public class UserRestriction {
             DISALLOW_CONFIG_TETHERING,
             DISALLOW_CONFIG_WIFI,
             DISALLOW_CREATE_WINDOWS,
+            DISALLOW_SYSTEM_ERROR_DIALOGS,
             DISALLOW_DATA_ROAMING,
             DISALLOW_FACTORY_RESET,
             DISALLOW_FUN,
@@ -178,7 +229,15 @@ public class UserRestriction {
             DISALLOW_SAFE_BOOT,
             DISALLOW_SMS,
             DISALLOW_UNMUTE_MICROPHONE,
-            DISALLOW_USB_FILE_TRANSFER
+            DISALLOW_USB_FILE_TRANSFER,
+            DISALLOW_AIRPLANE_MODE
+    };
+
+    /**
+     * User restrictions that cannot be set by profile owners. Applied to all users.
+     */
+    public static final String[] DEVICE_OWNER_ONLY_RESTRICTIONS = {
+            DISALLOW_USER_SWITCH
     };
 
     /**
@@ -186,7 +245,9 @@ public class UserRestriction {
      */
     public static final String[] MANAGED_PROFILE_ONLY_RESTRICTIONS = {
             ALLOW_PARENT_PROFILE_APP_LINKING,
-            DISALLOW_CROSS_PROFILE_COPY_PASTE
+            DISALLOW_CROSS_PROFILE_COPY_PASTE,
+            DISALLOW_UNIFIED_PASSWORD,
+            DISALLOW_SHARE_INTO_MANAGED_PROFILE,
     };
 
     /**
@@ -194,7 +255,12 @@ public class UserRestriction {
      */
     public static String[] NON_MANAGED_PROFILE_RESTRICTIONS = {
             DISALLOW_REMOVE_USER,
-            DISALLOW_SET_WALLPAPER
+            DISALLOW_SET_WALLPAPER,
+            DISALLOW_CONFIG_DATE_TIME,
+            DISALLOW_AIRPLANE_MODE,
+            DISALLOW_CONFIG_SCREEN_TIMEOUT,
+            DISALLOW_CONFIG_BRIGHTNESS,
+            DISALLOW_AMBIENT_DISPLAY
     };
 
     /**
@@ -215,7 +281,21 @@ public class UserRestriction {
             DISALLOW_ADD_MANAGED_PROFILE,
             DISALLOW_BLUETOOTH,
             DISALLOW_REMOVE_MANAGED_PROFILE,
-            DISALLOW_AUTOFILL
+            DISALLOW_AUTOFILL,
+            DISALLOW_BLUETOOTH_SHARING
     };
 
+    public static String[] PIC_PLUS_RESTRICTIONS = {
+            DISALLOW_UNIFIED_PASSWORD,
+            DISALLOW_SYSTEM_ERROR_DIALOGS,
+            DISALLOW_USER_SWITCH,
+            DISALLOW_CONFIG_LOCATION,
+            DISALLOW_AIRPLANE_MODE,
+            DISALLOW_CONFIG_DATE_TIME,
+            DISALLOW_CONFIG_BRIGHTNESS,
+            DISALLOW_CONFIG_SCREEN_TIMEOUT,
+            DISALLOW_AMBIENT_DISPLAY,
+            DISALLOW_SHARE_INTO_MANAGED_PROFILE,
+            DISALLOW_PRINTING,
+    };
 }

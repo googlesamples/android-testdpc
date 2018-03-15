@@ -64,6 +64,7 @@ public class ResetPasswordWithTokenFragment extends Fragment implements View.OnC
     private Button mBtnSetPassword;
     private CheckBox mChkRequireEntry;
     private CheckBox mChkDoNotRequirePasswordOnBoot;
+    private CheckBox mChkDoNotAllowOtherAdminsChange;
     private Button mBtnActivateToken;
     private KeyguardManager mKeyguardMgr;
 
@@ -135,6 +136,8 @@ public class ResetPasswordWithTokenFragment extends Fragment implements View.OnC
         mChkRequireEntry = (CheckBox) view.findViewById(R.id.require_password_entry_checkbox);
         mChkDoNotRequirePasswordOnBoot = (CheckBox) view.findViewById(
                 R.id.dont_require_password_on_boot_checkbox);
+        mChkDoNotAllowOtherAdminsChange =
+                (CheckBox) view.findViewById(R.id.dont_allow_other_admins_change_password);
 
         mBtnNewToken = (Button) view.findViewById(R.id.btnNewToken);
         mBtnRemoveToken = (Button) view.findViewById(R.id.btnRemoveToken);
@@ -227,6 +230,8 @@ public class ResetPasswordWithTokenFragment extends Fragment implements View.OnC
                 DevicePolicyManager.RESET_PASSWORD_REQUIRE_ENTRY : 0;
         flags |= mChkDoNotRequirePasswordOnBoot.isChecked() ?
                 DevicePolicyManager.RESET_PASSWORD_DO_NOT_ASK_CREDENTIALS_ON_BOOT : 0;
+        flags |= mChkDoNotAllowOtherAdminsChange.isChecked() ?
+                DevicePolicyManager.RESET_PASSWORD_REQUIRE_ENTRY : 0;
 
         if (token != null) {
             boolean result = mDpm.resetPasswordWithToken(

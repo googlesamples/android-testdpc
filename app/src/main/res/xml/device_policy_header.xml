@@ -15,7 +15,7 @@
 -->
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:testdpc="http://schemas.android.com/apk/res/com.afwsamples.testdpc">
+    xmlns:testdpc="http://schemas.android.com/apk/res-auto">
 
     <com.afwsamples.testdpc.common.preference.DpcPreference
         android:key="app_status"
@@ -36,6 +36,45 @@
             testdpc:minSdkVersion="L" />
     </PreferenceCategory>
 
+    <PreferenceCategory android:title="@string/set_time_manage">
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="set_time"
+            android:title="@string/set_time"
+            testdpc:admin="deviceOwner"
+            testdpc:minSdkVersion="P" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="set_time_zone"
+            android:title="@string/set_time_zone"
+            testdpc:admin="deviceOwner"
+            testdpc:minSdkVersion="P" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/set_system_setting">
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="set_screen_brightness"
+            android:title="@string/set_screen_brightness"
+            testdpc:admin="deviceOwner"
+            testdpc:minSdkVersion="P" />
+        <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
+            android:key="auto_brightness"
+            android:title="@string/auto_brightness"
+            testdpc:admin="deviceOwner"
+            testdpc:minSdkVersion="P" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="set_screen_off_timeout"
+            android:title="@string/set_screen_off_timeout"
+            testdpc:admin="deviceOwner"
+            testdpc:minSdkVersion="P" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/override_apn_title">
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="manage_override_apn"
+            android:title="@string/manage_override_apn"
+            testdpc:admin="deviceOwner"
+            testdpc:minSdkVersion="P" />
+    </PreferenceCategory>
+
     <PreferenceCategory android:title="@string/account_management_title">
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="set_disable_account_management"
@@ -49,6 +88,11 @@
             android:key="add_account"
             android:title="@string/add_account"
             testdpc:minSdkVersion="L" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="remove_account"
+            android:title="@string/remove_account"
+            testdpc:admin="deviceOwner|profileOwner"
+            testdpc:minSdkVersion="P" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/apps_management_title">
@@ -64,6 +108,10 @@
             android:key="enable_system_apps_by_intent"
             android:title="@string/enable_system_apps_by_intent"
             testdpc:minSdkVersion="L" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="install_existing_packages"
+            android:title="@string/install_existing_packages_title"
+            testdpc:minSdkVersion="P" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="hide_apps"
             android:title="@string/hide_apps_title"
@@ -81,9 +129,23 @@
             android:title="@string/unsuspend_apps_title"
             testdpc:minSdkVersion="N" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="clear_app_data"
+            android:title="@string/clear_app_data_title"
+            testdpc:minSdkVersion="P" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="keep_uninstalled_packages"
+            android:title="@string/keep_uninstalled_packages"
+            testdpc:admin="deviceOwner"
+            testdpc:minSdkVersion="P" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="manage_app_restrictions"
             android:title="@string/manage_app_restrictions"
             testdpc:minSdkVersion="L" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="disable_metered_data"
+            android:title="@string/metered_data_restriction"
+            testdpc:admin="deviceOwner|profileOwner"
+            testdpc:minSdkVersion="P" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/delegation_title">
@@ -137,8 +199,8 @@
         <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
             android:key="mute_audio"
             android:title="@string/mute_audio"
-            testdpc:user="notManagedProfile"
-            testdpc:minSdkVersion="L" />
+            testdpc:minSdkVersion="L"
+            testdpc:user="notManagedProfile" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/certificate_management_title">
@@ -154,6 +216,14 @@
             android:key="override_key_selection"
             android:title="@string/key_override_alias"
             testdpc:minSdkVersion="M" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="generate_key_and_certificate"
+            android:title="@string/generate_key_and_certificate"
+            testdpc:minSdkVersion="P" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="test_key_usability"
+            android:title="@string/test_key_usage"
+            testdpc:minSdkVersion="L" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="install_ca_certificate"
             android:title="@string/install_ca_certificate"
@@ -192,8 +262,8 @@
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="show_wifi_mac_address"
             android:title="@string/show_wifi_mac_address"
-            testdpc:user="primaryUser"
-            testdpc:minSdkVersion="N" />
+            testdpc:minSdkVersion="N"
+            testdpc:user="primaryUser" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/input_methods_title">
@@ -207,13 +277,13 @@
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="set_notification_listeners"
             android:title="@string/set_notification_listeners"
-            testdpc:user="managedProfile"
-            testdpc:minSdkVersion="O" />
+            testdpc:minSdkVersion="O"
+            testdpc:user="managedProfile" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="set_notification_listeners_text"
             android:title="@string/set_notification_listeners_text"
-            testdpc:user="managedProfile"
-            testdpc:minSdkVersion="O" />
+            testdpc:minSdkVersion="O"
+            testdpc:user="managedProfile" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/lock_category">
@@ -222,7 +292,13 @@
             android:selectable="false"
             android:title="@string/password_compliant_title"
             testdpc:minSdkVersion="N" />
-
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="separate_challenge"
+            android:selectable="false"
+            android:title="@string/separate_challenge_title"
+            testdpc:admin="profileOwner"
+            testdpc:minSdkVersion="P"
+            testdpc:user="managedProfile" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="lock_screen_policy"
             android:title="@string/lock_screen_policy"
@@ -243,14 +319,14 @@
             android:title="@string/lock_now"
             testdpc:minSdkVersion="L" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
-                android:key="set_new_password"
-                android:title="@string/request_to_set_new_password"
-                testdpc:minSdkVersion="L" />
+            android:key="set_new_password"
+            android:title="@string/request_to_set_new_password"
+            testdpc:minSdkVersion="L" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
-                android:key="set_profile_parent_new_password"
-                android:title="@string/request_to_set_profile_parent_new_password"
-                testdpc:user="managedProfile"
-                testdpc:minSdkVersion="N" />
+            android:key="set_profile_parent_new_password"
+            android:title="@string/request_to_set_profile_parent_new_password"
+            testdpc:minSdkVersion="N"
+            testdpc:user="managedProfile" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/lock_task_title">
@@ -265,10 +341,20 @@
             testdpc:admin="deviceOwner|profileOwner"
             testdpc:minSdkVersion="L" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="set_lock_task_features"
+            android:title="@string/set_lock_task_features_title"
+            testdpc:admin="deviceOwner|profileOwner"
+            testdpc:minSdkVersion="P" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="start_lock_task"
             android:title="@string/start_lock_task"
             testdpc:admin="deviceOwner|profileOwner"
             testdpc:minSdkVersion="M" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="relaunch_in_lock_task"
+            android:title="@string/relaunch_in_lock_task_title"
+            testdpc:admin="deviceOwner|profileOwner"
+            testdpc:minSdkVersion="P" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="stop_lock_task"
             android:title="@string/stop_lock_task"
@@ -280,16 +366,16 @@
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="managed_profile_policies"
             android:title="@string/managed_profile_specific_policy_title"
-            testdpc:user="managedProfile"
-            testdpc:minSdkVersion="L" />
+            testdpc:minSdkVersion="L"
+            testdpc:user="managedProfile" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/bind_device_admin_category_title">
         <com.afwsamples.testdpc.common.preference.DpcPreference
-                android:key="bind_device_admin_policies"
-                android:title="@string/bind_device_admin_policy_title"
-                testdpc:admin="deviceOwner"
-                testdpc:minSdkVersion="O" />
+            android:key="bind_device_admin_policies"
+            android:title="@string/bind_device_admin_policy_title"
+            testdpc:admin="deviceOwner"
+            testdpc:minSdkVersion="O" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/networking_management_title">
@@ -329,23 +415,27 @@
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="disable_status_bar"
             android:title="@string/disable_status_bar"
-            testdpc:user="primaryUser"
-            testdpc:minSdkVersion="M" />
+            testdpc:admin="deviceOwner|profileOwner"
+            testdpc:minSdkVersion="M"
+            testdpc:user="notManagedProfile" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="reenable_status_bar"
             android:title="@string/reenable_status_bar"
-            testdpc:user="primaryUser"
-            testdpc:minSdkVersion="M" />
+            testdpc:admin="deviceOwner|profileOwner"
+            testdpc:minSdkVersion="M"
+            testdpc:user="notManagedProfile" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="disable_keyguard"
             android:title="@string/disable_keyguard"
-            testdpc:user="primaryUser"
-            testdpc:minSdkVersion="M" />
+            testdpc:admin="deviceOwner|profileOwner"
+            testdpc:minSdkVersion="M"
+            testdpc:user="notManagedProfile" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="reenable_keyguard"
             android:title="@string/reenable_keyguard"
-            testdpc:user="primaryUser"
-            testdpc:minSdkVersion="M" />
+            testdpc:admin="deviceOwner|profileOwner"
+            testdpc:minSdkVersion="M"
+            testdpc:user="notManagedProfile" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="start_kiosk_mode"
             android:title="@string/start_kiosk_mode"
@@ -357,8 +447,8 @@
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="system_update_policy"
             android:title="@string/system_update_policy"
-            testdpc:user="primaryUser"
-            testdpc:minSdkVersion="M" />
+            testdpc:minSdkVersion="M"
+            testdpc:user="primaryUser" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="system_update_pending"
             android:title="@string/system_update_pending"
@@ -368,25 +458,77 @@
 
     <PreferenceCategory android:title="@string/user_management">
         <com.afwsamples.testdpc.common.preference.DpcPreference
-                android:key="create_managed_profile"
-                android:title="@string/create_managed_profile"
-                testdpc:admin="deviceOwner"
-                testdpc:minSdkVersion="O" />
+            android:key="create_managed_profile"
+            android:title="@string/create_managed_profile"
+            testdpc:admin="deviceOwner"
+            testdpc:minSdkVersion="O"
+            testdpc:user="primaryUser" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="create_and_manage_user"
             android:title="@string/create_and_manage_user"
-            testdpc:user="primaryUser"
-            testdpc:minSdkVersion="L" />
+            testdpc:admin="deviceOwner"
+            testdpc:minSdkVersion="L"
+            testdpc:user="primaryUser" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="remove_user"
             android:title="@string/remove_user"
-            testdpc:user="primaryUser"
-            testdpc:minSdkVersion="L" />
+            testdpc:admin="deviceOwner"
+            testdpc:minSdkVersion="L"
+            testdpc:user="primaryUser" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="switch_user"
+            android:title="@string/switch_user"
+            testdpc:admin="deviceOwner"
+            testdpc:minSdkVersion="P"
+            testdpc:user="primaryUser" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="start_user_in_background"
+            android:title="@string/start_user_in_background"
+            testdpc:admin="deviceOwner"
+            testdpc:minSdkVersion="P"
+            testdpc:user="primaryUser" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="stop_user"
+            android:title="@string/stop_user"
+            testdpc:admin="deviceOwner"
+            testdpc:minSdkVersion="P"
+            testdpc:user="primaryUser" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="logout_user"
+            android:title="@string/logout_user"
+            testdpc:admin="deviceOwner|profileOwner"
+            testdpc:minSdkVersion="P"
+            testdpc:user="secondaryUser" />
+        <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
+            android:key="enable_logout"
+            android:title="@string/enable_logout"
+            testdpc:admin="deviceOwner"
+            testdpc:minSdkVersion="P"
+            testdpc:user="primaryUser" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="set_user_session_message"
+            android:title="@string/set_user_session_message"
+            testdpc:admin="deviceOwner"
+            testdpc:minSdkVersion="P"
+            testdpc:user="primaryUser" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="set_affiliation_ids"
             android:title="@string/manage_affiliation_ids"
             testdpc:admin="deviceOwner|profileOwner"
-            testdpc:minSdkVersion="O" />
+            testdpc:minSdkVersion="O"
+            testdpc:user="any" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="affiliated_user"
+            android:title="@string/affiliated_user"
+            testdpc:admin="any"
+            testdpc:minSdkVersion="P"
+            testdpc:user="any" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="ephemeral_user"
+            android:title="@string/ephemeral_user"
+            testdpc:admin="deviceOwner|profileOwner"
+            testdpc:minSdkVersion="P"
+            testdpc:user="any" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/user_restrictions_management_title">
@@ -431,18 +573,23 @@
             testdpc:admin="deviceOwner"
             testdpc:minSdkVersion="L" />
         <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
-            android:key="enable_process_logging"
-            android:title="@string/enable_process_logging"
+            android:key="enable_security_logging"
+            android:title="@string/enable_security_logging"
             testdpc:admin="deviceOwner"
             testdpc:minSdkVersion="N" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
-            android:key="request_process_logs"
-            android:title="@string/request_process_logs"
+            android:key="request_security_logs"
+            android:title="@string/request_security_logs"
             testdpc:admin="deviceOwner"
             testdpc:minSdkVersion="N" />
         <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
             android:key="enable_network_logging"
             android:title="@string/enable_network_logging"
+            testdpc:admin="deviceOwner"
+            testdpc:minSdkVersion="O" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="request_network_logs"
+            android:title="@string/request_network_logs"
             testdpc:admin="deviceOwner"
             testdpc:minSdkVersion="O" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
@@ -455,6 +602,11 @@
             android:title="@string/enable_backup_service"
             testdpc:admin="deviceOwner"
             testdpc:minSdkVersion="O" />
+        <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
+            android:key="mandatory_backups"
+            android:title="@string/mandatory_backups"
+            testdpc:admin="deviceOwner"
+            testdpc:minSdkVersion="P" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="wipe_data"
             android:title="@string/wipe_data"
@@ -476,11 +628,27 @@
             testdpc:minSdkVersion="O_MR1" />
     </PreferenceCategory>
 
+    <PreferenceCategory android:title="@string/transfer_ownership">
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="transfer_ownership_to_component"
+            android:title="@string/transfer_ownership_to_component"
+            testdpc:admin="deviceOwner|profileOwner"
+            testdpc:minSdkVersion="P" />
+    </PreferenceCategory>
+
     <PreferenceCategory android:title="@string/safetynet_preference_title">
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="safetynet_attest"
             android:summary="@string/attest_preference_summary"
             android:title="@string/attest_preference_title"
             testdpc:minSdkVersion="L" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/cross_profile_section">
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="cross_profile_apps"
+            android:title="@string/cross_profile_apps_api"
+            testdpc:admin="any"
+            testdpc:minSdkVersion="P" />
     </PreferenceCategory>
 </PreferenceScreen>

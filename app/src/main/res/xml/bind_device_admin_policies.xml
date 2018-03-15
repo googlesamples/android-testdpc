@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:testdpc="http://schemas.android.com/apk/res/com.afwsamples.testdpc">
+        xmlns:testdpc="http://schemas.android.com/apk/res-auto">
 
     <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="po_user_status"

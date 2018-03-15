@@ -29,14 +29,12 @@ import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.os.BuildCompat;
-import android.util.ArrayMap;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,6 +46,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.afwsamples.testdpc.DeviceAdminReceiver;
+import com.afwsamples.testdpc.PolicyManagementActivity;
 import com.afwsamples.testdpc.R;
 
 import java.util.ArrayList;
@@ -158,11 +157,14 @@ public class KioskModeActivity extends Activity {
     public void onBackdoorClicked() {
         stopLockTask();
         setDefaultKioskPolicies(false);
+        mDevicePolicyManager.clearPackagePersistentPreferredActivities(mAdminComponentName,
+                getPackageName());
         mPackageManager.setComponentEnabledSetting(
                 new ComponentName(getPackageName(), getClass().getName()),
                 PackageManager.COMPONENT_ENABLED_STATE_DEFAULT,
                 PackageManager.DONT_KILL_APP);
         finish();
+        startActivity(new Intent(this, PolicyManagementActivity.class));
     }
 
     private void setUserRestriction(String restriction, boolean disallow) {
@@ -186,14 +188,6 @@ public class KioskModeActivity extends Activity {
             restorePreviousConfiguration();
         }
 
-        // disable keyguard and status bar
-        mDevicePolicyManager.setKeyguardDisabled(mAdminComponentName, active);
-        mDevicePolicyManager.setStatusBarDisabled(mAdminComponentName, active);
-
-        IntentFilter intentFilter = new IntentFilter(Intent.ACTION_MAIN);
-        intentFilter.addCategory(Intent.CATEGORY_HOME);
-        intentFilter.addCategory(Intent.CATEGORY_DEFAULT);
-
         // set lock task packages
         mDevicePolicyManager.setLockTaskPackages(mAdminComponentName,
                 active ? mKioskPackages.toArray(new String[]{}) : new String[]{});
@@ -201,13 +195,8 @@ public class KioskModeActivity extends Activity {
                 MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         if (active) {
-            // set kiosk activity as home intent receiver
-            mDevicePolicyManager.addPersistentPreferredActivity(mAdminComponentName, intentFilter,
-                    new ComponentName(getPackageName(), KioskModeActivity.class.getName()));
-            editor.putStringSet(KIOSK_APPS_KEY, new HashSet<String>(mKioskPackages));
+            editor.putStringSet(KIOSK_APPS_KEY, new HashSet<>(mKioskPackages));
         } else {
-            mDevicePolicyManager.clearPackagePersistentPreferredActivities(mAdminComponentName,
-                    getPackageName());
             editor.remove(KIOSK_APPS_KEY);
         }
         editor.commit();
@@ -278,6 +267,7 @@ public class KioskModeActivity extends Activity {
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             if (getPackageName().equals(getItem(position))) {
                 onBackdoorClicked();
+                return;
             }
             PackageManager pm = getPackageManager();
             startActivity(pm.getLaunchIntentForPackage(getItem(position)));

@@ -16,6 +16,8 @@
 
 package com.afwsamples.testdpc;
 
+import static com.afwsamples.testdpc.policy.PolicyManagementFragment.OVERRIDE_KEY_SELECTION_KEY;
+
 import android.annotation.TargetApi;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -26,20 +28,23 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Binder;
 import android.os.Build;
 import android.os.ParcelFileDescriptor;
+import android.os.PersistableBundle;
 import android.os.Process;
 import android.os.UserHandle;
 import android.os.UserManager;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.os.BuildCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
-
 import com.afwsamples.testdpc.common.NotificationUtil;
+import com.afwsamples.testdpc.common.Util;
+import com.afwsamples.testdpc.policy.UserRestriction;
 import com.afwsamples.testdpc.provision.PostProvisioningTask;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -57,8 +62,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import static com.afwsamples.testdpc.policy.PolicyManagementFragment.OVERRIDE_KEY_SELECTION_KEY;
-
 /**
  * Handles events related to the managed profile.
  */
@@ -67,6 +70,8 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
 
     public static final String ACTION_PASSWORD_REQUIREMENTS_CHANGED =
             "com.afwsamples.testdpc.policy.PASSWORD_REQUIREMENTS_CHANGED";
+
+    public static final String NETWORK_LOGS_FILE_PREFIX = "network_logs_";
 
     private static final String LOGS_DIR = "logs";
 
@@ -81,7 +86,13 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
         switch (intent.getAction()) {
             case ACTION_PASSWORD_REQUIREMENTS_CHANGED:
             case Intent.ACTION_BOOT_COMPLETED:
-                updatePasswordQualityNotification(context);
+                updatePasswordConstraintNotification(context);
+                break;
+            case DevicePolicyManager.ACTION_PROFILE_OWNER_CHANGED:
+                onProfileOwnerChanged(context);
+                break;
+            case DevicePolicyManager.ACTION_DEVICE_OWNER_CHANGED:
+                onDeviceOwnerChanged(context);
                 break;
             default:
                super.onReceive(context, intent);
@@ -124,7 +135,7 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
         if (events == null) {
             Log.e(TAG, "Failed to retrieve network logs batch with batchToken: " + batchToken);
             Toast.makeText(context,
-                    context.getString(R.string.on_network_logs_available_failure, batchToken),
+                    context.getString(R.string.on_network_logs_available_token_failure, batchToken),
                     Toast.LENGTH_LONG)
                     .show();
             return;
@@ -135,25 +146,33 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
                 Toast.LENGTH_LONG)
                 .show();
 
-        ArrayList<String> loggedEvents = new ArrayList<String>();
-        events.forEach(event -> loggedEvents.add(event.toString()));
-        new EventSavingTask(context, loggedEvents).execute();
+        ArrayList<String> loggedEvents = new ArrayList<>();
+        if (BuildCompat.isAtLeastP()) {
+            for (NetworkEvent event : events) {
+                loggedEvents.add(event.toString());
+            }
+        } else {
+            events.forEach(event -> loggedEvents.add(event.toString()));
+        }
+        new EventSavingTask(context, batchToken, loggedEvents).execute();
     }
 
     private static class EventSavingTask extends AsyncTask<Void, Void, Void> {
 
         private Context mContext;
+        private long mBatchToken;
         private List<String> mLoggedEvents;
 
-        public EventSavingTask(Context context, ArrayList<String> loggedEvents) {
+        public EventSavingTask(Context context, long batchToken, ArrayList<String> loggedEvents) {
             mContext = context;
+            mBatchToken = batchToken;
             mLoggedEvents = loggedEvents;
         }
 
         @Override
         protected Void doInBackground(Void... params) {
-            String filename = "network_logs_"
-                    + new Date().toString().replaceAll("\\s+","_") + ".txt";
+            Date timestamp = new Date();
+            String filename = NETWORK_LOGS_FILE_PREFIX + mBatchToken + "_" + timestamp.getTime() + ".txt";
             File file = new File(mContext.getExternalFilesDir(null), filename);
             try (OutputStream os = new FileOutputStream(file)) {
                 for (String event : mLoggedEvents) {
@@ -267,24 +286,36 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
     @TargetApi(Build.VERSION_CODES.O)
     @Override
     public void onUserAdded(Context context, Intent intent, UserHandle newUser) {
-        UserManager userManager = (UserManager) context.getSystemService(Context.USER_SERVICE);
-        String message = context.getString(R.string.on_user_added_message,
-                userManager.getSerialNumberForUser(newUser));
-        Log.i(TAG, message);
-        NotificationUtil.showNotification(context, R.string.on_user_added_title,
-                message,
-                NotificationUtil.USER_ADDED_NOTIFICATION_ID);
+        handleUserAction(context, newUser, R.string.on_user_added_title,
+                R.string.on_user_added_message, NotificationUtil.USER_ADDED_NOTIFICATION_ID);
     }
 
     @TargetApi(Build.VERSION_CODES.O)
     @Override
     public void onUserRemoved(Context context, Intent intent, UserHandle removedUser) {
-        UserManager userManager = (UserManager) context.getSystemService(Context.USER_SERVICE);
-        String message = context.getString(R.string.on_user_removed_message,
-                userManager.getSerialNumberForUser(removedUser));
-        Log.i(TAG, message);
-        NotificationUtil.showNotification(context, R.string.on_user_removed_title, message,
-                NotificationUtil.USER_REMOVED_NOTIFICATION_ID);
+        handleUserAction(context, removedUser, R.string.on_user_removed_title,
+                R.string.on_user_removed_message, NotificationUtil.USER_REMOVED_NOTIFICATION_ID);
+    }
+
+    @TargetApi(Build.VERSION_CODES.P)
+    @Override
+    public void onUserStarted(Context context, Intent intent, UserHandle startedUser) {
+        handleUserAction(context, startedUser, R.string.on_user_started_title,
+                R.string.on_user_started_message, NotificationUtil.USER_STARTED_NOTIFICATION_ID);
+    }
+
+    @TargetApi(Build.VERSION_CODES.P)
+    @Override
+    public void onUserStopped(Context context, Intent intent, UserHandle stoppedUser) {
+        handleUserAction(context, stoppedUser, R.string.on_user_stopped_title,
+                R.string.on_user_stopped_message, NotificationUtil.USER_STOPPED_NOTIFICATION_ID);
+    }
+
+    @TargetApi(Build.VERSION_CODES.P)
+    @Override
+    public void onUserSwitched(Context context, Intent intent, UserHandle switchedUser) {
+        handleUserAction(context, switchedUser, R.string.on_user_switched_title,
+                R.string.on_user_switched_message, NotificationUtil.USER_SWITCHED_NOTIFICATION_ID);
     }
 
     @TargetApi(Build.VERSION_CODES.M)
@@ -443,10 +474,16 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
     // @Override
     public void onPasswordChanged(Context context, Intent intent, UserHandle user) {
         if (Process.myUserHandle().equals(user)) {
-            updatePasswordQualityNotification(context);
+            updatePasswordConstraintNotification(context);
         }
     }
 
+    @Override
+    public void onEnabled(Context context, Intent intent) {
+        UserManager userManager = (UserManager) context.getSystemService(Context.USER_SERVICE);
+        long serialNumber = userManager.getSerialNumberForUser(Binder.getCallingUserHandle());
+        Log.i(TAG, "Device admin enabled in user with serial number: " + serialNumber);
+    }
 
     private static File logFile(Context context) {
         File parent = context.getDir(LOGS_DIR, Context.MODE_PRIVATE);
@@ -506,31 +543,118 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
         bw.close();
     }
 
-    private static void updatePasswordQualityNotification(Context context) {
-        DevicePolicyManager devicePolicyManager = (DevicePolicyManager) context.getSystemService(
+    private static void updatePasswordConstraintNotification(Context context) {
+        final DevicePolicyManager dpm = (DevicePolicyManager) context.getSystemService(
                 Context.DEVICE_POLICY_SERVICE);
+        final UserManager um = (UserManager) context.getSystemService(Context.USER_SERVICE);
 
-        if (!devicePolicyManager.isProfileOwnerApp(context.getPackageName())
-                && !devicePolicyManager.isDeviceOwnerApp(context.getPackageName())) {
+        if (!dpm.isProfileOwnerApp(context.getPackageName())
+                && !dpm.isDeviceOwnerApp(context.getPackageName())) {
             // Only try to update the notification if we are a profile or device owner.
             return;
         }
 
-        NotificationManager nm = (NotificationManager)
+        final NotificationManager nm = (NotificationManager)
                 context.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        if (!devicePolicyManager.isActivePasswordSufficient()) {
-            NotificationCompat.Builder warn = NotificationUtil.getNotificationBuilder(context);
+        final ArrayList<CharSequence> problems = new ArrayList<>();
+        if (!dpm.isActivePasswordSufficient()) {
+            problems.add(context.getText(R.string.password_not_compliant_title));
+        }
+
+        if (um.hasUserRestriction(UserRestriction.DISALLOW_UNIFIED_PASSWORD)
+                && Util.isManagedProfileOwner(context)
+                && isUsingUnifiedPassword(context)) {
+            problems.add(context.getText(R.string.separate_challenge_required_title));
+        }
+
+        if (!problems.isEmpty()) {
+            final NotificationCompat.InboxStyle style = new NotificationCompat.InboxStyle();
+            style.setBigContentTitle(
+                    context.getText(R.string.set_new_password_notification_content));
+            for (final CharSequence problem : problems) {
+                style.addLine(problem);
+            }
+            final NotificationCompat.Builder warn =
+                    NotificationUtil.getNotificationBuilder(context);
             warn.setOngoing(true)
                     .setSmallIcon(R.drawable.ic_launcher)
-                    .setTicker(context.getText(R.string.password_not_compliant_title))
-                    .setContentTitle(context.getText(R.string.password_not_compliant_title))
-                    .setContentText(context.getText(R.string.password_not_compliant_content))
+                    .setStyle(style)
                     .setContentIntent(PendingIntent.getActivity(context, /*requestCode*/ -1,
                             new Intent(DevicePolicyManager.ACTION_SET_NEW_PASSWORD), /*flags*/ 0));
             nm.notify(CHANGE_PASSWORD_NOTIFICATION_ID, warn.getNotification());
         } else {
             nm.cancel(CHANGE_PASSWORD_NOTIFICATION_ID);
         }
+    }
+
+    @TargetApi(28)
+    private static Boolean isUsingUnifiedPassword(Context context) {
+        if (!BuildCompat.isAtLeastP()) {
+            return false;
+        }
+        final DevicePolicyManager dpm = context.getSystemService(DevicePolicyManager.class);
+        return dpm.isUsingUnifiedPassword(getComponentName(context));
+    }
+
+    /**
+     * Notify the admin receiver that something about the password has changed, e.g. quality
+     * constraints or separate challenge requirements.
+     *
+     * This has to be sent manually because the system server only sends broadcasts for changes to
+     * the actual password, not any of the constraints related it it.
+     *
+     * <p>May trigger a show/hide of the notification warning to change the password through
+     * Settings.
+     */
+    public static void sendPasswordRequirementsChanged(Context context) {
+        final Intent changedIntent =
+                new Intent(DeviceAdminReceiver.ACTION_PASSWORD_REQUIREMENTS_CHANGED);
+        changedIntent.setComponent(getComponentName(context));
+        context.sendBroadcast(changedIntent);
+    }
+
+    private void onProfileOwnerChanged(Context context) {
+        Log.i(TAG, "onProfileOwnerChanged");
+        NotificationUtil.showNotification(context,
+                R.string.transfer_ownership_profile_owner_changed_title,
+                context.getString(R.string.transfer_ownership_profile_owner_changed_title),
+                NotificationUtil.PROFILE_OWNER_CHANGED_ID);
+    }
+
+    private void onDeviceOwnerChanged(Context context) {
+        Log.i(TAG, "onDeviceOwnerChanged");
+        NotificationUtil.showNotification(context,
+                R.string.transfer_ownership_device_owner_changed_title,
+                context.getString(R.string.transfer_ownership_device_owner_changed_title),
+                NotificationUtil.DEVICE_OWNER_CHANGED_ID);
+    }
+
+    @TargetApi(Build.VERSION_CODES.P)
+    public void onTransferOwnershipComplete(Context context, PersistableBundle bundle) {
+        Log.i(TAG, "onTransferOwnershipComplete");
+        NotificationUtil.showNotification(context,
+                R.string.transfer_ownership_complete_title,
+                context.getString(R.string.transfer_ownership_complete_message,
+                        getComponentName(context)),
+                NotificationUtil.TRANSFER_OWNERSHIP_COMPLETE_ID);
+    }
+
+    @TargetApi(Build.VERSION_CODES.P)
+    public void onTransferAffiliatedProfileOwnershipComplete(Context context, UserHandle user) {
+        Log.i(TAG, "onTransferAffiliatedProfileOwnershipComplete");
+        NotificationUtil.showNotification(context,
+                R.string.transfer_ownership_affiliated_complete_title,
+                context.getString(R.string.transfer_ownership_affiliated_complete_message, user),
+                NotificationUtil.TRANSFER_AFFILIATED_PROFILE_OWNERSHIP_COMPLETE_ID);
+    }
+
+    private void handleUserAction(Context context, UserHandle userHandle, int titleResId,
+            int messageResId, int notificationId) {
+        UserManager userManager = (UserManager) context.getSystemService(Context.USER_SERVICE);
+        String message = context.getString(messageResId,
+                userManager.getSerialNumberForUser(userHandle));
+        Log.i(TAG, message);
+        NotificationUtil.showNotification(context, titleResId, message, notificationId);
     }
 }

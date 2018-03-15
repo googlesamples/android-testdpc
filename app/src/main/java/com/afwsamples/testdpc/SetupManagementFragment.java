@@ -16,6 +16,15 @@
 
 package com.afwsamples.testdpc;
 
+import static android.app.admin.DevicePolicyManager.ACTION_PROVISION_MANAGED_DEVICE;
+import static android.app.admin.DevicePolicyManager.ACTION_PROVISION_MANAGED_PROFILE;
+import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_ACCOUNT_TO_MIGRATE;
+import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE;
+import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_DEVICE_ADMIN_COMPONENT_NAME;
+import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_DEVICE_ADMIN_PACKAGE_NAME;
+import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_LOGO_URI;
+import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_MAIN_COLOR;
+
 import android.accounts.Account;
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -43,27 +52,15 @@ import android.widget.ImageView;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.afwsamples.testdpc.common.ColorPicker;
 import com.afwsamples.testdpc.common.LaunchIntentUtil;
 import com.afwsamples.testdpc.common.ProvisioningStateUtil;
 import com.afwsamples.testdpc.common.Util;
 import com.android.setupwizardlib.SetupWizardLayout;
 import com.android.setupwizardlib.view.NavigationBar;
-
 import java.security.SecureRandom;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
-
-import static android.app.admin.DevicePolicyManager.ACTION_PROVISION_MANAGED_DEVICE;
-import static android.app.admin.DevicePolicyManager.ACTION_PROVISION_MANAGED_PROFILE;
-import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_ACCOUNT_TO_MIGRATE;
-import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE;
-import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_DEVICE_ADMIN_COMPONENT_NAME;
-import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_DEVICE_ADMIN_PACKAGE_NAME;
-import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_LOGO_URI;
-import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_MAIN_COLOR;
 
 /**
  * This {@link Fragment} shows the UI that allows the user to start the setup of a managed profile
@@ -78,6 +75,8 @@ public class SetupManagementFragment extends Fragment implements
     private static final int REQUEST_PROVISION_MANAGED_PROFILE = 1;
     private static final int REQUEST_PROVISION_DEVICE_OWNER = 2;
     private static final int REQUEST_GET_LOGO = 3;
+
+    private static final int NO_COLOR_SPECIFIED = -1;
 
     private TextView mSetupManagementMessage;
     private RadioGroup mSetupOptions;
@@ -95,18 +94,15 @@ public class SetupManagementFragment extends Fragment implements
     private ImageView mLogoPreviewView;
     private TextView mLogoValue;
 
-    private int mCurrentColor;
+    private int mCurrentColor = NO_COLOR_SPECIFIED;
     private Uri mLogoUri = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         if (savedInstanceState != null) {
-            mLogoUri = (Uri) savedInstanceState.getParcelable(EXTRA_PROVISIONING_LOGO_URI);
+            mLogoUri = savedInstanceState.getParcelable(EXTRA_PROVISIONING_LOGO_URI);
             mCurrentColor = savedInstanceState.getInt(EXTRA_PROVISIONING_MAIN_COLOR);
-        } else {
-            mLogoUri = resourceToUri(getActivity(), R.drawable.ic_launcher);
-            mCurrentColor = getResources().getColor(R.color.teal);
         }
 
         // Use setupwizard theme
@@ -134,9 +130,9 @@ public class SetupManagementFragment extends Fragment implements
 
         view.findViewById(R.id.color_select_button).setOnClickListener(this);
         mColorValue = (TextView) view.findViewById(R.id.selected_color_value);
-        mColorValue.setText(String.format(ColorPicker.COLOR_STRING_FORMATTER, mCurrentColor));
         mColorPreviewView = (ImageView) view.findViewById(R.id.preview_color);
-        mColorPreviewView.setImageTintList(ColorStateList.valueOf(mCurrentColor));
+
+        updateColorUi();
 
         Intent launchIntent = getActivity().getIntent();
         if (LaunchIntentUtil.isSynchronousAuthLaunch(launchIntent)) {
@@ -317,27 +313,19 @@ public class SetupManagementFragment extends Fragment implements
         return true;
     }
 
-    // TODO: replace with O SDK API
-    private static final String EXTRA_PROVISIONING_DISCLAIMERS =
-            "android.app.extra.PROVISIONING_DISCLAIMERS";
-    private static final String EXTRA_PROVISIONING_DISCLAIMER_HEADER =
-            "android.app.extra.PROVISIONING_DISCLAIMER_HEADER";
-    private static final String EXTRA_PROVISIONING_DISCLAIMER_CONTENT =
-            "android.app.extra.PROVISIONING_DISCLAIMER_CONTENT";
-
     private void specifyDefaultDisclaimers(Intent intent) {
         if (BuildCompat.isAtLeastO()) {
             Bundle emmBundle = new Bundle();
-            emmBundle.putString(EXTRA_PROVISIONING_DISCLAIMER_HEADER,
+            emmBundle.putString(DevicePolicyManager.EXTRA_PROVISIONING_DISCLAIMER_HEADER,
                     getString(R.string.default_disclaimer_emm_name));
-            emmBundle.putParcelable(EXTRA_PROVISIONING_DISCLAIMER_CONTENT,
+            emmBundle.putParcelable(DevicePolicyManager.EXTRA_PROVISIONING_DISCLAIMER_CONTENT,
                     resourceToUri(getActivity(), R.raw.emm_disclaimer));
             Bundle companyBundle = new Bundle();
-            companyBundle.putString(EXTRA_PROVISIONING_DISCLAIMER_HEADER,
+            companyBundle.putString(DevicePolicyManager.EXTRA_PROVISIONING_DISCLAIMER_HEADER,
                     getString(R.string.default_disclaimer_company_name));
-            companyBundle.putParcelable(EXTRA_PROVISIONING_DISCLAIMER_CONTENT,
+            companyBundle.putParcelable(DevicePolicyManager.EXTRA_PROVISIONING_DISCLAIMER_CONTENT,
                     resourceToUri(getActivity(), R.raw.company_disclaimer));
-            intent.putExtra(EXTRA_PROVISIONING_DISCLAIMERS,
+            intent.putExtra(DevicePolicyManager.EXTRA_PROVISIONING_DISCLAIMERS,
                     new Bundle[] { emmBundle, companyBundle });
         }
     }
@@ -376,6 +364,9 @@ public class SetupManagementFragment extends Fragment implements
 
 
     private void specifyLogoUri(Intent intent) {
+        if (mLogoUri == null) {
+            return;
+        }
         intent.putExtra(EXTRA_PROVISIONING_LOGO_URI, mLogoUri);
         if (mLogoUri.getScheme().equals(ContentResolver.SCHEME_CONTENT)) {
             intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
@@ -384,6 +375,9 @@ public class SetupManagementFragment extends Fragment implements
     }
 
     private void specifyColor(Intent intent) {
+        if (mCurrentColor == NO_COLOR_SPECIFIED) {
+            return;
+        }
         intent.putExtra(EXTRA_PROVISIONING_MAIN_COLOR, mCurrentColor);
     }
 
@@ -471,8 +465,7 @@ public class SetupManagementFragment extends Fragment implements
     @Override
     public void onColorSelected(int colorValue, String id) {
         mCurrentColor = colorValue;
-        mColorValue.setText(String.format(ColorPicker.COLOR_STRING_FORMATTER, colorValue));
-        mColorPreviewView.setImageTintList(ColorStateList.valueOf(colorValue));
+        updateColorUi();
     }
 
     @Override
@@ -499,5 +492,16 @@ public class SetupManagementFragment extends Fragment implements
 
     private boolean canAnAppHandleGetContent() {
         return getGetContentIntent().resolveActivity(getActivity().getPackageManager()) != null;
+    }
+
+    private void updateColorUi() {
+        if (mCurrentColor != NO_COLOR_SPECIFIED) {
+            mColorValue.setText(String.format(ColorPicker.COLOR_STRING_FORMATTER, mCurrentColor));
+            mColorPreviewView.setImageTintList(ColorStateList.valueOf(mCurrentColor));
+            mColorPreviewView.setVisibility(View.VISIBLE);
+        } else {
+            mColorValue.setText("");
+            mColorPreviewView.setVisibility(View.GONE);
+        }
     }
 }

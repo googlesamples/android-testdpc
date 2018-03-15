@@ -16,11 +16,15 @@
 
 package com.afwsamples.testdpc.policy.keyguard;
 
+import android.app.Activity;
+import android.app.Fragment;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.os.BuildCompat;
 import android.support.v7.preference.EditTextPreference;
 import android.support.v7.preference.ListPreference;
 import android.support.v7.preference.Preference;
@@ -30,10 +34,16 @@ import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.ProfileOrParentFragment;
 import com.afwsamples.testdpc.common.Util;
-import com.afwsamples.testdpc.common.preference.DpcPreferenceBase;
 import com.afwsamples.testdpc.common.preference.CustomConstraint;
+import com.afwsamples.testdpc.common.preference.DpcPreference;
+import com.afwsamples.testdpc.common.preference.DpcPreferenceBase;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -64,10 +74,12 @@ import static com.afwsamples.testdpc.common.preference.DpcPreferenceHelper.NO_CU
  * <li>{@link DevicePolicyManager#setPasswordMinimumSymbols(ComponentName, int)}</li>
  * <li>{@link DevicePolicyManager#setPasswordMinimumNonLetter(ComponentName, int)}</li>
  * <li>{@link DevicePolicyManager#setPasswordHistoryLength(ComponentName, int)}</li>
+ * <li>{@link DevicePolicyManager#setPasswordBlacklist(ComponentName, String, List<String>)}</li>
  * </ul>
  */
 public final class PasswordConstraintsFragment extends ProfileOrParentFragment implements
-        Preference.OnPreferenceChangeListener {
+        Preference.OnPreferenceChangeListener, Preference.OnPreferenceClickListener {
+    private static final int READ_BLACKLIST_FILE_CODE = 42;
 
     private DpcPreferenceBase mMinLength;
     private DpcPreferenceBase mMinLetters;
@@ -76,6 +88,7 @@ public final class PasswordConstraintsFragment extends ProfileOrParentFragment i
     private DpcPreferenceBase mMinUpper;
     private DpcPreferenceBase mMinSymbols;
     private DpcPreferenceBase mMinNonLetter;
+    private DpcPreference mClearBlacklist;
 
     public static class Container extends ProfileOrParentFragment.Container {
         @Override
@@ -98,6 +111,10 @@ public final class PasswordConstraintsFragment extends ProfileOrParentFragment i
         final static String MIN_UPPERCASE = "password_min_uppercase";
         final static String MIN_SYMBOLS = "password_min_symbols";
         final static String MIN_NONLETTER = "password_min_nonletter";
+
+        final static String SET_PASSWORD_BLACKLIST_KEY = "set_password_blacklist";
+        final static String LOAD_PASSWORD_BLACKLIST_KEY = "load_password_blacklist";
+        final static String CLEAR_PASSWORD_BLACKLIST_KEY = "clear_password_blacklist";
     }
 
     private static final TreeMap<Integer, Integer> PASSWORD_QUALITIES = new TreeMap<>();
@@ -152,6 +169,7 @@ public final class PasswordConstraintsFragment extends ProfileOrParentFragment i
         mMinUpper = (DpcPreferenceBase) findPreference(Keys.MIN_UPPERCASE);
         mMinSymbols = (DpcPreferenceBase) findPreference(Keys.MIN_SYMBOLS);
         mMinNonLetter = (DpcPreferenceBase) findPreference(Keys.MIN_NONLETTER);
+        mClearBlacklist = (DpcPreference) findPreference(Keys.CLEAR_PASSWORD_BLACKLIST_KEY);
 
         // Populate password quality settings - messy because the only API for this requires two
         // separate String[]s.
@@ -181,6 +199,10 @@ public final class PasswordConstraintsFragment extends ProfileOrParentFragment i
         setup(Keys.MIN_SYMBOLS, getDpm().getPasswordMinimumSymbols(getAdmin()));
         setup(Keys.MIN_NONLETTER, getDpm().getPasswordMinimumNonLetter(getAdmin()));
 
+        findPreference(Keys.SET_PASSWORD_BLACKLIST_KEY).setOnPreferenceClickListener(this);
+        findPreference(Keys.LOAD_PASSWORD_BLACKLIST_KEY).setOnPreferenceClickListener(this);
+        mClearBlacklist.setOnPreferenceClickListener(this);
+
         setPreferencesConstraint();
     }
 
@@ -190,6 +212,9 @@ public final class PasswordConstraintsFragment extends ProfileOrParentFragment i
 
         // Settings that may have been changed by other users need updating.
         updateExpirationTimes();
+        if (BuildCompat.isAtLeastP()) {
+            refreshBlacklistPreferences();
+        }
     }
 
     @Override
@@ -253,8 +278,45 @@ public final class PasswordConstraintsFragment extends ProfileOrParentFragment i
         }
 
         preference.setSummary(summary);
-        sendPasswordRequirementsChanged();
+        DeviceAdminReceiver.sendPasswordRequirementsChanged(getActivity());
         return true;
+    }
+
+    public boolean onPreferenceClick(Preference preference) {
+        String key = preference.getKey();
+        switch (key) {
+            case Keys.SET_PASSWORD_BLACKLIST_KEY:
+                showPasswordBlacklistFragment();
+                return true;
+            case Keys.LOAD_PASSWORD_BLACKLIST_KEY:
+                Util.showFilePicker(this, "text/plain", READ_BLACKLIST_FILE_CODE);
+                return true;
+            case Keys.CLEAR_PASSWORD_BLACKLIST_KEY:
+                PasswordBlacklistFragment.setBlacklist(getDpm(), getAdmin(), null, null);
+                refreshBlacklistPreferences();
+                return true;
+            default:
+                break;
+        }
+
+        return false;
+    }
+
+    private void showPasswordBlacklistFragment() {
+        final PasswordBlacklistFragment fragment = new PasswordBlacklistFragment();
+
+        fragment.passwordConstraintsFragment = this;
+        fragment.setDpm(getDpm());
+
+        Fragment containerFragment = getParentFragment();
+        if (containerFragment == null) {
+            containerFragment = this;
+        }
+        containerFragment.getFragmentManager().beginTransaction()
+                .addToBackStack(PasswordBlacklistFragment.class.getName())
+                .hide(containerFragment)
+                .add(R.id.container, fragment)
+                .commit();
     }
 
     /**
@@ -278,6 +340,10 @@ public final class PasswordConstraintsFragment extends ProfileOrParentFragment i
         mMinUpper.setCustomConstraint(constraint);
         mMinSymbols.setCustomConstraint(constraint);
         mMinNonLetter.setCustomConstraint(constraint);
+
+        mClearBlacklist.setCustomConstraint(
+                () -> PasswordBlacklistFragment.getBlacklistName(getDpm(), getAdmin()) != null
+                        ? NO_CUSTOM_CONSTRIANT : R.string.password_blacklist_no_blacklist);
     }
 
     private void refreshPreferences() {
@@ -290,6 +356,10 @@ public final class PasswordConstraintsFragment extends ProfileOrParentFragment i
         mMinNonLetter.refreshEnabledState();
     }
 
+    void refreshBlacklistPreferences() {
+        mClearBlacklist.refreshEnabledState();
+        mClearBlacklist.setSummary(PasswordBlacklistFragment.getBlacklistName(getDpm(), getAdmin()));
+    }
 
     /**
      * Set an initial value. Updates the summary to match.
@@ -327,19 +397,38 @@ public final class PasswordConstraintsFragment extends ProfileOrParentFragment i
         byAll.setSummary(Util.formatTimestamp(getDpm().getPasswordExpiration(null)));
     }
 
-    /**
-     * Notify the admin receiver that something about the password has changed - in this context,
-     * a minimum password requirement policy.
-     *
-     * This has to be sent manually because the system server only sends broadcasts for changes to
-     * the actual password, not any of the constraints related it it.
-     *
-     * <p>May trigger a show/hide of the notification warning to change the password through
-     * Settings.
-     */
-    private void sendPasswordRequirementsChanged() {
-        Intent changedIntent = new Intent(DeviceAdminReceiver.ACTION_PASSWORD_REQUIREMENTS_CHANGED);
-        changedIntent.setComponent(getAdmin());
-        getActivity().sendBroadcast(changedIntent);
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
+        if (requestCode == READ_BLACKLIST_FILE_CODE && resultCode == Activity.RESULT_OK) {
+            if (resultData != null) {
+                final Uri uri = resultData.getData();
+                final List<String> blacklist;
+                try {
+                    blacklist = readTextFileLines(uri);
+                } catch (IOException e) {
+                    Toast.makeText(getActivity(), R.string.password_blacklist_load_failed,
+                            Toast.LENGTH_LONG).show();
+                    return;
+                }
+                final String name = DateFormat.getDateTimeInstance().format(new Date());
+                if (!PasswordBlacklistFragment.setBlacklist(getDpm(), getAdmin(), name,
+                        blacklist)) {
+                    Toast.makeText(getActivity(), R.string.password_blacklist_save_failed,
+                            Toast.LENGTH_LONG).show();
+                }
+            }
+        }
+    }
+
+    private List<String> readTextFileLines(Uri uri) throws IOException {
+        final List<String> lines = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(
+                getActivity().getApplicationContext().getContentResolver().openInputStream(uri)))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                lines.add(line);
+            }
+        }
+        return lines;
     }
 }

@@ -1,7 +1,7 @@
 Test Device Policy Control (Test DPC) App
 =========================================
 
-Test DPC is an app designed to help EMMs, ISVs, and OEMs to test their applications and platforms in a Android enterprise managed profile (i.e. work profile). It serves as both a sample Device Policy Controller and a testing application to flex the APIs available for Android enterprise. It supports devices running Android 5.0 Lollipop or later. As of Mar 24, 2017, it also includes support for devices running API level 26.
+Test DPC is an app designed to help EMMs, ISVs, and OEMs to test their applications and platforms in a Android enterprise managed profile (i.e. work profile). It serves as both a sample Device Policy Controller and a testing application to flex the APIs available for Android enterprise. It supports devices running Android 5.0 Lollipop or later.
 
 See the [documentation](https://developer.android.com/work/index.html) to learn more about Android in the enterprise.
 
