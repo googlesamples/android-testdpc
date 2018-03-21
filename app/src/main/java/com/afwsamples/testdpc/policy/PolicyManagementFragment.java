@@ -119,7 +119,6 @@ import com.afwsamples.testdpc.profilepolicy.apprestrictions.AppRestrictionsManag
 import com.afwsamples.testdpc.profilepolicy.apprestrictions.ManageAppRestrictionsFragment;
 import com.afwsamples.testdpc.profilepolicy.delegation.DelegationFragment;
 import com.afwsamples.testdpc.profilepolicy.permission.ManageAppPermissionsFragment;
-import com.afwsamples.testdpc.safetynet.SafetyNetFragment;
 import com.afwsamples.testdpc.transferownership.PickTransferComponentFragment;
 import com.afwsamples.testdpc.util.MainThreadExecutor;
 
@@ -356,7 +355,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String TAG_WIFI_CONFIG_CREATION = "wifi_config_creation";
     private static final String WIFI_CONFIG_LOCKDOWN_ON = "1";
     private static final String WIFI_CONFIG_LOCKDOWN_OFF = "0";
-    private static final String SAFETYNET_ATTEST = "safetynet_attest";
     private static final String SECURITY_PATCH_FORMAT = "yyyy-MM-dd";
     private static final String SET_NEW_PASSWORD = "set_new_password";
     private static final String SET_PROFILE_PARENT_NEW_PASSWORD = "set_profile_parent_new_password";
@@ -599,7 +597,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(REBOOT_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_SHORT_SUPPORT_MESSAGE_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_LONG_SUPPORT_MESSAGE_KEY).setOnPreferenceClickListener(this);
-        findPreference(SAFETYNET_ATTEST).setOnPreferenceClickListener(this);
         findPreference(SET_NEW_PASSWORD).setOnPreferenceClickListener(this);
         findPreference(SET_PROFILE_PARENT_NEW_PASSWORD).setOnPreferenceClickListener(this);
         findPreference(CROSS_PROFILE_APPS).setOnPreferenceClickListener(this);
@@ -995,10 +992,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             case SET_LONG_SUPPORT_MESSAGE_KEY:
                 showFragment(SetSupportMessageFragment.newInstance(
                         SetSupportMessageFragment.TYPE_LONG));
-                return true;
-            case SAFETYNET_ATTEST:
-                DialogFragment safetynetFragment = new SafetyNetFragment();
-                safetynetFragment.show(getFragmentManager(), SafetyNetFragment.class.getName());
                 return true;
             case SET_NEW_PASSWORD:
                 startActivity(new Intent(DevicePolicyManager.ACTION_SET_NEW_PASSWORD));
