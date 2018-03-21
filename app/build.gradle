@@ -32,16 +32,8 @@ android {
         }
     }
 
-    flavorDimensions "targetSdk", "packageName"
+    flavorDimensions "packageName"
     productFlavors {
-        targetP {
-            dimension 'targetSdk'
-            targetSdkVersion 28
-        }
-        targetO {
-            dimension 'targetSdk'
-            targetSdkVersion 27
-        }
         normal {
             dimension 'packageName'
         }
