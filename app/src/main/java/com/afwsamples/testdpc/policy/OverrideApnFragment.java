@@ -23,6 +23,7 @@ import android.app.AlertDialog;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v14.preference.SwitchPreference;
 import android.support.v7.preference.Preference;
@@ -32,14 +33,13 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
+
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.BaseSearchablePolicyPreferenceFragment;
+
 import java.net.InetAddress;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.net.UnknownHostException;
-import java.util.Arrays;
 import java.util.List;
 
 @TargetApi(28)
@@ -180,18 +180,18 @@ public class OverrideApnFragment extends BaseSearchablePolicyPreferenceFragment 
                             apnName,
                             inetAddressFromString(proxyEditText.getText().toString()),
                             parseInt(portEditText.getText().toString(), -1),
-                            URLFromString(mmscEditText.getText().toString()),
+                            UriFromString(mmscEditText.getText().toString()),
                             inetAddressFromString(mmsProxyEditText.getText().toString()),
                             parseInt(mmsPortEditText.getText().toString(), -1),
                             userEditText.getText().toString(),
                             passwordEditText.getText().toString(),
                             authType,
-                            Arrays.asList(parseTypes(typeEditText.getText().toString())),
-                            protocolEditText.getText().toString(),
-                            roamingProtocolEditText.getText().toString(),
+                            parseInt(typeEditText.getText().toString(), 0),
+                            parseInt(protocolEditText.getText().toString(), -1),
+                            parseInt(roamingProtocolEditText.getText().toString(), -1),
                             enabled == 1,
                             networkbitmask,
-                            mvnoTypeEditText.getText().toString()
+                            parseInt(mvnoTypeEditText.getText().toString(), -1)
                     );
                     int insertedId = mDevicePolicyManager.addOverrideApn(mAdminComponentName, apn);
                     if (insertedId == -1) {
@@ -221,23 +221,23 @@ public class OverrideApnFragment extends BaseSearchablePolicyPreferenceFragment 
     }
 
     private ApnSetting makeApnSetting(String operatorNumeric, String entryName, String apnName,
-            InetAddress proxy, int port, URL mmsc, InetAddress mmsProxy, int mmsPort,
-            String user, String password, int authType, List<String> types, String protocol,
-            String roamingProtocol, boolean carrierEnabled, int networkTypeBitmask,
-            String mvnoType) {
-            ApnSetting.Builder builder = new ApnSetting.Builder();
-        return builder.setOperatorNumeric(operatorNumeric)
+            InetAddress proxyAddress, int proxyPort, Uri mmsc, InetAddress mmsProxyAddress,
+            int mmsProxyPort, String user, String password, int authType, int apnTypeBitmask,
+            int protocol, int roamingProtocol, boolean carrierEnabled, int networkTypeBitmask,
+            int mvnoType) {
+        return new ApnSetting.Builder()
+            .setOperatorNumeric(operatorNumeric)
             .setEntryName(entryName)
             .setApnName(apnName)
-            .setProxy(proxy)
-            .setPort(port)
+            .setProxyAddress(proxyAddress)
+            .setProxyPort(proxyPort)
             .setMmsc(mmsc)
-            .setMmsProxy(mmsProxy)
-            .setMmsPort(mmsPort)
+            .setMmsProxyAddress(mmsProxyAddress)
+            .setMmsProxyPort(mmsProxyPort)
             .setUser(user)
             .setPassword(password)
             .setAuthType(authType)
-            .setTypes(types)
+            .setApnTypeBitmask(apnTypeBitmask)
             .setProtocol(protocol)
             .setRoamingProtocol(roamingProtocol)
             .setCarrierEnabled(carrierEnabled)
@@ -246,14 +246,8 @@ public class OverrideApnFragment extends BaseSearchablePolicyPreferenceFragment 
             .build();
     }
 
-    private URL URLFromString(String url) {
-        try {
-            return TextUtils.isEmpty(url) ? null : new URL(url);
-        } catch (MalformedURLException e) {
-            Log.e(LOG_TAG, "Can't parse URL from string.");
-            showToast(R.string.apn_wrong_url);
-            return null;
-        }
+    private Uri UriFromString(String uri) {
+        return TextUtils.isEmpty(uri) ? null : Uri.parse(uri);
     }
 
     private InetAddress inetAddressFromString(String inetAddress) {
@@ -267,18 +261,6 @@ public class OverrideApnFragment extends BaseSearchablePolicyPreferenceFragment 
             showToast(R.string.apn_wrong_inetaddress);
             return null;
         }
-    }
-
-    private String[] parseTypes(String types) {
-        String[] result;
-        // If unset, set to DEFAULT.
-        if (TextUtils.isEmpty(types)) {
-            result = new String[1];
-            result[0] = "*";
-        } else {
-            result = types.split(",");
-        }
-        return result;
     }
 
     private void reloadEnableOverrideApnUi() {

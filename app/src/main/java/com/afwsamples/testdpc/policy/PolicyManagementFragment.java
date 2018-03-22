@@ -3111,7 +3111,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
         final ActivityOptions options = ActivityOptions.makeBasic();
-        options.setLockTaskMode(true);
+        options.setLockTaskEnabled(true);
 
         try {
             startActivity(intent, options.toBundle());
