@@ -20,6 +20,7 @@ import static android.app.admin.DevicePolicyManager.LOCK_TASK_FEATURE_GLOBAL_ACT
 import static android.app.admin.DevicePolicyManager.LOCK_TASK_FEATURE_HOME;
 import static android.app.admin.DevicePolicyManager.LOCK_TASK_FEATURE_KEYGUARD;
 import static android.app.admin.DevicePolicyManager.LOCK_TASK_FEATURE_NOTIFICATIONS;
+import static android.app.admin.DevicePolicyManager.LOCK_TASK_FEATURE_OVERVIEW;
 import static android.app.admin.DevicePolicyManager.LOCK_TASK_FEATURE_SYSTEM_INFO;
 
 import android.annotation.TargetApi;
@@ -59,18 +60,6 @@ public class SetLockTaskFeaturesFragment
     private static final String KEY_OVERVIEW = "lock_task_feature_overview";
     private static final String KEY_GLOBAL_ACTIONS = "lock_task_feature_global_actions";
     private static final String KEY_KEYGUARD = "lock_task_feature_keyguard";
-
-    private static final int LOCK_TASK_FEATURE_OVERVIEW;
-    static {
-        int flag = 1 << 3;
-        try {
-            flag = ReflectionUtil.intConstant(
-                DevicePolicyManager.class, "LOCK_TASK_FEATURE_OVERVIEW");
-        } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
-        } finally {
-            LOCK_TASK_FEATURE_OVERVIEW = flag;
-        }
-    }
 
     /** Maps from preference keys to {@link DevicePolicyManager#setLockTaskFeatures}'s flags. */
     private static final ArrayMap<String, Integer> FEATURE_FLAGS = new ArrayMap<>();
@@ -129,8 +118,8 @@ public class SetLockTaskFeaturesFragment
                 ? flagsBefore | FEATURE_FLAGS.get(key)
                 : flagsBefore & ~FEATURE_FLAGS.get(key);
         if ((flagsAfter & LOCK_TASK_FEATURE_HOME) == 0) {
-            // Disable OVERVIEW when HOME is disabled
-            flagsAfter &= ~LOCK_TASK_FEATURE_OVERVIEW;
+            // Disable OVERVIEW and NOTIFICATION when HOME is disabled
+            flagsAfter &= ~(LOCK_TASK_FEATURE_OVERVIEW | LOCK_TASK_FEATURE_NOTIFICATIONS);
         }
         if (flagsAfter != flagsBefore) {
             Log.i(TAG, "LockTask feature flags changing from 0x" + Integer.toHexString(flagsBefore)
@@ -155,8 +144,13 @@ public class SetLockTaskFeaturesFragment
     }
 
     private void enforceEnablingRestrictions(int enabledFeatures) {
-        DpcSwitchPreference pref = (DpcSwitchPreference) findPreference(KEY_OVERVIEW);
-        pref.setEnabled((enabledFeatures & LOCK_TASK_FEATURE_HOME) != 0);
+        boolean isHomeEnabled = (enabledFeatures & LOCK_TASK_FEATURE_HOME) != 0;
+        setPrefEnabledState((DpcSwitchPreference) findPreference(KEY_OVERVIEW), isHomeEnabled);
+        setPrefEnabledState((DpcSwitchPreference) findPreference(KEY_NOTIFICATIONS), isHomeEnabled);
+    }
+
+    private void setPrefEnabledState(DpcSwitchPreference pref, boolean enabled) {
+        pref.setEnabled(enabled);
         if (!pref.isEnabled() && pref.isChecked()) {
             pref.setChecked(false);
         }
