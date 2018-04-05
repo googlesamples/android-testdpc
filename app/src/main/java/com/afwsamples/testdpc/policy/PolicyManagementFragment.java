@@ -1274,8 +1274,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                                    boolean isUserSelectable) {
         if (BuildCompat.isAtLeastP()) {
             return mDevicePolicyManager.installKeyPair(
-                    mAdminComponentName, key, new Certificate[]{cert}, alias, false,
-                    isUserSelectable);
+                    mAdminComponentName, key, new Certificate[]{cert}, alias,
+                    isUserSelectable ? DevicePolicyManager.INSTALLKEY_SET_USER_SELECTABLE : 0);
         } else {
             if (!isUserSelectable) {
                 throw new IllegalArgumentException(
@@ -2783,7 +2783,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     @TargetApi(28)
     private List<String> getMeteredDataRestrictedPkgs() {
-        return mDevicePolicyManager.getMeteredDataDisabled(mAdminComponentName);
+        return mDevicePolicyManager.getMeteredDataDisabledPackages(mAdminComponentName);
     }
 
     /**
