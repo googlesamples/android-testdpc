@@ -599,11 +599,6 @@
             android:title="@string/enable_backup_service"
             testdpc:admin="deviceOwner"
             testdpc:minSdkVersion="O" />
-        <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
-            android:key="mandatory_backups"
-            android:title="@string/mandatory_backups"
-            testdpc:admin="deviceOwner"
-            testdpc:minSdkVersion="P" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="wipe_data"
             android:title="@string/wipe_data"
