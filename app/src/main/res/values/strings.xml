@@ -217,29 +217,67 @@
     <string name="enable_override_apn">Enable override APNs</string>
     <string name="apn_entry_name">Entry name</string>
     <string name="apn_apn_name">APN name</string>
-    <string name="apn_proxy">Proxy</string>
-    <string name="apn_port">Port</string>
+    <string name="apn_proxy">Proxy address</string>
+    <string name="apn_port">Proxy port</string>
     <string name="apn_mmsc">MMSC</string>
-    <string name="apn_mmsproxy">MMS Proxy</string>
-    <string name="apn_mmsport">MMS Port</string>
+    <string name="apn_mmsproxy">MMS proxy address</string>
+    <string name="apn_mmsport">MMS proxy port</string>
     <string name="apn_user">User</string>
     <string name="apn_password">Password</string>
     <string name="apn_auth_type">Authentication type</string>
-    <string name="apn_type">Type</string>
-    <string name="apn_numeric">Numeric(MCC+MNC)</string>
+    <string name="apn_type">Apn type bitmask</string>
+    <string name="apn_numeric">Operator numeric(MCC+MNC)</string>
     <string name="apn_protocol">Protocol</string>
     <string name="apn_roaming_protocol">Roaming protocol</string>
     <string name="apn_carrier_enabled">Carrier enabled</string>
-    <string name="apn_network_bitmask">Network bitmask</string>
+    <string name="apn_network_bitmask">Network type bitmask</string>
     <string name="apn_mvno_type">MVNO type</string>
-    <string name="apn_auth_type_hint">0:None, 1:PAP, 2:CHAP, 3:PAP_OR_CHAP</string>
     <string name="apn_numeric_hint">Numeric=MCC+MNC</string>
-    <string name="apn_carrier_enabled_hint">0 for false, 1 for true</string>
-    <string name="apn_no_entry_name">Entry name is not specified</string>
-    <string name="apn_no_apn_name">APN name is not specified</string>
+
+    <string name="apn_entry_name_cannot_be_empty">Entry name cannot be empty</string>
+    <string name="apn_name_cannot_be_empty">APN name cannot be empty</string>
+    <string name="apn_type_cannot_be_zero">Apn type bitmask cannot be empty or zero</string>
     <string name="apn_wrong_url">Cannot parse mmsc</string>
-    <string name="apn_wrong_inetaddress">Cannot parse proxy or mmsproxy</string>
-    <string name="apn_wrong_port">Cannot parse port or mmsport</string>
+    <string name="apn_wrong_inetaddress">Cannot parse proxy address or MMS proxy address</string>
+    <string name="apn_wrong_port">Cannot parse proxy port or MMS proxy port</string>
+
+    <string-array name="apn_auth_type_choices">
+        <item>Not specified</item>
+        <!-- Do not translate. -->
+        <item>NONE</item>
+        <!-- Do not translate. -->
+        <item>PAP</item>
+        <!-- Do not translate. -->
+        <item>CHAP</item>
+        <!-- Do not translate. -->
+        <item>PAP or CHAP</item>
+    </string-array>
+    <string-array name="apn_protocol_choices">
+        <item>Not specified</item>
+        <!-- Do not translate. -->
+        <item>IP</item>
+        <!-- Do not translate. -->
+        <item>IPV6</item>
+        <!-- Do not translate. -->
+        <item>IPV4V6</item>
+        <!-- Do not translate. -->
+        <item>PPP</item>
+    </string-array>
+    <string-array name="apn_mvno_type_choices">
+        <item>Not specified</item>
+        <!-- Do not translate. -->
+        <item>SPN</item>
+        <!-- Do not translate. -->
+        <item>IMSI</item>
+        <!-- Do not translate. -->
+        <item>GID</item>
+        <!-- Do not translate. -->
+        <item>ICCID</item>
+    </string-array>
+    <string-array name="apn_carrier_enabled_choices">
+        <item>Disabled</item>
+        <item>Enabled</item>
+    </string-array>
 
     <!-- Strings for wifi management -->
     <string name="wifi_management_title">WI-FI management</string>
