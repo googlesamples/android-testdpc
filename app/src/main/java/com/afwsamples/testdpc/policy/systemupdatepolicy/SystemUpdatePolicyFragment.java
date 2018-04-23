@@ -281,21 +281,22 @@ public class SystemUpdatePolicyFragment extends Fragment implements View.OnClick
             default:
                 newPolicy = null;
         }
-        if (BuildCompat.isAtLeastP() && newPolicy != null && mFreezePeriods.size() != 0) {
-            List<FreezePeriod> periods = new ArrayList<>(mFreezePeriods.size());
-            for (Period p : mFreezePeriods) {
-                periods.add(p.toFreezePeriod());
-            }
-            try {
+
+        try {
+            if (BuildCompat.isAtLeastP() && newPolicy != null && mFreezePeriods.size() != 0) {
+                final List<FreezePeriod> periods = new ArrayList<>(mFreezePeriods.size());
+                for (Period p : mFreezePeriods) {
+                    periods.add(p.toFreezePeriod());
+                }
                 newPolicy.setFreezePeriods(periods);
-                mDpm.setSystemUpdatePolicy(DeviceAdminReceiver.getComponentName(getActivity()),
-                        newPolicy);
-                Toast.makeText(getContext(), "Policy set successfully", Toast.LENGTH_LONG).show();
-                return true;
-            } catch (IllegalArgumentException e) {
-                Toast.makeText(getContext(), "Failed to set system update policy: " + e.getMessage(),
-                        Toast.LENGTH_LONG).show();
             }
+            mDpm.setSystemUpdatePolicy(DeviceAdminReceiver.getComponentName(getActivity()),
+                    newPolicy);
+            Toast.makeText(getContext(), "Policy set successfully", Toast.LENGTH_LONG).show();
+            return true;
+        } catch (IllegalArgumentException e) {
+            Toast.makeText(getContext(), "Failed to set system update policy: " + e.getMessage(),
+                    Toast.LENGTH_LONG).show();
         }
         return false;
     }
