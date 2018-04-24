@@ -35,8 +35,7 @@ import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
-import com.android.setupwizardlib.SetupWizardLayout;
-import com.android.setupwizardlib.view.NavigationBar;
+import com.android.setupwizardlib.GlifLayout;
 
 import java.io.IOException;
 
@@ -45,7 +44,7 @@ import java.io.IOException;
  * It is responsible for adding an account to the managed profile (Profile Owner) or managed device
  * (Device Owner).
  */
-public class AddAccountActivity extends Activity implements NavigationBar.NavigationBarListener {
+public class AddAccountActivity extends Activity {
 
     private static final String TAG = "AddAccountActivity";
     private static final String GOOGLE_ACCOUNT_TYPE = "com.google";
@@ -70,10 +69,8 @@ public class AddAccountActivity extends Activity implements NavigationBar.Naviga
         mAdminComponentName = DeviceAdminReceiver.getComponentName(this);
 
         setContentView(R.layout.activity_add_account);
-        SetupWizardLayout layout = (SetupWizardLayout) findViewById(R.id.setup_wizard_layout);
-        layout.getNavigationBar().setNavigationBarListener(this);
-        NavigationBar navigationBar = layout.getNavigationBar();
-        navigationBar.getBackButton().setEnabled(false);
+        GlifLayout layout = findViewById(R.id.setup_wizard_layout);
+        layout.findViewById(R.id.next_button).setOnClickListener(this::onNavigateNext);
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
@@ -145,9 +142,8 @@ public class AddAccountActivity extends Activity implements NavigationBar.Naviga
         }
     }
 
-    @Override
-    public void onNavigateNext() {
-        RadioGroup addAccountOptions = (RadioGroup) findViewById(R.id.add_account_options);
+    public void onNavigateNext(View nextButton) {
+        RadioGroup addAccountOptions = findViewById(R.id.add_account_options);
         switch (addAccountOptions.getCheckedRadioButtonId()) {
             case R.id.add_account:
                 addAccount(null);
@@ -168,14 +164,10 @@ public class AddAccountActivity extends Activity implements NavigationBar.Naviga
                 break;
             case R.id.add_account_skip:
                 if (mNextActivityIntent != null) {
-                    mNextActivityIntent.putExtra(EnableProfileActivity.EXTRA_ENABLE_PROFILE_NOW, true);
                     startActivity(mNextActivityIntent);
                 }
                 finish();
                 break;
         }
     }
-
-    @Override
-    public void onNavigateBack() {}
 }

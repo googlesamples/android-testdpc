@@ -21,12 +21,10 @@ import android.content.ComponentName;
 import android.content.Context;
 
 import com.afwsamples.testdpc.DeviceAdminReceiver;
-import com.afwsamples.testdpc.FirstAccountReadyBroadcastReceiver;
 import com.afwsamples.testdpc.R;
 
 public class ProvisioningUtil {
     public static void enableProfile(Context context) {
-        FirstAccountReadyBroadcastReceiver.cancelFirstAccountReadyTimeoutAlarm(context);
         DevicePolicyManager manager = (DevicePolicyManager) context.getSystemService(
                 Context.DEVICE_POLICY_SERVICE);
         ComponentName componentName = DeviceAdminReceiver.getComponentName(context);

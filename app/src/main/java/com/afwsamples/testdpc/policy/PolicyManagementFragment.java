@@ -52,7 +52,6 @@ import android.provider.Settings;
 import android.security.KeyChain;
 import android.security.KeyChainAliasCallback;
 import android.service.notification.NotificationListenerService;
-import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.annotation.StringRes;
 import android.support.v14.preference.SwitchPreference;
@@ -119,7 +118,6 @@ import com.afwsamples.testdpc.profilepolicy.apprestrictions.AppRestrictionsManag
 import com.afwsamples.testdpc.profilepolicy.apprestrictions.ManageAppRestrictionsFragment;
 import com.afwsamples.testdpc.profilepolicy.delegation.DelegationFragment;
 import com.afwsamples.testdpc.profilepolicy.permission.ManageAppPermissionsFragment;
-import com.afwsamples.testdpc.safetynet.SafetyNetFragment;
 import com.afwsamples.testdpc.transferownership.PickTransferComponentFragment;
 import com.afwsamples.testdpc.util.MainThreadExecutor;
 
@@ -284,13 +282,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String MANAGE_APP_RESTRICTIONS_KEY = "manage_app_restrictions";
     private static final String MANAGED_PROFILE_SPECIFIC_POLICIES_KEY = "managed_profile_policies";
     private static final String MANAGE_LOCK_TASK_LIST_KEY = "manage_lock_task";
-    private static final String MANDATORY_BACKUPS = "mandatory_backups";
-    private static final String MANDATORY_BACKUP_ACCOUNT_CHANGED_ACTION =
-            "com.google.android.gms.backup.MANDATORY_BACKUP_ACCOUNT_CHANGED";
-    private static final String MANDATORY_BACKUP_ACCOUNT_NAME_APP_RESTRICTION =
-            "mandatoryBackupAccountName";
-    private static final String MANDATORY_BACKUP_ACCOUNT_TYPE_APP_RESTRICTION =
-            "mandatoryBackupAccountType";
     private static final String MUTE_AUDIO_KEY = "mute_audio";
     private static final String NETWORK_STATS_KEY = "network_stats";
     private static final String PASSWORD_CONSTRAINTS_KEY = "password_constraints";
@@ -356,7 +347,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String TAG_WIFI_CONFIG_CREATION = "wifi_config_creation";
     private static final String WIFI_CONFIG_LOCKDOWN_ON = "1";
     private static final String WIFI_CONFIG_LOCKDOWN_OFF = "0";
-    private static final String SAFETYNET_ATTEST = "safetynet_attest";
     private static final String SECURITY_PATCH_FORMAT = "yyyy-MM-dd";
     private static final String SET_NEW_PASSWORD = "set_new_password";
     private static final String SET_PROFILE_PARENT_NEW_PASSWORD = "set_profile_parent_new_password";
@@ -377,9 +367,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             BatteryManager.BATTERY_PLUGGED_USB |
             BatteryManager.BATTERY_PLUGGED_WIRELESS);
     private static final String DONT_STAY_ON = "0";
-    public static final String GMSCORE_PACKAGE = "com.google.android.gms";
-    public static final String GMSCORE_BACKUP_TRANSPORT =
-            "com.google.android.gms.backup.BackupTransportService";
 
     private static final int USER_OPERATION_ERROR_UNKNOWN = 1;
     private static final int USER_OPERATION_SUCCESS = 0;
@@ -407,7 +394,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private DpcSwitchPreference mInstallNonMarketAppsPreference;
 
     private SwitchPreference mEnableBackupServicePreference;
-    private SwitchPreference mMandatoryBackupsPreference;
     private SwitchPreference mEnableSecurityLoggingPreference;
     private SwitchPreference mEnableNetworkLoggingPreference;
     private SwitchPreference mSetAutoTimeRequiredPreference;
@@ -525,8 +511,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(REMOVE_DEVICE_OWNER_KEY).setOnPreferenceClickListener(this);
         mEnableBackupServicePreference = (SwitchPreference) findPreference(ENABLE_BACKUP_SERVICE);
         mEnableBackupServicePreference.setOnPreferenceChangeListener(this);
-        mMandatoryBackupsPreference = (SwitchPreference) findPreference(MANDATORY_BACKUPS);
-        mMandatoryBackupsPreference.setOnPreferenceChangeListener(this);
         findPreference(REQUEST_BUGREPORT_KEY).setOnPreferenceClickListener(this);
         mEnableSecurityLoggingPreference =
             (SwitchPreference) findPreference(ENABLE_SECURITY_LOGGING);
@@ -599,7 +583,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(REBOOT_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_SHORT_SUPPORT_MESSAGE_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_LONG_SUPPORT_MESSAGE_KEY).setOnPreferenceClickListener(this);
-        findPreference(SAFETYNET_ATTEST).setOnPreferenceClickListener(this);
         findPreference(SET_NEW_PASSWORD).setOnPreferenceClickListener(this);
         findPreference(SET_PROFILE_PARENT_NEW_PASSWORD).setOnPreferenceClickListener(this);
         findPreference(CROSS_PROFILE_APPS).setOnPreferenceClickListener(this);
@@ -640,7 +623,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         reloadScreenCaptureDisableUi();
         reloadMuteAudioUi();
         reloadEnableBackupServiceUi();
-        reloadMandatoryBackupsUi();
         reloadEnableSecurityLoggingUi();
         reloadEnableNetworkLoggingUi();
         reloadSetAutoTimeRequiredUi();
@@ -996,10 +978,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 showFragment(SetSupportMessageFragment.newInstance(
                         SetSupportMessageFragment.TYPE_LONG));
                 return true;
-            case SAFETYNET_ATTEST:
-                DialogFragment safetynetFragment = new SafetyNetFragment();
-                safetynetFragment.show(getFragmentManager(), SafetyNetFragment.class.getName());
-                return true;
             case SET_NEW_PASSWORD:
                 startActivity(new Intent(DevicePolicyManager.ACTION_SET_NEW_PASSWORD));
                 return true;
@@ -1144,16 +1122,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             case ENABLE_BACKUP_SERVICE:
                 setBackupServiceEnabled((Boolean) newValue);
                 reloadEnableBackupServiceUi();
-                reloadMandatoryBackupsUi();
                 return true;
-            case MANDATORY_BACKUPS:
-                if ((Boolean) newValue) {
-                    showMandatoryBackupAccountPicker();
-                    return false;
-                } else {
-                    setupMandatoryBackups(null);
-                    return true;
-                }
             case ENABLE_SECURITY_LOGGING:
                 setSecurityLoggingEnabled((Boolean) newValue);
                 reloadEnableSecurityLoggingUi();
@@ -1281,8 +1250,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                                    boolean isUserSelectable) {
         if (BuildCompat.isAtLeastP()) {
             return mDevicePolicyManager.installKeyPair(
-                    mAdminComponentName, key, new Certificate[]{cert}, alias, false,
-                    isUserSelectable);
+                    mAdminComponentName, key, new Certificate[]{cert}, alias,
+                    isUserSelectable ? DevicePolicyManager.INSTALLKEY_SET_USER_SELECTABLE : 0);
         } else {
             if (!isUserSelectable) {
                 throw new IllegalArgumentException(
@@ -2097,14 +2066,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         }
     }
 
-    @TargetApi(28)
-    private void reloadMandatoryBackupsUi() {
-        if (mMandatoryBackupsPreference.isEnabled()) {
-            mMandatoryBackupsPreference.setChecked(
-                    null != mDevicePolicyManager.getMandatoryBackupTransport());
-        }
-    }
-
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void reloadScreenCaptureDisableUi() {
         boolean isScreenCaptureDisabled = mDevicePolicyManager.getScreenCaptureDisabled(
@@ -2790,7 +2751,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     @TargetApi(28)
     private List<String> getMeteredDataRestrictedPkgs() {
-        return mDevicePolicyManager.getMeteredDataDisabled(mAdminComponentName);
+        return mDevicePolicyManager.getMeteredDataDisabledPackages(mAdminComponentName);
     }
 
     /**
@@ -3118,7 +3079,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
         final ActivityOptions options = ActivityOptions.makeBasic();
-        options.setLockTaskMode(true);
+        options.setLockTaskEnabled(true);
 
         try {
             startActivity(intent, options.toBundle());
@@ -3387,65 +3348,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 return R.string.requires_device_owner;
             }
         }
-    }
-
-    @TargetApi(28)
-    private void showMandatoryBackupAccountPicker() {
-        if (!BuildCompat.isAtLeastP()) {
-            return;
-        }
-        if (getActivity() == null || getActivity().isFinishing()) {
-            return;
-        }
-        List<Account> accounts = Arrays.asList(mAccountManager.getAccounts());
-        if (accounts.isEmpty()) {
-            showToast(R.string.no_accounts_available);
-        } else {
-            AccountArrayAdapter accountArrayAdapter =
-                new AccountArrayAdapter(getActivity(), R.id.account_name, accounts);
-            new AlertDialog.Builder(getActivity())
-                .setTitle(R.string.mandatory_backup_account)
-                .setAdapter(
-                    accountArrayAdapter,
-                    (dialog, position) -> setupMandatoryBackups(accounts.get(position)))
-                .show();
-        }
-    }
-
-    @TargetApi(28)
-    private void setupMandatoryBackups(@Nullable Account account) {
-        boolean makeBackupsMandatory = account != null;
-        // For the data to be backed up to Google Drive, set the backup transport to the GmsCore's
-        // backup transport.
-        mDevicePolicyManager.setMandatoryBackupTransport(mAdminComponentName, makeBackupsMandatory ?
-                new ComponentName(GMSCORE_PACKAGE, GMSCORE_BACKUP_TRANSPORT) : null);
-
-        // Set app restrictions with the account type and name on GmsCore to let it know which
-        // account it should use for backing up the data and notify GmsCore about the change by
-        // sending a broadcast to it.
-        String name = account != null ? account.name : null;
-        String type = account != null ? account.type: null;
-        Bundle appRestrictions = mDevicePolicyManager.getApplicationRestrictions(
-                mAdminComponentName, GMSCORE_PACKAGE);
-        if (name == null) {
-           appRestrictions.remove(MANDATORY_BACKUP_ACCOUNT_NAME_APP_RESTRICTION);
-        } else {
-           appRestrictions.putString(MANDATORY_BACKUP_ACCOUNT_NAME_APP_RESTRICTION, name);
-        }
-        if (type == null) {
-            appRestrictions.remove(MANDATORY_BACKUP_ACCOUNT_TYPE_APP_RESTRICTION);
-        } else {
-            appRestrictions.putString(MANDATORY_BACKUP_ACCOUNT_TYPE_APP_RESTRICTION, type);
-        }
-        mDevicePolicyManager.setApplicationRestrictions(
-                mAdminComponentName, GMSCORE_PACKAGE, appRestrictions);
-        Intent intent = new Intent(MANDATORY_BACKUP_ACCOUNT_CHANGED_ACTION);
-        intent.setPackage(GMSCORE_PACKAGE);
-        getContext().sendBroadcast(intent);
-
-        // Update the UI for backup-related policies.
-        reloadEnableBackupServiceUi();
-        reloadMandatoryBackupsUi();
     }
 
     abstract class ManageLockTaskListCallback {

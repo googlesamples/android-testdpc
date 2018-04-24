@@ -21,6 +21,7 @@ import android.app.DatePickerDialog;
 import android.app.Fragment;
 import android.app.TimePickerDialog;
 import android.app.admin.DevicePolicyManager;
+import android.app.admin.FreezePeriod;
 import android.app.admin.SystemUpdatePolicy;
 import android.content.Context;
 import android.os.Build;
@@ -43,6 +44,7 @@ import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 
 import java.time.LocalDate;
+import java.time.MonthDay;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,18 +64,20 @@ public class SystemUpdatePolicyFragment extends Fragment implements View.OnClick
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     static class Period {
-        LocalDate mStart;
-        LocalDate mEnd;
+        MonthDay mStart;
+        MonthDay mEnd;
 
-        public Period(Integer start, Integer end) {
-            int currentYear = LocalDate.now().getYear();
-            mStart = LocalDate.ofYearDay(2001, start).withYear(currentYear);
-            mEnd = LocalDate.ofYearDay(2001, end).withYear(end >= start ? currentYear : currentYear + 1);
+        public Period() {
         }
 
-        public Period(LocalDate startDate, LocalDate endDate) {
-            mStart = startDate;
-            mEnd = endDate;
+        public Period(MonthDay start, MonthDay end) {
+            mStart = start;
+            mEnd = end;
+        }
+
+        public void set(LocalDate startDate, LocalDate endDate) {
+            mStart = MonthDay.of(startDate.getMonth(), startDate.getDayOfMonth());
+            mEnd = MonthDay.of(endDate.getMonth(), endDate.getDayOfMonth());
         }
 
         @Override
@@ -82,9 +86,17 @@ public class SystemUpdatePolicyFragment extends Fragment implements View.OnClick
             return mStart.format(formatter) + " - " + mEnd.format(formatter);
         }
 
-        public Pair<Integer, Integer> toIntegers() {
-            return new Pair<>(mStart.withYear(2001).getDayOfYear(),
-                    mEnd.withYear(2001).getDayOfYear());
+        public LocalDate getStartDate() {
+            return mStart.atYear(LocalDate.now().getYear());
+        }
+
+        public LocalDate getEndDate() {
+            return mEnd.atYear(LocalDate.now().getYear());
+        }
+
+        @TargetApi(28)
+        public FreezePeriod toFreezePeriod() {
+            return new FreezePeriod(mStart, mEnd);
         }
     }
 
@@ -131,10 +143,9 @@ public class SystemUpdatePolicyFragment extends Fragment implements View.OnClick
             textView.setOnClickListener(view -> {
                 final Period period = (Period) view.getTag();
                 promptToSetFreezePeriod((LocalDate startDate, LocalDate endDate) -> {
-                    period.mStart = startDate;
-                    period.mEnd = endDate;
+                    period.set(startDate, endDate);
                     mFreezePeriodAdapter.notifyDataSetChanged();
-                }, period.mStart, period.mEnd);
+                }, period.getStartDate(), period.getEndDate());
             });
             View deleteButton = convertView.findViewById(R.id.delete_period);
             deleteButton.setTag(mData.get(position));
@@ -210,7 +221,8 @@ public class SystemUpdatePolicyFragment extends Fragment implements View.OnClick
                 break;
             case R.id.system_update_policy_btn_add_period:
                 promptToSetFreezePeriod((LocalDate startDate, LocalDate endDate) -> {
-                    Period period = new Period(startDate, endDate);
+                    Period period = new Period();
+                    period.set(startDate, endDate);
                     mFreezePeriods.add(period);
                     mFreezePeriodAdapter.notifyDataSetChanged();
                 }, LocalDate.now(), LocalDate.now());
@@ -269,21 +281,22 @@ public class SystemUpdatePolicyFragment extends Fragment implements View.OnClick
             default:
                 newPolicy = null;
         }
-        if (BuildCompat.isAtLeastP() && newPolicy != null && mFreezePeriods.size() != 0) {
-            List<Pair<Integer, Integer>> periods = new ArrayList<>(mFreezePeriods.size());
-            for (Period p : mFreezePeriods) {
-                periods.add(p.toIntegers());
-            }
-            try {
+
+        try {
+            if (BuildCompat.isAtLeastP() && newPolicy != null && mFreezePeriods.size() != 0) {
+                final List<FreezePeriod> periods = new ArrayList<>(mFreezePeriods.size());
+                for (Period p : mFreezePeriods) {
+                    periods.add(p.toFreezePeriod());
+                }
                 newPolicy.setFreezePeriods(periods);
-                mDpm.setSystemUpdatePolicy(DeviceAdminReceiver.getComponentName(getActivity()),
-                        newPolicy);
-                Toast.makeText(getContext(), "Policy set successfully", Toast.LENGTH_LONG).show();
-                return true;
-            } catch (IllegalArgumentException e) {
-                Toast.makeText(getContext(), "Failed to set system update policy: " + e.getMessage(),
-                        Toast.LENGTH_LONG).show();
             }
+            mDpm.setSystemUpdatePolicy(DeviceAdminReceiver.getComponentName(getActivity()),
+                    newPolicy);
+            Toast.makeText(getContext(), "Policy set successfully", Toast.LENGTH_LONG).show();
+            return true;
+        } catch (IllegalArgumentException e) {
+            Toast.makeText(getContext(), "Failed to set system update policy: " + e.getMessage(),
+                    Toast.LENGTH_LONG).show();
         }
         return false;
     }
@@ -332,10 +345,10 @@ public class SystemUpdatePolicyFragment extends Fragment implements View.OnClick
                     break;
             }
             if (BuildCompat.isAtLeastP()) {
-                List<Pair<Integer, Integer>> freezePeriods = policy.getFreezePeriods();
+                List<FreezePeriod> freezePeriods = policy.getFreezePeriods();
                 mFreezePeriods.clear();
-                for (Pair<Integer, Integer> period : freezePeriods) {
-                    Period p = new Period(period.first, period.second);
+                for (FreezePeriod period : freezePeriods) {
+                    Period p = new Period(period.getStart(), period.getEnd());
                     mFreezePeriods.add(p);
                 }
                 mFreezePeriodAdapter.notifyDataSetChanged();

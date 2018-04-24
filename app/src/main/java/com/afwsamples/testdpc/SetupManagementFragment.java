@@ -16,15 +16,6 @@
 
 package com.afwsamples.testdpc;
 
-import static android.app.admin.DevicePolicyManager.ACTION_PROVISION_MANAGED_DEVICE;
-import static android.app.admin.DevicePolicyManager.ACTION_PROVISION_MANAGED_PROFILE;
-import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_ACCOUNT_TO_MIGRATE;
-import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE;
-import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_DEVICE_ADMIN_COMPONENT_NAME;
-import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_DEVICE_ADMIN_PACKAGE_NAME;
-import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_LOGO_URI;
-import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_MAIN_COLOR;
-
 import android.accounts.Account;
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -52,23 +43,34 @@ import android.widget.ImageView;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.afwsamples.testdpc.common.ColorPicker;
 import com.afwsamples.testdpc.common.LaunchIntentUtil;
 import com.afwsamples.testdpc.common.ProvisioningStateUtil;
 import com.afwsamples.testdpc.common.Util;
-import com.android.setupwizardlib.SetupWizardLayout;
+import com.android.setupwizardlib.GlifLayout;
 import com.android.setupwizardlib.view.NavigationBar;
+
 import java.security.SecureRandom;
 import java.util.Collections;
 import java.util.Set;
+
+import static android.app.admin.DevicePolicyManager.ACTION_PROVISION_MANAGED_DEVICE;
+import static android.app.admin.DevicePolicyManager.ACTION_PROVISION_MANAGED_PROFILE;
+import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_ACCOUNT_TO_MIGRATE;
+import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE;
+import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_DEVICE_ADMIN_COMPONENT_NAME;
+import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_DEVICE_ADMIN_PACKAGE_NAME;
+import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_LOGO_URI;
+import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_MAIN_COLOR;
 
 /**
  * This {@link Fragment} shows the UI that allows the user to start the setup of a managed profile
  * or configuration of a device-owner if the device is in an appropriate state.
  */
 public class SetupManagementFragment extends Fragment implements
-        NavigationBar.NavigationBarListener, View.OnClickListener,
-        ColorPicker.OnColorSelectListener, RadioGroup.OnCheckedChangeListener {
+        View.OnClickListener, ColorPicker.OnColorSelectListener,
+        RadioGroup.OnCheckedChangeListener {
     // Tag for creating this fragment. This tag can be used to retrieve this fragment.
     public static final String FRAGMENT_TAG = "SetupManagementFragment";
 
@@ -105,17 +107,12 @@ public class SetupManagementFragment extends Fragment implements
             mCurrentColor = savedInstanceState.getInt(EXTRA_PROVISIONING_MAIN_COLOR);
         }
 
-        // Use setupwizard theme
-        final Context contextThemeWrapper =
-                new ContextThemeWrapper(getActivity(), R.style.SetupTheme);
-        LayoutInflater themeInflater = inflater.cloneInContext(contextThemeWrapper);
-        View view = themeInflater.inflate(R.layout.setup_management_fragment, container, false);
-        SetupWizardLayout layout = (SetupWizardLayout) view.findViewById(R.id.setup_wizard_layout);
-        NavigationBar navigationBar = layout.getNavigationBar();
-        navigationBar.setNavigationBarListener(this);
-        navigationBar.getBackButton().setText(R.string.exit);
-        mNavigationNextButton = navigationBar.getNextButton();
-        mNavigationNextButton.setText(R.string.setup_label);
+        View view = inflater.inflate(R.layout.setup_management_fragment, container, false);
+        GlifLayout layout = view.findViewById(R.id.setup_wizard_layout);
+
+        mNavigationNextButton = layout.findViewById(R.id.setup_button);
+        mNavigationNextButton.setOnClickListener(this::onNavigateNext);
+        layout.findViewById(R.id.exit_button).setOnClickListener(this::onNavigateBack);
 
         mSetupManagementMessage = (TextView) view.findViewById(R.id.setup_management_message_id);
         mSetupOptions = (RadioGroup) view.findViewById(R.id.setup_options);
@@ -166,7 +163,6 @@ public class SetupManagementFragment extends Fragment implements
     public void onResume() {
         super.onResume();
 
-        getActivity().getActionBar().hide();
         if (setProvisioningMethodsVisibility()) {
             // The extra logo uri and color are supported only from N
             if (BuildCompat.isAtLeastN()) {
@@ -468,13 +464,11 @@ public class SetupManagementFragment extends Fragment implements
         updateColorUi();
     }
 
-    @Override
-    public void onNavigateBack() {
+    public void onNavigateBack(View view) {
         getActivity().onBackPressed();
     }
 
-    @Override
-    public void onNavigateNext() {
+    public void onNavigateNext(View view) {
         if (mSetupOptions.getCheckedRadioButtonId() == R.id.setup_managed_profile) {
             maybeLaunchProvisioning(ACTION_PROVISION_MANAGED_PROFILE,
                     REQUEST_PROVISION_MANAGED_PROFILE);

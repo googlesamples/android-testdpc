@@ -149,7 +149,6 @@ public class WifiConfigCreationDialog extends DialogFragment implements
         if (mListener != null) {
             mListener.onDismiss();
         }
-        dismiss();
     }
 
     @Override
@@ -157,7 +156,6 @@ public class WifiConfigCreationDialog extends DialogFragment implements
         if (mListener != null) {
             mListener.onCancel();
         }
-        dismiss();
     }
 
     private void initialize() {

@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
  Copyright 2015 The Android Open Source Project
 
  Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,48 +13,54 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-<com.android.setupwizardlib.SetupWizardLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/setup_wizard_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        style="@style/SetupIllustrationTheme"
-        app:suwHeaderText="@string/setup_finished">
+<com.android.setupwizardlib.GlifLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/setup_wizard_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:icon="@drawable/ic_enterprise_blue"
+    app:suwFooter="@layout/next_footer"
+    app:suwHeaderText="@string/setup_finished">
 
     <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            style="@style/contentContainer">
-        <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/add_account_explanation"
-                style="@style/containerText" />
+        style="@style/SuwItemContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <RadioGroup android:id="@+id/add_account_options"
+        <TextView
+            style="@style/SuwItemTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/add_account_explanation" />
+
+        <RadioGroup
+            android:id="@+id/add_account_options"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="@dimen/content_padding_between_text">
+
+            <RadioButton
+                android:id="@+id/add_account"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="@string/add_account" />
+
+            <RadioButton
+                android:id="@+id/add_account_with_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/add_account_with_name" />
+
+            <RadioButton
+                android:id="@+id/add_account_skip"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingTop="@dimen/content_padding_between_text">
-            <RadioButton android:id="@+id/add_account"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/add_account"
-                    style="@style/containerText"
-                    android:checked="true" />
-            <RadioButton android:id="@+id/add_account_with_name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    style="@style/containerText"
-                    android:text="@string/add_account_with_name" />
-            <RadioButton android:id="@+id/add_account_skip"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/add_account_skip"
-                    style="@style/containerText" />
+                android:text="@string/add_account_skip" />
         </RadioGroup>
     </LinearLayout>
 
-</com.android.setupwizardlib.SetupWizardLayout>
+</com.android.setupwizardlib.GlifLayout>
