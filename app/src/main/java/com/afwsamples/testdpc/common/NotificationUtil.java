@@ -56,6 +56,7 @@ public class NotificationUtil {
         String appName = context.getString(R.string.app_name);
         NotificationChannel channel = new NotificationChannel(DEFAULT_CHANNEL_ID,
                 appName, NotificationManager.IMPORTANCE_DEFAULT);
+        channel.setImportance(NotificationManager.IMPORTANCE_LOW);
         notificationManager.createNotificationChannel(channel);
     }
 

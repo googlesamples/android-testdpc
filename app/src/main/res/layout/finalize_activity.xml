@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2018 Google Inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+<com.android.setupwizardlib.GlifLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/setup_wizard_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:icon="@drawable/ic_enterprise_blue"
+    app:suwFooter="@layout/next_footer"
+    app:suwHeaderText="@string/finish_setup">
+
+    <LinearLayout
+        style="@style/SuwContentFrame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/account_migration_success"
+            style="@style/SuwItemContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/managed_account_name_label"
+                style="@style/SuwItemTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text="@string/managed_account_complete_message" />
+
+            <TextView
+                android:id="@+id/managed_account_name"
+                style="@style/SuwItemTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:paddingBottom="@dimen/content_padding_between_text" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/account_migration_fail"
+            style="@style/SuwItemContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                style="@style/SuwItemTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text="@string/account_migration_failed_message" />
+
+            <TextView
+                android:id="@id/managed_account_name"
+                style="@style/SuwItemTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal" />
+
+            <TextView
+                style="@style/SuwItemTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:paddingBottom="@dimen/content_padding_between_text"
+                android:text="@string/add_account_later_message" />
+        </LinearLayout>
+
+        <RelativeLayout
+            style="@style/SuwItemContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:paddingTop="@dimen/content_padding_between_text">
+
+            <TextView
+                android:id="@+id/explanation"
+                style="@style/SuwItemTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:layout_marginBottom="@dimen/content_padding_bottom"/>
+
+            <ImageView
+                android:id="@+id/app_icon"
+                style="@style/SuwItemTitle"
+                android:layout_width="@android:dimen/app_icon_size"
+                android:layout_height="@android:dimen/app_icon_size"
+                android:layout_below="@id/explanation"
+                android:baselineAlignBottom="true"
+                android:scaleType="fitXY" />
+
+            <TextView
+                android:id="@+id/app_label"
+                style="@style/SuwItemTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="@android:dimen/app_icon_size"
+                android:layout_below="@id/explanation"
+                android:layout_marginStart="8dp"
+                android:layout_toRightOf="@id/app_icon"
+                android:gravity="center_vertical" />
+        </RelativeLayout>
+    </LinearLayout>
+
+</com.android.setupwizardlib.GlifLayout>

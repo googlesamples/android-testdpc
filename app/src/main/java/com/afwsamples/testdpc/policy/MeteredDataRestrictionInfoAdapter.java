@@ -98,7 +98,7 @@ public class MeteredDataRestrictionInfoAdapter extends ToggleComponentsArrayAdap
 
     @TargetApi(28)
     private void setMeteredDataRestrictedPkgs(List<String> pkgNames) {
-        final List<String> excludedPkgs = mDevicePolicyManager.setMeteredDataDisabled(
+        final List<String> excludedPkgs = mDevicePolicyManager.setMeteredDataDisabledPackages(
             DeviceAdminReceiver.getComponentName(mContext), pkgNames);
 
         if (!excludedPkgs.isEmpty()) {

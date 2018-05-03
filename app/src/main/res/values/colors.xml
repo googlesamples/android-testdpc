@@ -25,4 +25,7 @@
     <color name="light_gray">#D3D3D3</color>
     <color name="dark_red">#D32F2F</color>
     <color name="dark_green">#388E3C</color>
+    <color name="primary_dark">#ff254FAE</color>
+    <color name="primary">#ff3367d6</color>
+    <color name="accent">#ff3367d6</color>
 </resources>

@@ -16,10 +16,6 @@
 
 package com.afwsamples.testdpc.provision;
 
-import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE;
-import static android.app.admin.DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED;
-import static com.afwsamples.testdpc.DeviceAdminReceiver.getComponentName;
-
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.annotation.TargetApi;
@@ -38,8 +34,7 @@ import android.util.Log;
 
 import com.afwsamples.testdpc.AddAccountActivity;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
-import com.afwsamples.testdpc.EnableDeviceOwnerActivity;
-import com.afwsamples.testdpc.EnableProfileActivity;
+import com.afwsamples.testdpc.FinalizeActivity;
 import com.afwsamples.testdpc.common.LaunchIntentUtil;
 import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.cosu.EnableCosuActivity;
@@ -47,6 +42,10 @@ import com.afwsamples.testdpc.cosu.EnableCosuActivity;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE;
+import static android.app.admin.DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED;
+import static com.afwsamples.testdpc.DeviceAdminReceiver.getComponentName;
 
 /**
  * Task executed after provisioning is done indicated by either the
@@ -140,13 +139,11 @@ public class PostProvisioningTask {
             return null;
         }
 
-        if (isProfileOwner) {
-            launch = new Intent(mContext, EnableProfileActivity.class);
-        } else if (cosuLaunch) {
+        if (cosuLaunch) {
             launch = new Intent(mContext, EnableCosuActivity.class);
             launch.putExtra(EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE, extras);
         } else {
-            launch = new Intent(mContext, EnableDeviceOwnerActivity.class);
+            launch = new Intent(mContext, FinalizeActivity.class);
         }
 
         if (synchronousAuthLaunch) {
