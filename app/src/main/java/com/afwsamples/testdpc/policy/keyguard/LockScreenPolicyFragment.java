@@ -69,6 +69,8 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
         static final String MAX_TIME_SCREEN_LOCK = "key_max_time_screen_lock";
         static final String MAX_TIME_SCREEN_LOCK_ALL = "key_max_time_screen_lock_aggregate";
 
+        static final String KEYGUARD_DISABLE_FACE = "keyguard_disable_face";
+        static final String KEYGUARD_DISABLE_IRIS = "keyguard_disable_iris";
         static final String KEYGUARD_DISABLE_FINGERPRINT = "keyguard_disable_fingerprint";
         static final String KEYGUARD_DISABLE_REMOTE_INPUT = "keyguard_disable_remote_input";
         static final String KEYGUARD_DISABLE_SECURE_CAMERA = "keyguard_disable_secure_camera";
@@ -101,8 +103,14 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
         KEYGUARD_FEATURES.put(Keys.KEYGUARD_DISABLE_TRUST_AGENTS,
                 DevicePolicyManager.KEYGUARD_DISABLE_TRUST_AGENTS);
 
+        KEYGUARD_FEATURES.put(Keys.KEYGUARD_DISABLE_FACE,
+            DevicePolicyManager.KEYGUARD_DISABLE_FACE);
+
         KEYGUARD_FEATURES.put(Keys.KEYGUARD_DISABLE_FINGERPRINT,
                 DevicePolicyManager.KEYGUARD_DISABLE_FINGERPRINT);
+
+        KEYGUARD_FEATURES.put(Keys.KEYGUARD_DISABLE_IRIS,
+            DevicePolicyManager.KEYGUARD_DISABLE_IRIS);
 
         KEYGUARD_FEATURES.put(Keys.KEYGUARD_DISABLE_REMOTE_INPUT,
                 DevicePolicyManager.KEYGUARD_DISABLE_REMOTE_INPUT);
