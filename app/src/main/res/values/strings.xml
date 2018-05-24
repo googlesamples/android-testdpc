@@ -797,6 +797,8 @@
     <string name="permission_default">Let user decide</string>
     <string name="permission_deny">Deny</string>
     <string name="manage_app_permissions">Manage app permissions</string>
+    <!-- Message displayed when there are no apps permissions to show. -->
+    <string name="app_permissions_empty">There are no permissions to display for this app.</string>
 
     <!-- Keyguard features -->
     <string name="keyguard_features">Keyguard features</string>
