@@ -23,8 +23,8 @@
     <string name="set_up_device_owner">Set up device owner</string>
     <string name="set_up_management_header">Set up management</string>
     <string name="setup_management_message">This app is currently not the owner of this device or
-        profile. Please select an option below and tap SET UP to set up appropriate management by this app.</string>
-    <string name="setup_management_message_for_do">This app is currently set as device owner. Please select the options below and tap SET UP to create a profile managed by the same app</string>
+        profile. Please select an option below and tap Next to set up appropriate management by this app.</string>
+    <string name="setup_management_message_for_do">This app is currently set as device owner. Please select the options below and tap Next to create a profile managed by the same app</string>
     <string name="provisioning_not_possible">TestDPC isn\'t currently allowed to be set up as the profile or device owner.</string>
     <string name="provisioning_not_possible_for_do">TestDPC isn\'t currently allowed to create a managed profile.</string>
     <string name="exit">Exit</string>
