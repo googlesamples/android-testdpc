@@ -13,13 +13,13 @@ ext {
 }
 
 android {
-    compileSdkVersion 'android-P'
+    compileSdkVersion 28
     buildToolsVersion "28.0.0"
 
     defaultConfig {
         applicationId "com.afwsamples.testdpc"
         minSdkVersion 21
-        targetSdkVersion 'P'
+        targetSdkVersion 28
         versionCode versionMajor * 1000 + versionMinor * 100 + versionBuild
         versionName "${versionMajor}.${versionMinor}.${versionBuild}"
         multiDexEnabled true

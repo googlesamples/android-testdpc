@@ -93,9 +93,6 @@ public class DpcPreferenceHelper {
      *         not yet assigned.
      */
     private int getDeviceSdkInt() {
-        if (BuildCompat.isAtLeastP()) {
-            return Build.VERSION_CODES.CUR_DEVELOPMENT;
-        }
         return Build.VERSION.SDK_INT;
     }
 
@@ -220,10 +217,6 @@ public class DpcPreferenceHelper {
      */
     private CharSequence findConstraintViolation() {
         if (getDeviceSdkInt() < mMinSdkVersion) {
-            // FIXME: Remove this special checking once P is out.
-            if (mMinSdkVersion > 27) {
-                return mContext.getString(R.string.requires_preview_release);
-            }
             return mContext.getString(R.string.requires_android_api_level, mMinSdkVersion);
         }
 

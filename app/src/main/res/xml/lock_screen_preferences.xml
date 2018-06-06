@@ -87,9 +87,17 @@
             android:title="@string/keyguard_disable_trust_agents"
             testdpc:minSdkVersion="L" />
         <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
+            android:key="keyguard_disable_face"
+            android:title="@string/keyguard_disable_face"
+            testdpc:minSdkVersion="P" />
+        <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
             android:key="keyguard_disable_fingerprint"
             android:title="@string/keyguard_disable_fingerprint"
             testdpc:minSdkVersion="L" />
+        <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
+            android:key="keyguard_disable_iris"
+            android:title="@string/keyguard_disable_iris"
+            testdpc:minSdkVersion="P" />
         <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
             android:key="keyguard_disable_remote_input"
             android:title="@string/keyguard_disable_remote_input"
