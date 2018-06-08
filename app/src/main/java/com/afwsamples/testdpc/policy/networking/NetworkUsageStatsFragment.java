@@ -50,6 +50,7 @@ import android.widget.TextView;
 
 import com.afwsamples.testdpc.R;
 
+import com.afwsamples.testdpc.common.OnBackPressedHandler;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -63,7 +64,7 @@ import java.util.List;
  */
 @TargetApi(Build.VERSION_CODES.M)
 public class NetworkUsageStatsFragment extends ListFragment implements View.OnClickListener,
-        AdapterView.OnItemSelectedListener {
+        AdapterView.OnItemSelectedListener, OnBackPressedHandler {
 
     private static final String TAG = "TestDPC.NetworkUsageStatsFragment";
 
@@ -87,7 +88,6 @@ public class NetworkUsageStatsFragment extends ListFragment implements View.OnCl
     private List<List<NetworkStats.Bucket>> mListData;
     private ArrayAdapter<List<NetworkStats.Bucket>> mListAdapter;
     private ListView mAppHistoryList;
-    private Button mBackToAppsListButton;
     private DateFormat mDateStringFormat;
     private DateFormat mHourMinuteDateFormat;
 
@@ -147,10 +147,6 @@ public class NetworkUsageStatsFragment extends ListFragment implements View.OnCl
         mDataUsageList = (ListView) view.findViewById(android.R.id.list);
         mDataUsageList.setAdapter(mListAdapter);
         mAppHistoryList = (ListView) view.findViewById(R.id.app_history);
-        mBackToAppsListButton = (Button) view.findViewById(R.id.back_to_apps_button);
-        if (mBackToAppsListButton != null) {
-            mBackToAppsListButton.setOnClickListener(this);
-        }
         return view;
     }
 
@@ -163,10 +159,19 @@ public class NetworkUsageStatsFragment extends ListFragment implements View.OnCl
             case R.id.end_date_button: {
                 pickDate(mEndDate);
             } break;
-            case R.id.back_to_apps_button: {
-                transitionAppHistoryView(View.GONE);
-            }
         }
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        if (mAppHistoryList.getVisibility() == View.VISIBLE) {
+            // Go back to previous view in the network usage stats fragment.
+            transitionAppHistoryView(View.GONE);
+            // Returns true if onBackPressed was executed and we do not need to call the
+            // onBackPressed superclass method.
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -176,7 +181,6 @@ public class NetworkUsageStatsFragment extends ListFragment implements View.OnCl
         mDataUsageSummary.setVisibility(View.GONE);
         mDataUsageList.setVisibility(View.GONE);
         mAppHistoryList.setVisibility(View.GONE);
-        mBackToAppsListButton.setVisibility(View.GONE);
         mExplanation.setText("");
         try {
             switch (pos) {
@@ -425,7 +429,6 @@ public class NetworkUsageStatsFragment extends ListFragment implements View.OnCl
 
     private void transitionAppHistoryView(int appHistoryVisibility) {
         mAppHistoryList.setVisibility(appHistoryVisibility);
-        mBackToAppsListButton.setVisibility(appHistoryVisibility);
         mDataUsageList.setVisibility(
                 appHistoryVisibility == View.VISIBLE ? View.GONE : View.VISIBLE);
     }
