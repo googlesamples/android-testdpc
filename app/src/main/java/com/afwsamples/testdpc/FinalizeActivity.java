@@ -48,7 +48,7 @@ public class FinalizeActivity extends Activity {
         }
         setContentView(R.layout.finalize_activity);
         mSetupWizardLayout = findViewById(R.id.setup_wizard_layout);
-        mFinishButton = mSetupWizardLayout.findViewById(R.id.next_button);
+        mFinishButton = mSetupWizardLayout.findViewById(R.id.suw_navbar_next);
         mFinishButton.setText(R.string.finish_button);
         mFinishButton.setOnClickListener(this::onNavigateNext);
 
