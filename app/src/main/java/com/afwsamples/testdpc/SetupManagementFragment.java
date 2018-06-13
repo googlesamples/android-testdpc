@@ -110,7 +110,7 @@ public class SetupManagementFragment extends Fragment implements
         View view = inflater.inflate(R.layout.setup_management_fragment, container, false);
         GlifLayout layout = view.findViewById(R.id.setup_wizard_layout);
 
-        mNavigationNextButton = layout.findViewById(R.id.setup_button);
+        mNavigationNextButton = layout.findViewById(R.id.suw_navbar_next);
         mNavigationNextButton.setOnClickListener(this::onNavigateNext);
         layout.findViewById(R.id.exit_button).setOnClickListener(this::onNavigateBack);
 
