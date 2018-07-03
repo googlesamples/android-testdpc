@@ -525,6 +525,7 @@
     <string name="serial_num_attestation_checkbox">Include device serial number</string>
     <string name="imei_attestation_checkbox">Include device IMEI</string>
     <string name="meid_attestation_checkbox">Include device MEID</string>
+    <string name="use_strongbox_checkbox">Use StrongBox</string>
 
     <!-- Strings for app restrictions -->
     <string name="manage_app_restrictions">Manage app restrictions</string>

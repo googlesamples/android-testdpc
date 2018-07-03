@@ -25,6 +25,7 @@ import android.os.AsyncTask;
 import android.security.AttestedKeyPair;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
+import android.security.keystore.StrongBoxUnavailableException;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -56,6 +57,7 @@ public class GenerateKeyAndCertificateTask extends AsyncTask<Void, Integer, Atte
     final boolean mIsUserSelectable;
     private final byte[] mAttestationChallenge;
     private final int mIdAttestationFlags;
+    private final boolean mUseStrongBox;
     private final ComponentName mAdminComponentName;
     private final DevicePolicyManager mDevicePolicyManager;
     private final Activity mActivity;
@@ -65,11 +67,13 @@ public class GenerateKeyAndCertificateTask extends AsyncTask<Void, Integer, Atte
             boolean isUserSelectable,
             byte[] attestationChallenge,
             int idAttestationFlags,
+            boolean useStrongBox,
             Activity activity) {
         mAlias = alias;
         mIsUserSelectable = isUserSelectable;
         mAttestationChallenge = attestationChallenge;
         mIdAttestationFlags = idAttestationFlags;
+        mUseStrongBox = useStrongBox;
         mActivity = activity;
         mAdminComponentName = DeviceAdminReceiver.getComponentName(activity);
         mDevicePolicyManager =
@@ -88,7 +92,8 @@ public class GenerateKeyAndCertificateTask extends AsyncTask<Void, Integer, Atte
                             .setDigests(KeyProperties.DIGEST_SHA256)
                             .setSignaturePaddings(
                                     KeyProperties.SIGNATURE_PADDING_RSA_PSS,
-                                    KeyProperties.SIGNATURE_PADDING_RSA_PKCS1);
+                                    KeyProperties.SIGNATURE_PADDING_RSA_PKCS1)
+                            .setIsStrongBoxBacked(mUseStrongBox);
 
             if (mAttestationChallenge != null) {
                 keySpecBuilder.setAttestationChallenge(mAttestationChallenge);
@@ -119,6 +124,8 @@ public class GenerateKeyAndCertificateTask extends AsyncTask<Void, Integer, Atte
             return keyPair;
         } catch (CertificateException | OperatorCreationException | IOException e) {
             Log.e(TAG, "Failed to create certificate", e);
+        } catch (StrongBoxUnavailableException e) {
+            Log.e(TAG, "StrongBox unavailable", e);
         }
 
         return null;

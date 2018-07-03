@@ -1263,10 +1263,11 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     private void generateKeyPair(final String alias, boolean isUserSelectable,
                                  byte[] attestationChallenge,
-                                 int idAttestationFlags) {
+                                 int idAttestationFlags,
+                                 boolean useStrongBox) {
         new GenerateKeyAndCertificateTask(
                 alias, isUserSelectable, attestationChallenge, idAttestationFlags,
-                getActivity()).execute();
+                useStrongBox, getActivity()).execute();
     }
 
     /**
@@ -2291,7 +2292,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 R.id.include_device_imei_in_attestation);
         final CheckBox deviceMeidAttestationCheckbox = aliasNamingView.findViewById(
                 R.id.include_device_meid_in_attestation);
-
+        final CheckBox useStrongBoxCheckbox = aliasNamingView.findViewById(
+                R.id.use_strongbox);
 
         new AlertDialog.Builder(getActivity())
                 .setTitle(getString(R.string.certificate_alias_prompt_title))
@@ -2322,7 +2324,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                         }
 
                         generateKeyPair(alias, isUserSelectable, attestationChallenge,
-                                idAttestationFlags);
+                                idAttestationFlags, useStrongBoxCheckbox.isChecked());
                     }
                 })
                 .setNegativeButton(android.R.string.cancel, null)
