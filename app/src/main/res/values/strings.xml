@@ -589,7 +589,9 @@
     <!-- Enterprise security logging -->
     <string name="enable_security_logging">Enable security logging</string>
     <string name="request_security_logs">Request security logs</string>
+    <string name="request_pre_reboot_security_logs">Request pre-reboot security logs</string>
     <string name="failed_to_retrieve_security_logs">Failed to retrieve security logs, they were probably accessed less than 2 hours ago</string>
+    <string name="failed_to_retrieve_pre_reboot_security_logs">Failed to retrieve pre-reboot security logs, make sure your device supports it</string>
     <string name="exception_retrieving_security_logs">Not allowed to retrieve security logs, SecurityException thrown</string>
     <string name="security_logs_retrieved_message">---- Logs retrieved  %s ----</string>
     <string name="on_security_logs_available">Test DPC: Security logs ready to be retrieved</string>

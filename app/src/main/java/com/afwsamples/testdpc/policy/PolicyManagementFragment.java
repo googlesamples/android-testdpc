@@ -91,6 +91,7 @@ import com.afwsamples.testdpc.common.CertificateUtil;
 import com.afwsamples.testdpc.common.MediaDisplayFragment;
 import com.afwsamples.testdpc.common.UserArrayAdapter;
 import com.afwsamples.testdpc.common.Util;
+import com.afwsamples.testdpc.common.preference.CustomConstraint;
 import com.afwsamples.testdpc.common.preference.DpcPreference;
 import com.afwsamples.testdpc.common.preference.DpcPreferenceBase;
 import com.afwsamples.testdpc.common.preference.DpcPreferenceHelper;
@@ -304,6 +305,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String REQUEST_BUGREPORT_KEY = "request_bugreport";
     private static final String REQUEST_NETWORK_LOGS = "request_network_logs";
     private static final String REQUEST_SECURITY_LOGS = "request_security_logs";
+    private static final String REQUEST_PRE_REBOOT_SECURITY_LOGS =
+            "request_pre_reboot_security_logs";
     private static final String RESET_PASSWORD_KEY = "reset_password";
     private static final String LOCK_NOW_KEY = "lock_now";
     private static final String SET_ACCESSIBILITY_SERVICES_KEY = "set_accessibility_services";
@@ -406,6 +409,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private Preference mEphemeralUserPreference;
     private DpcPreference mRequestNetworkLogsPreference;
     private DpcPreference mRequestSecurityLogsPreference;
+    private DpcPreference mRequestPreRebootSecurityLogsPreference;
     private Preference mSetDeviceOrganizationNamePreference;
 
     private DpcSwitchPreference mAutoBrightnessPreference;
@@ -517,10 +521,14 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         mEnableSecurityLoggingPreference.setOnPreferenceChangeListener(this);
         mRequestSecurityLogsPreference = (DpcPreference) findPreference(REQUEST_SECURITY_LOGS);
         mRequestSecurityLogsPreference.setOnPreferenceClickListener(this);
-        mRequestSecurityLogsPreference.setCustomConstraint(
-                () -> isSecurityLoggingEnabled()
-                        ? NO_CUSTOM_CONSTRIANT
-                        : R.string.requires_security_logs);
+        final CustomConstraint securityLoggingChecker = () -> isSecurityLoggingEnabled()
+                ? NO_CUSTOM_CONSTRIANT
+                : R.string.requires_security_logs;
+        mRequestSecurityLogsPreference.setCustomConstraint(securityLoggingChecker);
+        mRequestPreRebootSecurityLogsPreference =
+                (DpcPreference) findPreference(REQUEST_PRE_REBOOT_SECURITY_LOGS);
+        mRequestPreRebootSecurityLogsPreference.setOnPreferenceClickListener(this);
+        mRequestPreRebootSecurityLogsPreference.setCustomConstraint(securityLoggingChecker);
         mEnableNetworkLoggingPreference = (SwitchPreference) findPreference(ENABLE_NETWORK_LOGGING);
         mEnableNetworkLoggingPreference.setOnPreferenceChangeListener(this);
         mRequestNetworkLogsPreference = (DpcPreference) findPreference(REQUEST_NETWORK_LOGS);
@@ -742,7 +750,10 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 showFragment(new NetworkLogsFragment());
                 return true;
             case REQUEST_SECURITY_LOGS:
-                showFragment(new SecurityLogsFragment());
+                showFragment(SecurityLogsFragment.newInstance(false /* preReboot */));
+                return true;
+            case REQUEST_PRE_REBOOT_SECURITY_LOGS:
+                showFragment(SecurityLogsFragment.newInstance(true /* preReboot */));
                 return true;
             case SET_ACCESSIBILITY_SERVICES_KEY:
                 // Avoid starting the same task twice.
@@ -2056,6 +2067,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 mDevicePolicyManager.isSecurityLoggingEnabled(mAdminComponentName);
             mEnableSecurityLoggingPreference.setChecked(securityLoggingEnabled);
             mRequestSecurityLogsPreference.refreshEnabledState();
+            mRequestPreRebootSecurityLogsPreference.refreshEnabledState();
         }
     }
 
