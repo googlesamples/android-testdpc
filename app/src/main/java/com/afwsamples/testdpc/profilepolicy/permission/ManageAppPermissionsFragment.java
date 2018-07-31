@@ -32,9 +32,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
+import android.widget.TextView;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
-import com.afwsamples.testdpc.common.BaseManageComponentFragment;
 import com.afwsamples.testdpc.common.ManageAppFragment;
 
 import java.util.ArrayList;
@@ -50,6 +50,7 @@ public class ManageAppPermissionsFragment extends ManageAppFragment {
 
     private DevicePolicyManager mDpm;
     private List<AppPermissionsArrayAdapter.AppPermission> mAppPermissions = new ArrayList<>();
+    private TextView mAppPermissionsView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -64,6 +65,8 @@ public class ManageAppPermissionsFragment extends ManageAppFragment {
         view.findViewById(R.id.load_default_button).setVisibility(View.GONE);
         view.findViewById(R.id.add_new_row).setVisibility(View.GONE);
         view.findViewById(R.id.manage_app_button_container).setVisibility(View.GONE);
+        mAppPermissionsView = view.findViewById(R.id.error_message);
+        mAppPermissionsView.setText(R.string.app_permissions_empty);
         return view;
     }
 
@@ -107,8 +110,7 @@ public class ManageAppPermissionsFragment extends ManageAppFragment {
                                 permissionState);
                 populatedPermissions.add(populatedPerm);
             }
-
-            loadAppPermissionsList(populatedPermissions);
+            displayAppPermissions(populatedPermissions);
         }
     }
 
@@ -129,12 +131,19 @@ public class ManageAppPermissionsFragment extends ManageAppFragment {
         return new AppPermissionsArrayAdapter(getActivity(), 0, mAppPermissions);
     }
 
-    private void loadAppPermissionsList(
-            List<AppPermissionsArrayAdapter.AppPermission> permissions) {
-        if (permissions != null) {
-            mAppPermissions.clear();
+    /**
+     * Displays the list of permissions for the selected app. If there are no permissions to
+     * be displayed, a text view displays a message about this.
+     */
+    private void displayAppPermissions(
+        List<AppPermissionsArrayAdapter.AppPermission> permissions) {
+        mAppPermissions.clear();
+        if (permissions.isEmpty()) {
+            mAppPermissionsView.setVisibility(View.VISIBLE);
+        } else {
+            mAppPermissionsView.setVisibility(View.GONE);
             mAppPermissions.addAll(permissions);
-            mAdapter.notifyDataSetChanged();
         }
+        mAdapter.notifyDataSetChanged();
     }
 }

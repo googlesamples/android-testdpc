@@ -81,8 +81,13 @@ public abstract class BaseManageComponentFragment<T> extends Fragment
         view.findViewById(R.id.reset_app).setOnClickListener(this);
         view.findViewById(R.id.add_new_row).setOnClickListener(this);
         view.findViewById(R.id.load_default_button).setOnClickListener(this);
-        onSpinnerItemSelected((T) mManagedAppsSpinner.getSelectedItem());
         return view;
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        onSpinnerItemSelected((T) mManagedAppsSpinner.getSelectedItem());
     }
 
     protected abstract SpinnerAdapter createSpinnerAdapter();

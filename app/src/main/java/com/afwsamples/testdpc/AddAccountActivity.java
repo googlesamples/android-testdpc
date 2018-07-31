@@ -70,7 +70,7 @@ public class AddAccountActivity extends Activity {
 
         setContentView(R.layout.activity_add_account);
         GlifLayout layout = findViewById(R.id.setup_wizard_layout);
-        layout.findViewById(R.id.next_button).setOnClickListener(this::onNavigateNext);
+        layout.findViewById(R.id.suw_navbar_next).setOnClickListener(this::onNavigateNext);
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {

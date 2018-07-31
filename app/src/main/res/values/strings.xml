@@ -23,8 +23,8 @@
     <string name="set_up_device_owner">Set up device owner</string>
     <string name="set_up_management_header">Set up management</string>
     <string name="setup_management_message">This app is currently not the owner of this device or
-        profile. Please select an option below and tap SET UP to set up appropriate management by this app.</string>
-    <string name="setup_management_message_for_do">This app is currently set as device owner. Please select the options below and tap SET UP to create a profile managed by the same app</string>
+        profile. Please select an option below and tap Next to set up appropriate management by this app.</string>
+    <string name="setup_management_message_for_do">This app is currently set as device owner. Please select the options below and tap Next to create a profile managed by the same app</string>
     <string name="provisioning_not_possible">TestDPC isn\'t currently allowed to be set up as the profile or device owner.</string>
     <string name="provisioning_not_possible_for_do">TestDPC isn\'t currently allowed to create a managed profile.</string>
     <string name="exit">Exit</string>
@@ -797,6 +797,8 @@
     <string name="permission_default">Let user decide</string>
     <string name="permission_deny">Deny</string>
     <string name="manage_app_permissions">Manage app permissions</string>
+    <!-- Message displayed when there are no apps permissions to show. -->
+    <string name="app_permissions_empty">There are no permissions to display for this app.</string>
 
     <!-- Keyguard features -->
     <string name="keyguard_features">Keyguard features</string>
@@ -804,6 +806,8 @@
     <string name="keyguard_disable_secure_notifications">Disable secure notifications</string>
     <string name="keyguard_disable_unredacted_notifications">Disable unredacted notifications</string>
     <string name="keyguard_disable_trust_agents">Disable trust agents</string>
+    <string name="keyguard_disable_face">Disable face unlock</string>
+    <string name="keyguard_disable_iris">Disable iris unlock</string>
     <string name="keyguard_disable_fingerprint">Disable fingerprint</string>
     <string name="keyguard_disable_remote_input">Disable text entry in secure keyguard screen</string>
 

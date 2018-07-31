@@ -50,6 +50,16 @@ limitations under the License.
             android:layout_alignParentRight="true"
             android:text="@string/plus" />
 
+    <TextView
+        android:id="@+id/error_message"
+        android:layout_below="@id/header_view"
+        android:layout_above="@+id/load_default_button"
+        android:visibility="gone"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:paddingTop="16dp"
+        android:paddingBottom="4dp" />
+
     <ListView
             android:id="@+id/app_list_view"
             android:layout_below="@id/header_view"
