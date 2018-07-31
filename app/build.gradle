@@ -11,7 +11,7 @@ ext {
 }
 
 android {
-    compileSdkVersion 'android-P'
+    compileSdkVersion 'android-28'
 
     defaultConfig {
         applicationId "com.afwsamples.testdpc"
