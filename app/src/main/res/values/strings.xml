@@ -437,6 +437,7 @@
     <string name="check_setting_disallow_install_unknown_sources">Ensure that
         \"Allow installs from unknown sources\" under Settings management is correctly checked.
     </string>
+    <string name="disallow_install_unknown_sources_globally">Disallow installs from unknown sources globally</string>
     <string name="check_setting_ok">Ok</string>
     <string name="disallow_modify_accounts">Disallow modify accounts</string>
     <string name="disallow_mount_physical_media">Disallow mount physical media</string>

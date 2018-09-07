@@ -53,6 +53,8 @@ public class UserRestriction {
     public static final String DISALLOW_UNIFIED_PASSWORD = "no_unified_password";
     public static final String DISALLOW_CONFIG_LOCATION = "no_config_location";
     public static final String DISALLOW_PRINTING= "no_printing";
+    public static final String DISALLOW_INSTALL_UNKNOWN_SOURCES_GLOBALLY =
+            "no_install_unknown_sources_globally";
 
     public String key;
     public int titleResId;
@@ -127,6 +129,8 @@ public class UserRestriction {
                     R.string.disallow_install_apps),
             new UserRestriction(DISALLOW_INSTALL_UNKNOWN_SOURCES,
                     R.string.disallow_install_unknown_sources),
+            new UserRestriction(DISALLOW_INSTALL_UNKNOWN_SOURCES_GLOBALLY,
+                    R.string.disallow_install_unknown_sources_globally),
             new UserRestriction(DISALLOW_MODIFY_ACCOUNTS, R
                     .string.disallow_modify_accounts),
             new UserRestriction(DISALLOW_MOUNT_PHYSICAL_MEDIA,
@@ -297,5 +301,9 @@ public class UserRestriction {
             DISALLOW_AMBIENT_DISPLAY,
             DISALLOW_SHARE_INTO_MANAGED_PROFILE,
             DISALLOW_PRINTING,
+    };
+
+    public static String[] QT_PLUS_RESTRICTIONS = {
+            DISALLOW_INSTALL_UNKNOWN_SOURCES_GLOBALLY,
     };
 }

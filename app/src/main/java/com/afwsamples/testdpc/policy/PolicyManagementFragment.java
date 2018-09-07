@@ -583,7 +583,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         mInstallNonMarketAppsPreference = (DpcSwitchPreference) findPreference(
                 INSTALL_NONMARKET_APPS_KEY);
         mInstallNonMarketAppsPreference.setCustomConstraint(
-                () -> mUserManager.hasUserRestriction(DISALLOW_INSTALL_UNKNOWN_SOURCES)
+                () -> (mUserManager.hasUserRestriction(DISALLOW_INSTALL_UNKNOWN_SOURCES) ||
+                    mUserManager.hasUserRestriction(
+                        UserRestriction.DISALLOW_INSTALL_UNKNOWN_SOURCES_GLOBALLY))
                         ? R.string.user_restricted
                         : NO_CUSTOM_CONSTRIANT);
         mInstallNonMarketAppsPreference.setOnPreferenceChangeListener(this);
@@ -1557,8 +1559,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
      * Update the preference switch for {@link Settings.Secure#INSTALL_NON_MARKET_APPS} setting.
      *
      * <p>
-     * If the user restriction {@link UserManager#DISALLOW_INSTALL_UNKNOWN_SOURCES} is set, then
-     * we disable this preference.
+     * If one of the user restrictions {@link UserManager#DISALLOW_INSTALL_UNKNOWN_SOURCES} or
+     * {@link DISALLOW_INSTALL_UNKNOWN_SOURCES_GLOBALLY} is set, then we disable this preference.
      * </p>
      */
     public void updateInstallNonMarketAppsPreference() {
