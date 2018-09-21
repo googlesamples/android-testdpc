@@ -1712,7 +1712,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 R.id.make_user_ephemeral_checkbox);
         final CheckBox leaveAllSystemAppsEnabled = (CheckBox) dialogView.findViewById(
                 R.id.leave_all_system_apps_enabled_checkbox);
-        if (!BuildCompat.isAtLeastP()) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
             makeUserEphemeralCheckBox.setEnabled(false);
             leaveAllSystemAppsEnabled.setEnabled(false);
         }
