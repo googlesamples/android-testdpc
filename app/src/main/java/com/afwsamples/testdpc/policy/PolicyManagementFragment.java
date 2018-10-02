@@ -16,6 +16,9 @@
 
 package com.afwsamples.testdpc.policy;
 
+import static android.os.UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES;
+import static com.afwsamples.testdpc.common.preference.DpcPreferenceHelper.NO_CUSTOM_CONSTRIANT;
+
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.accounts.Account;
 import android.accounts.AccountManager;
@@ -149,9 +152,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
-
-import static android.os.UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES;
-import static com.afwsamples.testdpc.common.preference.DpcPreferenceHelper.NO_CUSTOM_CONSTRIANT;
 
 /**
  * Provides several device management functions.
@@ -359,6 +359,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     private static final String SET_SCREEN_BRIGHTNESS_KEY = "set_screen_brightness";
     private static final String AUTO_BRIGHTNESS_KEY = "auto_brightness";
+    private static final String CROSS_PROFILE_CALENDAR_KEY = "cross_profile_calendar";
     private static final String SET_SCREEN_OFF_TIMEOUT_KEY = "set_screen_off_timeout";
 
     private static final String SET_TIME_KEY = "set_time";
@@ -610,6 +611,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(SET_TIME_ZONE_KEY).setOnPreferenceClickListener(this);
 
         findPreference(MANAGE_OVERRIDE_APN_KEY).setOnPreferenceClickListener(this);
+
+        findPreference(CROSS_PROFILE_CALENDAR_KEY).setOnPreferenceClickListener(this);
 
         DpcPreference bindDeviceAdminPreference =
                 (DpcPreference) findPreference(BIND_DEVICE_ADMIN_POLICIES);
@@ -1033,6 +1036,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 return true;
             case MANAGE_OVERRIDE_APN_KEY:
                 showFragment(new OverrideApnFragment());
+                return true;
+            case CROSS_PROFILE_CALENDAR_KEY:
+                showFragment(new CrossProfileCalendarFragment());
                 return true;
         }
         return false;
