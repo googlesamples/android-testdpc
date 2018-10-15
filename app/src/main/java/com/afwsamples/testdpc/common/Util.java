@@ -27,6 +27,7 @@ import android.content.IntentFilter;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.UserHandle;
@@ -151,6 +152,12 @@ public class Util {
 
     public static boolean isAtLeastM() {
         return Build.VERSION.SDK_INT >= VERSION_CODES.M;
+    }
+
+    public static boolean isAtLeastQ() {
+        return VERSION.CODENAME.length() == 1
+            && VERSION.CODENAME.charAt(0) >= 'Q'
+            && VERSION.CODENAME.charAt(0) <= 'Z';
     }
 
     @TargetApi(VERSION_CODES.O)

@@ -22,7 +22,6 @@ import android.content.res.TypedArray;
 import android.os.Build;
 import android.support.annotation.IntDef;
 import android.support.annotation.StringRes;
-import android.support.v4.os.BuildCompat;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceViewHolder;
 import android.text.TextUtils;
@@ -93,6 +92,10 @@ public class DpcPreferenceHelper {
      *         not yet assigned.
      */
     private int getDeviceSdkInt() {
+        // TODO(b/117767701): Remove this when Q version code is finalized.
+        if (Util.isAtLeastQ()) {
+            return Build.VERSION_CODES.CUR_DEVELOPMENT;
+        }
         return Build.VERSION.SDK_INT;
     }
 
