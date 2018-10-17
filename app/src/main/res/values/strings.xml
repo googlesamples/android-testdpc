@@ -62,7 +62,7 @@
     <string name="fail_to_add_account">Failed to add account</string>
     <string name="remove_account">Remove account</string>
     <string name="success_remove_account">Account removed: %s</string>
-    <string name="fail_to_remove_account">Failed to add account: %s</string>
+    <string name="fail_to_remove_account">Failed to remove account: %s</string>
     <string name="no_accounts_available">No accounts available.</string>
     <string name="icon">Icon</string>
     <string name="manage_apps">Manage applications</string>
