@@ -55,6 +55,8 @@ public class UserRestriction {
     public static final String DISALLOW_PRINTING= "no_printing";
     public static final String DISALLOW_INSTALL_UNKNOWN_SOURCES_GLOBALLY =
             "no_install_unknown_sources_globally";
+    public static final String DISALLOW_CONFIG_PRIVATE_DNS =
+            "disallow_config_private_dns";
 
     public String key;
     public int titleResId;
@@ -206,6 +208,9 @@ public class UserRestriction {
             new UserRestriction(
                     DISALLOW_PRINTING,
                     R.string.disallow_printing),
+            new UserRestriction(
+                    DISALLOW_CONFIG_PRIVATE_DNS,
+                    R.string.disallow_config_private_dns),
     };
 
     /**
@@ -234,7 +239,8 @@ public class UserRestriction {
             DISALLOW_SMS,
             DISALLOW_UNMUTE_MICROPHONE,
             DISALLOW_USB_FILE_TRANSFER,
-            DISALLOW_AIRPLANE_MODE
+            DISALLOW_AIRPLANE_MODE,
+            DISALLOW_CONFIG_PRIVATE_DNS,
     };
 
     /**
@@ -305,5 +311,6 @@ public class UserRestriction {
 
     public static String[] QT_PLUS_RESTRICTIONS = {
             DISALLOW_INSTALL_UNKNOWN_SOURCES_GLOBALLY,
+            DISALLOW_CONFIG_PRIVATE_DNS,
     };
 }
