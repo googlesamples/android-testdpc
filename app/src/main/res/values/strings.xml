@@ -754,6 +754,14 @@
     <string name="no_host">No host specified.</string>
     <string name="no_port">No port specified.</string>
     <string name="port_out_of_range">Port out of range.</string>
+    <string name="set_global_private_dns">Set Private DNS Mode</string>
+    <string name="current_private_dns_mode">Current Mode</string>
+    <string name="private_dns_mode_off">Off</string>
+    <string name="private_dns_mode_automatic">Automatic</string>
+    <string name="private_dns_mode_specific_host">Specified Host</string>
+    <string name="private_dns_mode_unknown">Unknown</string>
+    <string name="private_dns_mode_apply">Set</string>
+    <string name="setting_private_dns_succeess">Success setting Private DNS</string>
 
     <!--  Strings for data usage -->
     <string name="data_usage">Data usage</string>

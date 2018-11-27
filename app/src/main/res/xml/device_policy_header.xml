@@ -395,6 +395,11 @@
             android:title="@string/clear_global_http_proxy"
             testdpc:admin="deviceOwner"
             testdpc:minSdkVersion="L" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="set_private_dns_mode"
+            android:title="@string/set_global_private_dns"
+            testdpc:admin="deviceOwner"
+            testdpc:minSdkVersion="Q" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/permission_management">

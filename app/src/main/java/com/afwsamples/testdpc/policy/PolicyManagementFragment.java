@@ -108,6 +108,7 @@ import com.afwsamples.testdpc.policy.locktask.LockTaskAppInfoArrayAdapter;
 import com.afwsamples.testdpc.policy.locktask.SetLockTaskFeaturesFragment;
 import com.afwsamples.testdpc.policy.networking.AlwaysOnVpnFragment;
 import com.afwsamples.testdpc.policy.networking.NetworkUsageStatsFragment;
+import com.afwsamples.testdpc.policy.networking.PrivateDnsModeFragment;
 import com.afwsamples.testdpc.policy.resetpassword.ResetPasswordWithTokenFragment;
 import com.afwsamples.testdpc.policy.systemupdatepolicy.SystemUpdatePolicyFragment;
 import com.afwsamples.testdpc.policy.wifimanagement.WifiConfigCreationDialog;
@@ -365,6 +366,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     private static final String MANAGE_OVERRIDE_APN_KEY = "manage_override_apn";
 
+    private static final String SET_PRIVATE_DNS_MODE_KEY = "set_private_dns_mode";
+
     private static final String BATTERY_PLUGGED_ANY = Integer.toString(
             BatteryManager.BATTERY_PLUGGED_AC |
             BatteryManager.BATTERY_PLUGGED_USB |
@@ -492,6 +495,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(SET_ALWAYS_ON_VPN_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_GLOBAL_HTTP_PROXY_KEY).setOnPreferenceClickListener(this);
         findPreference(CLEAR_GLOBAL_HTTP_PROXY_KEY).setOnPreferenceClickListener(this);
+        findPreference(SET_PRIVATE_DNS_MODE_KEY).setOnPreferenceClickListener(this);
         findPreference(NETWORK_STATS_KEY).setOnPreferenceClickListener(this);
         findPreference(DELEGATED_CERT_INSTALLER_KEY).setOnPreferenceClickListener(this);
         mDisableStatusBarPreference = (DpcPreference) findPreference(DISABLE_STATUS_BAR);
@@ -928,6 +932,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             case CLEAR_GLOBAL_HTTP_PROXY_KEY:
                 mDevicePolicyManager.setRecommendedGlobalProxy(mAdminComponentName,
                         null /* proxyInfo */);
+                return true;
+            case SET_PRIVATE_DNS_MODE_KEY:
+                showFragment(new PrivateDnsModeFragment());
                 return true;
             case NETWORK_STATS_KEY:
                 showFragment(new NetworkUsageStatsFragment());
