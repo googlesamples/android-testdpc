@@ -114,6 +114,15 @@
             </intent-filter>
         </receiver>
 
+        <receiver
+                android:name=".DelegatedAdminReceiver"
+                android:permission="android.permission.BIND_DEVICE_ADMIN">
+            <intent-filter>
+                <action android:name="android.app.action.CHOOSE_PRIVATE_KEY_ALIAS"/>
+                <action android:name="android.app.action.NETWORK_LOGS_AVAILABLE"/>
+            </intent-filter>
+        </receiver>
+
         <receiver android:name=".BootReceiver"
             android:exported="false">
             <intent-filter>

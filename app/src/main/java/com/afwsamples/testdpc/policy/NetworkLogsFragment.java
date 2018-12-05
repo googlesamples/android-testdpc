@@ -16,7 +16,7 @@
 
 package com.afwsamples.testdpc.policy;
 
-import static com.afwsamples.testdpc.DeviceAdminReceiver.NETWORK_LOGS_FILE_PREFIX;
+import static com.afwsamples.testdpc.CommonReceiverOperations.NETWORK_LOGS_FILE_PREFIX;
 
 import android.annotation.TargetApi;
 import android.app.ListFragment;
@@ -33,7 +33,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.regex.PatternSyntaxException;
 
