@@ -259,4 +259,13 @@ public class Util {
         return (DevicePolicyManager)context.getSystemService(Service.DEVICE_POLICY_SERVICE);
     }
 
+    public static boolean hasDelegation(Context context, String delegation) {
+        if (Build.VERSION.SDK_INT < VERSION_CODES.O) {
+            return false;
+        }
+        DevicePolicyManager dpm = context.getSystemService(DevicePolicyManager.class);
+        return dpm.getDelegatedScopes(null, context.getPackageName()).contains(delegation);
+    }
+
+
 }

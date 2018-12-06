@@ -68,14 +68,15 @@ public class GenerateKeyAndCertificateTask extends AsyncTask<Void, Integer, Atte
             byte[] attestationChallenge,
             int idAttestationFlags,
             boolean useStrongBox,
-            Activity activity) {
+            Activity activity,
+            ComponentName admin) {
         mAlias = alias;
         mIsUserSelectable = isUserSelectable;
         mAttestationChallenge = attestationChallenge;
         mIdAttestationFlags = idAttestationFlags;
         mUseStrongBox = useStrongBox;
         mActivity = activity;
-        mAdminComponentName = DeviceAdminReceiver.getComponentName(activity);
+        mAdminComponentName = admin;
         mDevicePolicyManager =
                 (DevicePolicyManager) activity.getSystemService(Context.DEVICE_POLICY_SERVICE);
     }

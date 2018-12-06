@@ -427,7 +427,11 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        mAdminComponentName = DeviceAdminReceiver.getComponentName(getActivity());
+        if (isDelegatedApp()) {
+            mAdminComponentName = null;
+        } else {
+            mAdminComponentName = DeviceAdminReceiver.getComponentName(getActivity());
+        }
         mDevicePolicyManager = (DevicePolicyManager) getActivity().getSystemService(
                 Context.DEVICE_POLICY_SERVICE);
         mUserManager = (UserManager) getActivity().getSystemService(Context.USER_SERVICE);
@@ -665,6 +669,14 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                         .setAdminConstraint(DpcPreferenceHelper.ADMIN_DEVICE_OWNER);
             }
         }
+    }
+
+    private boolean isDelegatedApp() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            return false;
+        }
+        DevicePolicyManager dpm = getActivity().getSystemService(DevicePolicyManager.class);
+        return !dpm.getDelegatedScopes(null, getActivity().getPackageName()).isEmpty();
     }
 
     @Override
@@ -1287,7 +1299,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                                  boolean useStrongBox) {
         new GenerateKeyAndCertificateTask(
                 alias, isUserSelectable, attestationChallenge, idAttestationFlags,
-                useStrongBox, getActivity()).execute();
+                useStrongBox, getActivity(), mAdminComponentName).execute();
     }
 
     /**
@@ -1952,6 +1964,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             appStatusStringId = R.string.this_is_a_profile_owner;
         } else if (mDevicePolicyManager.isDeviceOwnerApp(mPackageName)) {
             appStatusStringId = R.string.this_is_a_device_owner;
+        } else if (isDelegatedApp()) {
+            appStatusStringId = R.string.this_is_a_delegated_app;
         } else {
             appStatusStringId = R.string.this_is_not_an_admin;
         }
@@ -2521,7 +2535,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
         final BlockUninstallationInfoArrayAdapter blockUninstallationInfoArrayAdapter
                 = new BlockUninstallationInfoArrayAdapter(getActivity(), R.id.pkg_name,
-                resolveInfoList);
+                resolveInfoList, mAdminComponentName);
         ListView listview = new ListView(getActivity());
         listview.setAdapter(blockUninstallationInfoArrayAdapter);
         listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {

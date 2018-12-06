@@ -114,6 +114,7 @@
 
     <string name="this_is_a_device_owner">This app is the device owner.</string>
     <string name="this_is_a_profile_owner">This app is a profile owner.</string>
+    <string name="this_is_a_delegated_app">This app has delegated permissions.</string>
     <string name="this_is_not_an_admin">This app is not an admin.</string>
 
     <!-- Strings for provisioning disclaimers-->

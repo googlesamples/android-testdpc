@@ -96,35 +96,43 @@
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="enable_system_apps"
             android:title="@string/enable_system_apps_title"
-            testdpc:minSdkVersion="L" />
+            testdpc:minSdkVersion="L"
+            testdpc:delegation="delegation-enable-system-app" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="enable_system_apps_by_package_name"
             android:title="@string/enable_system_apps_by_package_name"
-            testdpc:minSdkVersion="L" />
+            testdpc:minSdkVersion="L"
+            testdpc:delegation="delegation-enable-system-app" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="enable_system_apps_by_intent"
             android:title="@string/enable_system_apps_by_intent"
-            testdpc:minSdkVersion="L" />
+            testdpc:minSdkVersion="L"
+            testdpc:delegation="delegation-enable-system-app" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="install_existing_packages"
             android:title="@string/install_existing_packages_title"
-            testdpc:minSdkVersion="P" />
+            testdpc:minSdkVersion="P"
+            testdpc:delegation="delegation-install-existing-package" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="hide_apps"
             android:title="@string/hide_apps_title"
-            testdpc:minSdkVersion="L" />
+            testdpc:minSdkVersion="L"
+            testdpc:delegation="delegation-package-access" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="unhide_apps"
             android:title="@string/unhide_apps_title"
-            testdpc:minSdkVersion="L" />
+            testdpc:minSdkVersion="L"
+            testdpc:delegation="delegation-package-access" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="suspend_apps"
             android:title="@string/suspend_apps_title"
-            testdpc:minSdkVersion="N" />
+            testdpc:minSdkVersion="N"
+            testdpc:delegation="delegation-package-access" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="unsuspend_apps"
             android:title="@string/unsuspend_apps_title"
-            testdpc:minSdkVersion="N" />
+            testdpc:minSdkVersion="N"
+            testdpc:delegation="delegation-package-access" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="clear_app_data"
             android:title="@string/clear_app_data_title"
@@ -133,11 +141,13 @@
             android:key="keep_uninstalled_packages"
             android:title="@string/keep_uninstalled_packages"
             testdpc:admin="deviceOwner"
+            testdpc:delegation="delegation-keep-uninstalled-packages"
             testdpc:minSdkVersion="P" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="manage_app_restrictions"
             android:title="@string/manage_app_restrictions"
-            testdpc:minSdkVersion="L" />
+            testdpc:minSdkVersion="L"
+            testdpc:delegation="delegation-app-restrictions" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="disable_metered_data"
             android:title="@string/metered_data_restriction"
@@ -159,7 +169,7 @@
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="generic_delegation"
             android:title="@string/generic_delegation"
-            testdpc:admin="deviceOwner|profileOwner"
+            testdpc:admin="none"
             testdpc:minSdkVersion="O" />
     </PreferenceCategory>
 
@@ -167,11 +177,13 @@
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="block_uninstallation_by_pkg"
             android:title="@string/block_uninstallation_by_pkg"
-            testdpc:minSdkVersion="L" />
+            testdpc:minSdkVersion="L"
+            testdpc:delegation="delegation-block-uninstall" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="block_uninstallation_list"
             android:title="@string/block_uninstallation_list"
-            testdpc:minSdkVersion="L" />
+            testdpc:minSdkVersion="L"
+            testdpc:delegation="delegation-block-uninstall" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/camera_title">
@@ -204,11 +216,13 @@
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="install_key_certificate"
             android:title="@string/install_key_certificate"
-            testdpc:minSdkVersion="L" />
+            testdpc:minSdkVersion="L"
+            testdpc:delegation="delegation-cert-install" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="remove_key_certificate"
             android:title="@string/remove_key_certificate"
-            testdpc:minSdkVersion="N" />
+            testdpc:minSdkVersion="N"
+            testdpc:delegation="delegation-cert-install" />
         <com.afwsamples.testdpc.common.preference.DpcEditTextPreference
             android:key="override_key_selection"
             android:title="@string/key_override_alias"
@@ -216,23 +230,28 @@
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="generate_key_and_certificate"
             android:title="@string/generate_key_and_certificate"
-            testdpc:minSdkVersion="P" />
+            testdpc:minSdkVersion="P"
+            testdpc:delegation="delegation-cert-install" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="test_key_usability"
             android:title="@string/test_key_usage"
-            testdpc:minSdkVersion="L" />
+            testdpc:minSdkVersion="L"
+            testdpc:admin="none" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="install_ca_certificate"
             android:title="@string/install_ca_certificate"
-            testdpc:minSdkVersion="L" />
+            testdpc:minSdkVersion="L"
+            testdpc:delegation="delegation-cert-install" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="get_ca_certificates"
             android:title="@string/get_ca_certificates"
-            testdpc:minSdkVersion="L" />
+            testdpc:minSdkVersion="L"
+            testdpc:delegation="delegation-cert-install" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="remove_all_ca_certificates"
             android:title="@string/remove_all_ca_certificates"
-            testdpc:minSdkVersion="L" />
+            testdpc:minSdkVersion="L"
+            testdpc:delegation="delegation-cert-install" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/wifi_management_title">
@@ -406,11 +425,13 @@
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="set_permission_policy"
             android:title="@string/set_default_permission_policy"
-            testdpc:minSdkVersion="M" />
+            testdpc:minSdkVersion="M"
+            testdpc:delegation="delegation-permission-grant" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="manage_app_permissions"
             android:title="@string/manage_app_permissions"
-            testdpc:minSdkVersion="M" />
+            testdpc:minSdkVersion="M"
+            testdpc:delegation="delegation-permission-grant" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/single_use_devices">
