@@ -36,6 +36,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afwsamples.testdpc.common.PackageInstallationUtils;
 import com.android.setupwizardlib.SetupWizardLayout;
 import com.android.setupwizardlib.view.NavigationBar;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
@@ -99,7 +100,8 @@ public class EnableCosuActivity extends Activity {
         // register the download and install receiver
         registerReceiver(mDownloadReceiver, new IntentFilter(
                 DownloadManager.ACTION_DOWNLOAD_COMPLETE));
-        registerReceiver(mInstallReceiver, new IntentFilter(CosuUtils.ACTION_INSTALL_COMPLETE));
+        registerReceiver(mInstallReceiver, new IntentFilter(
+                PackageInstallationUtils.ACTION_INSTALL_COMPLETE));
 
         // download the config file
         String configDownloadLocation = (String) persistableBundle.get(BUNDLE_KEY_COSU_CONFIG);
@@ -267,7 +269,7 @@ public class EnableCosuActivity extends Activity {
     private BroadcastReceiver mInstallReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (!CosuUtils.ACTION_INSTALL_COMPLETE.equals(intent.getAction())) {
+            if (!PackageInstallationUtils.ACTION_INSTALL_COMPLETE.equals(intent.getAction())) {
                 return;
             }
 

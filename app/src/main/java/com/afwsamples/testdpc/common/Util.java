@@ -170,14 +170,13 @@ public class Util {
         return dpm.getBindDeviceAdminTargetUsers(DeviceAdminReceiver.getComponentName(context));
     }
 
-    public static void showFileViewerForImportingCertificate(PreferenceFragment fragment,
-            int requestCode) {
+    public static void showFileViewer(PreferenceFragment fragment, int requestCode) {
         Intent certIntent = new Intent(Intent.ACTION_GET_CONTENT);
         certIntent.setTypeAndNormalize("*/*");
         try {
             fragment.startActivityForResult(certIntent, requestCode);
         } catch (ActivityNotFoundException e) {
-            Log.e(TAG, "showFileViewerForImportingCertificate: ", e);
+            Log.e(TAG, "showFileViewer: ", e);
         }
     }
 

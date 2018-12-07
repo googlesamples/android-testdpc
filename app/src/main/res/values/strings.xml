@@ -346,6 +346,8 @@
     <string name="no_uninstalled_apps">All cached apps have been installed.</string>
     <string name="enable">Enable</string>
     <string name="invalid_system_apps_action">Invalid action</string>
+    <string name="install_apk_package_title">Install package from APK file</string>
+    <string name="uninstall_packages_title">Uninstall package</string>
     <string name="hide_apps_title">Hide apps</string>
     <string name="hide_apps_empty">All apps are hidden.</string>
     <string name="hide_apps_success">%s is now hidden.</string>

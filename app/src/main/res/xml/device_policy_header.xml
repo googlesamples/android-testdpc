@@ -114,6 +114,18 @@
             testdpc:minSdkVersion="P"
             testdpc:delegation="delegation-install-existing-package" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="install_apk_package"
+            android:title="@string/install_apk_package_title"
+            testdpc:minSdkVersion="M"
+            testdpc:admin="deviceOwner"
+            testdpc:delegation="delegation-package-installation" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="uninstall_package"
+            android:title="@string/uninstall_packages_title"
+            testdpc:minSdkVersion="M"
+            testdpc:admin="deviceOwner"
+            testdpc:delegation="delegation-package-installation" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="hide_apps"
             android:title="@string/hide_apps_title"
             testdpc:minSdkVersion="L"

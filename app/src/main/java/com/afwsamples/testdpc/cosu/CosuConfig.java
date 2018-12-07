@@ -27,6 +27,8 @@ import android.os.ParcelFileDescriptor;
 import android.util.Log;
 import android.util.Xml;
 
+import com.afwsamples.testdpc.common.PackageInstallationUtils;
+
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -203,7 +205,7 @@ import java.util.Set;
                 try {
                     ParcelFileDescriptor pfd = mDownloadManager.openDownloadedFile(id);
                     InputStream in = new FileInputStream(pfd.getFileDescriptor());
-                    CosuUtils.installPackage(mContext, in, ai.packageName);
+                    PackageInstallationUtils.installPackage(mContext, in, ai.packageName);
                 } catch (IOException e) {
                     Log.e(CosuUtils.TAG, "Error installing package: " + ai.packageName, e);
                     // We are still marking the package as "installed", just so we don't block the

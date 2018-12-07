@@ -97,6 +97,7 @@ import com.afwsamples.testdpc.common.preference.DpcPreferenceBase;
 import com.afwsamples.testdpc.common.preference.DpcPreferenceHelper;
 import com.afwsamples.testdpc.common.preference.DpcSwitchPreference;
 import com.afwsamples.testdpc.comp.BindDeviceAdminFragment;
+import com.afwsamples.testdpc.common.PackageInstallationUtils;
 import com.afwsamples.testdpc.policy.blockuninstallation.BlockUninstallationInfoArrayAdapter;
 import com.afwsamples.testdpc.policy.certificate.DelegatedCertInstallerFragment;
 import com.afwsamples.testdpc.policy.keyguard.LockScreenPolicyFragment;
@@ -233,6 +234,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final int INSTALL_CA_CERTIFICATE_REQUEST_CODE = 7690;
     private static final int CAPTURE_IMAGE_REQUEST_CODE = 7691;
     private static final int CAPTURE_VIDEO_REQUEST_CODE = 7692;
+    private static final int INSTALL_APK_PACKAGE_REQUEST_CODE = 7693;
 
     public static final String X509_CERT_TYPE = "X.509";
     public static final String TAG = "PolicyManagement";
@@ -268,6 +270,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             = "enable_system_apps_by_package_name";
     private static final String ENABLE_SYSTEM_APPS_KEY = "enable_system_apps";
     private static final String INSTALL_EXISTING_PACKAGE_KEY = "install_existing_packages";
+    private static final String INSTALL_APK_PACKAGE_KEY = "install_apk_package";
+    private static final String UNINSTALL_PACKAGE_KEY = "uninstall_package";
     private static final String GENERATE_KEY_CERTIFICATE_KEY = "generate_key_and_certificate";
     private static final String GET_CA_CERTIFICATES_KEY = "get_ca_certificates";
     private static final String GET_DISABLE_ACCOUNT_MANAGEMENT_KEY
@@ -562,6 +566,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 (DpcPreference) findPreference(INSTALL_EXISTING_PACKAGE_KEY);
         mInstallExistingPackagePreference.setOnPreferenceClickListener(this);
         mInstallExistingPackagePreference.setCustomConstraint(this::validateAffiliatedUserAfterP);
+        findPreference(INSTALL_APK_PACKAGE_KEY).setOnPreferenceClickListener(this);
+        findPreference(UNINSTALL_PACKAGE_KEY).setOnPreferenceClickListener(this);
         findPreference(HIDE_APPS_KEY).setOnPreferenceClickListener(this);
         findPreference(UNHIDE_APPS_KEY).setOnPreferenceClickListener(this);
         findPreference(SUSPEND_APPS_KEY).setOnPreferenceClickListener(this);
@@ -859,6 +865,12 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             case INSTALL_EXISTING_PACKAGE_KEY:
                 showInstallExistingPackagePrompt();
                 return true;
+            case INSTALL_APK_PACKAGE_KEY:
+                Util.showFileViewer(this, INSTALL_APK_PACKAGE_REQUEST_CODE);
+                return true;
+            case UNINSTALL_PACKAGE_KEY:
+                showUninstallPackagePrompt();
+                return true;
             case HIDE_APPS_KEY:
                 showHideAppsPrompt(false);
                 return true;
@@ -896,7 +908,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 showFragment(new ManageAppPermissionsFragment());
                 return true;
             case INSTALL_KEY_CERTIFICATE_KEY:
-                Util.showFileViewerForImportingCertificate(this,
+                Util.showFileViewer(this,
                         INSTALL_KEY_CERTIFICATE_REQUEST_CODE);
                 return true;
             case REMOVE_KEY_CERTIFICATE_KEY:
@@ -909,7 +921,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 testKeyCanBeUsedForSigning();
                 return true;
             case INSTALL_CA_CERTIFICATE_KEY:
-                Util.showFileViewerForImportingCertificate(this,
+                Util.showFileViewer(this,
                         INSTALL_CA_CERTIFICATE_REQUEST_CODE);
                 return true;
             case GET_CA_CERTIFICATES_KEY:
@@ -2444,6 +2456,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                     showFragment(MediaDisplayFragment.newInstance(
                             MediaDisplayFragment.REQUEST_DISPLAY_VIDEO, mVideoUri));
                     break;
+                case INSTALL_APK_PACKAGE_REQUEST_CODE:
+                    installApkPackageFromIntent(data);
             }
         }
     }
@@ -2623,6 +2637,45 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                     dialog.dismiss();
                 })
                 .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    @TargetApi(23)
+    private void installApkPackageFromIntent(Intent intent) {
+        if (getActivity() == null || getActivity().isFinishing()) {
+            return;
+        }
+        Uri data;
+        if (intent != null && (data = intent.getData()) != null) {
+            try {
+                InputStream inputStream = getActivity().getContentResolver().openInputStream(data);
+                PackageInstallationUtils.installPackage(getActivity(), inputStream, null);
+            } catch (IOException e) {
+                showToast("Failed to open APK file");
+                Log.e(TAG, "Failed to open APK file", e);
+            }
+        }
+    }
+
+    @TargetApi(23)
+    private void showUninstallPackagePrompt() {
+        final List<String> installedApps = new ArrayList<>();
+        for (ResolveInfo res : getAllLauncherIntentResolversSorted()) {
+            if (!installedApps.contains(res.activityInfo.packageName)) { // O(N^2) but not critical
+                installedApps.add(res.activityInfo.packageName);
+            }
+        }
+        AppInfoArrayAdapter appInfoArrayAdapter = new AppInfoArrayAdapter(getActivity(),
+                R.id.pkg_name, installedApps, true);
+        new AlertDialog.Builder(getActivity())
+                .setTitle(getString(R.string.uninstall_packages_title))
+                .setAdapter(appInfoArrayAdapter, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int position) {
+                        String packageName = installedApps.get(position);
+                        PackageInstallationUtils.uninstallPackage(getContext(), packageName);
+                    }
+                })
                 .show();
     }
 
