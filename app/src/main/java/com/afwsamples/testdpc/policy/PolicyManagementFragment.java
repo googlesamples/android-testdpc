@@ -1280,16 +1280,22 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     @TargetApi(28)
     private boolean installKeyPair(final PrivateKey key, final Certificate cert, final String alias,
                                    boolean isUserSelectable) {
-        if (BuildCompat.isAtLeastP()) {
-            return mDevicePolicyManager.installKeyPair(
-                    mAdminComponentName, key, new Certificate[]{cert}, alias,
-                    isUserSelectable ? DevicePolicyManager.INSTALLKEY_SET_USER_SELECTABLE : 0);
-        } else {
-            if (!isUserSelectable) {
-                throw new IllegalArgumentException(
-                        "Cannot set key as non-user-selectable prior to P");
+        try {
+            if (BuildCompat.isAtLeastP()) {
+
+                return mDevicePolicyManager.installKeyPair(
+                        mAdminComponentName, key, new Certificate[]{cert}, alias,
+                        isUserSelectable ? DevicePolicyManager.INSTALLKEY_SET_USER_SELECTABLE : 0);
+            } else {
+                if (!isUserSelectable) {
+                    throw new IllegalArgumentException(
+                            "Cannot set key as non-user-selectable prior to P");
+                }
+                return mDevicePolicyManager.installKeyPair(mAdminComponentName, key, cert, alias);
             }
-            return mDevicePolicyManager.installKeyPair(mAdminComponentName, key, cert, alias);
+        } catch (SecurityException e) {
+            Log.w(TAG, "Not allowed to install keys", e);
+            return false;
         }
     }
 

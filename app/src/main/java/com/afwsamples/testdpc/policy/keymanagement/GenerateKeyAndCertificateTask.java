@@ -127,6 +127,8 @@ public class GenerateKeyAndCertificateTask extends AsyncTask<Void, Integer, Atte
             Log.e(TAG, "Failed to create certificate", e);
         } catch (StrongBoxUnavailableException e) {
             Log.e(TAG, "StrongBox unavailable", e);
+        } catch (SecurityException e) {
+            Log.e(TAG, "Not permitted to generate key", e);
         }
 
         return null;
@@ -150,7 +152,7 @@ public class GenerateKeyAndCertificateTask extends AsyncTask<Void, Integer, Atte
         Toast.makeText(
                 mActivity,
                 mActivity.getResources().getString(msgId) + " " + extra,
-                Toast.LENGTH_SHORT);
+                Toast.LENGTH_SHORT).show();
     }
 
     @TargetApi(28)
