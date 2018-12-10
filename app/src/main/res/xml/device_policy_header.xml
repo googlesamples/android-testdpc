@@ -225,12 +225,13 @@
             android:key="install_key_certificate"
             android:title="@string/install_key_certificate"
             testdpc:minSdkVersion="L"
+            testdpc:admin="any"
             testdpc:delegation="delegation-cert-install" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="remove_key_certificate"
             android:title="@string/remove_key_certificate"
             testdpc:minSdkVersion="N"
-            testdpc:delegation="delegation-cert-install" />
+            testdpc:admin="any" />
         <com.afwsamples.testdpc.common.preference.DpcEditTextPreference
             android:key="override_key_selection"
             android:title="@string/key_override_alias"
@@ -239,7 +240,7 @@
             android:key="generate_key_and_certificate"
             android:title="@string/generate_key_and_certificate"
             testdpc:minSdkVersion="P"
-            testdpc:delegation="delegation-cert-install" />
+            testdpc:admin="any" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="test_key_usability"
             android:title="@string/test_key_usage"
