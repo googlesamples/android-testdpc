@@ -72,6 +72,14 @@
             testdpc:minSdkVersion="P" />
     </PreferenceCategory>
 
+    <PreferenceCategory android:title="@string/cross_profile_calendar">
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="cross_profile_calendar"
+            android:title="@string/cross_profile_calendar"
+            testdpc:admin="any"
+            testdpc:minSdkVersion="Q" />
+    </PreferenceCategory>
+
     <PreferenceCategory android:title="@string/account_management_title">
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="set_disable_account_management"
