@@ -85,7 +85,7 @@ public class BindDeviceAdminFragment extends BaseSearchablePolicyPreferenceFragm
                 KEY_INSTALL_CA_CERTIFICATE);
         mInstallCaCertificatePreference.setOnPreferenceClickListener(
                 preference -> {
-                    Util.showFileViewerForImportingCertificate(this,
+                    Util.showFileViewer(this,
                             INSTALL_CA_CERTIFICATE_REQUEST_CODE);
                     return true;
                 }
