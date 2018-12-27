@@ -17,6 +17,10 @@
 package com.afwsamples.testdpc.policy;
 
 import static android.os.UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES;
+import static com.afwsamples.testdpc.common.ReflectionUtil.intConstant;
+import static com.afwsamples.testdpc.common.ReflectionUtil.invoke;
+import static com.afwsamples.testdpc.common.ReflectionUtil.stringConstant;
+import static com.afwsamples.testdpc.common.Util.isAtLeastQ;
 import static com.afwsamples.testdpc.common.preference.DpcPreferenceHelper.NO_CUSTOM_CONSTRIANT;
 
 import android.accessibilityservice.AccessibilityServiceInfo;
@@ -62,11 +66,13 @@ import android.support.v14.preference.SwitchPreference;
 import android.support.v4.content.FileProvider;
 import android.support.v4.os.BuildCompat;
 import android.support.v7.preference.EditTextPreference;
+import android.support.v7.preference.ListPreference;
 import android.support.v7.preference.Preference;
 import android.telephony.TelephonyManager;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.SparseIntArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.accessibility.AccessibilityManager;
@@ -93,6 +99,7 @@ import com.afwsamples.testdpc.common.BaseSearchablePolicyPreferenceFragment;
 import com.afwsamples.testdpc.common.CertificateUtil;
 import com.afwsamples.testdpc.common.MediaDisplayFragment;
 import com.afwsamples.testdpc.common.PackageInstallationUtils;
+import com.afwsamples.testdpc.common.ReflectionUtil.ReflectionIsTemporaryException;
 import com.afwsamples.testdpc.common.UserArrayAdapter;
 import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.common.preference.CustomConstraint;
@@ -220,6 +227,9 @@ import java.util.stream.Collectors;
  * <li> {@link DevicePolicyManager#setLongSupportMessage(ComponentName, CharSequence)} </li>
  * <li> {@link UserManager#DISALLOW_CONFIG_WIFI} </li>
  * <li> {@link DevicePolicyManager#installExistingPackage(ComponentName, String)} </li>
+ * <li> {@link DevicePolicyManager#getPasswordComplexity()}
+ * <li> {@link DevicePolicyManager#ACTION_SET_NEW_PASSWORD}
+ * <li> {@link DevicePolicyManager#EXTRA_PASSWORD_COMPLEXITY}
  * </ul>
  */
 public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFragment implements
@@ -255,6 +265,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String APP_STATUS_KEY = "app_status";
     private static final String SECURITY_PATCH_KEY = "security_patch";
     private static final String PASSWORD_COMPLIANT_KEY = "password_compliant";
+    private static final String PASSWORD_COMPLEXITY_KEY = "password_complexity";
     private static final String SEPARATE_CHALLENGE_KEY = "separate_challenge";
     private static final String DISABLE_CAMERA_KEY = "disable_camera";
     private static final String DISABLE_KEYGUARD = "disable_keyguard";
@@ -356,6 +367,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String WIFI_CONFIG_LOCKDOWN_OFF = "0";
     private static final String SECURITY_PATCH_FORMAT = "yyyy-MM-dd";
     private static final String SET_NEW_PASSWORD = "set_new_password";
+    private static final String SET_NEW_PASSWORD_WITH_COMPLEXITY =
+        "set_new_password_with_complexity";
     private static final String SET_PROFILE_PARENT_NEW_PASSWORD = "set_profile_parent_new_password";
     private static final String BIND_DEVICE_ADMIN_POLICIES = "bind_device_admin_policies";
     private static final String CROSS_PROFILE_APPS = "cross_profile_apps";
@@ -382,6 +395,33 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     private static final int USER_OPERATION_ERROR_UNKNOWN = 1;
     private static final int USER_OPERATION_SUCCESS = 0;
+
+    private static final SparseIntArray PASSWORD_COMPLEXITY = new SparseIntArray(4);
+    static {
+        if (isAtLeastQ()) {
+            try {
+                final int[] complexityIds = new int[]{
+                    intConstant(DevicePolicyManager.class, "PASSWORD_COMPLEXITY_NONE"),
+                    intConstant(DevicePolicyManager.class, "PASSWORD_COMPLEXITY_LOW"),
+                    intConstant(DevicePolicyManager.class, "PASSWORD_COMPLEXITY_MEDIUM"),
+                    intConstant(DevicePolicyManager.class, "PASSWORD_COMPLEXITY_HIGH")
+                };
+
+                // Strings to show for each password complexity setting.
+                final int[] complexityNames = new int[]{
+                    R.string.password_complexity_none,
+                    R.string.password_complexity_low,
+                    R.string.password_complexity_medium,
+                    R.string.password_complexity_high
+                };
+                for (int i = 0; i < complexityIds.length; i++) {
+                    PASSWORD_COMPLEXITY.put(complexityIds[i], complexityNames[i]);
+                }
+            } catch (ReflectionIsTemporaryException e) {
+                Log.e(TAG, "Cannot get password complexity constants.", e);
+            }
+        }
+    }
 
     private DevicePolicyManager mDevicePolicyManager;
     private PackageManager mPackageManager;
@@ -642,6 +682,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         (EditTextPreference) findPreference(SET_DEVICE_ORGANIZATION_NAME_KEY);
         mSetDeviceOrganizationNamePreference.setOnPreferenceChangeListener(this);
 
+        onCreateSetNewPasswordWithComplexityPreference();
         constrainSpecialCasePreferences();
 
         maybeDisableLockTaskPreferences();
@@ -657,6 +698,21 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         reloadSetAutoTimeRequiredUi();
         reloadEnableLogoutUi();
         reloadAutoBrightnessUi();
+    }
+
+    private void onCreateSetNewPasswordWithComplexityPreference() {
+        ListPreference complexityPref =
+            (ListPreference) findPreference(SET_NEW_PASSWORD_WITH_COMPLEXITY);
+        List<CharSequence> entries = new ArrayList<>();
+        List<CharSequence> values = new ArrayList<>();
+        int size = PASSWORD_COMPLEXITY.size();
+        for (int i = 0; i < size; i++) {
+            entries.add(getString(PASSWORD_COMPLEXITY.valueAt(i)));
+            values.add(Integer.toString(PASSWORD_COMPLEXITY.keyAt(i)));
+        }
+        complexityPref.setEntries(entries.toArray(new CharSequence[size]));
+        complexityPref.setEntryValues(values.toArray(new CharSequence[size]));
+        complexityPref.setOnPreferenceChangeListener(this);
     }
 
     private void constrainSpecialCasePreferences() {
@@ -705,6 +761,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         updateStayOnWhilePluggedInPreference();
         updateInstallNonMarketAppsPreference();
         loadPasswordCompliant();
+        loadPasswordComplexity();
         loadSeparateChallenge();
         reloadAffiliatedApis();
     }
@@ -1262,6 +1319,17 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 mDevicePolicyManager.setSystemSetting(mAdminComponentName,
                         Settings.System.SCREEN_BRIGHTNESS_MODE, newValue.equals(true) ? "1" : "0");
                 reloadAutoBrightnessUi();
+                return true;
+            case SET_NEW_PASSWORD_WITH_COMPLEXITY:
+                Intent intent = new Intent(DevicePolicyManager.ACTION_SET_NEW_PASSWORD);
+                try {
+                    intent.putExtra(
+                        stringConstant(DevicePolicyManager.class, "EXTRA_PASSWORD_COMPLEXITY"),
+                        Integer.parseInt((String) newValue));
+                } catch (ReflectionIsTemporaryException e) {
+                    Log.e(TAG, "Cannot get EXTRA_PASSWORD_COMPLEXITY.", e);
+                }
+                startActivity(intent);
                 return true;
         }
         return false;
@@ -2062,6 +2130,21 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         separateChallengePreference.setSummary(String.format(
                 getString(R.string.separate_challenge_summary),
                 Boolean.toString(separate)));
+    }
+
+    private void loadPasswordComplexity() {
+        Preference passwordComplexityPreference = findPreference(PASSWORD_COMPLEXITY_KEY);
+        if (!passwordComplexityPreference.isEnabled()) {
+            return;
+        }
+
+        try {
+            int complexity =
+                (int) invoke(mDevicePolicyManager, "getPasswordComplexity");
+            passwordComplexityPreference.setSummary(PASSWORD_COMPLEXITY.get(complexity));
+        } catch (ReflectionIsTemporaryException e) {
+            Log.e(TAG, "Cannot get password complexity.", e);
+        }
     }
 
     @TargetApi(Build.VERSION_CODES.N)

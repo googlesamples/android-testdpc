@@ -325,6 +325,11 @@
 
     <PreferenceCategory android:title="@string/lock_category">
         <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="password_complexity"
+            android:title="@string/password_complexity_title"
+            testdpc:admin="any"
+            testdpc:minSdkVersion="Q"/>
+        <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="password_compliant"
             android:selectable="false"
             android:title="@string/password_compliant_title"
@@ -358,7 +363,13 @@
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="set_new_password"
             android:title="@string/request_to_set_new_password"
+            testdpc:admin="any"
             testdpc:minSdkVersion="L" />
+        <com.afwsamples.testdpc.common.preference.DpcListPreference
+            android:key="set_new_password_with_complexity"
+            android:title="@string/request_to_set_new_password_with_complexity"
+            testdpc:admin="any"
+            testdpc:minSdkVersion="Q"/>
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="set_profile_parent_new_password"
             android:title="@string/request_to_set_profile_parent_new_password"
