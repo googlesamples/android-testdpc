@@ -1062,4 +1062,9 @@
     <string name="cross_profile_apps_available">TestDPC is installed in another profile, tap the icon to launch it in that profile.</string>
     <string name="cross_profile_apps_not_available">TestDPC is not installed in another profile, try installing it and come back to here.</string>
 
+    <string name="install_update">Install update from file</string>
+    <string name="install_update_prompt">This will attempt to install the update file ota.zip in the TestDPC files directory, if the file exists (i.e. if you pushed it there with adb). Do you want to continue?</string>
+    <string name="install_update_prompt_yes">Yes</string>
+    <string name="install_update_prompt_no">No</string>
+
 </resources>

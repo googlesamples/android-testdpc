@@ -33,6 +33,7 @@ import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.admin.DevicePolicyManager;
+import android.app.admin.DevicePolicyManager.InstallUpdateCallback;
 import android.app.admin.SystemUpdateInfo;
 import android.content.ComponentName;
 import android.content.ContentResolver;
@@ -80,7 +81,6 @@ import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
-
 import com.afwsamples.testdpc.AddAccountActivity;
 import com.afwsamples.testdpc.BuildConfig;
 import com.afwsamples.testdpc.CrossProfileAppsFragment;
@@ -92,6 +92,7 @@ import com.afwsamples.testdpc.common.AppInfoArrayAdapter;
 import com.afwsamples.testdpc.common.BaseSearchablePolicyPreferenceFragment;
 import com.afwsamples.testdpc.common.CertificateUtil;
 import com.afwsamples.testdpc.common.MediaDisplayFragment;
+import com.afwsamples.testdpc.common.PackageInstallationUtils;
 import com.afwsamples.testdpc.common.UserArrayAdapter;
 import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.common.preference.CustomConstraint;
@@ -100,7 +101,6 @@ import com.afwsamples.testdpc.common.preference.DpcPreferenceBase;
 import com.afwsamples.testdpc.common.preference.DpcPreferenceHelper;
 import com.afwsamples.testdpc.common.preference.DpcSwitchPreference;
 import com.afwsamples.testdpc.comp.BindDeviceAdminFragment;
-import com.afwsamples.testdpc.common.PackageInstallationUtils;
 import com.afwsamples.testdpc.policy.blockuninstallation.BlockUninstallationInfoArrayAdapter;
 import com.afwsamples.testdpc.policy.certificate.DelegatedCertInstallerFragment;
 import com.afwsamples.testdpc.policy.keyguard.LockScreenPolicyFragment;
@@ -126,7 +126,6 @@ import com.afwsamples.testdpc.profilepolicy.delegation.DelegationFragment;
 import com.afwsamples.testdpc.profilepolicy.permission.ManageAppPermissionsFragment;
 import com.afwsamples.testdpc.transferownership.PickTransferComponentFragment;
 import com.afwsamples.testdpc.util.MainThreadExecutor;
-
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -370,6 +369,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String SET_TIME_ZONE_KEY = "set_time_zone";
 
     private static final String MANAGE_OVERRIDE_APN_KEY = "manage_override_apn";
+
+    private static final String MANAGED_SYSTEM_UPDATES_KEY = "managed_system_updates";
 
     private static final String SET_PRIVATE_DNS_MODE_KEY = "set_private_dns_mode";
 
@@ -621,6 +622,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(SET_TIME_ZONE_KEY).setOnPreferenceClickListener(this);
 
         findPreference(MANAGE_OVERRIDE_APN_KEY).setOnPreferenceClickListener(this);
+        findPreference(MANAGED_SYSTEM_UPDATES_KEY).setOnPreferenceClickListener(this);
 
         findPreference(CROSS_PROFILE_CALENDAR_KEY).setOnPreferenceClickListener(this);
 
@@ -1061,11 +1063,44 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             case MANAGE_OVERRIDE_APN_KEY:
                 showFragment(new OverrideApnFragment());
                 return true;
+            case MANAGED_SYSTEM_UPDATES_KEY:
+                promptInstallUpdate();
+                return true;
             case CROSS_PROFILE_CALENDAR_KEY:
                 showFragment(new CrossProfileCalendarFragment());
                 return true;
         }
         return false;
+    }
+
+    @TargetApi(Build.VERSION_CODES.Q)
+    private void promptInstallUpdate() {
+        new AlertDialog.Builder(getActivity())
+                .setMessage(R.string.install_update_prompt)
+                .setTitle(R.string.install_update)
+                .setPositiveButton(
+                        R.string.install_update_prompt_yes, (dialogInterface, i) -> installUpdate())
+                .setNegativeButton(
+                        R.string.install_update_prompt_no, (dialogInterface, i) -> {})
+                .create()
+                .show();
+    }
+
+    @TargetApi(Build.VERSION_CODES.Q)
+    private void installUpdate() {
+        File file = new File(getContext().getFilesDir(), "ota.zip");
+        Uri uri = FileProvider.getUriForFile(
+                getActivity(), BuildConfig.APPLICATION_ID + ".fileprovider", file);
+        mDevicePolicyManager.installSystemUpdate(
+                mAdminComponentName,
+                uri,
+                new MainThreadExecutor(),
+                new InstallUpdateCallback() {
+                  @Override
+                  public void onInstallUpdateError(int errorCode, String errorMessage) {
+                      showToast("Error code: " + errorCode);
+                  }
+                });
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)

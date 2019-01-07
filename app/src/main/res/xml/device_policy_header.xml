@@ -695,4 +695,10 @@
             testdpc:admin="any"
             testdpc:minSdkVersion="P" />
     </PreferenceCategory>
+
+    <com.afwsamples.testdpc.common.preference.DpcPreference
+        android:key="managed_system_updates"
+        android:title="@string/install_update"
+        testdpc:admin="deviceOwner"
+        testdpc:minSdkVersion="Q" />
 </PreferenceScreen>
