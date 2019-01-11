@@ -247,7 +247,9 @@
         <com.afwsamples.testdpc.common.preference.DpcEditTextPreference
             android:key="override_key_selection"
             android:title="@string/key_override_alias"
-            testdpc:minSdkVersion="M" />
+            testdpc:minSdkVersion="M"
+            testdpc:admin="any"
+            testdpc:delegation="delegation-cert-selection" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="generate_key_and_certificate"
             android:title="@string/generate_key_and_certificate"
@@ -646,11 +648,13 @@
             android:key="enable_network_logging"
             android:title="@string/enable_network_logging"
             testdpc:admin="deviceOwner"
+            testdpc:delegation="delegation-network-logging"
             testdpc:minSdkVersion="O" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="request_network_logs"
             android:title="@string/request_network_logs"
             testdpc:admin="deviceOwner"
+            testdpc:delegation="delegation-network-logging"
             testdpc:minSdkVersion="O" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="request_bugreport"

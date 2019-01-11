@@ -59,6 +59,16 @@ class DelegationScopesArrayAdapter
             case DevicePolicyManager.DELEGATION_ENABLE_SYSTEM_APP:
                 viewHolder.setText(R.string.delegation_scope_enable_system_app);
                 break;
+            case "delegation-network-logging": //TODO: b/122460462
+                viewHolder.setText(R.string.delegation_scope_network_logging);
+                break;
+            case "delegation-cert-selection": //TODO: b/122460462
+                viewHolder.setText(R.string.delegation_scope_cert_selection);
+                break;
+            case "delegation-package-installation": //TODO: b/122460462
+                viewHolder.setText(R.string.delegation_scope_package_installation);
+                break;
+
         }
 
         return convertView;

@@ -50,7 +50,7 @@ public class DelegationFragment extends ManageAppFragment {
     /**
      * Model for representing the scopes delegated to the selected app.
      */
-    List<DelegationScope> mDelegations = DelegationScope.defaultDelegationScopes();
+    List<DelegationScope> mDelegations;
     private String mPackageName;
     private boolean mIsDeviceOrProfileOwner;
 
@@ -62,6 +62,8 @@ public class DelegationFragment extends ManageAppFragment {
         final boolean isDeviceOwner = mDpm.isDeviceOwnerApp(mPackageName);
         final boolean isProfileOwner = mDpm.isProfileOwnerApp(mPackageName);
         mIsDeviceOrProfileOwner = isDeviceOwner || isProfileOwner;
+
+        mDelegations = DelegationScope.defaultDelegationScopes(isDeviceOwner);
 
         getActivity().getActionBar().setTitle(R.string.generic_delegation);
     }
@@ -192,7 +194,7 @@ public class DelegationFragment extends ManageAppFragment {
         }
 
         @TargetApi(Build.VERSION_CODES.O)
-        static List<DelegationScope> defaultDelegationScopes() {
+        static List<DelegationScope> defaultDelegationScopes(boolean isDeviceOwner) {
             List<DelegationScope> defaultDelegations = new ArrayList<>();
             defaultDelegations.add(
                     new DelegationScope(DevicePolicyManager.DELEGATION_CERT_INSTALL));
@@ -206,6 +208,14 @@ public class DelegationFragment extends ManageAppFragment {
                     new DelegationScope(DevicePolicyManager.DELEGATION_PACKAGE_ACCESS));
             defaultDelegations.add(
                     new DelegationScope(DevicePolicyManager.DELEGATION_ENABLE_SYSTEM_APP));
+            defaultDelegations.add(
+                    new DelegationScope("delegation-cert-selection")); //TODO: b/122460462
+            if (isDeviceOwner) {
+                defaultDelegations.add(
+                        new DelegationScope("delegation-network-logging")); //TODO: b/122460462
+                defaultDelegations.add(
+                        new DelegationScope("delegation-package-installation")); //TODO: b/122460462
+            }
             return defaultDelegations;
         }
     }

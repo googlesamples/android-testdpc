@@ -570,6 +570,9 @@
     <string name="delegation_scope_package_access">Package access</string>
     <string name="delegation_scope_enable_system_app">System app enabling</string>
     <string name="delegation_scope_keep_uninstalled_packages">Keep uninstalled packages</string>
+    <string name="delegation_scope_network_logging">Access network logging</string>
+    <string name="delegation_scope_cert_selection">Choose private key</string>
+    <string name="delegation_scope_package_installation">Silently install APK</string>
     <string name="manage_cert_installer">Delegated cert installer</string>
 
     <!-- strings used in the alert dialog for editing application restrictions. -->
