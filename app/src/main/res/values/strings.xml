@@ -1078,4 +1078,13 @@
     <string name="install_update_prompt_yes">Yes</string>
     <string name="install_update_prompt_no">No</string>
 
+    <!-- strings used in dpc login screen and dpc policy compliance screen.-->
+    <string name="dpc_login_title">Select provisioning method</string>
+    <string name="dpc_login_explanation">Select provisioning method:</string>
+    <string name="dpc_login_do">Fully managed device</string>
+    <string name="dpc_login_po">Managed profile</string>
+    <string name="dpc_login_comp">Managed profile on a fully managed device</string>
+    <string name="dpc_policy_compliance_title">Dpc policy compliance</string>
+    <string name="dpc_policy_compliance_explanation">TestDPC setup is completed.</string>
+
 </resources>

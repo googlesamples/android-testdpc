@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ Copyright 2019 The Android Open Source Project
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<com.android.setupwizardlib.GlifLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/dpc_login"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:icon="@drawable/ic_enterprise_blue"
+    app:suwFooter="@layout/next_footer"
+    app:suwHeaderText="@string/dpc_login_title">
+
+  <LinearLayout
+      style="@style/SuwItemContainer"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:orientation="vertical">
+
+    <TextView
+        style="@style/SuwItemTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/dpc_login_explanation" />
+
+    <RadioGroup
+        android:id="@+id/dpc_login_options"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingTop="@dimen/content_padding_between_text">
+
+      <RadioButton
+          android:id="@+id/dpc_login_do"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:checked="true"
+          android:text="@string/dpc_login_do" />
+
+      <RadioButton
+          android:id="@+id/dpc_login_po"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="@string/dpc_login_po" />
+
+      <RadioButton
+          android:id="@+id/dpc_login_comp"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:text="@string/dpc_login_comp" />
+    </RadioGroup>
+  </LinearLayout>
+
+</com.android.setupwizardlib.GlifLayout>
