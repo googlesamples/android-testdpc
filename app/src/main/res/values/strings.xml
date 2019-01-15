@@ -852,6 +852,10 @@
     <string name="no_timezone">Timezone not specified</string>
     <string name="invalid_timezone">Timezone id not valid</string>
 
+    <!-- Strings for setting profile name -->
+    <string name="set_profile_name">Set profile name</string>
+    <string name="no_profile_name">Missing profile name</string>
+
     <!-- Strings for set system settings -->
     <string name="set_system_setting">Set system settings</string>
     <string name="auto_brightness">Auto brightness</string>

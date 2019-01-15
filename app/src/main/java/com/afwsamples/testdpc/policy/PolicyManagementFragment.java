@@ -381,6 +381,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String SET_TIME_KEY = "set_time";
     private static final String SET_TIME_ZONE_KEY = "set_time_zone";
 
+    private static final String SET_PROFILE_NAME_KEY = "set_profile_name";
+
     private static final String MANAGE_OVERRIDE_APN_KEY = "manage_override_apn";
 
     private static final String MANAGED_SYSTEM_UPDATES_KEY = "managed_system_updates";
@@ -660,6 +662,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
         findPreference(SET_TIME_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_TIME_ZONE_KEY).setOnPreferenceClickListener(this);
+
+        findPreference(SET_PROFILE_NAME_KEY).setOnPreferenceClickListener(this);
 
         findPreference(MANAGE_OVERRIDE_APN_KEY).setOnPreferenceClickListener(this);
         findPreference(MANAGED_SYSTEM_UPDATES_KEY).setOnPreferenceClickListener(this);
@@ -1125,6 +1129,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 return true;
             case CROSS_PROFILE_CALENDAR_KEY:
                 showFragment(new CrossProfileCalendarFragment());
+                return true;
+            case SET_PROFILE_NAME_KEY:
+                showSetProfileNameDialog();
                 return true;
         }
         return false;
@@ -3399,7 +3406,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
      * Shows a dialog that asks the user for a screen off timeout value, then sets this value as
      * screen off timeout.
      */
-    @TargetApi(28)
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void showSetScreenOffTimeoutDialog() {
         if (getActivity() == null || getActivity().isFinishing()) {
             return;
@@ -3509,6 +3516,36 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                         return;
                     }
                     mDevicePolicyManager.setTimeZone(mAdminComponentName, newTimezone);
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    /**
+     * Shows a dialog that asks the user to set a profile name.
+     */
+    @TargetApi(28)
+    private void showSetProfileNameDialog() {
+        if (getActivity() == null || getActivity().isFinishing()) {
+            return;
+        }
+
+        final View dialogView = getActivity().getLayoutInflater().inflate(
+                R.layout.simple_edittext, null);
+        final EditText profileNameEditText = (EditText) dialogView.findViewById(
+                R.id.input);
+        profileNameEditText.setText("");
+
+        new AlertDialog.Builder(getActivity())
+                .setTitle(R.string.set_profile_name)
+                .setView(dialogView)
+                .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
+                    final String newProfileName = profileNameEditText.getText().toString();
+                    if (newProfileName.isEmpty()) {
+                        showToast(R.string.no_profile_name);
+                        return;
+                    }
+                    mDevicePolicyManager.setProfileName(mAdminComponentName, newProfileName);
                 })
                 .setNegativeButton(android.R.string.cancel, null)
                 .show();

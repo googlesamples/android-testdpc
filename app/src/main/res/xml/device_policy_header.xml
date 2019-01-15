@@ -62,6 +62,11 @@
             android:key="set_screen_off_timeout"
             android:title="@string/set_screen_off_timeout"
             testdpc:minSdkVersion="P" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="set_profile_name"
+            android:title="@string/set_profile_name"
+            testdpc:admin="deviceOwner|profileOwner"
+            testdpc:minSdkVersion="L" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/override_apn_title">
