@@ -329,6 +329,7 @@
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="password_complexity"
             android:title="@string/password_complexity_title"
+            android:selectable="false"
             testdpc:admin="any"
             testdpc:minSdkVersion="Q"/>
         <com.afwsamples.testdpc.common.preference.DpcPreference

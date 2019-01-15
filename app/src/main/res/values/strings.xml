@@ -1023,7 +1023,7 @@
     <string name="safetynet_verify_on_server">You should verify the response in your server.</string>
 
     <string name="request_to_set_new_password">Request user to set new password</string>
-    <string name="request_to_set_new_password_with_complexity">Specify minimum complexity and request user to set a new password</string>
+    <string name="request_to_set_new_password_with_complexity">Set new password and specify minimum complexity</string>
     <string name="request_to_set_profile_parent_new_password">Request user to set profile parent new password</string>
 
     <!-- Device owner to profile owner communication (COMP and DO<->PO of secondary users) -->
