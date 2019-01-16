@@ -16,13 +16,10 @@
 
 package com.afwsamples.testdpc;
 
-import static com.afwsamples.testdpc.policy.PolicyManagementFragment.OVERRIDE_KEY_SELECTION_KEY;
-
 import android.annotation.TargetApi;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.admin.DevicePolicyManager;
-import android.app.admin.NetworkEvent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -35,10 +32,8 @@ import android.os.PersistableBundle;
 import android.os.Process;
 import android.os.UserHandle;
 import android.os.UserManager;
-import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.os.BuildCompat;
-import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 import com.afwsamples.testdpc.common.NotificationUtil;
@@ -60,7 +55,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 
 /**
  * Handles events related to the managed profile.
@@ -126,16 +120,6 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
         PostProvisioningTask task = new PostProvisioningTask(context);
         if (!task.performPostProvisioningOperations(intent)) {
             return;
-        }
-
-        Intent launchIntent = task.getPostProvisioningLaunchIntent(intent);
-        if (launchIntent != null) {
-            context.startActivity(launchIntent);
-        } else {
-            Log.e(TAG, "DeviceAdminReceiver.onProvisioningComplete() invoked, but ownership "
-                    + "not assigned");
-            Toast.makeText(context, R.string.device_admin_receiver_failure, Toast.LENGTH_LONG)
-                    .show();
         }
     }
 

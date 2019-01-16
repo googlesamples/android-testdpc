@@ -102,7 +102,7 @@
         <activity android:name=".policy.DpcEnforcePoliciesActivity"
                 android:exported="true">
             <intent-filter>
-                <action android:name="android.app.action.DPC_POLICY_COMPLIANCE" />
+                <action android:name="android.app.action.ADMIN_POLICY_COMPLIANCE" />
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
