@@ -96,7 +96,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".policy.DpcLoginActivity"
+        <activity android:name=".provision.DpcLoginActivity"
                 android:exported="true">
             <intent-filter>
                 <action android:name="android.app.action.GET_PROVISIONING_MODE" />

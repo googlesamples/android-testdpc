@@ -21,7 +21,7 @@
     android:layout_height="match_parent"
     android:icon="@drawable/ic_enterprise_blue"
     app:suwFooter="@layout/next_footer"
-    app:suwHeaderText="@string/setup_finished">
+    app:suwHeaderText="@string/add_account">
 
     <LinearLayout
         style="@style/SuwItemContainer"

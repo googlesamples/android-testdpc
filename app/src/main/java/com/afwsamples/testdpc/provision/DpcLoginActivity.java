@@ -14,13 +14,18 @@
  * limitations under the License.
  */
 
-package com.afwsamples.testdpc.policy;
+package com.afwsamples.testdpc.provision;
 
+import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_ACCOUNT_TO_MIGRATE;
+
+import android.accounts.Account;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.RadioGroup;
+import com.afwsamples.testdpc.AddAccountActivity;
 import com.afwsamples.testdpc.R;
 import com.android.setupwizardlib.GlifLayout;
 
@@ -37,6 +42,9 @@ public class DpcLoginActivity extends Activity {
     public static final int PROVISIONING_MODE_PO = 2;
     public static final int PROVISIONING_MODE_MANAGED_PROFILE_ON_FULLY_MANAGED_DEVICE = 3;
 
+    private static final String LOG_TAG = "DpcLoginActivity";
+    private static final int ADD_ACCOUNT_REQUEST_CODE = 1;
+
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
@@ -51,22 +59,54 @@ public class DpcLoginActivity extends Activity {
         super.onBackPressed();
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case ADD_ACCOUNT_REQUEST_CODE:
+                finishWithIntent(createResultIntentFromData(data));
+                break;
+            default:
+                Log.d(LOG_TAG, "Unknown result code: " + resultCode);
+                break;
+        }
+    }
+
+    private Intent createResultIntentFromData(Intent data) {
+        final Intent resultIntent = new Intent();
+        resultIntent.putExtra(EXTRA_PROVISIONING_MODE, PROVISIONING_MODE_PO);
+        if (data != null && data.hasExtra(EXTRA_PROVISIONING_ACCOUNT_TO_MIGRATE)) {
+            final Account accountToMigrate = data.getParcelableExtra(
+                EXTRA_PROVISIONING_ACCOUNT_TO_MIGRATE);
+            resultIntent.putExtra(EXTRA_PROVISIONING_ACCOUNT_TO_MIGRATE, accountToMigrate);
+        }
+        return resultIntent;
+    }
+
     private void onNavigateNext(View nextButton) {
-        Intent intent = new Intent();
+        final Intent intent = new Intent();
         RadioGroup dpcLoginOptions = findViewById(R.id.dpc_login_options);
         switch (dpcLoginOptions.getCheckedRadioButtonId()) {
             case R.id.dpc_login_do:
                 intent.putExtra(EXTRA_PROVISIONING_MODE, PROVISIONING_MODE_DO);
-                break;
+                finishWithIntent(intent);
+                return;
             case R.id.dpc_login_po:
-                intent.putExtra(EXTRA_PROVISIONING_MODE, PROVISIONING_MODE_PO);
-                break;
+                startActivityForResult(
+                    new Intent(getApplicationContext(), AddAccountActivity.class),
+                    ADD_ACCOUNT_REQUEST_CODE);
+                return;
             case R.id.dpc_login_comp:
                 intent.putExtra(EXTRA_PROVISIONING_MODE,
                     PROVISIONING_MODE_MANAGED_PROFILE_ON_FULLY_MANAGED_DEVICE);
-                break;
+                finishWithIntent(intent);
+                return;
+            default:
+                finish();
         }
-        setResult(RESULT_OK , intent);
+    }
+
+    private void finishWithIntent(Intent intent) {
+        setResult(RESULT_OK, intent);
         finish();
     }
 }
