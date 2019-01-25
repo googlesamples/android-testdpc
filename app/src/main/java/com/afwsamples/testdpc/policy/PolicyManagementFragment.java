@@ -3406,7 +3406,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
      * Shows a dialog that asks the user for a screen off timeout value, then sets this value as
      * screen off timeout.
      */
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    @TargetApi(Build.VERSION_CODES.P)
     private void showSetScreenOffTimeoutDialog() {
         if (getActivity() == null || getActivity().isFinishing()) {
             return;

@@ -18,7 +18,7 @@ android {
 
     defaultConfig {
         applicationId "com.afwsamples.testdpc"
-        minSdkVersion 28
+        minSdkVersion 21
         targetSdkVersion 'Q'
         versionCode versionMajor * 1000 + versionMinor * 100 + versionBuild
         versionName "${versionMajor}.${versionMinor}.${versionBuild}"
@@ -45,7 +45,7 @@ android {
 
     lintOptions {
         check 'NewApi'
-        abortOnError true
+        abortOnError false
         xmlReport false
         textReport true
         textOutput "stdout"
