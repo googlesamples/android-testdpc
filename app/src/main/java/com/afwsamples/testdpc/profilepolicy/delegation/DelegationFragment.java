@@ -63,7 +63,9 @@ public class DelegationFragment extends ManageAppFragment {
         final boolean isProfileOwner = mDpm.isProfileOwnerApp(mPackageName);
         mIsDeviceOrProfileOwner = isDeviceOwner || isProfileOwner;
 
-        mDelegations = DelegationScope.defaultDelegationScopes(isDeviceOwner);
+        // Show DO-only delegations if we are DO or delegated app i.e. we are not PO, ignoring the
+        // case where we are neither PO or DO (in which case this fragment is not accessible at all)
+        mDelegations = DelegationScope.defaultDelegationScopes(!isProfileOwner);
 
         getActivity().getActionBar().setTitle(R.string.generic_delegation);
     }
@@ -194,7 +196,7 @@ public class DelegationFragment extends ManageAppFragment {
         }
 
         @TargetApi(Build.VERSION_CODES.O)
-        static List<DelegationScope> defaultDelegationScopes(boolean isDeviceOwner) {
+        static List<DelegationScope> defaultDelegationScopes(boolean showDoOnlyDelegations) {
             List<DelegationScope> defaultDelegations = new ArrayList<>();
             defaultDelegations.add(
                     new DelegationScope(DevicePolicyManager.DELEGATION_CERT_INSTALL));
@@ -209,12 +211,12 @@ public class DelegationFragment extends ManageAppFragment {
             defaultDelegations.add(
                     new DelegationScope(DevicePolicyManager.DELEGATION_ENABLE_SYSTEM_APP));
             defaultDelegations.add(
-                    new DelegationScope("delegation-cert-selection")); //TODO: b/122460462
-            if (isDeviceOwner) {
+                    new DelegationScope(DevicePolicyManager.DELEGATION_CERT_SELECTION));
+            if (showDoOnlyDelegations) {
                 defaultDelegations.add(
-                        new DelegationScope("delegation-network-logging")); //TODO: b/122460462
+                        new DelegationScope(DevicePolicyManager.DELEGATION_NETWORK_LOGGING));
                 defaultDelegations.add(
-                        new DelegationScope("delegation-package-installation")); //TODO: b/122460462
+                        new DelegationScope(DevicePolicyManager.DELEGATION_PACKAGE_INSTALLATION));
             }
             return defaultDelegations;
         }
