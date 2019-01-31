@@ -1091,4 +1091,7 @@
     <string name="dpc_policy_compliance_title">Dpc policy compliance</string>
     <string name="dpc_policy_compliance_explanation">TestDPC setup is completed.</string>
 
+    <string name="vpn_exempted_packages">Exempted packages</string>
+    <string name="vpn_lockdown">Lockdown</string>
+
 </resources>

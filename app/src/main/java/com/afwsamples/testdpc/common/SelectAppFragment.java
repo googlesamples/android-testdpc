@@ -65,9 +65,9 @@ public abstract class SelectAppFragment extends Fragment implements View.OnClick
             Bundle savedInstanceState) {
         View view = layoutInflater.inflate(R.layout.select_app, null);
 
-        mCurrentSelectedPackage = (EditText) view.findViewById(R.id.selected_package_current);
-        mNewSelectedPackage = (EditText) view.findViewById(R.id.selected_package_new);
-        mAppListView = (ListView) view.findViewById(R.id.select_app_list);
+        mCurrentSelectedPackage = view.findViewById(R.id.selected_package_current);
+        mNewSelectedPackage = view.findViewById(R.id.selected_package_new);
+        mAppListView = view.findViewById(R.id.select_app_list);
         AppInfoArrayAdapter appInfoArrayAdapter = new AppInfoArrayAdapter(getActivity(),
                 R.id.pkg_name, mAppPackages, true);
         mAppListView.setAdapter(appInfoArrayAdapter);
@@ -93,6 +93,10 @@ public abstract class SelectAppFragment extends Fragment implements View.OnClick
         return appList;
     }
 
+    protected ViewGroup getExtensionLayout(View rootView) {
+       return rootView.findViewById(R.id.extension);
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -108,7 +112,7 @@ public abstract class SelectAppFragment extends Fragment implements View.OnClick
         }
     }
 
-    private void reloadSelectedPackage() {
+    protected void reloadSelectedPackage() {
         String selectedPackage = getSelectedPackage();
         if (selectedPackage == null) {
             mCurrentSelectedPackage.setText("");

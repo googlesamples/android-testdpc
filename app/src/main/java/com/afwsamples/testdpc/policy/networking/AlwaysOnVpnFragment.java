@@ -16,6 +16,8 @@
 
 package com.afwsamples.testdpc.policy.networking;
 
+import static com.afwsamples.testdpc.common.Util.isAtLeastQ;
+
 import android.annotation.TargetApi;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
@@ -27,15 +29,23 @@ import android.net.VpnService;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.SelectAppFragment;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * This fragment provides a setting for always-on VPN apps.
@@ -49,20 +59,43 @@ import java.util.Set;
 @TargetApi(Build.VERSION_CODES.N)
 public class AlwaysOnVpnFragment extends SelectAppFragment {
     private static final String TAG = "AlwaysOnVpnFragment";
+
     private DevicePolicyManager mDpm;
 
+    private CheckBox mLockdown;
+    private EditText mExemptedPackages;
+
     private static final Intent VPN_INTENT = new Intent(VpnService.SERVICE_INTERFACE);
+    private ComponentName mWho;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mDpm = (DevicePolicyManager) getContext().getSystemService(Context.DEVICE_POLICY_SERVICE);
+        mWho = DeviceAdminReceiver.getComponentName(getActivity());
     }
 
     @Override
     public void onResume() {
         super.onResume();
         getActivity().getActionBar().setTitle(R.string.set_always_on_vpn);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater layoutInflater, ViewGroup container,
+            Bundle savedInstanceState) {
+        final View view = super.onCreateView(layoutInflater, container, savedInstanceState);
+
+        if (isAtLeastQ()) {
+            final ViewGroup extension = getExtensionLayout(view);
+            extension.setVisibility(View.VISIBLE);
+            layoutInflater.inflate(R.layout.lockdown_settings, extension);
+            mLockdown = view.findViewById(R.id.enable_lockdown);
+            mExemptedPackages = view.findViewById(R.id.exempted_packages);
+            mLockdown.setOnCheckedChangeListener(
+                    (unused, checked) -> mExemptedPackages.setEnabled(checked));
+        }
+        return view;
     }
 
     @Override
@@ -80,13 +113,51 @@ public class AlwaysOnVpnFragment extends SelectAppFragment {
     }
 
     @Override
+    protected void reloadSelectedPackage() {
+        super.reloadSelectedPackage();
+        if (isAtLeastQ()) {
+            updateLockdown();
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.Q)
+    private void updateLockdown() {
+        mLockdown.setChecked(mDpm.isAlwaysOnVpnLockdownEnabled(mWho));
+        final List<String> exemptedPackages = mDpm.getAlwaysOnVpnLockdownWhitelist(mWho);
+        mExemptedPackages.setText(
+                exemptedPackages != null ? String.join(",", exemptedPackages) : "");
+    }
+
+    @Override
     protected void setSelectedPackage(String pkg) {
         try {
-            final ComponentName who = DeviceAdminReceiver.getComponentName(getActivity());
-            mDpm.setAlwaysOnVpnPackage(who, pkg, /* lockdownEnabled */ true);
-        } catch (PackageManager.NameNotFoundException | UnsupportedOperationException e) {
+            if (isAtLeastQ()) {
+                setAlwaysOnVpnPackageQPlus(pkg);
+            } else {
+                mDpm.setAlwaysOnVpnPackage(mWho, pkg, /* lockdownEnabled */ true);
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+            final String text = "Package not found: " + e.getMessage();
+            Toast.makeText(getActivity(), text, Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "setAlwaysOnVpnPackage:", e);
+        } catch (UnsupportedOperationException e) {
+            Toast.makeText(getActivity(), "App doesn't support always-on VPN", Toast.LENGTH_SHORT)
+                    .show();
             Log.e(TAG, "setAlwaysOnVpnPackage:", e);
         }
+    }
+
+    @TargetApi(Build.VERSION_CODES.Q)
+    private void setAlwaysOnVpnPackageQPlus(String pkg)
+            throws PackageManager.NameNotFoundException {
+        final boolean lockdown = mLockdown.isChecked();
+        final List<String> packages = lockdown ?
+                Arrays.stream(mExemptedPackages.getText().toString().split(","))
+                        .map(String::trim)
+                        .filter(s -> !s.isEmpty())
+                        .collect(Collectors.toList())
+                : null;
+        mDpm.setAlwaysOnVpnPackage(mWho, pkg, lockdown, packages);
     }
 
     @Override
