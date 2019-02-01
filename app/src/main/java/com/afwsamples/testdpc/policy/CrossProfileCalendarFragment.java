@@ -18,52 +18,45 @@ package com.afwsamples.testdpc.policy;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.preference.Preference;
 import android.util.ArraySet;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
-
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
-import com.afwsamples.testdpc.common.AppInfoArrayAdapter;
 import com.afwsamples.testdpc.common.BaseSearchablePolicyPreferenceFragment;
-import com.afwsamples.testdpc.common.ReflectionUtil;
-import com.afwsamples.testdpc.common.ReflectionUtil.ReflectionIsTemporaryException;
-
-import java.util.ArrayList;
+import com.afwsamples.testdpc.common.preference.DpcPreference;
+import com.afwsamples.testdpc.common.preference.DpcSwitchPreference;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Set;
 
-/**
- * TODO: Cleanup reflection usages once SDK is updated. b/120765156.
- */
-@TargetApi(29)
+@TargetApi(Build.VERSION_CODES.Q)
 public class CrossProfileCalendarFragment extends BaseSearchablePolicyPreferenceFragment implements
-    Preference.OnPreferenceClickListener {
+    Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
 
-    private static String LOG_TAG = "CrossProfileCalendarFragment";
-
-    private static final String CROSS_PROFILE_CALENDAR_ADD_PACKAGE_KEY =
-        "cross_profile_calendar_add_package";
-    private static final String CROSS_PROFILE_CALENDAR_DELETE_PACKAGE_KEY =
-        "cross_profile_calendar_delete_package";
-    private static final String CROSS_PROFILE_CALENDAR_LIST_PACKAGE_KEY =
-        "cross_profile_calendar_list_package";
+    private static final String CROSS_PROFILE_CALENDAR_SET_ALLOWED_PACKAGES_KEY =
+        "cross_profile_calendar_set_allowed_packages";
+    private static final String CROSS_PROFILE_CALENDAR_ALLOW_ALL_PACKAGES_KEY =
+        "cross_profile_calendar_allow_all_packages";
 
     private DevicePolicyManager mDevicePolicyManager;
+
     private ComponentName mAdminComponentName;
+    private DpcPreference mSetAllowedPackagesPreference;
+    private DpcSwitchPreference mAllowAllPackagesPreference;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        mDevicePolicyManager = (DevicePolicyManager) getActivity().getSystemService(
-            Context.DEVICE_POLICY_SERVICE);
+        mDevicePolicyManager = getActivity().getSystemService(DevicePolicyManager.class);
         mAdminComponentName = DeviceAdminReceiver.getComponentName(getActivity());
         getActivity().getActionBar().setTitle(R.string.cross_profile_calendar);
         super.onCreate(savedInstanceState);
@@ -73,10 +66,15 @@ public class CrossProfileCalendarFragment extends BaseSearchablePolicyPreference
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.cross_profile_calendar_preferences);
 
-        findPreference(CROSS_PROFILE_CALENDAR_ADD_PACKAGE_KEY).setOnPreferenceClickListener(this);
-        findPreference(CROSS_PROFILE_CALENDAR_DELETE_PACKAGE_KEY)
-            .setOnPreferenceClickListener(this);
-        findPreference(CROSS_PROFILE_CALENDAR_LIST_PACKAGE_KEY).setOnPreferenceClickListener(this);
+        mSetAllowedPackagesPreference = (DpcPreference) findPreference(
+            CROSS_PROFILE_CALENDAR_SET_ALLOWED_PACKAGES_KEY);
+        mSetAllowedPackagesPreference.setOnPreferenceClickListener(this);
+
+        mAllowAllPackagesPreference = (DpcSwitchPreference) findPreference(
+            CROSS_PROFILE_CALENDAR_ALLOW_ALL_PACKAGES_KEY);
+        mAllowAllPackagesPreference.setOnPreferenceChangeListener(this);
+
+        reloadAllowAllPackagesUi();
     }
 
     @Override
@@ -88,136 +86,62 @@ public class CrossProfileCalendarFragment extends BaseSearchablePolicyPreference
     public boolean onPreferenceClick(Preference preference) {
         String key = preference.getKey();
         switch (key) {
-            case CROSS_PROFILE_CALENDAR_ADD_PACKAGE_KEY:
-                showAddPackageDialog();
-                return true;
-            case CROSS_PROFILE_CALENDAR_DELETE_PACKAGE_KEY:
-                showDeletePackageDialog();
-                return true;
-            case CROSS_PROFILE_CALENDAR_LIST_PACKAGE_KEY:
-                showListPackageDialog();
+            case CROSS_PROFILE_CALENDAR_SET_ALLOWED_PACKAGES_KEY:
+                showSetPackagesDialog();
                 return true;
         }
         return false;
     }
 
+    @Override
+    public boolean onPreferenceChange(Preference preference, Object newValue) {
+        String key = preference.getKey();
+        switch (key) {
+            case CROSS_PROFILE_CALENDAR_ALLOW_ALL_PACKAGES_KEY:
+                mDevicePolicyManager.setCrossProfileCalendarPackages(
+                    mAdminComponentName, newValue.equals(true) ? null : Collections.emptySet());
+                reloadAllowAllPackagesUi();
+        }
+        return false;
+    }
+
+    @TargetApi(Build.VERSION_CODES.Q)
+    private void reloadAllowAllPackagesUi() {
+        final Set<String> packages =
+            mDevicePolicyManager.getCrossProfileCalendarPackages(mAdminComponentName);
+        mAllowAllPackagesPreference.setChecked(packages == null);
+        mSetAllowedPackagesPreference.setEnabled(!mAllowAllPackagesPreference.isChecked());
+    }
+
     /**
-     * Shows a dialog that asks the user for a package name to be whitelisted.
+     * Shows a dialog that asks the user for a set of package names to be allowed.
      */
-    private void showAddPackageDialog() {
+    private void showSetPackagesDialog() {
         if (getActivity() == null || getActivity().isFinishing()) {
             return;
         }
 
         final View dialogView = getActivity().getLayoutInflater().inflate(
             R.layout.simple_edittext, null);
-        final EditText addPackageEditText = (EditText) dialogView.findViewById(
+        final EditText setPackagesEditText = (EditText) dialogView.findViewById(
             R.id.input);
 
-        new AlertDialog.Builder(getActivity())
-            .setTitle(R.string.cross_profile_calendar_add_package)
+        setPackagesEditText.setText(String.join(",",
+                mDevicePolicyManager.getCrossProfileCalendarPackages(mAdminComponentName)));
+
+        new Builder(getActivity())
+            .setTitle(R.string.cross_profile_calendar_set_allowed_packages_title)
             .setView(dialogView)
             .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
-                final String packageName = addPackageEditText.getText().toString();
-                if (packageName.isEmpty()) {
-                    showToast(R.string.cross_profile_calendar_no_package);
-                    return;
-                }
-                try {
-                    ReflectionUtil.invoke(mDevicePolicyManager, "addCrossProfileCalendarPackage",
-                        mAdminComponentName, packageName);
-                    showToast(String.format("Successfully whitelisted package %s for cross profile "
-                        + "calendar", packageName));
-                } catch (ReflectionIsTemporaryException e) {
-                    Log.e(LOG_TAG, "Failed to invoke addCrossProfileCalendarPackage", e);
-                }
+                final String packageNamesString = setPackagesEditText.getText().toString();
+                final Set<String> packageNames = packageNamesString.isEmpty()
+                    ? Collections.emptySet()
+                    : new ArraySet<>(Arrays.asList(
+                        packageNamesString.replace(" ", "").split(",")));
+                mDevicePolicyManager.setCrossProfileCalendarPackages(
+                    mAdminComponentName, packageNames);
             })
             .setNegativeButton(android.R.string.cancel, null)
             .show();
-    }
-
-    /**
-     * Shows a dialog that asks the user for a package name to be removed from the whitelist.
-     */
-    private void showDeletePackageDialog() {
-        if (getActivity() == null || getActivity().isFinishing()) {
-            return;
-        }
-
-        final View dialogView = getActivity().getLayoutInflater().inflate(
-            R.layout.simple_edittext, null);
-        final EditText deletePackageEditText = (EditText) dialogView.findViewById(
-            R.id.input);
-
-        new AlertDialog.Builder(getActivity())
-            .setTitle(R.string.cross_profile_calendar_delete_package)
-            .setView(dialogView)
-            .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
-                final String packageName = deletePackageEditText.getText().toString();
-                if (packageName.isEmpty()) {
-                    showToast(R.string.cross_profile_calendar_no_package);
-                    return;
-                }
-                try {
-                    boolean succeed = (Boolean) ReflectionUtil.invoke(mDevicePolicyManager,
-                        "removeCrossProfileCalendarPackage", mAdminComponentName, packageName);
-                    if (succeed) {
-                        showToast(String.format("Successfully removed package %s for cross profile "
-                            + "calendar", packageName));
-                    } else {
-                        showToast(String.format("Failed to remove package %s for cross profile "
-                            + "calendar", packageName));
-                    }
-                } catch (ReflectionIsTemporaryException e) {
-                    Log.e(LOG_TAG, "Failed to invoke removeCrossProfileCalendarPackage", e);
-                }
-            })
-            .setNegativeButton(android.R.string.cancel, null)
-            .show();
-    }
-
-    /**
-     * Shows a dialog that displays all the packages that have been whitelisted.
-     */
-    private void showListPackageDialog() {
-        Set<String> packages = new ArraySet<String>();
-        try {
-            packages = (Set<String>) ReflectionUtil.invoke(mDevicePolicyManager,
-                "getCrossProfileCalendarPackages", mAdminComponentName);
-        } catch (ReflectionIsTemporaryException e) {
-            Log.e(LOG_TAG, "Failed to invoke getCrossProfileCalendarPackages", e);
-        }
-
-        if (packages.isEmpty()) {
-            showToast(R.string.cross_profile_calendar_list_package_empty);
-        } else {
-            AppInfoArrayAdapter appInfoArrayAdapter = new AppInfoArrayAdapter(getActivity(),
-                R.id.pkg_name, new ArrayList<String>(packages), true);
-            new AlertDialog.Builder(getActivity())
-                .setTitle(getString(R.string.cross_profile_calendar_list_package_title))
-                .setAdapter(appInfoArrayAdapter, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int position) {
-                        // Do nothing.
-                    }
-                })
-                .show();
-        }
-    }
-
-    private void showToast(int msgId, Object... args) {
-        showToast(getString(msgId, args), Toast.LENGTH_SHORT);
-    }
-
-    private void showToast(String msg) {
-        showToast(msg, Toast.LENGTH_SHORT);
-    }
-
-    private void showToast(String msg, int duration) {
-        Activity activity = getActivity();
-        if (activity == null || activity.isFinishing()) {
-            return;
-        }
-        Toast.makeText(activity, msg, duration).show();
     }
 }

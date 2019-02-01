@@ -18,19 +18,14 @@
     xmlns:testdpc="http://schemas.android.com/apk/res-auto"
     android:title="@string/cross_profile_calendar">
     <PreferenceCategory android:title="@string/cross_profile_calendar">
-        <com.afwsamples.testdpc.common.preference.DpcPreference
-            android:key="cross_profile_calendar_add_package"
-            android:title="@string/cross_profile_calendar_add_package"
+        <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
+            android:key="cross_profile_calendar_allow_all_packages"
+            android:title="@string/cross_profile_calendar_allow_all_packages"
             testdpc:admin="profileOwner"
-            testdpc:minSdkVersion="Q"/>
+            testdpc:minSdkVersion="Q" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
-            android:key="cross_profile_calendar_delete_package"
-            android:title="@string/cross_profile_calendar_delete_package"
-            testdpc:admin="profileOwner"
-            testdpc:minSdkVersion="Q"/>
-        <com.afwsamples.testdpc.common.preference.DpcPreference
-            android:key="cross_profile_calendar_list_package"
-            android:title="@string/cross_profile_calendar_list_package"
+            android:key="cross_profile_calendar_set_allowed_packages"
+            android:title="@string/cross_profile_calendar_set_allowed_packages"
             testdpc:admin="profileOwner"
             testdpc:minSdkVersion="Q"/>
     </PreferenceCategory>

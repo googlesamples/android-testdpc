@@ -244,12 +244,9 @@
 
     <!-- Strings for Cross Profile Calendar -->
     <string name="cross_profile_calendar">Cross-profile calendar</string>
-    <string name="cross_profile_calendar_add_package">Whitelist a package</string>
-    <string name="cross_profile_calendar_delete_package">Remove a package from whitelist</string>
-    <string name="cross_profile_calendar_list_package">View all whitelisted packages</string>
-    <string name="cross_profile_calendar_list_package_empty">No package in the whitelist</string>
-    <string name="cross_profile_calendar_list_package_title">Cross-profile calendar whitelist</string>
-    <string name="cross_profile_calendar_no_package">Please enter a package name</string>
+    <string name="cross_profile_calendar_set_allowed_packages">Set allowed packages</string>
+    <string name="cross_profile_calendar_set_allowed_packages_title">Enter packages names, separated by comma</string>
+    <string name="cross_profile_calendar_allow_all_packages">Allow all packages</string>
 
     <string-array name="apn_auth_type_choices">
         <item>Not specified</item>
