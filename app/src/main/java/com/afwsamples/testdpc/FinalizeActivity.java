@@ -97,6 +97,7 @@ public class FinalizeActivity extends Activity {
     }
 
     public void onNavigateNext(View nextButton) {
+        setResult(RESULT_OK);
         finish();
     }
 }
