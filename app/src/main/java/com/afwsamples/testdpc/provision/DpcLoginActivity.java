@@ -17,16 +17,19 @@
 package com.afwsamples.testdpc.provision;
 
 import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_ACCOUNT_TO_MIGRATE;
+import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE;
 
 import android.accounts.Account;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.RadioGroup;
 import com.afwsamples.testdpc.AddAccountActivity;
 import com.afwsamples.testdpc.R;
+import com.afwsamples.testdpc.common.LaunchIntentUtil;
 import com.android.setupwizardlib.GlifLayout;
 
 /**
@@ -78,6 +81,9 @@ public class DpcLoginActivity extends Activity {
             final Account accountToMigrate = data.getParcelableExtra(
                 EXTRA_PROVISIONING_ACCOUNT_TO_MIGRATE);
             resultIntent.putExtra(EXTRA_PROVISIONING_ACCOUNT_TO_MIGRATE, accountToMigrate);
+            final PersistableBundle bundle = new PersistableBundle();
+            bundle.putString(LaunchIntentUtil.EXTRA_ACCOUNT_NAME, accountToMigrate.name);
+            resultIntent.putExtra(EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE, bundle);
         }
         return resultIntent;
     }
@@ -94,11 +100,6 @@ public class DpcLoginActivity extends Activity {
                 startActivityForResult(
                     new Intent(getApplicationContext(), AddAccountActivity.class),
                     ADD_ACCOUNT_REQUEST_CODE);
-                return;
-            case R.id.dpc_login_comp:
-                intent.putExtra(EXTRA_PROVISIONING_MODE,
-                    PROVISIONING_MODE_MANAGED_PROFILE_ON_FULLY_MANAGED_DEVICE);
-                finishWithIntent(intent);
                 return;
             default:
                 finish();
