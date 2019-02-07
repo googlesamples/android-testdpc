@@ -33,7 +33,6 @@ import android.widget.Toast;
 
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
-import com.afwsamples.testdpc.common.ReflectionUtil;
 
 @TargetApi(29)
 public class PrivateDnsModeFragment extends Fragment implements View.OnClickListener,
@@ -122,10 +121,9 @@ public class PrivateDnsModeFragment extends Fragment implements View.OnClickList
 
     private int getPrivateDnsMode() {
         try {
-            return (Integer) ReflectionUtil.invoke(
-                    mDpm, "getGlobalPrivateDnsMode",
+            return mDpm.getGlobalPrivateDnsMode(
                     DeviceAdminReceiver.getComponentName(getActivity()));
-        } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
+        } catch (SecurityException e) {
             Log.w(TAG, "Failure getting current mode", e);
         }
 
@@ -134,10 +132,9 @@ public class PrivateDnsModeFragment extends Fragment implements View.OnClickList
 
     private String getPrivateDnsHost() {
         try {
-            return (String) ReflectionUtil.invoke(
-                    mDpm, "getGlobalPrivateDnsHost",
+            return mDpm.getGlobalPrivateDnsHost(
                     DeviceAdminReceiver.getComponentName(getActivity()));
-        } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
+        } catch (SecurityException e) {
             Log.w(TAG, "Failure getting host", e);
         }
 
@@ -146,23 +143,12 @@ public class PrivateDnsModeFragment extends Fragment implements View.OnClickList
 
     private void setPrivateDnsMode(int mode, String resolver) {
         Log.w(TAG, String.format("Setting mode %d host %s", mSelectedMode, resolver));
-        try {
-            ReflectionUtil.invoke(
-                    mDpm, "setGlobalPrivateDns",
-                    new Class[]{ComponentName.class, int.class, String.class},
-                    DeviceAdminReceiver.getComponentName(getActivity()),
-                    mode,
-                    resolver);
-            Toast.makeText(getActivity(), R.string.setting_private_dns_succeess,
-                    Toast.LENGTH_LONG).show();
-        } catch (ReflectionUtil.ReflectionIsTemporaryException e) {
-            Log.w(TAG, "Failed to invoke, cause", e);
 
-            // This is the real exception.
-            Throwable causeOfCause = e.getCause().getCause();
-
-            Toast.makeText(getActivity(),
-                    "Failure: " + causeOfCause.getMessage(), Toast.LENGTH_LONG).show();
-        }
+        final ComponentName component = DeviceAdminReceiver.getComponentName(getActivity());
+        new SetPrivateDnsTask(
+                mDpm, component, mode, resolver, (int msgId, Object... args) -> {
+                    Toast.makeText(getActivity(), getString(msgId, args),
+                            Toast.LENGTH_LONG).show();
+                }).execute(new Void[0]);
     }
 }

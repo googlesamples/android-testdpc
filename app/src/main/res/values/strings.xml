@@ -774,6 +774,7 @@
     <string name="private_dns_mode_unknown">Unknown</string>
     <string name="private_dns_mode_apply">Set</string>
     <string name="setting_private_dns_succeess">Success setting Private DNS</string>
+    <string name="setting_private_dns_failure">FAILED: %s</string>
 
     <!--  Strings for data usage -->
     <string name="data_usage">Data usage</string>
