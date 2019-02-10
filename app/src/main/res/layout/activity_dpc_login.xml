@@ -55,12 +55,6 @@
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:text="@string/dpc_login_po" />
-
-      <RadioButton
-          android:id="@+id/dpc_login_comp"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:text="@string/dpc_login_comp" />
     </RadioGroup>
   </LinearLayout>
 

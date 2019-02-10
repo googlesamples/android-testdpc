@@ -16,6 +16,9 @@
 
 package com.afwsamples.testdpc;
 
+import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE;
+import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_DEVICE_ADMIN_COMPONENT_NAME;
+
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
@@ -67,7 +70,7 @@ public class FinalizeActivity extends Activity {
         }
 
         // Show the user which account now has management, if specified.
-        String addedAccount = getIntent().getStringExtra(LaunchIntentUtil.EXTRA_ACCOUNT_NAME);
+        final String addedAccount = getAddedAccountName();
         if (addedAccount != null) {
             View accountMigrationStatusLayout;
             if (isAccountMigrated(addedAccount)) {
@@ -84,6 +87,17 @@ public class FinalizeActivity extends Activity {
         ((TextView) findViewById(R.id.explanation)).setText(Util.isDeviceOwner(this)
                 ? R.string.all_done_explanation_device_owner
                 : R.string.all_done_explanation_profile_owner);
+    }
+
+    private String getAddedAccountName() {
+        String addedAccount = getIntent().getStringExtra(LaunchIntentUtil.EXTRA_ACCOUNT_NAME);
+        // Added account infomation may be contained in EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE
+        // if FinalizeActivity is started from ACTION_ADMIN_POLICY_COMPLIANCE.
+        if (addedAccount == null) {
+            addedAccount = LaunchIntentUtil.getAddedAccountName(
+                getIntent().getParcelableExtra(EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE));
+        }
+        return addedAccount;
     }
 
     private boolean isAccountMigrated(String addedAccount) {
