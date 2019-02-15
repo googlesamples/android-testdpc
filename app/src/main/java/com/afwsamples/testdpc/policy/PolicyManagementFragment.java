@@ -37,7 +37,7 @@ import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.admin.DevicePolicyManager;
-import android.app.admin.DevicePolicyManager.InstallUpdateCallback;
+import android.app.admin.DevicePolicyManager.InstallSystemUpdateCallback;
 import android.app.admin.SystemUpdateInfo;
 import android.content.ComponentName;
 import android.content.ContentResolver;
@@ -1159,7 +1159,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 mAdminComponentName,
                 uri,
                 new MainThreadExecutor(),
-                new InstallUpdateCallback() {
+                new InstallSystemUpdateCallback() {
                   @Override
                   public void onInstallUpdateError(int errorCode, String errorMessage) {
                       showToast("Error code: " + errorCode);
