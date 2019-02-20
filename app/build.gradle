@@ -75,6 +75,53 @@ android {
             output.assemble.dependsOn lintTask
         }
     }
+
+    task stripTestOnlyNormalDebug << {
+        stripTestOnlyForBuild("normal", "debug")
+    }
+
+    task stripTestOnlyNormalRelease << {
+        stripTestOnlyForBuild("normal", "release")
+    }
+
+    task stripTestOnlyReplicaDebug << {
+        stripTestOnlyForBuild("replica", "debug")
+    }
+
+    task stripTestOnlyReplicaRelease << {
+        stripTestOnlyForBuild("replica", "release")
+    }
+
+    tasks.whenTaskAdded { task ->
+        if (task.name == "splitsDiscoveryTaskNormalDebug") {
+            task.dependsOn stripTestOnlyNormalDebug
+        } else if (task.name == "splitsDiscoveryTaskNormalRelease") {
+            task.dependsOn stripTestOnlyNormalRelease
+        } else if (task.name == "splitsDiscoveryTaskReplicaDebug") {
+            task.dependsOn stripTestOnlyReplicaDebug
+        } else if (task.name == "splitsDiscoveryTaskReplicaRelease") {
+            task.dependsOn stripTestOnlyReplicaRelease
+        }
+    }
+}
+
+// Modifies the specified build variant's intermediate AndroidManifest.xml file
+// to remove the testOnly attribute. Used for preventing Gradle from inserting the
+// attribute when TestDPC is compiled with a development Android branch.
+private void stripTestOnlyForBuild(flavor, buildType) {
+    def manifestPath =
+            "${buildDir}/intermediates/manifests/full/${flavor}/${buildType}/AndroidManifest.xml"
+    if (file(manifestPath).exists()) {
+        def xml = new XmlParser().parse(manifestPath)
+        def attributeNames = xml.application[0].attributes().collect { it.key }
+        attributeNames.each {
+            if (it.getLocalPart() == 'testOnly') {
+                xml.application[0].attributes().remove(it)
+                println "Removed testOnly attribute successfully!"
+            }
+        }
+        new XmlNodePrinter(new PrintWriter(new FileWriter(manifestPath))).print(xml)
+    }
 }
 
 dependencies {
