@@ -121,6 +121,16 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
         if (!task.performPostProvisioningOperations(intent)) {
             return;
         }
+
+        final Intent launchIntent = task.getPostProvisioningLaunchIntent(intent);
+        if (launchIntent != null) {
+            context.startActivity(launchIntent);
+        } else {
+            Log.e(TAG, "DeviceAdminReceiver.onProvisioningComplete() invoked, but ownership "
+                + "not assigned");
+            Toast.makeText(context, R.string.device_admin_receiver_failure, Toast.LENGTH_LONG)
+                .show();
+        }
     }
 
     @TargetApi(Build.VERSION_CODES.N)
