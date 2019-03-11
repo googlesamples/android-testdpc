@@ -29,7 +29,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.REQUEST_SCREEN_LOCK_COMPLEXITY"/>
+    <uses-permission android:name="android.permission.REQUEST_PASSWORD_COMPLEXITY"/>
 
     <application
             android:allowBackup="true"
