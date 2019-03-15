@@ -35,7 +35,6 @@ import android.widget.Toast;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.BaseSearchablePolicyPreferenceFragment;
-import com.afwsamples.testdpc.common.ReflectionUtil;
 import com.afwsamples.testdpc.common.preference.DpcSwitchPreference;
 import java.util.Map;
 
