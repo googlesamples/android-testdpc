@@ -105,16 +105,20 @@ public class PrivateDnsModeFragment extends Fragment implements View.OnClickList
         switch (checkedId) {
             case R.id.private_dns_mode_off:
                 mSelectedMode = PRIVATE_DNS_MODE_OFF;
+                mSetButton.setEnabled(false);
                 break;
             case R.id.private_dns_mode_automatic:
                 mSelectedMode = PRIVATE_DNS_MODE_OPPORTUNISTIC;
+                mSetButton.setEnabled(true);
                 break;
             case R.id.private_dns_mode_specific_host:
                 mSelectedMode = PRIVATE_DNS_MODE_PROVIDER_HOSTNAME;
+                mSetButton.setEnabled(true);
                 break;
             case R.id.private_dns_mode_unknown:
             default:
                 mSelectedMode = PRIVATE_DNS_MODE_UNKNOWN;
+                mSetButton.setEnabled(false);
                 break;
         }
     }

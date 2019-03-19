@@ -120,10 +120,10 @@ public class AlwaysOnVpnFragment extends SelectAppFragment {
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.Q)
+    @TargetApi(29)
     private void updateLockdown() {
         mLockdown.setChecked(mDpm.isAlwaysOnVpnLockdownEnabled(mWho));
-        final List<String> exemptedPackages = mDpm.getAlwaysOnVpnLockdownWhitelist(mWho);
+        final Set<String> exemptedPackages = mDpm.getAlwaysOnVpnLockdownWhitelist(mWho);
         mExemptedPackages.setText(
                 exemptedPackages != null ? String.join(",", exemptedPackages) : "");
     }
@@ -147,15 +147,15 @@ public class AlwaysOnVpnFragment extends SelectAppFragment {
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.Q)
+    @TargetApi(29)
     private void setAlwaysOnVpnPackageQPlus(String pkg)
             throws PackageManager.NameNotFoundException {
         final boolean lockdown = mLockdown.isChecked();
-        final List<String> packages = lockdown ?
+        final Set<String> packages = lockdown ?
                 Arrays.stream(mExemptedPackages.getText().toString().split(","))
                         .map(String::trim)
                         .filter(s -> !s.isEmpty())
-                        .collect(Collectors.toList())
+                        .collect(Collectors.toSet())
                 : null;
         mDpm.setAlwaysOnVpnPackage(mWho, pkg, lockdown, packages);
     }
