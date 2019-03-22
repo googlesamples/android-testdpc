@@ -18,6 +18,9 @@ package com.afwsamples.testdpc.provision;
 
 import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_ACCOUNT_TO_MIGRATE;
 import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE;
+import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_MODE;
+import static android.app.admin.DevicePolicyManager.PROVISIONING_MODE_FULLY_MANAGED_DEVICE;
+import static android.app.admin.DevicePolicyManager.PROVISIONING_MODE_MANAGED_PROFILE;
 
 import android.accounts.Account;
 import android.app.Activity;
@@ -37,13 +40,6 @@ import com.android.setupwizardlib.GlifLayout;
  * {@link android.app.admin.DevicePolicyManager#ACTION_GET_PROVISIONING_MODE} intent.
  */
 public class DpcLoginActivity extends Activity {
-
-    // TODO: clean up these hard coded constants once the new SDK is available.
-    private static final String EXTRA_PROVISIONING_MODE =
-        "android.app.extra.PROVISIONING_MODE";
-    public static final int PROVISIONING_MODE_DO = 1;
-    public static final int PROVISIONING_MODE_PO = 2;
-    public static final int PROVISIONING_MODE_MANAGED_PROFILE_ON_FULLY_MANAGED_DEVICE = 3;
 
     private static final String LOG_TAG = "DpcLoginActivity";
     private static final int ADD_ACCOUNT_REQUEST_CODE = 1;
@@ -76,7 +72,7 @@ public class DpcLoginActivity extends Activity {
 
     private Intent createResultIntentFromData(Intent data) {
         final Intent resultIntent = new Intent();
-        resultIntent.putExtra(EXTRA_PROVISIONING_MODE, PROVISIONING_MODE_PO);
+        resultIntent.putExtra(EXTRA_PROVISIONING_MODE, PROVISIONING_MODE_MANAGED_PROFILE);
         if (data != null && data.hasExtra(EXTRA_PROVISIONING_ACCOUNT_TO_MIGRATE)) {
             final Account accountToMigrate = data.getParcelableExtra(
                 EXTRA_PROVISIONING_ACCOUNT_TO_MIGRATE);
@@ -93,7 +89,7 @@ public class DpcLoginActivity extends Activity {
         RadioGroup dpcLoginOptions = findViewById(R.id.dpc_login_options);
         switch (dpcLoginOptions.getCheckedRadioButtonId()) {
             case R.id.dpc_login_do:
-                intent.putExtra(EXTRA_PROVISIONING_MODE, PROVISIONING_MODE_DO);
+                intent.putExtra(EXTRA_PROVISIONING_MODE, PROVISIONING_MODE_FULLY_MANAGED_DEVICE);
                 finishWithIntent(intent);
                 return;
             case R.id.dpc_login_po:
