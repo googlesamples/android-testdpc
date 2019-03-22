@@ -548,6 +548,10 @@
     <string name="plus">+</string>
     <string name="app_restrictions_managing_package">App restrictions manager</string>
 
+    <!-- Strings for app feedback -->
+    <!-- [CHAR LIMIT=40] Settings label. A user can toggle this setting to turn on notifications for app feedback. -->
+    <string name="app_feedback_notifications">App feedback notifications</string>
+
     <!-- Strings for metered data restriction -->
     <string name="metered_data_restriction">Disable metered data</string>
     <string name="update_pkgs">Update</string>
