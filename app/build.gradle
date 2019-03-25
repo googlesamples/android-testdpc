@@ -5,11 +5,11 @@ apply from: '../dist.gradle'
 ext {
     /* Version code for *next* release, bump *after* a release is created. */
     // 1 or more digits
-    versionMajor = 5
+    versionMajor = 6
     // exactly 1 digit
     versionMinor = 0
     // exactly 2 digits
-    versionBuild = 04
+    versionBuild = 00
 }
 
 android {

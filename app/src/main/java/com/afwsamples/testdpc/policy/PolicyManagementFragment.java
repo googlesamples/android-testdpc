@@ -17,9 +17,6 @@
 package com.afwsamples.testdpc.policy;
 
 import static android.os.UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES;
-import static com.afwsamples.testdpc.common.ReflectionUtil.intConstant;
-import static com.afwsamples.testdpc.common.ReflectionUtil.invoke;
-import static com.afwsamples.testdpc.common.ReflectionUtil.stringConstant;
 import static com.afwsamples.testdpc.common.Util.isAtLeastQ;
 import static com.afwsamples.testdpc.common.preference.DpcPreferenceHelper.NO_CUSTOM_CONSTRIANT;
 
@@ -99,7 +96,6 @@ import com.afwsamples.testdpc.common.BaseSearchablePolicyPreferenceFragment;
 import com.afwsamples.testdpc.common.CertificateUtil;
 import com.afwsamples.testdpc.common.MediaDisplayFragment;
 import com.afwsamples.testdpc.common.PackageInstallationUtils;
-import com.afwsamples.testdpc.common.ReflectionUtil.ReflectionIsTemporaryException;
 import com.afwsamples.testdpc.common.UserArrayAdapter;
 import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.common.preference.CustomConstraint;
@@ -401,26 +397,22 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final SparseIntArray PASSWORD_COMPLEXITY = new SparseIntArray(4);
     static {
         if (isAtLeastQ()) {
-            try {
-                final int[] complexityIds = new int[]{
-                    intConstant(DevicePolicyManager.class, "PASSWORD_COMPLEXITY_NONE"),
-                    intConstant(DevicePolicyManager.class, "PASSWORD_COMPLEXITY_LOW"),
-                    intConstant(DevicePolicyManager.class, "PASSWORD_COMPLEXITY_MEDIUM"),
-                    intConstant(DevicePolicyManager.class, "PASSWORD_COMPLEXITY_HIGH")
-                };
+            final int[] complexityIds = new int[]{
+                DevicePolicyManager.PASSWORD_COMPLEXITY_NONE,
+                DevicePolicyManager.PASSWORD_COMPLEXITY_LOW,
+                DevicePolicyManager.PASSWORD_COMPLEXITY_MEDIUM,
+                DevicePolicyManager.PASSWORD_COMPLEXITY_HIGH
+            };
 
-                // Strings to show for each password complexity setting.
-                final int[] complexityNames = new int[]{
-                    R.string.password_complexity_none,
-                    R.string.password_complexity_low,
-                    R.string.password_complexity_medium,
-                    R.string.password_complexity_high
-                };
-                for (int i = 0; i < complexityIds.length; i++) {
-                    PASSWORD_COMPLEXITY.put(complexityIds[i], complexityNames[i]);
-                }
-            } catch (ReflectionIsTemporaryException e) {
-                Log.e(TAG, "Cannot get password complexity constants.", e);
+            // Strings to show for each password complexity setting.
+            final int[] complexityNames = new int[]{
+                R.string.password_complexity_none,
+                R.string.password_complexity_low,
+                R.string.password_complexity_medium,
+                R.string.password_complexity_high
+            };
+            for (int i = 0; i < complexityIds.length; i++) {
+                PASSWORD_COMPLEXITY.put(complexityIds[i], complexityNames[i]);
             }
         }
     }
@@ -1329,13 +1321,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 return true;
             case SET_NEW_PASSWORD_WITH_COMPLEXITY:
                 Intent intent = new Intent(DevicePolicyManager.ACTION_SET_NEW_PASSWORD);
-                try {
-                    intent.putExtra(
-                        stringConstant(DevicePolicyManager.class, "EXTRA_PASSWORD_COMPLEXITY"),
-                        Integer.parseInt((String) newValue));
-                } catch (ReflectionIsTemporaryException e) {
-                    Log.e(TAG, "Cannot get EXTRA_PASSWORD_COMPLEXITY.", e);
-                }
+                intent.putExtra(
+                    DevicePolicyManager.EXTRA_PASSWORD_COMPLEXITY,
+                    Integer.parseInt((String) newValue));
                 startActivity(intent);
                 return true;
         }
@@ -2145,13 +2133,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             return;
         }
 
-        try {
-            int complexity =
-                (int) invoke(mDevicePolicyManager, "getPasswordComplexity");
-            passwordComplexityPreference.setSummary(PASSWORD_COMPLEXITY.get(complexity));
-        } catch (ReflectionIsTemporaryException e) {
-            Log.e(TAG, "Cannot get password complexity.", e);
-        }
+        int complexity = mDevicePolicyManager.getPasswordComplexity();
+        passwordComplexityPreference.setSummary(PASSWORD_COMPLEXITY.get(complexity));
     }
 
     @TargetApi(Build.VERSION_CODES.N)
