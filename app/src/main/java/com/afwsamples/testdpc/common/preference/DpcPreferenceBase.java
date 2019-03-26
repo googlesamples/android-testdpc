@@ -29,6 +29,7 @@ public interface DpcPreferenceBase {
     void clearUserConstraint();
     void clearNonCustomConstraints();
     void setCustomConstraint(@Nullable CustomConstraint customConstraint);
+    void addCustomConstraint(@Nullable CustomConstraint customConstraint);
     /**
      * To re-check is the constraint met and enable/disable the preference accordingly.
      */

@@ -49,6 +49,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.BatteryManager;
 import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.UserHandle;
 import android.os.UserManager;
@@ -545,15 +546,19 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         mDisableStatusBarPreference = (DpcPreference) findPreference(DISABLE_STATUS_BAR);
         mDisableStatusBarPreference.setOnPreferenceClickListener(this);
         mDisableStatusBarPreference.setCustomConstraint(this::validateAffiliatedUserAfterP);
+        mDisableStatusBarPreference.addCustomConstraint(this::validateDeviceOwnerBeforeP);
         mReenableStatusBarPreference = (DpcPreference) findPreference(REENABLE_STATUS_BAR);
         mReenableStatusBarPreference.setOnPreferenceClickListener(this);
         mReenableStatusBarPreference.setCustomConstraint(this::validateAffiliatedUserAfterP);
+        mReenableStatusBarPreference.addCustomConstraint(this::validateDeviceOwnerBeforeP);
         mDisableKeyguardPreference = (DpcPreference) findPreference(DISABLE_KEYGUARD);
         mDisableKeyguardPreference.setOnPreferenceClickListener(this);
         mDisableKeyguardPreference.setCustomConstraint(this::validateAffiliatedUserAfterP);
+        mDisableKeyguardPreference.addCustomConstraint(this::validateDeviceOwnerBeforeP);
         mReenableKeyguardPreference = (DpcPreference) findPreference(REENABLE_KEYGUARD);
         mReenableKeyguardPreference.setOnPreferenceClickListener(this);
         mReenableKeyguardPreference.setCustomConstraint(this::validateAffiliatedUserAfterP);
+        mReenableKeyguardPreference.addCustomConstraint(this::validateDeviceOwnerBeforeP);
         findPreference(START_KIOSK_MODE).setOnPreferenceClickListener(this);
         mStayOnWhilePluggedInSwitchPreference = (SwitchPreference) findPreference(
                 STAY_ON_WHILE_PLUGGED_IN);
@@ -3575,19 +3580,21 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     @TargetApi(28)
     private int validateAffiliatedUserAfterP() {
-        if (BuildCompat.isAtLeastP()) {
-            if (mDevicePolicyManager.isAffiliatedUser()) {
-                return NO_CUSTOM_CONSTRIANT;
-            } else {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            if (!mDevicePolicyManager.isAffiliatedUser()) {
                 return R.string.require_affiliated_user;
             }
-        } else {
-            if (mDevicePolicyManager.isDeviceOwnerApp(mPackageName)) {
-               return NO_CUSTOM_CONSTRIANT;
-            } else {
+        }
+        return NO_CUSTOM_CONSTRIANT;
+    }
+
+    private int validateDeviceOwnerBeforeP() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+            if (!mDevicePolicyManager.isDeviceOwnerApp(mPackageName)) {
                 return R.string.requires_device_owner;
             }
         }
+        return NO_CUSTOM_CONSTRIANT;
     }
 
     abstract class ManageLockTaskListCallback {

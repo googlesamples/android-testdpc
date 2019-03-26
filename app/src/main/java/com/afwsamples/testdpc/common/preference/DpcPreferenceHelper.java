@@ -81,7 +81,7 @@ public class DpcPreferenceHelper {
     private Preference mPreference;
 
     private CharSequence mConstraintViolationSummary = null;
-    private CustomConstraint mCustomConstraint = null;
+    private List<CustomConstraint> mCustomConstraints = new ArrayList<>();
     private int mMinSdkVersion;
     private @AdminKind int mAdminConstraint;
     private @UserKind int mUserConstraint;
@@ -194,19 +194,37 @@ public class DpcPreferenceHelper {
     /**
      * Specify a custom constraint by setting a {{@link CustomConstraint}} object. The enabled
      * state of the preference will be updated accordingly.
+     *
+     * <p>This will remove all previously set custom constraints. If you do not want to do this, use
+     * {@link #addCustomConstraint(CustomConstraint)}.
      */
     public void setCustomConstraint(CustomConstraint customConstraint) {
-        mCustomConstraint = customConstraint;
+        clearCustomConstraints();
+        addCustomConstraint(customConstraint);
+    }
+
+    /**
+     * Add a {@link CustomConstraint} to be evaluated in addition to existing custom constraints.
+     *
+     * <p>The enabled state of the preference will be updated accordingly.
+     *
+     * <p>The new constraint will be enforced in addition to any previously set custom constraints.
+     * If you'd prefer that this constraint replaces previous constraints,
+     * use {@link #setCustomConstraint(CustomConstraint)}.
+     */
+    public void addCustomConstraint(CustomConstraint customConstraint) {
+        mCustomConstraints.add(customConstraint);
         disableIfConstraintsNotMet();
     }
 
     /**
-     * Remove any custom constraints set by {@link #setCustomConstraint(CustomConstraint)}.
-     * <p/>
-     * This method is safe to call if there is no current custom constraint.
+     * Remove any custom constraints set by {@link #setCustomConstraint(CustomConstraint)} and
+     * {@link #addCustomConstraint(CustomConstraint)}.
+     *
+     * <p>This method is safe to call if there is no current custom constraint.
      */
-    public void clearCustomConstraint() {
-        setCustomConstraint(null);
+    public void clearCustomConstraints() {
+        mCustomConstraints.clear();
     }
 
     public void disableIfConstraintsNotMet() {
@@ -233,8 +251,8 @@ public class DpcPreferenceHelper {
             return getUserConstraintSummary();
         }
 
-        if (mCustomConstraint != null) {
-            @StringRes int strRes = mCustomConstraint.validateConstraint();
+        for (CustomConstraint customConstraint : mCustomConstraints) {
+            @StringRes int strRes = customConstraint.validateConstraint();
             if (strRes != NO_CUSTOM_CONSTRIANT) {
                 return mContext.getString(strRes);
             }
