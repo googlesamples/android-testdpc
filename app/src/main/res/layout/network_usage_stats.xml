@@ -131,10 +131,4 @@
         android:clipToPadding="false"
         android:smoothScrollbar="true"
         android:scrollbarStyle="outsideInset" />
-    <Button
-        android:id="@+id/back_to_apps_button"
-        android:visibility="gone"
-        android:text="@string/network_stats_back_to_apps_button_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
 </LinearLayout>

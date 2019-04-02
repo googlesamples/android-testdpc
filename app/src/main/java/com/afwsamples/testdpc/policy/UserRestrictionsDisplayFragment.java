@@ -76,7 +76,7 @@ public class UserRestrictionsDisplayFragment extends BaseSearchablePolicyPrefere
         }
 
         updateAllUserRestrictions();
-        constrainPerferences();
+        constrainPreferences();
     }
 
     @Override
@@ -98,7 +98,9 @@ public class UserRestrictionsDisplayFragment extends BaseSearchablePolicyPrefere
                 mDevicePolicyManager.addUserRestriction(mAdminComponentName, restriction);
             } else {
                 mDevicePolicyManager.clearUserRestriction(mAdminComponentName, restriction);
-                if (DISALLOW_INSTALL_UNKNOWN_SOURCES.equals(restriction)) {
+                if (DISALLOW_INSTALL_UNKNOWN_SOURCES.equals(restriction) ||
+                        UserRestriction.DISALLOW_INSTALL_UNKNOWN_SOURCES_GLOBALLY.equals(
+                                restriction)) {
                     new AlertDialog.Builder(getActivity())
                             .setMessage(R.string.check_setting_disallow_install_unknown_sources)
                             .setPositiveButton(R.string.check_setting_ok, null)
@@ -130,7 +132,7 @@ public class UserRestrictionsDisplayFragment extends BaseSearchablePolicyPrefere
         preference.setChecked(disallowed);
     }
 
-    private void constrainPerferences() {
+    private void constrainPreferences() {
         for (String restriction : UserRestriction.MNC_PLUS_RESTRICTIONS) {
             DpcPreferenceBase pref = (DpcPreferenceBase) findPreference(restriction);
             pref.setMinSdkVersion(Build.VERSION_CODES.M);
@@ -146,6 +148,11 @@ public class UserRestrictionsDisplayFragment extends BaseSearchablePolicyPrefere
         for (String restriction: UserRestriction.PIC_PLUS_RESTRICTIONS) {
             DpcPreferenceBase pref = (DpcPreferenceBase) findPreference(restriction);
             pref.setMinSdkVersion(Build.VERSION_CODES.P);
+        }
+        for (String restriction: UserRestriction.QT_PLUS_RESTRICTIONS) {
+            DpcPreferenceBase pref = (DpcPreferenceBase) findPreference(restriction);
+            // Replace this with Q when available
+            pref.setMinSdkVersion(Build.VERSION_CODES.CUR_DEVELOPMENT);
         }
         for (String restriction : UserRestriction.PRIMARY_USER_ONLY_RESTRICTIONS) {
             DpcPreferenceBase pref = (DpcPreferenceBase) findPreference(restriction);

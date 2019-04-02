@@ -16,7 +16,7 @@
 
 package com.afwsamples.testdpc.policy;
 
-import static com.afwsamples.testdpc.DeviceAdminReceiver.NETWORK_LOGS_FILE_PREFIX;
+import static com.afwsamples.testdpc.CommonReceiverOperations.NETWORK_LOGS_FILE_PREFIX;
 
 import android.annotation.TargetApi;
 import android.app.ListFragment;
@@ -120,9 +120,12 @@ public class NetworkLogsFragment extends ListFragment {
         if (networkLogsFiles == null || networkLogsFiles.length == 0) {
             return null;
         }
-        // Order, so that most recent batch token is first.
-        Arrays.sort(networkLogsFiles, Collections.reverseOrder());
-        return networkLogsFiles[0];
+        // Get the most recent batch. Batches are sorted by the timestamp they were last modified
+        // in, also corresponding to the last value in their file names.
+        return Collections.max(
+            // Can't use Comparator.comparing(): requires default interface methods (min_sdk >= 24).
+            Arrays.asList(networkLogsFiles),
+            (f1, f2) -> Long.signum (f1.lastModified() - f2.lastModified()));
     }
 
     private long determineBatchToken(String fileName) throws NumberFormatException {

@@ -62,7 +62,7 @@
     <string name="fail_to_add_account">Failed to add account</string>
     <string name="remove_account">Remove account</string>
     <string name="success_remove_account">Account removed: %s</string>
-    <string name="fail_to_remove_account">Failed to add account: %s</string>
+    <string name="fail_to_remove_account">Failed to remove account: %s</string>
     <string name="no_accounts_available">No accounts available.</string>
     <string name="icon">Icon</string>
     <string name="manage_apps">Manage applications</string>
@@ -114,6 +114,7 @@
 
     <string name="this_is_a_device_owner">This app is the device owner.</string>
     <string name="this_is_a_profile_owner">This app is a profile owner.</string>
+    <string name="this_is_a_delegated_app">This app has delegated permissions.</string>
     <string name="this_is_not_an_admin">This app is not an admin.</string>
 
     <!-- Strings for provisioning disclaimers-->
@@ -241,6 +242,12 @@
     <string name="apn_wrong_inetaddress">Cannot parse proxy address or MMS proxy address</string>
     <string name="apn_wrong_port">Cannot parse proxy port or MMS proxy port</string>
 
+    <!-- Strings for Cross Profile Calendar -->
+    <string name="cross_profile_calendar">Cross-profile calendar</string>
+    <string name="cross_profile_calendar_set_allowed_packages">Set allowed packages</string>
+    <string name="cross_profile_calendar_set_allowed_packages_title">Enter packages names, separated by comma</string>
+    <string name="cross_profile_calendar_allow_all_packages">Allow all packages</string>
+
     <string-array name="apn_auth_type_choices">
         <item>Not specified</item>
         <!-- Do not translate. -->
@@ -345,6 +352,8 @@
     <string name="no_uninstalled_apps">All cached apps have been installed.</string>
     <string name="enable">Enable</string>
     <string name="invalid_system_apps_action">Invalid action</string>
+    <string name="install_apk_package_title">Install package from APK file</string>
+    <string name="uninstall_packages_title">Uninstall package</string>
     <string name="hide_apps_title">Hide apps</string>
     <string name="hide_apps_empty">All apps are hidden.</string>
     <string name="hide_apps_success">%s is now hidden.</string>
@@ -437,6 +446,7 @@
     <string name="check_setting_disallow_install_unknown_sources">Ensure that
         \"Allow installs from unknown sources\" under Settings management is correctly checked.
     </string>
+    <string name="disallow_install_unknown_sources_globally">Disallow installs from unknown sources globally</string>
     <string name="check_setting_ok">Ok</string>
     <string name="disallow_modify_accounts">Disallow modify accounts</string>
     <string name="disallow_mount_physical_media">Disallow mount physical media</string>
@@ -465,6 +475,7 @@
     <string name="disallow_ambient_display">Disallow ambient display</string>
     <string name="disallow_share_into_work_profile">Disallow sharing data into the profile</string>
     <string name="disallow_printing">Disallow printing</string>
+    <string name="disallow_config_private_dns">Disallow config Private DNS</string>
     <string name="user_restriction_error_msg">Operation not allowed</string>
 
     <!-- Strings for select app -->
@@ -525,6 +536,7 @@
     <string name="serial_num_attestation_checkbox">Include device serial number</string>
     <string name="imei_attestation_checkbox">Include device IMEI</string>
     <string name="meid_attestation_checkbox">Include device MEID</string>
+    <string name="use_strongbox_checkbox">Use StrongBox</string>
 
     <!-- Strings for app restrictions -->
     <string name="manage_app_restrictions">Manage app restrictions</string>
@@ -555,6 +567,9 @@
     <string name="delegation_scope_package_access">Package access</string>
     <string name="delegation_scope_enable_system_app">System app enabling</string>
     <string name="delegation_scope_keep_uninstalled_packages">Keep uninstalled packages</string>
+    <string name="delegation_scope_network_logging">Access network logging</string>
+    <string name="delegation_scope_cert_selection">Choose private key</string>
+    <string name="delegation_scope_package_installation">Silently install APK</string>
     <string name="manage_cert_installer">Delegated cert installer</string>
 
     <!-- strings used in the alert dialog for editing application restrictions. -->
@@ -588,7 +603,9 @@
     <!-- Enterprise security logging -->
     <string name="enable_security_logging">Enable security logging</string>
     <string name="request_security_logs">Request security logs</string>
+    <string name="request_pre_reboot_security_logs">Request pre-reboot security logs</string>
     <string name="failed_to_retrieve_security_logs">Failed to retrieve security logs, they were probably accessed less than 2 hours ago</string>
+    <string name="failed_to_retrieve_pre_reboot_security_logs">Failed to retrieve pre-reboot security logs, make sure your device supports it</string>
     <string name="exception_retrieving_security_logs">Not allowed to retrieve security logs, SecurityException thrown</string>
     <string name="security_logs_retrieved_message">---- Logs retrieved  %s ----</string>
     <string name="on_security_logs_available">Test DPC: Security logs ready to be retrieved</string>
@@ -749,6 +766,15 @@
     <string name="no_host">No host specified.</string>
     <string name="no_port">No port specified.</string>
     <string name="port_out_of_range">Port out of range.</string>
+    <string name="set_global_private_dns">Set Private DNS Mode</string>
+    <string name="current_private_dns_mode">Current Mode</string>
+    <string name="private_dns_mode_off">Off</string>
+    <string name="private_dns_mode_automatic">Automatic</string>
+    <string name="private_dns_mode_specific_host">Specified Host</string>
+    <string name="private_dns_mode_unknown">Unknown</string>
+    <string name="private_dns_mode_apply">Set</string>
+    <string name="setting_private_dns_succeess">Success setting Private DNS</string>
+    <string name="setting_private_dns_failure">FAILED: %s</string>
 
     <!--  Strings for data usage -->
     <string name="data_usage">Data usage</string>
@@ -777,7 +803,6 @@
     <string name="network_stats_uid_tethering">Tethering</string>
     <string name="network_stats_uid_system">Android System</string>
     <string name="network_stats_bucket_usage">Received %1$s in %2$d packets and transmitted %3$s in %4$d packets.</string>
-    <string name="network_stats_back_to_apps_button_label">Back to apps list</string>
     <string name="network_stats_foreground_state">State: foreground</string>
     <string name="network_stats_default_state">State: default (background)</string>
     <string name="network_stats_combined_state">State: combined foreground and background</string>
@@ -824,6 +849,10 @@
     <string name="set_time_zone_hint">Example: "America/New_York", "America/Los_Angeles"</string>
     <string name="no_timezone">Timezone not specified</string>
     <string name="invalid_timezone">Timezone id not valid</string>
+
+    <!-- Strings for setting profile name -->
+    <string name="set_profile_name">Set profile name</string>
+    <string name="no_profile_name">Missing profile name</string>
 
     <!-- Strings for set system settings -->
     <string name="set_system_setting">Set system settings</string>
@@ -897,6 +926,13 @@
     <string name="password_compliant_title">Active password compliant</string>
     <string name="password_compliant_profile_summary">Personal: %1$s, Work: %2$s</string>
     <string name="password_compliant_summary">Compliant %1$s</string>
+
+    <!-- Strings for password complexity -->
+    <string name="password_complexity_title">Password complexity</string>
+    <string name="password_complexity_none">None</string>
+    <string name="password_complexity_low">Low</string>
+    <string name="password_complexity_medium">Medium</string>
+    <string name="password_complexity_high">High</string>
 
     <string name="separate_challenge_title">Separate challenge</string>
     <string name="separate_challenge_summary">Separate challenge enabled: %s</string>
@@ -973,7 +1009,7 @@
     <string name="transfer_ownership_affiliated_complete_title">Transfer of affiliated profile ownership is complete</string>
     <string name="transfer_ownership_affiliated_complete_message">The transferred user is %1$s</string>
 
-    <!-- SefetyNet -->
+    <!-- SafetyNet -->
     <string name="safetynet_preference_title">SafetyNet</string>
     <string name="attest_preference_title">SafetyNet Attestation</string>
     <string name="attest_preference_summary">Checking Device Compatibility with SafetyNet</string>
@@ -989,6 +1025,7 @@
     <string name="safetynet_verify_on_server">You should verify the response in your server.</string>
 
     <string name="request_to_set_new_password">Request user to set new password</string>
+    <string name="request_to_set_new_password_with_complexity">Set new password and specify minimum complexity</string>
     <string name="request_to_set_profile_parent_new_password">Request user to set profile parent new password</string>
 
     <!-- Device owner to profile owner communication (COMP and DO<->PO of secondary users) -->
@@ -1037,5 +1074,22 @@
     <string name="cross_profile_apps_api_explanation">By using the CrossProfileApps APIs, apps can start an instance in another profile, provided that the app is also installed in that profile.</string>
     <string name="cross_profile_apps_available">TestDPC is installed in another profile, tap the icon to launch it in that profile.</string>
     <string name="cross_profile_apps_not_available">TestDPC is not installed in another profile, try installing it and come back to here.</string>
+
+    <string name="install_update">Install update from file</string>
+    <string name="install_update_prompt">This will attempt to install the update file ota.zip in the TestDPC files directory, if the file exists (i.e. if you pushed it there with adb). Do you want to continue?</string>
+    <string name="install_update_prompt_yes">Yes</string>
+    <string name="install_update_prompt_no">No</string>
+
+    <!-- strings used in dpc login screen and dpc policy compliance screen.-->
+    <string name="dpc_login_title">Select provisioning method</string>
+    <string name="dpc_login_explanation">Select provisioning method:</string>
+    <string name="dpc_login_do">Fully managed device</string>
+    <string name="dpc_login_po">Managed profile</string>
+    <string name="dpc_login_comp">Managed profile on a fully managed device</string>
+    <string name="dpc_policy_compliance_title">Dpc policy compliance</string>
+    <string name="dpc_policy_compliance_explanation">TestDPC setup is completed.</string>
+
+    <string name="vpn_exempted_packages">Exempted packages</string>
+    <string name="vpn_lockdown">Lockdown</string>
 
 </resources>

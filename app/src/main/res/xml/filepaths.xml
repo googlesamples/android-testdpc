@@ -17,4 +17,5 @@
 
 <paths>
     <files-path path="media/" name="media" />
+    <files-path path="/" name="allfiles" />
 </paths>

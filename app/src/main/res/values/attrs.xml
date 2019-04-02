@@ -28,6 +28,7 @@
             <enum name="O" value="26" />
             <enum name="O_MR1" value="27" />
             <enum name="P" value="28" />
+            <enum name="Q" value="10000" />
         </attr>
 
         <!-- Constrain a preference to DO or PO admins. -->
@@ -43,6 +44,9 @@
             <flag name="any" value="0x7" />
         </attr>
 
+        <!-- Constrain a preference to a delegated scope. -->
+        <attr name="delegation" format="string" />
+
         <!-- Constrain a preference to certain users. -->
         <attr name="user">
             <flag name="primaryUser" value="0x1" />
@@ -55,5 +59,6 @@
 
             <flag name="any" value="0x7" /> <!-- default -->
         </attr>
+
     </declare-styleable>
 </resources>

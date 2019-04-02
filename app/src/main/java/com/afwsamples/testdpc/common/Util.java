@@ -27,6 +27,7 @@ import android.content.IntentFilter;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.UserHandle;
@@ -153,6 +154,12 @@ public class Util {
         return Build.VERSION.SDK_INT >= VERSION_CODES.M;
     }
 
+    public static boolean isAtLeastQ() {
+        return VERSION.CODENAME.length() == 1
+            && VERSION.CODENAME.charAt(0) >= 'Q'
+            && VERSION.CODENAME.charAt(0) <= 'Z';
+    }
+
     @TargetApi(VERSION_CODES.O)
     public static List<UserHandle> getBindDeviceAdminTargetUsers(Context context) {
         if (!BuildCompat.isAtLeastO()) {
@@ -163,14 +170,13 @@ public class Util {
         return dpm.getBindDeviceAdminTargetUsers(DeviceAdminReceiver.getComponentName(context));
     }
 
-    public static void showFileViewerForImportingCertificate(PreferenceFragment fragment,
-            int requestCode) {
+    public static void showFileViewer(PreferenceFragment fragment, int requestCode) {
         Intent certIntent = new Intent(Intent.ACTION_GET_CONTENT);
         certIntent.setTypeAndNormalize("*/*");
         try {
             fragment.startActivityForResult(certIntent, requestCode);
         } catch (ActivityNotFoundException e) {
-            Log.e(TAG, "showFileViewerForImportingCertificate: ", e);
+            Log.e(TAG, "showFileViewer: ", e);
         }
     }
 
@@ -251,5 +257,14 @@ public class Util {
     private static DevicePolicyManager getDevicePolicyManager(Context context) {
         return (DevicePolicyManager)context.getSystemService(Service.DEVICE_POLICY_SERVICE);
     }
+
+    public static boolean hasDelegation(Context context, String delegation) {
+        if (Build.VERSION.SDK_INT < VERSION_CODES.O) {
+            return false;
+        }
+        DevicePolicyManager dpm = context.getSystemService(DevicePolicyManager.class);
+        return dpm.getDelegatedScopes(null, context.getPackageName()).contains(delegation);
+    }
+
 
 }

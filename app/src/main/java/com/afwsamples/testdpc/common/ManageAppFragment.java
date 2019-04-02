@@ -46,6 +46,14 @@ public abstract class ManageAppFragment extends BaseManageComponentFragment<Appl
                 managedAppList);
     }
 
+    /**
+     * Additionally filter apps returned in the list, return {@code true} to keep the app in the
+     * list, {@code false} to exclude it.
+     */
+    protected boolean filterApp(ApplicationInfo info) {
+        return true;
+    }
+
     private List<ApplicationInfo> getInstalledOrLaunchableApps() {
         List<ApplicationInfo> installedApps = mPackageManager.getInstalledApplications(
                 0 /* Default flags */);
@@ -54,7 +62,9 @@ public abstract class ManageAppFragment extends BaseManageComponentFragment<Appl
             if (mPackageManager.getLaunchIntentForPackage(applicationInfo.packageName) != null
                     || (applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0
                     || WHITELISTED_APPS.contains(applicationInfo.packageName)) {
-                filteredAppList.add(applicationInfo);
+                if (filterApp(applicationInfo)) {
+                    filteredAppList.add(applicationInfo);
+                }
             }
         }
         return filteredAppList;

@@ -18,6 +18,7 @@ package com.afwsamples.testdpc.profilepolicy.permission;
 
 import android.annotation.TargetApi;
 import android.app.admin.DevicePolicyManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
@@ -36,6 +37,7 @@ import android.widget.TextView;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.ManageAppFragment;
+import com.afwsamples.testdpc.common.Util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,11 +53,17 @@ public class ManageAppPermissionsFragment extends ManageAppFragment {
     private DevicePolicyManager mDpm;
     private List<AppPermissionsArrayAdapter.AppPermission> mAppPermissions = new ArrayList<>();
     private TextView mAppPermissionsView;
+    private ComponentName mAdminComponent;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mDpm = (DevicePolicyManager) getContext().getSystemService(Context.DEVICE_POLICY_SERVICE);
+        if (Util.hasDelegation(getActivity(), DevicePolicyManager.DELEGATION_PERMISSION_GRANT)) {
+            mAdminComponent = null;
+        } else {
+            mAdminComponent = DeviceAdminReceiver.getComponentName(getContext());
+        }
     }
 
     @Override
@@ -103,8 +111,8 @@ public class ManageAppPermissionsFragment extends ManageAppFragment {
 
             List<AppPermissionsArrayAdapter.AppPermission> populatedPermissions = new ArrayList<>();
             for (String permission : permissions) {
-                int permissionState = mDpm.getPermissionGrantState(
-                        DeviceAdminReceiver.getComponentName(getContext()), pkgName, permission);
+                int permissionState = mDpm.getPermissionGrantState(mAdminComponent,
+                        pkgName, permission);
                 AppPermissionsArrayAdapter.AppPermission populatedPerm =
                         new AppPermissionsArrayAdapter.AppPermission(pkgName, permission,
                                 permissionState);
@@ -128,7 +136,8 @@ public class ManageAppPermissionsFragment extends ManageAppFragment {
 
     @Override
     protected BaseAdapter createListAdapter() {
-        return new AppPermissionsArrayAdapter(getActivity(), 0, mAppPermissions);
+        return new AppPermissionsArrayAdapter(getActivity(), 0, mAppPermissions,
+                mAdminComponent);
     }
 
     /**

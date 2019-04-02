@@ -22,7 +22,6 @@ import android.content.res.TypedArray;
 import android.os.Build;
 import android.support.annotation.IntDef;
 import android.support.annotation.StringRes;
-import android.support.v4.os.BuildCompat;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceViewHolder;
 import android.text.TextUtils;
@@ -36,6 +35,7 @@ import com.afwsamples.testdpc.common.Util;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -85,6 +85,7 @@ public class DpcPreferenceHelper {
     private int mMinSdkVersion;
     private @AdminKind int mAdminConstraint;
     private @UserKind int mUserConstraint;
+    private String mDelegationConstraint;
 
     /**
      * Update this method as {@link Build.VERSION_CODES} and Android releases are updated.
@@ -93,6 +94,10 @@ public class DpcPreferenceHelper {
      *         not yet assigned.
      */
     private int getDeviceSdkInt() {
+        // TODO(b/117767701): Remove this when Q version code is finalized.
+        if (Util.isAtLeastQ()) {
+            return Build.VERSION_CODES.CUR_DEVELOPMENT;
+        }
         return Build.VERSION.SDK_INT;
     }
 
@@ -115,7 +120,7 @@ public class DpcPreferenceHelper {
         mAdminConstraint = a.getInt(R.styleable.DpcPreference_admin, ADMIN_DEFAULT);
         // noinspection ResourceType
         mUserConstraint = a.getInt(R.styleable.DpcPreference_user, USER_DEFAULT);
-
+        mDelegationConstraint = a.getString(R.styleable.DpcPreference_delegation);
         a.recycle();
     }
 
@@ -220,7 +225,7 @@ public class DpcPreferenceHelper {
             return mContext.getString(R.string.requires_android_api_level, mMinSdkVersion);
         }
 
-        if (!isEnabledForAdmin(getCurrentAdmin())) {
+        if (!isSufficientlyPrivileged(getCurrentAdmin(), getCurrentDelegations())) {
             return getAdminConstraintSummary();
         }
 
@@ -251,21 +256,38 @@ public class DpcPreferenceHelper {
         return ADMIN_NONE;
     }
 
+    private List<String> getCurrentDelegations() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            return Collections.EMPTY_LIST;
+        }
+        final DevicePolicyManager dpm =
+                (DevicePolicyManager) mContext.getSystemService(Context.DEVICE_POLICY_SERVICE);
+        final String packageName = mContext.getPackageName();
+            return dpm.getDelegatedScopes(null, packageName);
+    }
+
     private int getCurrentUser() {
         if (Util.isPrimaryUser(mContext)) {
             return USER_PRIMARY_USER;
         }
 
         if (Util.isManagedProfileOwner(mContext)) {
-
             return USER_MANAGED_PROFILE;
         }
 
         return USER_SECONDARY_USER;
     }
 
+    private boolean isSufficientlyPrivileged(@AdminKind int admin, List<String> delegations) {
+        return isEnabledForAdmin(admin) || hasDelegation(delegations);
+    }
+
     private boolean isEnabledForAdmin(@AdminKind int admin) {
         return (mAdminConstraint & admin) == admin;
+    }
+
+    private boolean hasDelegation(List<String> delegations) {
+        return delegations.contains(mDelegationConstraint);
     }
 
     private boolean isEnabledForUser(@UserKind int user) {
@@ -281,7 +303,9 @@ public class DpcPreferenceHelper {
         if (isEnabledForAdmin(ADMIN_PROFILE_OWNER)) {
             admins.add(mContext.getString(R.string.profile_owner));
         }
-
+        if (!TextUtils.isEmpty(mDelegationConstraint)) {
+            admins.add(mDelegationConstraint);
+        }
         return joinRequirementList(admins);
     }
 

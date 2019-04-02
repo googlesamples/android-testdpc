@@ -45,11 +45,11 @@ public class AppPermissionsArrayAdapter
     private final DevicePolicyManager mDpm;
     private final ComponentName mAdminComponentName;
 
-    public AppPermissionsArrayAdapter(Context context, int resource,
-            List<AppPermission> objects) {
+    public AppPermissionsArrayAdapter(Context context, int resource, List<AppPermission> objects,
+            ComponentName admin) {
         super(context, resource, objects);
         mDpm = (DevicePolicyManager) getContext().getSystemService(Context.DEVICE_POLICY_SERVICE);
-        mAdminComponentName = DeviceAdminReceiver.getComponentName(context);
+        mAdminComponentName = admin;
     }
 
     @Override

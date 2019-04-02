@@ -87,4 +87,10 @@
         android:layout_height="wrap_content"
         android:text="@string/meid_attestation_checkbox"/>
 
+    <CheckBox
+        android:id="@+id/use_strongbox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/use_strongbox_checkbox"/>
+
 </LinearLayout>

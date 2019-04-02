@@ -50,12 +50,22 @@ public class DelegationFragment extends ManageAppFragment {
     /**
      * Model for representing the scopes delegated to the selected app.
      */
-    List<DelegationScope> mDelegations = DelegationScope.defaultDelegationScopes();
+    List<DelegationScope> mDelegations;
+    private String mPackageName;
+    private boolean mIsDeviceOrProfileOwner;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mDpm = (DevicePolicyManager) getActivity().getSystemService(Context.DEVICE_POLICY_SERVICE);
+        mPackageName = getActivity().getPackageName();
+        final boolean isDeviceOwner = mDpm.isDeviceOwnerApp(mPackageName);
+        final boolean isProfileOwner = mDpm.isProfileOwnerApp(mPackageName);
+        mIsDeviceOrProfileOwner = isDeviceOwner || isProfileOwner;
+
+        // Show DO-only delegations if we are DO or delegated app i.e. we are not PO, ignoring the
+        // case where we are neither PO or DO (in which case this fragment is not accessible at all)
+        mDelegations = DelegationScope.defaultDelegationScopes(!isProfileOwner);
 
         getActivity().getActionBar().setTitle(R.string.generic_delegation);
     }
@@ -66,7 +76,22 @@ public class DelegationFragment extends ManageAppFragment {
         View view = super.onCreateView(layoutInflater, container, savedInstanceState);
         view.findViewById(R.id.add_new_row).setVisibility(View.GONE);
         view.findViewById(R.id.reset_app).setVisibility(View.GONE);
+
+        if (!mIsDeviceOrProfileOwner) {
+            // Non-PO/DO app cannot make changes to delegations.
+            view.findViewById(R.id.save_app).setVisibility(View.GONE);
+        }
         return view;
+    }
+
+    @Override
+    protected boolean filterApp(ApplicationInfo info) {
+        if (mIsDeviceOrProfileOwner) {
+            return super.filterApp(info);
+        } else {
+            // Non-PO/DO app can only view its own delegations
+            return info.packageName.equals(mPackageName);
+        }
     }
 
     /**
@@ -75,8 +100,9 @@ public class DelegationFragment extends ManageAppFragment {
     @TargetApi(Build.VERSION_CODES.O)
     private void readScopesFromDpm(String pkgName) {
         // Get the scopes delegated to pkgName.
-        List<String> scopes = mDpm.getDelegatedScopes(
-                DeviceAdminReceiver.getComponentName(getActivity()), pkgName);
+        List<String> scopes = mDpm.getDelegatedScopes(mIsDeviceOrProfileOwner
+                ? DeviceAdminReceiver.getComponentName(getActivity())
+                : null, pkgName);
         Log.i(TAG, pkgName + " | " + Arrays.toString(scopes.toArray()));
 
         // Update our model.
@@ -121,6 +147,12 @@ public class DelegationFragment extends ManageAppFragment {
     @Override
     @TargetApi(Build.VERSION_CODES.O)
     protected void saveConfig() {
+        if (!mIsDeviceOrProfileOwner) {
+            Toast.makeText(getActivity(), getString(R.string.delegation_error),
+                    Toast.LENGTH_SHORT).show();
+            Log.i(TAG, "Only PO/DO can modify delegations");
+            return;
+        }
         // Get selected package name.
         final ApplicationInfo info = (ApplicationInfo) mManagedAppsSpinner.getSelectedItem();
         final String pkgName = info.packageName;
@@ -164,7 +196,7 @@ public class DelegationFragment extends ManageAppFragment {
         }
 
         @TargetApi(Build.VERSION_CODES.O)
-        static List<DelegationScope> defaultDelegationScopes() {
+        static List<DelegationScope> defaultDelegationScopes(boolean showDoOnlyDelegations) {
             List<DelegationScope> defaultDelegations = new ArrayList<>();
             defaultDelegations.add(
                     new DelegationScope(DevicePolicyManager.DELEGATION_CERT_INSTALL));
@@ -178,6 +210,14 @@ public class DelegationFragment extends ManageAppFragment {
                     new DelegationScope(DevicePolicyManager.DELEGATION_PACKAGE_ACCESS));
             defaultDelegations.add(
                     new DelegationScope(DevicePolicyManager.DELEGATION_ENABLE_SYSTEM_APP));
+            defaultDelegations.add(
+                    new DelegationScope(DevicePolicyManager.DELEGATION_CERT_SELECTION));
+            if (showDoOnlyDelegations) {
+                defaultDelegations.add(
+                        new DelegationScope(DevicePolicyManager.DELEGATION_NETWORK_LOGGING));
+                defaultDelegations.add(
+                        new DelegationScope(DevicePolicyManager.DELEGATION_PACKAGE_INSTALLATION));
+            }
             return defaultDelegations;
         }
     }

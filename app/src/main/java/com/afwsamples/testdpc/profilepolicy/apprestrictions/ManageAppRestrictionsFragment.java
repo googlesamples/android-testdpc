@@ -19,6 +19,7 @@ package com.afwsamples.testdpc.profilepolicy.apprestrictions;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.admin.DevicePolicyManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.RestrictionEntry;
@@ -39,6 +40,7 @@ import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.EditDeleteArrayAdapter;
 import com.afwsamples.testdpc.common.ManageAppFragment;
 import com.afwsamples.testdpc.common.RestrictionManagerCompat;
+import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.common.keyvaluepair.KeyValuePairDialogFragment;
 
 import java.util.ArrayList;
@@ -60,6 +62,7 @@ public class ManageAppRestrictionsFragment extends ManageAppFragment
     private RestrictionsManager mRestrictionsManager;
     private EditDeleteArrayAdapter<RestrictionEntry> mAppRestrictionsArrayAdapter;
     private RestrictionEntry mEditingRestrictionEntry;
+    private ComponentName mAdminComponent;
 
     private static final int RESULT_CODE_EDIT_DIALOG = 1;
 
@@ -86,6 +89,11 @@ public class ManageAppRestrictionsFragment extends ManageAppFragment
                 Context.DEVICE_POLICY_SERVICE);
         mRestrictionsManager = (RestrictionsManager) getActivity().getSystemService(
                 Context.RESTRICTIONS_SERVICE);
+        if (Util.hasDelegation(getActivity(), DevicePolicyManager.DELEGATION_APP_RESTRICTIONS)) {
+            mAdminComponent = null;
+        } else {
+            mAdminComponent = DeviceAdminReceiver.getComponentName(getActivity());
+        }
     }
 
     @Override
@@ -320,7 +328,7 @@ public class ManageAppRestrictionsFragment extends ManageAppFragment
         String pkgName = appInfo.packageName;
         if (!TextUtils.isEmpty(pkgName)) {
             Bundle bundle = mDevicePolicyManager.getApplicationRestrictions(
-                    DeviceAdminReceiver.getComponentName(getActivity()), pkgName);
+                    mAdminComponent, pkgName);
             loadAppRestrictionsList(convertBundleToRestrictions(bundle));
             mLastRestrictionEntries = new ArrayList<>(mRestrictionEntries);
         }
@@ -368,7 +376,7 @@ public class ManageAppRestrictionsFragment extends ManageAppFragment
         String pkgName =
                 ((ApplicationInfo) mManagedAppsSpinner.getSelectedItem()).packageName;
         mDevicePolicyManager.setApplicationRestrictions(
-                DeviceAdminReceiver.getComponentName(getActivity()), pkgName,
+                mAdminComponent, pkgName,
                 RestrictionManagerCompat.convertRestrictionsToBundle(mRestrictionEntries));
         mLastRestrictionEntries = new ArrayList<>(mRestrictionEntries);
         showToast(getString(R.string.set_app_restrictions_success, pkgName));

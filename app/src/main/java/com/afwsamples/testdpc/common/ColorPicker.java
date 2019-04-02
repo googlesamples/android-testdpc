@@ -202,8 +202,15 @@ public class ColorPicker extends DialogFragment implements SeekBar.OnSeekBarChan
      */
     @Override
     public void onClick(View view) {
+        final String color = mColorValue.getText().toString();
+
+        if (color.isEmpty()) {
+            Toast.makeText(getActivity(), R.string.not_valid_color, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         try {
-            mCurrentColor = Color.parseColor(mColorValue.getText().toString());
+            mCurrentColor = Color.parseColor(color);
             updateViewsColor();
         } catch (IllegalArgumentException e) {
             Toast.makeText(getActivity(), R.string.not_valid_color, Toast.LENGTH_SHORT).show();

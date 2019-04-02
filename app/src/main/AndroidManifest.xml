@@ -27,6 +27,9 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.REQUEST_PASSWORD_COMPLEXITY"/>
 
     <application
             android:allowBackup="true"
@@ -69,7 +72,13 @@
         <activity
                 android:name=".FinalizeActivity"
                 android:label="@string/app_name"
-                android:theme="@style/SuwThemeGlifV3.Light"/>
+                android:theme="@style/SuwThemeGlifV3.Light"
+                android:permission="android.permission.BIND_DEVICE_ADMIN">
+            <intent-filter>
+                <action android:name="android.app.action.ADMIN_POLICY_COMPLIANCE" />
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
 
         <activity
                 android:name=".cosu.EnableCosuActivity"
@@ -84,6 +93,15 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.HOME"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".provision.DpcLoginActivity"
+                android:exported="true"
+                android:permission="android.permission.BIND_DEVICE_ADMIN">
+            <intent-filter>
+                <action android:name="android.app.action.GET_PROVISIONING_MODE" />
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
@@ -111,6 +129,15 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
                 <action android:name="android.app.action.PROFILE_OWNER_CHANGED"/>
                 <action android:name="android.app.action.DEVICE_OWNER_CHANGED"/>
+            </intent-filter>
+        </receiver>
+
+        <receiver
+                android:name=".DelegatedAdminReceiver"
+                android:permission="android.permission.BIND_DEVICE_ADMIN">
+            <intent-filter>
+                <action android:name="android.app.action.CHOOSE_PRIVATE_KEY_ALIAS"/>
+                <action android:name="android.app.action.NETWORK_LOGS_AVAILABLE"/>
             </intent-filter>
         </receiver>
 

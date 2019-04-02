@@ -16,13 +16,10 @@
 
 package com.afwsamples.testdpc;
 
-import static com.afwsamples.testdpc.policy.PolicyManagementFragment.OVERRIDE_KEY_SELECTION_KEY;
-
 import android.annotation.TargetApi;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.admin.DevicePolicyManager;
-import android.app.admin.NetworkEvent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -35,10 +32,8 @@ import android.os.PersistableBundle;
 import android.os.Process;
 import android.os.UserHandle;
 import android.os.UserManager;
-import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.os.BuildCompat;
-import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 import com.afwsamples.testdpc.common.NotificationUtil;
@@ -60,7 +55,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 
 /**
  * Handles events related to the managed profile.
@@ -70,8 +64,6 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
 
     public static final String ACTION_PASSWORD_REQUIREMENTS_CHANGED =
             "com.afwsamples.testdpc.policy.PASSWORD_REQUIREMENTS_CHANGED";
-
-    public static final String NETWORK_LOGS_FILE_PREFIX = "network_logs_";
 
     private static final String LOGS_DIR = "logs";
 
@@ -119,71 +111,8 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
     @Override
     public void onNetworkLogsAvailable(Context context, Intent intent, long batchToken,
             int networkLogsCount) {
-        Log.i(TAG, "onNetworkLogsAvailable(), batchToken: " + batchToken
-                + ", event count: " + networkLogsCount);
-
-        DevicePolicyManager dpm =
-                (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
-        List<NetworkEvent> events = null;
-        try {
-            events = dpm.retrieveNetworkLogs(getComponentName(context), batchToken);
-        } catch (SecurityException e) {
-            Log.e(TAG,
-                "Exception while retrieving network logs batch with batchToken: " + batchToken, e);
-        }
-
-        if (events == null) {
-            Log.e(TAG, "Failed to retrieve network logs batch with batchToken: " + batchToken);
-            Toast.makeText(context,
-                    context.getString(R.string.on_network_logs_available_token_failure, batchToken),
-                    Toast.LENGTH_LONG)
-                    .show();
-            return;
-        }
-
-        Toast.makeText(context,
-                context.getString(R.string.on_network_logs_available_success, batchToken),
-                Toast.LENGTH_LONG)
-                .show();
-
-        ArrayList<String> loggedEvents = new ArrayList<>();
-        if (BuildCompat.isAtLeastP()) {
-            for (NetworkEvent event : events) {
-                loggedEvents.add(event.toString());
-            }
-        } else {
-            events.forEach(event -> loggedEvents.add(event.toString()));
-        }
-        new EventSavingTask(context, batchToken, loggedEvents).execute();
-    }
-
-    private static class EventSavingTask extends AsyncTask<Void, Void, Void> {
-
-        private Context mContext;
-        private long mBatchToken;
-        private List<String> mLoggedEvents;
-
-        public EventSavingTask(Context context, long batchToken, ArrayList<String> loggedEvents) {
-            mContext = context;
-            mBatchToken = batchToken;
-            mLoggedEvents = loggedEvents;
-        }
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            Date timestamp = new Date();
-            String filename = NETWORK_LOGS_FILE_PREFIX + mBatchToken + "_" + timestamp.getTime() + ".txt";
-            File file = new File(mContext.getExternalFilesDir(null), filename);
-            try (OutputStream os = new FileOutputStream(file)) {
-                for (String event : mLoggedEvents) {
-                    os.write((event + "\n").getBytes());
-                }
-                Log.d(TAG, "Saved network logs to file: " + filename);
-            } catch (IOException e) {
-                Log.e(TAG, "Failed saving network events to file" + filename, e);
-            }
-            return null;
-        }
+        CommonReceiverOperations.onNetworkLogsAvailable(context, getComponentName(context),
+                batchToken, networkLogsCount);
     }
 
     @Override
@@ -193,14 +122,14 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
             return;
         }
 
-        Intent launchIntent = task.getPostProvisioningLaunchIntent(intent);
+        final Intent launchIntent = task.getPostProvisioningLaunchIntent(intent);
         if (launchIntent != null) {
             context.startActivity(launchIntent);
         } else {
             Log.e(TAG, "DeviceAdminReceiver.onProvisioningComplete() invoked, but ownership "
-                    + "not assigned");
+                + "not assigned");
             Toast.makeText(context, R.string.device_admin_receiver_failure, Toast.LENGTH_LONG)
-                    .show();
+                .show();
         }
     }
 
@@ -335,20 +264,7 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
     @Override
     public String onChoosePrivateKeyAlias(Context context, Intent intent, int uid, Uri uri,
             String alias) {
-        if (uid == Process.myUid()) {
-            // Always show the chooser if we were the one requesting the cert.
-            return null;
-        }
-
-        String chosenAlias = PreferenceManager.getDefaultSharedPreferences(context)
-                .getString(OVERRIDE_KEY_SELECTION_KEY, null);
-        if (!TextUtils.isEmpty(chosenAlias)) {
-            Toast.makeText(context, "Substituting private key alias: \"" + chosenAlias + "\"",
-                    Toast.LENGTH_LONG).show();
-            return chosenAlias;
-        } else {
-            return null;
-        }
+        return CommonReceiverOperations.onChoosePrivateKeyAlias(context, uid);
     }
 
     /**

@@ -48,6 +48,14 @@ limitations under the License.
             android:layout_weight="1">
     </ListView>
 
+    <!-- For extension by subclasses of SelectAppFragment -->
+    <FrameLayout
+        android:id="@+id/extension"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+    </FrameLayout>
+
     <EditText
             android:id="@+id/selected_package_new"
             android:layout_width="fill_parent"
@@ -69,4 +77,5 @@ limitations under the License.
             android:layout_height="50dip"
             android:text="@string/selected_package_clear" />
     </LinearLayout>
+
 </LinearLayout>

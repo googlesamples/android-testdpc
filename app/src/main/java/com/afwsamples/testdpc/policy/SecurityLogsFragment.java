@@ -41,6 +41,8 @@ public class SecurityLogsFragment extends ListFragment {
 
     private static final String TAG = "ProcessLogsFragment";
 
+    private static final String PRE_REBOOT_KEY = "pre-reboot";
+
     // TODO: remove when it lands in the SDK:
     private static final int TAG_OS_STARTUP = 210009;
     private static final int TAG_OS_SHUTDOWN = 210010;
@@ -73,6 +75,15 @@ public class SecurityLogsFragment extends ListFragment {
 
     private DevicePolicyManager mDevicePolicyManager;
     private ComponentName mAdminName;
+    private boolean mPreReboot;
+
+    public static SecurityLogsFragment newInstance(boolean preReboot) {
+        final SecurityLogsFragment fragment = new SecurityLogsFragment();
+        final Bundle args = new Bundle();
+        args.putBoolean(PRE_REBOOT_KEY, preReboot);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -82,6 +93,7 @@ public class SecurityLogsFragment extends ListFragment {
                 Context.DEVICE_POLICY_SERVICE);
         mAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1,
                 android.R.id.text1, mLogs);
+        mPreReboot = getArguments().getBoolean(PRE_REBOOT_KEY);
         setListAdapter(mAdapter);
     }
 
@@ -90,17 +102,26 @@ public class SecurityLogsFragment extends ListFragment {
         super.onActivityCreated(savedInstanceState);
         mAdapter.add(getString(R.string.security_logs_retrieved_message, new Date().toString()));
         try {
-            processEvents(mDevicePolicyManager.retrieveSecurityLogs(mAdminName));
+            processEvents(getLogs());
         } catch (SecurityException e) {
             Log.e(TAG, "Exception thrown when trying to retrieve security logs", e);
             mAdapter.add(getString(R.string.exception_retrieving_security_logs));
         }
     }
 
+    private List<SecurityEvent> getLogs() {
+        return mPreReboot
+                ? mDevicePolicyManager.retrievePreRebootSecurityLogs(mAdminName)
+                : mDevicePolicyManager.retrieveSecurityLogs(mAdminName);
+    }
+
     private void processEvents(List<SecurityEvent> logs) {
         if (logs == null) {
             Log.w(TAG, "logs == null, are you polling too early?");
-            mAdapter.add(getString(R.string.failed_to_retrieve_security_logs));
+            final String message = getString(mPreReboot
+                    ? R.string.failed_to_retrieve_pre_reboot_security_logs
+                    : R.string.failed_to_retrieve_security_logs);
+            mAdapter.add(message);
         } else {
             Log.d(TAG, "Incoming logs size: " + logs.size());
             for (SecurityEvent event : logs) {

@@ -3,21 +3,21 @@ apply plugin: 'com.android.application'
 ext {
     /* Version code for *next* release, bump *after* a release is created. */
     // 1 or more digits
-    versionMajor = 5
+    versionMajor = 6
     // exactly 1 digit
     versionMinor = 0
     // exactly 2 digits
-    versionBuild = 04
+    versionBuild = 00
 }
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 'android-Q'
     buildToolsVersion "28.0.0"
 
     defaultConfig {
         applicationId "com.afwsamples.testdpc"
         minSdkVersion 21
-        targetSdkVersion 28
+        targetSdkVersion 'Q'
         versionCode versionMajor * 1000 + versionMinor * 100 + versionBuild
         versionName "${versionMajor}.${versionMinor}.${versionBuild}"
         multiDexEnabled true
@@ -43,7 +43,7 @@ android {
 
     lintOptions {
         check 'NewApi'
-        abortOnError true
+        abortOnError false
         xmlReport false
         textReport true
         textOutput "stdout"
@@ -69,6 +69,53 @@ android {
             def lintTask = tasks["lint${variant.name.capitalize()}"]
             output.assemble.dependsOn lintTask
         }
+    }
+
+    task stripTestOnlyNormalDebug << {
+        stripTestOnlyForBuild("normal", "debug")
+    }
+
+    task stripTestOnlyNormalRelease << {
+        stripTestOnlyForBuild("normal", "release")
+    }
+
+    task stripTestOnlyReplicaDebug << {
+        stripTestOnlyForBuild("replica", "debug")
+    }
+
+    task stripTestOnlyReplicaRelease << {
+        stripTestOnlyForBuild("replica", "release")
+    }
+
+    tasks.whenTaskAdded { task ->
+        if (task.name == "splitsDiscoveryTaskNormalDebug") {
+            task.dependsOn stripTestOnlyNormalDebug
+        } else if (task.name == "splitsDiscoveryTaskNormalRelease") {
+            task.dependsOn stripTestOnlyNormalRelease
+        } else if (task.name == "splitsDiscoveryTaskReplicaDebug") {
+            task.dependsOn stripTestOnlyReplicaDebug
+        } else if (task.name == "splitsDiscoveryTaskReplicaRelease") {
+            task.dependsOn stripTestOnlyReplicaRelease
+        }
+    }
+}
+
+// Modifies the specified build variant's intermediate AndroidManifest.xml file
+// to remove the testOnly attribute. Used for preventing Gradle from inserting the
+// attribute when TestDPC is compiled with a development Android branch.
+private void stripTestOnlyForBuild(flavor, buildType) {
+    def manifestPath =
+            "${buildDir}/intermediates/manifests/full/${flavor}/${buildType}/AndroidManifest.xml"
+    if (file(manifestPath).exists()) {
+        def xml = new XmlParser().parse(manifestPath)
+        def attributeNames = xml.application[0].attributes().collect { it.key }
+        attributeNames.each {
+            if (it.getLocalPart() == 'testOnly') {
+                xml.application[0].attributes().remove(it)
+                println "Removed testOnly attribute successfully!"
+            }
+        }
+        new XmlNodePrinter(new PrintWriter(new FileWriter(manifestPath))).print(xml)
     }
 }
 

@@ -16,6 +16,9 @@
 
 package com.afwsamples.testdpc;
 
+import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_ACCOUNT_TO_MIGRATE;
+
+import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
@@ -34,9 +37,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.Toast;
-
 import com.android.setupwizardlib.GlifLayout;
-
 import java.io.IOException;
 
 /**
@@ -106,6 +107,10 @@ public class AddAccountActivity extends Activity {
                         if (mNextActivityIntent != null) {
                             startActivity(mNextActivityIntent);
                         }
+                        final Intent resultIntent = new Intent();
+                        resultIntent.putExtra(EXTRA_PROVISIONING_ACCOUNT_TO_MIGRATE,
+                            new Account(accountNameAdded, GOOGLE_ACCOUNT_TYPE));
+                        setResult(RESULT_OK, resultIntent);
                         finish();
                     } catch (OperationCanceledException | AuthenticatorException
                             | IOException e) {

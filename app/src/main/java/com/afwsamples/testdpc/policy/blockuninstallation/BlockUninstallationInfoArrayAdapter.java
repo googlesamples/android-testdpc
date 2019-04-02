@@ -16,6 +16,7 @@
 
 package com.afwsamples.testdpc.policy.blockuninstallation;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -37,16 +38,18 @@ import java.util.List;
  */
 public class BlockUninstallationInfoArrayAdapter extends ToggleComponentsArrayAdapter {
 
+    private final ComponentName mAdminComponent;
+
     public BlockUninstallationInfoArrayAdapter(Context context, int resource,
-            List<ResolveInfo> resolveInfoList) {
+            List<ResolveInfo> resolveInfoList, ComponentName admin) {
         super(context, resource, resolveInfoList);
+        mAdminComponent = admin;
         setIsComponentEnabledList(createIsComponentEnabledList());
     }
 
     @Override
     public boolean isComponentEnabled(ResolveInfo resolveInfo) {
-        return mDevicePolicyManager.isUninstallBlocked(
-                DeviceAdminReceiver.getComponentName(getContext()),
+        return mDevicePolicyManager.isUninstallBlocked(mAdminComponent,
                 resolveInfo.resolvePackageName);
     }
 
@@ -59,8 +62,7 @@ public class BlockUninstallationInfoArrayAdapter extends ToggleComponentsArrayAd
                     public void onClick(View v) {
                         boolean isBlocked = ((CheckBox) v).isChecked();
                         mIsComponentCheckedList.set(position, isBlocked);
-                        mDevicePolicyManager.setUninstallBlocked(
-                                DeviceAdminReceiver.getComponentName(getContext()),
+                        mDevicePolicyManager.setUninstallBlocked(mAdminComponent,
                                 getItem(position).resolvePackageName, isBlocked);
                     }
                 }

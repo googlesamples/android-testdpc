@@ -17,13 +17,13 @@
 package com.afwsamples.testdpc;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.app.FragmentManager;
-import android.app.admin.DevicePolicyManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.WindowManager.LayoutParams;
 
+import com.afwsamples.testdpc.common.OnBackPressedHandler;
 import com.afwsamples.testdpc.policy.PolicyManagementFragment;
 import com.afwsamples.testdpc.search.PolicySearchFragment;
 
@@ -74,6 +74,18 @@ public class PolicyManagementActivity extends Activity implements
         // Show the up button in actionbar if back stack has any entry.
         getActionBar().setDisplayHomeAsUpEnabled(
                 getFragmentManager().getBackStackEntryCount() > 0);
+    }
+
+    @Override
+    public void onBackPressed() {
+        Fragment currFragment = getFragmentManager().findFragmentById(R.id.container);
+        boolean onBackPressHandled = false;
+        if (currFragment != null && currFragment instanceof OnBackPressedHandler) {
+            onBackPressHandled = ((OnBackPressedHandler) currFragment).onBackPressed();
+        }
+        if (!onBackPressHandled) {
+            super.onBackPressed();
+        }
     }
 
     @Override
