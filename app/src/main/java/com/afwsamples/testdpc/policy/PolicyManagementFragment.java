@@ -41,6 +41,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -66,6 +67,7 @@ import android.support.v4.os.BuildCompat;
 import android.support.v7.preference.EditTextPreference;
 import android.support.v7.preference.ListPreference;
 import android.support.v7.preference.Preference;
+import android.support.v7.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
 import android.text.InputType;
 import android.text.TextUtils;
@@ -270,6 +272,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String DISABLE_SCREEN_CAPTURE_KEY = "disable_screen_capture";
     private static final String DISABLE_STATUS_BAR = "disable_status_bar";
     private static final String ENABLE_BACKUP_SERVICE = "enable_backup_service";
+    private static final String APP_FEEDBACK_NOTIFICATIONS = "app_feedback_notifications";
     private static final String ENABLE_SECURITY_LOGGING = "enable_security_logging";
     private static final String ENABLE_NETWORK_LOGGING = "enable_network_logging";
     private static final String ENABLE_SYSTEM_APPS_BY_INTENT_KEY = "enable_system_apps_by_intent";
@@ -458,6 +461,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     private DpcSwitchPreference mAutoBrightnessPreference;
 
+    private DpcSwitchPreference mEnableAppFeedbackNotificationsPreference;
+
     private GetAccessibilityServicesTask mGetAccessibilityServicesTask = null;
     private GetInputMethodsTask mGetInputMethodsTask = null;
     private GetNotificationListenersTask mGetNotificationListenersTask = null;
@@ -600,6 +605,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(REMOVE_ACCOUNT_KEY).setOnPreferenceClickListener(this);
         findPreference(BLOCK_UNINSTALLATION_BY_PKG_KEY).setOnPreferenceClickListener(this);
         findPreference(BLOCK_UNINSTALLATION_LIST_KEY).setOnPreferenceClickListener(this);
+        findPreference(APP_FEEDBACK_NOTIFICATIONS).setOnPreferenceChangeListener(this);
+        mEnableAppFeedbackNotificationsPreference =
+            (DpcSwitchPreference) findPreference(APP_FEEDBACK_NOTIFICATIONS);
         findPreference(ENABLE_SYSTEM_APPS_KEY).setOnPreferenceClickListener(this);
         findPreference(ENABLE_SYSTEM_APPS_BY_PACKAGE_NAME_KEY).setOnPreferenceClickListener(this);
         findPreference(ENABLE_SYSTEM_APPS_BY_INTENT_KEY).setOnPreferenceClickListener(this);
@@ -687,6 +695,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         constrainSpecialCasePreferences();
 
         maybeDisableLockTaskPreferences();
+        loadAppFeedbackNotifications();
         loadAppStatus();
         loadSecurityPatch();
         loadIsEphemeralUserUi();
@@ -1330,6 +1339,14 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                     DevicePolicyManager.EXTRA_PASSWORD_COMPLEXITY,
                     Integer.parseInt((String) newValue));
                 startActivity(intent);
+                return true;
+            case APP_FEEDBACK_NOTIFICATIONS:
+                SharedPreferences.Editor editor =
+                    PreferenceManager.getDefaultSharedPreferences(getContext()).edit();
+                editor.putBoolean(
+                    getString(
+                        R.string.app_feedback_notifications), newValue.equals(true));
+                editor.commit();
                 return true;
         }
         return false;
@@ -2083,6 +2100,13 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 })
                 .setNegativeButton(android.R.string.cancel, null)
                 .show();
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    private void loadAppFeedbackNotifications() {
+        mEnableAppFeedbackNotificationsPreference.setChecked(
+            PreferenceManager.getDefaultSharedPreferences(getContext())
+                .getBoolean(getString(R.string.app_feedback_notifications), false));
     }
 
     private void loadAppStatus() {
