@@ -7,7 +7,7 @@ ext {
     // 1 or more digits
     versionMajor = 6
     // exactly 1 digit
-    versionMinor = 0
+    versionMinor = 1
     // exactly 2 digits
     versionBuild = 00
 }
