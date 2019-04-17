@@ -104,6 +104,11 @@ public class DpcSwitchPreference extends SwitchPreference implements DpcPreferen
     }
 
     @Override
+    public void addCustomConstraint(@Nullable CustomConstraint customConstraint) {
+        mHelper.addCustomConstraint(customConstraint);
+    }
+
+    @Override
     public void refreshEnabledState() {
         mHelper.disableIfConstraintsNotMet();
     }

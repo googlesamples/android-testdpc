@@ -178,6 +178,11 @@
             android:title="@string/metered_data_restriction"
             testdpc:admin="deviceOwner|profileOwner"
             testdpc:minSdkVersion="P" />
+        <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
+            android:key="app_feedback_notifications"
+            android:title="@string/app_feedback_notifications"
+            testdpc:admin="deviceOwner|profileOwner"
+            testdpc:minSdkVersion="N" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/delegation_title">

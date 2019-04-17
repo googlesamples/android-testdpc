@@ -215,8 +215,6 @@ public class DelegationFragment extends ManageAppFragment {
             if (showDoOnlyDelegations) {
                 defaultDelegations.add(
                         new DelegationScope(DevicePolicyManager.DELEGATION_NETWORK_LOGGING));
-                defaultDelegations.add(
-                        new DelegationScope(DevicePolicyManager.DELEGATION_PACKAGE_INSTALLATION));
             }
             return defaultDelegations;
         }

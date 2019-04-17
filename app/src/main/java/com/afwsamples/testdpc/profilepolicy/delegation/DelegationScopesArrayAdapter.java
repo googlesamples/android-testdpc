@@ -65,10 +65,6 @@ class DelegationScopesArrayAdapter
             case DevicePolicyManager.DELEGATION_CERT_SELECTION:
                 viewHolder.setText(R.string.delegation_scope_cert_selection);
                 break;
-            case DevicePolicyManager.DELEGATION_PACKAGE_INSTALLATION:
-                viewHolder.setText(R.string.delegation_scope_package_installation);
-                break;
-
         }
 
         return convertView;

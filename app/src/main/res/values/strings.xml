@@ -548,6 +548,10 @@
     <string name="plus">+</string>
     <string name="app_restrictions_managing_package">App restrictions manager</string>
 
+    <!-- Strings for app feedback -->
+    <!-- [CHAR LIMIT=40] Settings label. A user can toggle this setting to turn on notifications for app feedback. -->
+    <string name="app_feedback_notifications">App feedback notifications</string>
+
     <!-- Strings for metered data restriction -->
     <string name="metered_data_restriction">Disable metered data</string>
     <string name="update_pkgs">Update</string>
@@ -569,7 +573,6 @@
     <string name="delegation_scope_keep_uninstalled_packages">Keep uninstalled packages</string>
     <string name="delegation_scope_network_logging">Access network logging</string>
     <string name="delegation_scope_cert_selection">Choose private key</string>
-    <string name="delegation_scope_package_installation">Silently install APK</string>
     <string name="manage_cert_installer">Delegated cert installer</string>
 
     <!-- strings used in the alert dialog for editing application restrictions. -->
