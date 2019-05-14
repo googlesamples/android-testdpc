@@ -529,6 +529,7 @@
     <string name="all_ca_certificates_removed">All CA certificates have been removed.</string>
     <string name="user_selectability_description">User-selectability</string>
     <string name="user_selectability_checkbox">Make user-selectable</string>
+    <string name="ec_key_checkbox">Generate EC key (Default: RSA)</string>
     <string name="key_attestation_description">Key Attestation options</string>
     <string name="key_attestation_checkbox">Include key attestation challenge</string>
     <string name="device_id_attestation_description">Device ID attestation options</string>

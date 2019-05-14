@@ -987,7 +987,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 choosePrivateKeyForRemoval();
                 return true;
             case GENERATE_KEY_CERTIFICATE_KEY:
-                showPromptForGeneratedKeyAlias("generated-rsa-testdpc-1");
+                showPromptForGeneratedKeyAlias("generated-key-testdpc-1");
                 return true;
             case TEST_KEY_USABILITY_KEY:
                 testKeyCanBeUsedForSigning();
@@ -1440,10 +1440,11 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private void generateKeyPair(final String alias, boolean isUserSelectable,
                                  byte[] attestationChallenge,
                                  int idAttestationFlags,
-                                 boolean useStrongBox) {
+                                 boolean useStrongBox,
+                                 boolean generateEcKey) {
         new GenerateKeyAndCertificateTask(
                 alias, isUserSelectable, attestationChallenge, idAttestationFlags,
-                useStrongBox, getActivity(), mAdminComponentName).execute();
+                useStrongBox, generateEcKey, getActivity(), mAdminComponentName).execute();
     }
 
     /**
@@ -2477,6 +2478,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 R.id.alias_user_selectable);
         userSelectableCheckbox.setChecked(!BuildCompat.isAtLeastP());
 
+        final CheckBox ecKeyCheckbox = aliasNamingView.findViewById(
+                R.id.generate_ec_key);
+
         // Attestation check-boxes
         final CheckBox includeAttestationChallengeCheckbox = aliasNamingView.findViewById(
                 R.id.include_key_attestation_challenge);
@@ -2520,7 +2524,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                         }
 
                         generateKeyPair(alias, isUserSelectable, attestationChallenge,
-                                idAttestationFlags, useStrongBoxCheckbox.isChecked());
+                                idAttestationFlags, useStrongBoxCheckbox.isChecked(),
+                                ecKeyCheckbox.isChecked());
                     }
                 })
                 .setNegativeButton(android.R.string.cancel, null)
