@@ -3,6 +3,7 @@ package com.afwsamples.testdpc.feedback;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.preference.PreferenceManager;
@@ -66,7 +67,7 @@ public class AppStatesService extends KeyedAppStatesService {
   }
 
   private void createNotificationChannel() {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+    if (Build.VERSION.SDK_INT >= VERSION_CODES.O) {
       NotificationChannel channel =
           new NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT);
       NotificationManager notificationManager = getSystemService(NotificationManager.class);

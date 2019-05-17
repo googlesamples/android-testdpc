@@ -17,15 +17,14 @@
 package com.afwsamples.testdpc.common;
 
 import android.annotation.TargetApi;
-import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.PersistableBundle;
-
 import java.util.Set;
 
 public class BundleUtil {
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP_MR1)
+    @TargetApi(VERSION_CODES.LOLLIPOP_MR1)
     public static PersistableBundle bundleToPersistableBundle(Bundle bundle) {
         Set<String> keySet = bundle.keySet();
         PersistableBundle persistableBundle = new PersistableBundle();
@@ -47,7 +46,7 @@ public class BundleUtil {
         return persistableBundle;
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP_MR1)
+    @TargetApi(VERSION_CODES.LOLLIPOP_MR1)
     public static Bundle persistableBundleToBundle(PersistableBundle persistableBundle) {
         Set<String> keySet = persistableBundle.keySet();
         Bundle bundle = new Bundle();

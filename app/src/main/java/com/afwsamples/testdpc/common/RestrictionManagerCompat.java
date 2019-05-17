@@ -19,9 +19,9 @@ package com.afwsamples.testdpc.common;
 import android.annotation.TargetApi;
 import android.content.RestrictionEntry;
 import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.util.Log;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -85,9 +85,9 @@ public class RestrictionManagerCompat {
         return bundle;
     }
 
-    @TargetApi(Build.VERSION_CODES.M)
+    @TargetApi(VERSION_CODES.M)
     private static void addBundleRestrictionToBundle(Bundle bundle, RestrictionEntry entry) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT >= VERSION_CODES.M) {
             RestrictionEntry[] restrictions = entry.getRestrictions();
             Bundle childBundle = convertRestrictionsToBundle(Arrays.asList(restrictions));
             bundle.putBundle(entry.getKey(), childBundle);
@@ -96,9 +96,9 @@ public class RestrictionManagerCompat {
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.M)
+    @TargetApi(VERSION_CODES.M)
     private static void addBundleArrayRestrictionToBundle(Bundle bundle, RestrictionEntry entry) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT >= VERSION_CODES.M) {
             RestrictionEntry[] bundleRestrictionArray = entry.getRestrictions();
             Bundle[] bundleArray = new Bundle[bundleRestrictionArray.length];
             for (int i = 0; i < bundleRestrictionArray.length; i++) {

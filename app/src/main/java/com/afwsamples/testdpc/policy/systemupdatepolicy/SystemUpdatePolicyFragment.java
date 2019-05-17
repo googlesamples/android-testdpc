@@ -24,11 +24,10 @@ import android.app.admin.DevicePolicyManager;
 import android.app.admin.FreezePeriod;
 import android.app.admin.SystemUpdatePolicy;
 import android.content.Context;
-import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.support.v4.os.BuildCompat;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,10 +38,8 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioGroup;
 import android.widget.Toast;
-
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
-
 import java.time.LocalDate;
 import java.time.MonthDay;
 import java.time.format.DateTimeFormatter;
@@ -58,11 +55,11 @@ import java.util.List;
  * 2) {@link DevicePolicyManager#getSystemUpdatePolicy}
  * 3) {@link SystemUpdatePolicy}
  */
-@TargetApi(Build.VERSION_CODES.M)
+@TargetApi(VERSION_CODES.M)
 public class SystemUpdatePolicyFragment extends Fragment implements View.OnClickListener,
         RadioGroup.OnCheckedChangeListener {
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+    @RequiresApi(api = VERSION_CODES.O)
     static class Period {
         MonthDay mStart;
         MonthDay mEnd;
@@ -129,7 +126,7 @@ public class SystemUpdatePolicyFragment extends Fragment implements View.OnClick
             this.mData = periods;
         }
 
-        @RequiresApi(api = Build.VERSION_CODES.O)
+        @RequiresApi(api = VERSION_CODES.O)
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             Period currentPeriod = getItem(position);
@@ -204,7 +201,7 @@ public class SystemUpdatePolicyFragment extends Fragment implements View.OnClick
         timePicker.show();
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+    @RequiresApi(api = VERSION_CODES.O)
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -237,7 +234,7 @@ public class SystemUpdatePolicyFragment extends Fragment implements View.OnClick
         void onResult(LocalDate pickedDate);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+    @RequiresApi(api = VERSION_CODES.O)
     private void showDatePicker(LocalDate hint, int titleResId, DatePickResult resultCallback) {
         DatePickerDialog picker = new DatePickerDialog(getActivity(),
                 (pickerObj, year, month, day) -> {
@@ -248,7 +245,7 @@ public class SystemUpdatePolicyFragment extends Fragment implements View.OnClick
         picker.show();
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+    @RequiresApi(api = VERSION_CODES.O)
     private void promptToSetFreezePeriod(FreezePeriodPickResult callback, final LocalDate startDate,
                                          final LocalDate endDate) {
         showDatePicker(startDate, R.string.system_update_policy_pick_start_free_period_title,

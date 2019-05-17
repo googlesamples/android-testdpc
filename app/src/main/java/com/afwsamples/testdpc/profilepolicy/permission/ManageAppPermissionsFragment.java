@@ -24,7 +24,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PermissionInfo;
-import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -32,13 +32,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-
 import android.widget.TextView;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.ManageAppFragment;
 import com.afwsamples.testdpc.common.Util;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,7 +44,7 @@ import java.util.List;
  * This fragment shows all installed apps and allows viewing and editing the dangerous application
  * permissions for those apps.
  */
-@TargetApi(Build.VERSION_CODES.M)
+@TargetApi(VERSION_CODES.M)
 public class ManageAppPermissionsFragment extends ManageAppFragment {
     private static final String TAG = "ManageAppPermissions";
 

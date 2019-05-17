@@ -22,21 +22,19 @@ import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.os.Handler;
 import android.os.ParcelFileDescriptor;
 import android.util.Log;
 import android.util.Xml;
-
 import com.afwsamples.testdpc.common.PackageInstallationUtils;
-
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
 
 /**
  * This class represents the specific cosu set up we want to achieve. The set up is read from an
@@ -158,7 +156,7 @@ import java.util.Set;
             dpm.setGlobalSetting(admin, globalSetting.key, globalSetting.value);
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT >= VERSION_CODES.M) {
             disableKeyGuardAndStatusBar(dpm, admin);
         }
         dpm.setScreenCaptureDisabled(admin, mDisableScreenCapture);
@@ -167,7 +165,7 @@ import java.util.Set;
         return true;
     }
 
-    @TargetApi(Build.VERSION_CODES.M)
+    @TargetApi(VERSION_CODES.M)
     private void disableKeyGuardAndStatusBar(DevicePolicyManager dpm, ComponentName admin) {
         dpm.setStatusBarDisabled(admin, mDisableStatusBar);
         dpm.setKeyguardDisabled(admin, mDisableKeyguard);

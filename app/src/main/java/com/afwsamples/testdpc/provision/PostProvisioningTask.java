@@ -16,6 +16,10 @@
 
 package com.afwsamples.testdpc.provision;
 
+import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE;
+import static android.app.admin.DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED;
+import static com.afwsamples.testdpc.DeviceAdminReceiver.getComponentName;
+
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.annotation.TargetApi;
@@ -27,25 +31,19 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PermissionInfo;
-import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.os.PersistableBundle;
 import android.support.v4.os.BuildCompat;
 import android.util.Log;
-
 import com.afwsamples.testdpc.AddAccountActivity;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.FinalizeActivity;
 import com.afwsamples.testdpc.common.LaunchIntentUtil;
 import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.cosu.EnableCosuActivity;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE;
-import static android.app.admin.DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED;
-import static com.afwsamples.testdpc.DeviceAdminReceiver.getComponentName;
 
 /**
  * Task executed after provisioning is done indicated by either the
@@ -181,7 +179,7 @@ public class PostProvisioningTask {
         return mSharedPrefs.getBoolean(KEY_POST_PROV_DONE, false);
     }
 
-    @TargetApi(Build.VERSION_CODES.O)
+    @TargetApi(VERSION_CODES.O)
     private void maybeSetAffiliationIds(PersistableBundle extras) {
         if (extras == null) {
             return;
@@ -194,7 +192,7 @@ public class PostProvisioningTask {
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.M)
+    @TargetApi(VERSION_CODES.M)
     private void autoGrantRequestedPermissionsToSelf() {
         String packageName = mContext.getPackageName();
         ComponentName adminComponentName = getComponentName(mContext);

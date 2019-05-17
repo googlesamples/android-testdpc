@@ -28,6 +28,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.os.IBinder;
 import android.os.UserManager;
 import android.support.annotation.Nullable;
@@ -38,7 +39,7 @@ import com.afwsamples.testdpc.R;
 
 import static android.content.Intent.ACTION_USER_UNLOCKED;
 
-@TargetApi(Build.VERSION_CODES.O)
+@TargetApi(VERSION_CODES.O)
 public class ResetPasswordService extends Service {
     private static final String TAG = "ResetPasswordService";
 

@@ -16,20 +16,21 @@
 
 package com.afwsamples.testdpc;
 
+import static com.afwsamples.testdpc.policy.PolicyManagementFragment.OVERRIDE_KEY_SELECTION_KEY;
+
 import android.annotation.TargetApi;
 import android.app.admin.DevicePolicyManager;
 import android.app.admin.NetworkEvent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.os.Process;
 import android.preference.PreferenceManager;
 import android.support.v4.os.BuildCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -37,8 +38,6 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import static com.afwsamples.testdpc.policy.PolicyManagementFragment.OVERRIDE_KEY_SELECTION_KEY;
 
 /**
  * A class that implements common logic to handle direct and delegated admin callbacks
@@ -65,7 +64,7 @@ public class CommonReceiverOperations {
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.O)
+    @TargetApi(VERSION_CODES.O)
     public static void onNetworkLogsAvailable(Context context, ComponentName admin, long batchToken,
                                               int networkLogsCount) {
         Log.i(TAG, "onNetworkLogsAvailable(), batchToken: " + batchToken

@@ -16,11 +16,14 @@
 
 package com.afwsamples.testdpc.policy.keyguard;
 
+import static com.afwsamples.testdpc.common.preference.DpcPreferenceHelper.NO_CUSTOM_CONSTRIANT;
+import static com.afwsamples.testdpc.policy.keyguard.SetTrustAgentConfigFragment.Type;
+
 import android.annotation.TargetApi;
 import android.app.Fragment;
 import android.app.admin.DevicePolicyManager;
 import android.content.Context;
-import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.support.v4.os.BuildCompat;
 import android.support.v7.preference.EditTextPreference;
@@ -28,21 +31,16 @@ import android.support.v7.preference.Preference;
 import android.support.v7.preference.TwoStatePreference;
 import android.util.ArrayMap;
 import android.widget.Toast;
-
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.ProfileOrParentFragment;
 import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.common.preference.DpcPreferenceBase;
 import com.afwsamples.testdpc.common.preference.DpcPreferenceHelper;
-
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-
-import static com.afwsamples.testdpc.common.preference.DpcPreferenceHelper.NO_CUSTOM_CONSTRIANT;
-import static com.afwsamples.testdpc.policy.keyguard.SetTrustAgentConfigFragment.Type;
 
 /**
  * This fragment provides functionalities to set policies on keyguard interaction as a profile
@@ -139,7 +137,7 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
     }
 
     @Override
-    @TargetApi(Build.VERSION_CODES.O)
+    @TargetApi(VERSION_CODES.O)
     public void onResume() {
         super.onResume();
         updateAggregates();
@@ -152,7 +150,7 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
     }
 
     @Override
-    @TargetApi(Build.VERSION_CODES.O)
+    @TargetApi(VERSION_CODES.O)
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         if (KEYGUARD_FEATURES.containsKey(preference.getKey())) {
             final int featureFlag = KEYGUARD_FEATURES.get(preference.getKey());
@@ -226,7 +224,7 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
                 .commit();
     }
 
-    @TargetApi(Build.VERSION_CODES.N)
+    @TargetApi(VERSION_CODES.N)
     private void setLockScreenMessage(Preference preference, String newValue) {
         getDpm().setDeviceOwnerLockScreenInfo(getAdmin(), newValue);
         preference.setSummary(newValue);
@@ -260,7 +258,7 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
                 : null);
     }
 
-    @TargetApi(Build.VERSION_CODES.O)
+    @TargetApi(VERSION_CODES.O)
     private void setupAll() {
         setup(Keys.LOCK_SCREEN_MESSAGE,
                 BuildCompat.isAtLeastN() && isDeviceOwner()

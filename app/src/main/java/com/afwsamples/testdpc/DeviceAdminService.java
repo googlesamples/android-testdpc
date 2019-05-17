@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.support.annotation.RequiresApi;
 
 /**
@@ -11,7 +12,7 @@ import android.support.annotation.RequiresApi;
  *
  * @see {@link android.app.admin.DeviceAdminService}
  */
-@RequiresApi(api = Build.VERSION_CODES.O)
+@RequiresApi(api = VERSION_CODES.O)
 public class DeviceAdminService extends android.app.admin.DeviceAdminService {
 
     private BroadcastReceiver mPackageChangedReceiver;

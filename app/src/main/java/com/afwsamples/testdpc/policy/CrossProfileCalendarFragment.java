@@ -17,19 +17,16 @@
 package com.afwsamples.testdpc.policy;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.app.AlertDialog.Builder;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.pm.PackageManager;
-import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.support.v7.preference.Preference;
 import android.util.ArraySet;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.Toast;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.BaseSearchablePolicyPreferenceFragment;
@@ -39,7 +36,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
 
-@TargetApi(Build.VERSION_CODES.Q)
+@TargetApi(VERSION_CODES.Q)
 public class CrossProfileCalendarFragment extends BaseSearchablePolicyPreferenceFragment implements
     Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
 
@@ -105,7 +102,7 @@ public class CrossProfileCalendarFragment extends BaseSearchablePolicyPreference
         return false;
     }
 
-    @TargetApi(Build.VERSION_CODES.Q)
+    @TargetApi(VERSION_CODES.Q)
     private void reloadAllowAllPackagesUi() {
         final Set<String> packages =
             mDevicePolicyManager.getCrossProfileCalendarPackages(mAdminComponentName);

@@ -23,7 +23,7 @@ import android.app.admin.SecurityLog;
 import android.app.admin.SecurityLog.SecurityEvent;
 import android.content.ComponentName;
 import android.content.Context;
-import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.support.v4.os.BuildCompat;
 import android.util.Log;
@@ -36,7 +36,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-@TargetApi(Build.VERSION_CODES.N)
+@TargetApi(VERSION_CODES.N)
 public class SecurityLogsFragment extends ListFragment {
 
     private static final String TAG = "ProcessLogsFragment";

@@ -20,13 +20,11 @@ import android.annotation.TargetApi;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
-import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.support.v4.util.ArraySet;
-
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -54,13 +52,13 @@ public class ManageAffiliationIdsFragment extends BaseStringItemsFragment {
         mAdminComponent = DeviceAdminReceiver.getComponentName(getActivity());
     }
 
-    @TargetApi(Build.VERSION_CODES.O)
+    @TargetApi(VERSION_CODES.O)
     @Override
     protected Collection<String> loadItems() {
         return mDevicePolicyManager.getAffiliationIds(mAdminComponent);
     }
 
-    @TargetApi(Build.VERSION_CODES.O)
+    @TargetApi(VERSION_CODES.O)
     @Override
     protected void saveItems(List<String> items) {
         mDevicePolicyManager.setAffiliationIds(mAdminComponent, new ArraySet<>(items));

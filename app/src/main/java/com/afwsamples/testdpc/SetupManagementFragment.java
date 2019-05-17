@@ -16,6 +16,15 @@
 
 package com.afwsamples.testdpc;
 
+import static android.app.admin.DevicePolicyManager.ACTION_PROVISION_MANAGED_DEVICE;
+import static android.app.admin.DevicePolicyManager.ACTION_PROVISION_MANAGED_PROFILE;
+import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_ACCOUNT_TO_MIGRATE;
+import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE;
+import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_DEVICE_ADMIN_COMPONENT_NAME;
+import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_DEVICE_ADMIN_PACKAGE_NAME;
+import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_LOGO_URI;
+import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_MAIN_COLOR;
+
 import android.accounts.Account;
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -29,10 +38,10 @@ import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.v4.os.BuildCompat;
-import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,26 +52,14 @@ import android.widget.ImageView;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.afwsamples.testdpc.common.ColorPicker;
 import com.afwsamples.testdpc.common.LaunchIntentUtil;
 import com.afwsamples.testdpc.common.ProvisioningStateUtil;
 import com.afwsamples.testdpc.common.Util;
 import com.android.setupwizardlib.GlifLayout;
-import com.android.setupwizardlib.view.NavigationBar;
-
 import java.security.SecureRandom;
 import java.util.Collections;
 import java.util.Set;
-
-import static android.app.admin.DevicePolicyManager.ACTION_PROVISION_MANAGED_DEVICE;
-import static android.app.admin.DevicePolicyManager.ACTION_PROVISION_MANAGED_PROFILE;
-import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_ACCOUNT_TO_MIGRATE;
-import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE;
-import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_DEVICE_ADMIN_COMPONENT_NAME;
-import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_DEVICE_ADMIN_PACKAGE_NAME;
-import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_LOGO_URI;
-import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_MAIN_COLOR;
 
 /**
  * This {@link Fragment} shows the UI that allows the user to start the setup of a managed profile
@@ -216,7 +213,7 @@ public class SetupManagementFragment extends Fragment implements
         Activity activity = getActivity();
 
         Intent intent = new Intent(intentAction);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT >= VERSION_CODES.M) {
             intent.putExtra(EXTRA_PROVISIONING_DEVICE_ADMIN_COMPONENT_NAME,
                     DeviceAdminReceiver.getComponentName(getActivity()));
         } else {
@@ -259,7 +256,7 @@ public class SetupManagementFragment extends Fragment implements
         Account accountToMigrate = LaunchIntentUtil.getAddedAccount(launchIntent);
         if (accountToMigrate != null) {
             // EXTRA_PROVISIONING_ACCOUNT_TO_MIGRATE only supported in API 22+.
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+            if (Build.VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP_MR1) {
                 // Configure the account to migrate into the managed profile if setup
                 // completes.
                 intent.putExtra(EXTRA_PROVISIONING_ACCOUNT_TO_MIGRATE, accountToMigrate);
@@ -281,7 +278,7 @@ public class SetupManagementFragment extends Fragment implements
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.O)
+    @TargetApi(VERSION_CODES.O)
     private void passAffiliationIds(Intent intent, PersistableBundle adminExtras) {
         ComponentName admin = DeviceAdminReceiver.getComponentName(getActivity());
         DevicePolicyManager dpm = (DevicePolicyManager)

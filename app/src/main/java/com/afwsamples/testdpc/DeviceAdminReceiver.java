@@ -26,7 +26,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Binder;
-import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.os.ParcelFileDescriptor;
 import android.os.PersistableBundle;
 import android.os.Process;
@@ -92,7 +92,7 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.N)
+    @TargetApi(VERSION_CODES.N)
     @Override
     public void onSecurityLogsAvailable(Context context, Intent intent) {
         Log.i(TAG, "onSecurityLogsAvailable() called");
@@ -107,7 +107,7 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
      * TODO: reconsider how to store and present the logs in the future, e.g. save the file into
      * internal memory and show the content in a ListView
      */
-    @TargetApi(Build.VERSION_CODES.O)
+    @TargetApi(VERSION_CODES.O)
     @Override
     public void onNetworkLogsAvailable(Context context, Intent intent, long batchToken,
             int networkLogsCount) {
@@ -133,7 +133,7 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.N)
+    @TargetApi(VERSION_CODES.N)
     @Override
     public void onBugreportSharingDeclined(Context context, Intent intent) {
         Log.i(TAG, "Bugreport sharing declined");
@@ -142,7 +142,7 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
                 NotificationUtil.BUGREPORT_NOTIFICATION_ID);
     }
 
-    @TargetApi(Build.VERSION_CODES.N)
+    @TargetApi(VERSION_CODES.N)
     @Override
     public void onBugreportShared(final Context context, Intent intent,
             final String bugreportFileHash) {
@@ -190,7 +190,7 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
         }.execute();
     }
 
-    @TargetApi(Build.VERSION_CODES.N)
+    @TargetApi(VERSION_CODES.N)
     @Override
     public void onBugreportFailed(Context context, Intent intent, int failureCode) {
         String failureReason;
@@ -212,42 +212,42 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
     }
 
 
-    @TargetApi(Build.VERSION_CODES.O)
+    @TargetApi(VERSION_CODES.O)
     @Override
     public void onUserAdded(Context context, Intent intent, UserHandle newUser) {
         handleUserAction(context, newUser, R.string.on_user_added_title,
                 R.string.on_user_added_message, NotificationUtil.USER_ADDED_NOTIFICATION_ID);
     }
 
-    @TargetApi(Build.VERSION_CODES.O)
+    @TargetApi(VERSION_CODES.O)
     @Override
     public void onUserRemoved(Context context, Intent intent, UserHandle removedUser) {
         handleUserAction(context, removedUser, R.string.on_user_removed_title,
                 R.string.on_user_removed_message, NotificationUtil.USER_REMOVED_NOTIFICATION_ID);
     }
 
-    @TargetApi(Build.VERSION_CODES.P)
+    @TargetApi(VERSION_CODES.P)
     @Override
     public void onUserStarted(Context context, Intent intent, UserHandle startedUser) {
         handleUserAction(context, startedUser, R.string.on_user_started_title,
                 R.string.on_user_started_message, NotificationUtil.USER_STARTED_NOTIFICATION_ID);
     }
 
-    @TargetApi(Build.VERSION_CODES.P)
+    @TargetApi(VERSION_CODES.P)
     @Override
     public void onUserStopped(Context context, Intent intent, UserHandle stoppedUser) {
         handleUserAction(context, stoppedUser, R.string.on_user_stopped_title,
                 R.string.on_user_stopped_message, NotificationUtil.USER_STOPPED_NOTIFICATION_ID);
     }
 
-    @TargetApi(Build.VERSION_CODES.P)
+    @TargetApi(VERSION_CODES.P)
     @Override
     public void onUserSwitched(Context context, Intent intent, UserHandle switchedUser) {
         handleUserAction(context, switchedUser, R.string.on_user_switched_title,
                 R.string.on_user_switched_message, NotificationUtil.USER_SWITCHED_NOTIFICATION_ID);
     }
 
-    @TargetApi(Build.VERSION_CODES.M)
+    @TargetApi(VERSION_CODES.M)
     @Override
     public void onSystemUpdatePending(Context context, Intent intent, long receivedTime) {
         if (receivedTime != -1) {
@@ -260,7 +260,7 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.M)
+    @TargetApi(VERSION_CODES.M)
     @Override
     public String onChoosePrivateKeyAlias(Context context, Intent intent, int uid, Uri uri,
             String alias) {
@@ -281,7 +281,7 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
         onPasswordExpiring(context, intent, Process.myUserHandle());
     }
 
-    @TargetApi(Build.VERSION_CODES.O)
+    @TargetApi(VERSION_CODES.O)
     // @Override
     public void onPasswordExpiring(Context context, Intent intent, UserHandle user) {
         if (!Process.myUserHandle().equals(user)) {
@@ -309,7 +309,7 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
         onPasswordFailed(context, intent, Process.myUserHandle());
     }
 
-    @TargetApi(Build.VERSION_CODES.O)
+    @TargetApi(VERSION_CODES.O)
     // @Override
     public void onPasswordFailed(Context context, Intent intent, UserHandle user) {
         if (!Process.myUserHandle().equals(user)) {
@@ -372,7 +372,7 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
         onPasswordSucceeded(context, intent, Process.myUserHandle());
     }
 
-    @TargetApi(Build.VERSION_CODES.O)
+    @TargetApi(VERSION_CODES.O)
     // @Override
     public void onPasswordSucceeded(Context context, Intent intent, UserHandle user) {
         if (Process.myUserHandle().equals(user)) {
@@ -386,7 +386,7 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
         onPasswordChanged(context, intent, Process.myUserHandle());
     }
 
-    @TargetApi(Build.VERSION_CODES.O)
+    @TargetApi(VERSION_CODES.O)
     // @Override
     public void onPasswordChanged(Context context, Intent intent, UserHandle user) {
         if (Process.myUserHandle().equals(user)) {
@@ -546,7 +546,7 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
                 NotificationUtil.DEVICE_OWNER_CHANGED_ID);
     }
 
-    @TargetApi(Build.VERSION_CODES.P)
+    @TargetApi(VERSION_CODES.P)
     public void onTransferOwnershipComplete(Context context, PersistableBundle bundle) {
         Log.i(TAG, "onTransferOwnershipComplete");
         NotificationUtil.showNotification(context,
@@ -556,7 +556,7 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
                 NotificationUtil.TRANSFER_OWNERSHIP_COMPLETE_ID);
     }
 
-    @TargetApi(Build.VERSION_CODES.P)
+    @TargetApi(VERSION_CODES.P)
     public void onTransferAffiliatedProfileOwnershipComplete(Context context, UserHandle user) {
         Log.i(TAG, "onTransferAffiliatedProfileOwnershipComplete");
         NotificationUtil.showNotification(context,

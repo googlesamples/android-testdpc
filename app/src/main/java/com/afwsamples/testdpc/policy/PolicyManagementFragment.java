@@ -738,7 +738,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
      * restriction for those restriction so further restricting them, if necessary
      */
     private void maybeDisableLockTaskPreferences() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT < VERSION_CODES.O) {
             String[] lockTaskPreferences = { MANAGE_LOCK_TASK_LIST_KEY,
                     CHECK_LOCK_TASK_PERMITTED_KEY, START_LOCK_TASK, STOP_LOCK_TASK };
             for (String preference : lockTaskPreferences) {
@@ -749,7 +749,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     }
 
     private boolean isDelegatedApp() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT < VERSION_CODES.O) {
             return false;
         }
         DevicePolicyManager dpm = getActivity().getSystemService(DevicePolicyManager.class);
@@ -777,7 +777,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     }
 
     @Override
-    @TargetApi(Build.VERSION_CODES.N)
+    @TargetApi(VERSION_CODES.N)
     public boolean onPreferenceClick(Preference preference) {
         String key = preference.getKey();
         switch (key) {
@@ -1143,7 +1143,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         return false;
     }
 
-    @TargetApi(Build.VERSION_CODES.Q)
+    @TargetApi(VERSION_CODES.Q)
     private void promptInstallUpdate() {
         new AlertDialog.Builder(getActivity())
                 .setMessage(R.string.install_update_prompt)
@@ -1156,7 +1156,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 .show();
     }
 
-    @TargetApi(Build.VERSION_CODES.Q)
+    @TargetApi(VERSION_CODES.Q)
     private void installUpdate() {
         File file = new File(getContext().getFilesDir(), "ota.zip");
         Uri uri = FileProvider.getUriForFile(
@@ -1173,7 +1173,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 });
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
+    @RequiresApi(api = VERSION_CODES.M)
     private void testKeyCanBeUsedForSigning() {
         KeyChain.choosePrivateKeyAlias(getActivity(), new KeyChainAliasCallback() {
             @Override
@@ -1192,7 +1192,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         }, null, null, null, null);
     }
 
-    @TargetApi(Build.VERSION_CODES.O)
+    @TargetApi(VERSION_CODES.O)
     private void showPendingSystemUpdate() {
         final SystemUpdateInfo updateInfo =
                 mDevicePolicyManager.getPendingSystemUpdate(mAdminComponentName);
@@ -1216,7 +1216,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.O)
+    @TargetApi(VERSION_CODES.O)
     private void lockNow() {
         if (BuildCompat.isAtLeastO() && Util.isManagedProfileOwner(getActivity())) {
             showLockNowPrompt();
@@ -1231,7 +1231,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     /**
      * Shows a prompt to ask for any flags to pass to lockNow.
      */
-    @TargetApi(Build.VERSION_CODES.O)
+    @TargetApi(VERSION_CODES.O)
     private void showLockNowPrompt() {
         final LayoutInflater inflater = getActivity().getLayoutInflater();
         final View dialogView = inflater.inflate(R.layout.lock_now_dialog_prompt, null);
@@ -1352,22 +1352,22 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         return false;
     }
 
-    @TargetApi(Build.VERSION_CODES.M)
+    @TargetApi(VERSION_CODES.M)
     private void setCameraDisabled(boolean disabled) {
         mDevicePolicyManager.setCameraDisabled(mAdminComponentName, disabled);
     }
 
-    @TargetApi(Build.VERSION_CODES.N)
+    @TargetApi(VERSION_CODES.N)
     private void setSecurityLoggingEnabled(boolean enabled) {
         mDevicePolicyManager.setSecurityLoggingEnabled(mAdminComponentName, enabled);
     }
 
-    @TargetApi(Build.VERSION_CODES.O)
+    @TargetApi(VERSION_CODES.O)
     private void setBackupServiceEnabled(boolean enabled) {
         mDevicePolicyManager.setBackupServiceEnabled(mAdminComponentName, enabled);
     }
 
-    @TargetApi(Build.VERSION_CODES.M)
+    @TargetApi(VERSION_CODES.M)
     private void setKeyGuardDisabled(boolean disabled) {
         if (!mDevicePolicyManager.setKeyguardDisabled(mAdminComponentName, disabled)) {
             // this should not happen
@@ -1379,22 +1379,22 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    @TargetApi(VERSION_CODES.LOLLIPOP)
     private void setScreenCaptureDisabled(boolean disabled) {
         mDevicePolicyManager.setScreenCaptureDisabled(mAdminComponentName, disabled);
     }
 
-    @TargetApi(Build.VERSION_CODES.O)
+    @TargetApi(VERSION_CODES.O)
     private boolean isNetworkLoggingEnabled() {
         return mDevicePolicyManager.isNetworkLoggingEnabled(mAdminComponentName);
     }
 
-    @TargetApi(Build.VERSION_CODES.O)
+    @TargetApi(VERSION_CODES.O)
     private boolean isSecurityLoggingEnabled() {
         return mDevicePolicyManager.isSecurityLoggingEnabled(mAdminComponentName);
     }
 
-    @TargetApi(Build.VERSION_CODES.N)
+    @TargetApi(VERSION_CODES.N)
     private void requestBugReport() {
         try {
             if (!mDevicePolicyManager.requestBugreport(mAdminComponentName)) {
@@ -1406,7 +1406,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.M)
+    @TargetApi(VERSION_CODES.M)
     private void setStatusBarDisabled(boolean disable) {
         if (!mDevicePolicyManager.setStatusBarDisabled(mAdminComponentName, disable)) {
             if (disable) {
@@ -1673,7 +1673,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     /**
      * Shows a message box with the device wifi mac address.
      */
-    @TargetApi(Build.VERSION_CODES.N)
+    @TargetApi(VERSION_CODES.N)
     private void showWifiMacAddress() {
         final String macAddress = mDevicePolicyManager.getWifiMacAddress(mAdminComponentName);
         final String message = macAddress != null ? macAddress
@@ -1738,7 +1738,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
      * Shows the default response for future runtime permission requests by applications, and lets
      * the user change the default value.
      */
-    @TargetApi(Build.VERSION_CODES.M)
+    @TargetApi(VERSION_CODES.M)
     private void showSetPermissionPolicyDialog() {
         if (getActivity() == null || getActivity().isFinishing()) {
             return;
@@ -1861,7 +1861,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
      * Shows a prompt asking for the username of the new user and whether the setup wizard should
      * be skipped.
      */
-    @TargetApi(Build.VERSION_CODES.N)
+    @TargetApi(VERSION_CODES.N)
     private void showCreateAndManageUserPrompt() {
         if (getActivity() == null || getActivity().isFinishing()) {
             return;
@@ -1878,7 +1878,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 R.id.make_user_ephemeral_checkbox);
         final CheckBox leaveAllSystemAppsEnabled = (CheckBox) dialogView.findViewById(
                 R.id.leave_all_system_apps_enabled_checkbox);
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+        if (Build.VERSION.SDK_INT < VERSION_CODES.P) {
             makeUserEphemeralCheckBox.setEnabled(false);
             leaveAllSystemAppsEnabled.setEnabled(false);
         }
@@ -2103,7 +2103,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 .show();
     }
 
-    @TargetApi(Build.VERSION_CODES.M)
+    @TargetApi(VERSION_CODES.M)
     private void loadAppFeedbackNotifications() {
         mEnableAppFeedbackNotificationsPreference.setChecked(
             PreferenceManager.getDefaultSharedPreferences(getContext())
@@ -2124,7 +2124,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(APP_STATUS_KEY).setSummary(appStatusStringId);
     }
 
-    @TargetApi(Build.VERSION_CODES.M)
+    @TargetApi(VERSION_CODES.M)
     private void loadSecurityPatch() {
         Preference securityPatchPreference = findPreference(SECURITY_PATCH_KEY);
         if (!securityPatchPreference.isEnabled()) {
@@ -2167,7 +2167,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         passwordComplexityPreference.setSummary(PASSWORD_COMPLEXITY.get(complexity));
     }
 
-    @TargetApi(Build.VERSION_CODES.N)
+    @TargetApi(VERSION_CODES.N)
     private void loadPasswordCompliant() {
         Preference passwordCompliantPreference = findPreference(PASSWORD_COMPLIANT_KEY);
         if (!passwordCompliantPreference.isEnabled()) {
@@ -2230,13 +2230,13 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    @TargetApi(VERSION_CODES.LOLLIPOP)
     private void reloadCameraDisableUi() {
         boolean isCameraDisabled = mDevicePolicyManager.getCameraDisabled(mAdminComponentName);
         mDisableCameraSwitchPreference.setChecked(isCameraDisabled);
     }
 
-    @TargetApi(Build.VERSION_CODES.O)
+    @TargetApi(VERSION_CODES.O)
     private void reloadEnableNetworkLoggingUi() {
         if (mEnableNetworkLoggingPreference.isEnabled()) {
             boolean isNetworkLoggingEnabled = mDevicePolicyManager.isNetworkLoggingEnabled(mAdminComponentName);
@@ -2245,7 +2245,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.N)
+    @TargetApi(VERSION_CODES.N)
     private void reloadEnableSecurityLoggingUi() {
         if (mEnableSecurityLoggingPreference.isEnabled()) {
             boolean securityLoggingEnabled =
@@ -2256,7 +2256,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.O)
+    @TargetApi(VERSION_CODES.O)
     private void reloadEnableBackupServiceUi() {
         if (mEnableBackupServicePreference.isEnabled()) {
             mEnableBackupServicePreference.setChecked(mDevicePolicyManager.isBackupServiceEnabled(
@@ -2264,14 +2264,14 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    @TargetApi(VERSION_CODES.LOLLIPOP)
     private void reloadScreenCaptureDisableUi() {
         boolean isScreenCaptureDisabled = mDevicePolicyManager.getScreenCaptureDisabled(
                 mAdminComponentName);
         mDisableScreenCaptureSwitchPreference.setChecked(isScreenCaptureDisabled);
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    @TargetApi(VERSION_CODES.LOLLIPOP)
     private void reloadSetAutoTimeRequiredUi() {
         if (mDevicePolicyManager.isDeviceOwnerApp(mPackageName)) {
             boolean isAutoTimeRequired = mDevicePolicyManager.getAutoTimeRequired();
@@ -2279,7 +2279,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    @TargetApi(VERSION_CODES.LOLLIPOP)
     private void reloadMuteAudioUi() {
         if (mMuteAudioSwitchPreference.isEnabled()) {
             final boolean isAudioMuted = mDevicePolicyManager.isMasterVolumeMuted(mAdminComponentName);
@@ -2539,7 +2539,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
      *
      * Once the alias is chosen and deleted, a {@link Toast} shows status- success or failure.
      */
-    @TargetApi(Build.VERSION_CODES.N)
+    @TargetApi(VERSION_CODES.N)
     private void choosePrivateKeyForRemoval() {
         KeyChain.choosePrivateKeyAlias(getActivity(), new KeyChainAliasCallback() {
             @Override
@@ -2898,7 +2898,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     /**
      * Shows an alert dialog which displays a list of suspended/non-suspended apps.
      */
-    @TargetApi(Build.VERSION_CODES.N)
+    @TargetApi(VERSION_CODES.N)
     private void showSuspendAppsPrompt(final boolean forUnsuspending) {
         final List<String> showApps = new ArrayList<>();
         if (forUnsuspending) {
@@ -3036,7 +3036,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                         packageName));
     }
 
-    @TargetApi(Build.VERSION_CODES.N)
+    @TargetApi(VERSION_CODES.N)
     private boolean isPackageSuspended(String packageName) {
         try {
             return mDevicePolicyManager.isPackageSuspended(mAdminComponentName, packageName);
@@ -3177,7 +3177,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.O)
+    @TargetApi(VERSION_CODES.O)
     private void setNotificationWhitelistEditBox() {
         if (getActivity() == null || getActivity().isFinishing()) {
             return;
@@ -3235,7 +3235,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         }
 
         @Override
-        @TargetApi(Build.VERSION_CODES.O)
+        @TargetApi(VERSION_CODES.O)
         protected List<String> getPermittedComponentsList() {
             return mDevicePolicyManager.
                     getPermittedCrossProfileNotificationListeners(mAdminComponentName);
@@ -3247,7 +3247,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.O)
+    @TargetApi(VERSION_CODES.O)
     private void setPermittedNotificationListeners(List<String> permittedNotificationListeners) {
         boolean result = mDevicePolicyManager.
                 setPermittedCrossProfileNotificationListeners(
@@ -3363,7 +3363,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         fragment.show(getFragmentManager(), WifiEapTlsCreateDialogFragment.class.getName());
     }
 
-    @TargetApi(Build.VERSION_CODES.N)
+    @TargetApi(VERSION_CODES.N)
     private void reboot() {
         if (mTelephonyManager.getCallState() != TelephonyManager.CALL_STATE_IDLE) {
             showToast(R.string.reboot_error_msg);
@@ -3423,7 +3423,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
      * Shows a dialog that asks the user for a screen off timeout value, then sets this value as
      * screen off timeout.
      */
-    @TargetApi(Build.VERSION_CODES.P)
+    @TargetApi(VERSION_CODES.P)
     private void showSetScreenOffTimeoutDialog() {
         if (getActivity() == null || getActivity().isFinishing()) {
             return;
@@ -3588,7 +3588,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP_MR1)
+    @TargetApi(VERSION_CODES.LOLLIPOP_MR1)
     private void removeAccount(Account account) {
         mAccountManager.removeAccount(account, getActivity(), future -> {
             try {
@@ -3609,7 +3609,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     @TargetApi(28)
     private int validateAffiliatedUserAfterP() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        if (Build.VERSION.SDK_INT >= VERSION_CODES.P) {
             if (!mDevicePolicyManager.isAffiliatedUser()) {
                 return R.string.require_affiliated_user;
             }
@@ -3618,7 +3618,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     }
 
     private int validateDeviceOwnerBeforeP() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+        if (Build.VERSION.SDK_INT < VERSION_CODES.P) {
             if (!mDevicePolicyManager.isDeviceOwnerApp(mPackageName)) {
                 return R.string.requires_device_owner;
             }

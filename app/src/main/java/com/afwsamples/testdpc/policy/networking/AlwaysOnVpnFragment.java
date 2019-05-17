@@ -26,7 +26,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.VpnService;
-import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -35,11 +35,9 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
-
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.SelectAppFragment;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -56,7 +54,7 @@ import java.util.stream.Collectors;
  * <li> {@link DevicePolicyManager#getAlwaysOnVpnPackage} </li>
  * </ul>
  */
-@TargetApi(Build.VERSION_CODES.N)
+@TargetApi(VERSION_CODES.N)
 public class AlwaysOnVpnFragment extends SelectAppFragment {
     private static final String TAG = "AlwaysOnVpnFragment";
 

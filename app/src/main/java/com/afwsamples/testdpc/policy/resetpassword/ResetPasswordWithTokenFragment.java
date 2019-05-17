@@ -24,6 +24,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -47,7 +48,7 @@ import static android.app.Activity.RESULT_OK;
 /**
  * STOPSHIP: remove reflection once SDK is updated.
  */
-@TargetApi(Build.VERSION_CODES.O)
+@TargetApi(VERSION_CODES.O)
 public class ResetPasswordWithTokenFragment extends Fragment implements View.OnClickListener {
 
     private static final String PREFS_NAME = "password-token";

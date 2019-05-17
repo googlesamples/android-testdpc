@@ -20,6 +20,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.Resources;
 import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.os.UserHandle;
 import android.os.UserManager;
 import android.view.LayoutInflater;
@@ -35,7 +36,7 @@ import java.util.List;
 /**
  * A simple adapter which takes a list of user serial numbers in a listview.
  */
-@TargetApi(Build.VERSION_CODES.M)
+@TargetApi(VERSION_CODES.M)
 public class UserArrayAdapter extends ArrayAdapter<UserHandle> {
     private static final String TAG = "UserArrayAdapter";
 
