@@ -24,10 +24,10 @@ import android.app.admin.DevicePolicyManager;
 import android.app.admin.FreezePeriod;
 import android.app.admin.SystemUpdatePolicy;
 import android.content.Context;
+import android.os.Build;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
-import android.support.v4.os.BuildCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -184,7 +184,8 @@ public class SystemUpdatePolicyFragment extends Fragment implements View.OnClick
 
         mSystemUpdatePolicySelection.setOnCheckedChangeListener(this);
 
-        mFreezePeriodPanel.setVisibility(BuildCompat.isAtLeastP() ? View.VISIBLE : View.GONE);
+        mFreezePeriodPanel.setVisibility(
+            Build.VERSION.SDK_INT >= VERSION_CODES.P ?View.VISIBLE : View.GONE);
         return view;
     }
 
@@ -280,7 +281,8 @@ public class SystemUpdatePolicyFragment extends Fragment implements View.OnClick
         }
 
         try {
-            if (BuildCompat.isAtLeastP() && newPolicy != null && mFreezePeriods.size() != 0) {
+            if (Build.VERSION.SDK_INT >= VERSION_CODES.P
+                    && newPolicy != null && mFreezePeriods.size() != 0) {
                 final List<FreezePeriod> periods = new ArrayList<>(mFreezePeriods.size());
                 for (Period p : mFreezePeriods) {
                     periods.add(p.toFreezePeriod());
@@ -341,7 +343,7 @@ public class SystemUpdatePolicyFragment extends Fragment implements View.OnClick
                     mMaintenanceWindowDetails.setVisibility(View.INVISIBLE);
                     break;
             }
-            if (BuildCompat.isAtLeastP()) {
+            if (Build.VERSION.SDK_INT >= VERSION_CODES.P) {
                 List<FreezePeriod> freezePeriods = policy.getFreezePeriods();
                 mFreezePeriods.clear();
                 for (FreezePeriod period : freezePeriods) {
@@ -363,7 +365,8 @@ public class SystemUpdatePolicyFragment extends Fragment implements View.OnClick
         } else {
             mMaintenanceWindowDetails.setVisibility(View.INVISIBLE);
         }
-        if (checkedId == R.id.system_update_policy_none || !BuildCompat.isAtLeastP()) {
+        if (checkedId == R.id.system_update_policy_none ||
+                Build.VERSION.SDK_INT < VERSION_CODES.P) {
             mFreezePeriodPanel.setVisibility(View.GONE);
         } else {
             mFreezePeriodPanel.setVisibility(View.VISIBLE);

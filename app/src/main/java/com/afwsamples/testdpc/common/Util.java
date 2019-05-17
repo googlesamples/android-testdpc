@@ -33,15 +33,12 @@ import android.os.Bundle;
 import android.os.UserHandle;
 import android.os.UserManager;
 import android.support.v14.preference.PreferenceFragment;
-import android.support.v4.os.BuildCompat;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.Toast;
-
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
-
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -111,7 +108,7 @@ public class Util {
     public static boolean isManagedProfileOwner(Context context) {
         final DevicePolicyManager dpm = getDevicePolicyManager(context);
 
-        if (BuildCompat.isAtLeastN()) {
+        if (Build.VERSION.SDK_INT >= VERSION_CODES.N) {
             try {
                 return dpm.isManagedProfile(DeviceAdminReceiver.getComponentName(context));
             } catch (SecurityException ex) {
@@ -128,7 +125,7 @@ public class Util {
 
     @TargetApi(VERSION_CODES.M)
     public static boolean isPrimaryUser(Context context) {
-        if (isAtLeastM()) {
+        if (Build.VERSION.SDK_INT >= VERSION_CODES.M) {
             UserManager userManager = (UserManager) context.getSystemService(Context.USER_SERVICE);
             return userManager.isSystemUser();
         } else {
@@ -150,19 +147,9 @@ public class Util {
         return dpm.isProfileOwnerApp(context.getPackageName());
     }
 
-    public static boolean isAtLeastM() {
-        return Build.VERSION.SDK_INT >= VERSION_CODES.M;
-    }
-
-    public static boolean isAtLeastQ() {
-        return VERSION.CODENAME.length() == 1
-            && VERSION.CODENAME.charAt(0) >= 'Q'
-            && VERSION.CODENAME.charAt(0) <= 'Z';
-    }
-
     @TargetApi(VERSION_CODES.O)
     public static List<UserHandle> getBindDeviceAdminTargetUsers(Context context) {
-        if (!BuildCompat.isAtLeastO()) {
+        if (Build.VERSION.SDK_INT < VERSION_CODES.O) {
             return Collections.emptyList();
         }
 

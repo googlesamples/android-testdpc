@@ -28,9 +28,10 @@ import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.UserManager;
-import android.support.v4.os.BuildCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -122,7 +123,7 @@ public class AddAccountActivity extends Activity {
     }
 
     private void disableUserRestrictions() {
-        if (BuildCompat.isAtLeastN()) {
+        if (Build.VERSION.SDK_INT >= VERSION_CODES.N) {
             // DPC is allowed to bypass DISALLOW_MODIFY_ACCOUNTS on N or above.
             Log.v(TAG, "skip disabling user restriction on N or above");
             return;
@@ -135,7 +136,7 @@ public class AddAccountActivity extends Activity {
     }
 
     private void restoreUserRestrictions() {
-        if (BuildCompat.isAtLeastN()) {
+        if (Build.VERSION.SDK_INT >= VERSION_CODES.N) {
             // DPC is allowed to bypass DISALLOW_MODIFY_ACCOUNTS on N or above.
             Log.v(TAG, "skip restoring user restrictions on N or above");
             return;

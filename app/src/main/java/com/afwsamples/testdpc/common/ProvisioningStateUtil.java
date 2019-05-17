@@ -27,7 +27,6 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Build.VERSION_CODES;
 import android.provider.Settings;
-import android.support.v4.os.BuildCompat;
 import java.util.List;
 
 /**
@@ -94,7 +93,7 @@ public class ProvisioningStateUtil {
      */
     @TargetApi(VERSION_CODES.N)
     public static boolean isProvisioningAllowed(Context context, String action) {
-        if (BuildCompat.isAtLeastN()) {
+        if (Build.VERSION.SDK_INT >= VERSION_CODES.N) {
             DevicePolicyManager dpm = (DevicePolicyManager) context
                     .getSystemService(Context.DEVICE_POLICY_SERVICE);
             return dpm.isProvisioningAllowed(action);

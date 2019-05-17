@@ -41,7 +41,6 @@ import android.os.Build;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.PersistableBundle;
-import android.support.v4.os.BuildCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -162,7 +161,7 @@ public class SetupManagementFragment extends Fragment implements
 
         if (setProvisioningMethodsVisibility()) {
             // The extra logo uri and color are supported only from N
-            if (BuildCompat.isAtLeastN()) {
+            if (Build.VERSION.SDK_INT >= VERSION_CODES.N) {
                 getView().findViewById(R.id.params_title).setVisibility(View.VISIBLE);
                 if (canAnAppHandleGetContent()) {
                     getView().findViewById(
@@ -190,15 +189,19 @@ public class SetupManagementFragment extends Fragment implements
         final int setUpOptionId = mSetupOptions.getCheckedRadioButtonId();
         final boolean isManagedProfileAction = setUpOptionId == R.id.setup_managed_profile;
         final boolean isManagedDeviceAction = setUpOptionId == R.id.setup_device_owner;
-        mSkipUserConsent.setVisibility(BuildCompat.isAtLeastO() && isManagedProfileAction &&
-                Util.isDeviceOwner(getActivity())
+        mSkipUserConsent.setVisibility(
+            Build.VERSION.SDK_INT >= VERSION_CODES.O
+                && isManagedProfileAction
+                && Util.isDeviceOwner(getActivity())
                 ? View.VISIBLE
                 : View.GONE);
-        mKeepAccountMigrated.setVisibility(BuildCompat.isAtLeastO() && isManagedProfileAction
+        mKeepAccountMigrated.setVisibility(
+            Build.VERSION.SDK_INT >= VERSION_CODES.O && isManagedProfileAction
                 ? View.VISIBLE
                 : View.GONE);
-        mSkipEncryption.setVisibility((isManagedProfileAction && BuildCompat.isAtLeastN())
-                || (isManagedDeviceAction && Util.isAtLeastM())
+        mSkipEncryption.setVisibility(
+            (isManagedProfileAction && Build.VERSION.SDK_INT >= VERSION_CODES.N)
+                || (isManagedDeviceAction && Build.VERSION.SDK_INT >= VERSION_CODES.M)
                 ? View.VISIBLE
                 : View.GONE);
 
@@ -273,7 +276,7 @@ public class SetupManagementFragment extends Fragment implements
     private void maybePassAffiliationIds(Intent intent, PersistableBundle adminExtras) {
         if (Util.isDeviceOwner(getActivity())
                 && ACTION_PROVISION_MANAGED_PROFILE.equals(intent.getAction())
-                && BuildCompat.isAtLeastO()) {
+                && Build.VERSION.SDK_INT >= VERSION_CODES.O) {
             passAffiliationIds(intent, adminExtras);
         }
     }
@@ -299,7 +302,7 @@ public class SetupManagementFragment extends Fragment implements
      * @return true if we can launch the intent
      */
     private boolean maybeSpecifyNExtras(Intent intent) {
-        if (BuildCompat.isAtLeastN()) {
+        if (Build.VERSION.SDK_INT >= VERSION_CODES.N) {
             specifyLogoUri(intent);
             specifyColor(intent);
         }
@@ -307,7 +310,7 @@ public class SetupManagementFragment extends Fragment implements
     }
 
     private void specifyDefaultDisclaimers(Intent intent) {
-        if (BuildCompat.isAtLeastO()) {
+        if (Build.VERSION.SDK_INT >= VERSION_CODES.O) {
             Bundle emmBundle = new Bundle();
             emmBundle.putString(DevicePolicyManager.EXTRA_PROVISIONING_DISCLAIMER_HEADER,
                     getString(R.string.default_disclaimer_emm_name));
@@ -331,16 +334,19 @@ public class SetupManagementFragment extends Fragment implements
     }
 
     private void specifySkipUserConsent(Intent intent) {
-        if (BuildCompat.isAtLeastO() && ACTION_PROVISION_MANAGED_PROFILE.equals(intent.getAction())
-                && mSkipUserConsent.getVisibility() == View.VISIBLE) {
-            intent.putExtra(DevicePolicyManager.EXTRA_PROVISIONING_SKIP_USER_CONSENT,
-                    mSkipUserConsent.isChecked());
+        if (Build.VERSION.SDK_INT >= VERSION_CODES.O
+              && ACTION_PROVISION_MANAGED_PROFILE.equals(intent.getAction())
+              && mSkipUserConsent.getVisibility() == View.VISIBLE) {
+            intent.putExtra(
+                DevicePolicyManager.EXTRA_PROVISIONING_SKIP_USER_CONSENT,
+                mSkipUserConsent.isChecked());
         }
     }
 
     private void specifyKeepAccountMigrated(Intent intent) {
-        if (BuildCompat.isAtLeastO() && ACTION_PROVISION_MANAGED_PROFILE.equals(intent.getAction())
-                && mKeepAccountMigrated.getVisibility() == View.VISIBLE) {
+        if (Build.VERSION.SDK_INT >= VERSION_CODES.O
+              && ACTION_PROVISION_MANAGED_PROFILE.equals(intent.getAction())
+              && mKeepAccountMigrated.getVisibility() == View.VISIBLE) {
             intent.putExtra(DevicePolicyManager.EXTRA_PROVISIONING_KEEP_ACCOUNT_ON_MIGRATION,
                     mKeepAccountMigrated.isChecked());
         }

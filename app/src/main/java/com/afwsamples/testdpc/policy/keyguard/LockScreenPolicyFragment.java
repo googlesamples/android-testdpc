@@ -23,9 +23,9 @@ import android.annotation.TargetApi;
 import android.app.Fragment;
 import android.app.admin.DevicePolicyManager;
 import android.content.Context;
+import android.os.Build;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
-import android.support.v4.os.BuildCompat;
 import android.support.v7.preference.EditTextPreference;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.TwoStatePreference;
@@ -33,7 +33,6 @@ import android.util.ArrayMap;
 import android.widget.Toast;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.ProfileOrParentFragment;
-import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.common.preference.DpcPreferenceBase;
 import com.afwsamples.testdpc.common.preference.DpcPreferenceHelper;
 import java.util.Arrays;
@@ -261,7 +260,7 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
     @TargetApi(VERSION_CODES.O)
     private void setupAll() {
         setup(Keys.LOCK_SCREEN_MESSAGE,
-                BuildCompat.isAtLeastN() && isDeviceOwner()
+            Build.VERSION.SDK_INT >= VERSION_CODES.N && isDeviceOwner()
                         ? getDpm().getDeviceOwnerLockScreenInfo() : null);
         setup(Keys.MAX_FAILS_BEFORE_WIPE, getDpm().getMaximumFailedPasswordsForWipe(getAdmin()));
         setup(Keys.MAX_TIME_SCREEN_LOCK,
@@ -289,7 +288,7 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
         );
 
         // We do not allow user to add trust agent config in pre-N devices in managed profile.
-        if (!BuildCompat.isAtLeastN() && key.equals(Keys.SET_TRUST_AGENT_CONFIG)) {
+        if (Build.VERSION.SDK_INT < VERSION_CODES.N && key.equals(Keys.SET_TRUST_AGENT_CONFIG)) {
             dpcPref.setAdminConstraint(DpcPreferenceHelper.ADMIN_DEVICE_OWNER);
             return;
         }
@@ -312,7 +311,7 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
     }
 
     private void disableIncompatibleManagementOptionsInCurrentProfile() {
-        if (!Util.isAtLeastM()) {
+        if (Build.VERSION.SDK_INT < VERSION_CODES.M) {
             for (String preference : KEYGUARD_FEATURES.keySet()) {
                 ((DpcPreferenceBase) findPreference(preference))
                         .setAdminConstraint(DpcPreferenceHelper.ADMIN_DEVICE_OWNER);

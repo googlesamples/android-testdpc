@@ -21,15 +21,14 @@ import android.app.Fragment;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.os.Build;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.support.v13.app.FragmentTabHost;
-import android.support.v4.os.BuildCompat;
 import android.support.v7.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 
@@ -66,7 +65,8 @@ public abstract class ProfileOrParentFragment extends BaseSearchablePolicyPrefer
             tabHost.setup(getActivity(), getChildFragmentManager(), View.generateViewId());
 
             final boolean showDualTabs =
-                    Util.isManagedProfileOwner(getActivity()) && BuildCompat.isAtLeastN();
+                Util.isManagedProfileOwner(getActivity())
+                    && Build.VERSION.SDK_INT >= VERSION_CODES.N;
 
             // Tab for the parent profile
             if (showDualTabs) {

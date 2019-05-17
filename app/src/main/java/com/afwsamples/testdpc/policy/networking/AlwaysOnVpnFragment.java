@@ -16,8 +16,6 @@
 
 package com.afwsamples.testdpc.policy.networking;
 
-import static com.afwsamples.testdpc.common.Util.isAtLeastQ;
-
 import android.annotation.TargetApi;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
@@ -26,6 +24,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.VpnService;
+import android.os.Build;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.util.Log;
@@ -84,7 +83,7 @@ public class AlwaysOnVpnFragment extends SelectAppFragment {
             Bundle savedInstanceState) {
         final View view = super.onCreateView(layoutInflater, container, savedInstanceState);
 
-        if (isAtLeastQ()) {
+        if (Build.VERSION.SDK_INT >= VERSION_CODES.Q) {
             final ViewGroup extension = getExtensionLayout(view);
             extension.setVisibility(View.VISIBLE);
             layoutInflater.inflate(R.layout.lockdown_settings, extension);
@@ -113,7 +112,7 @@ public class AlwaysOnVpnFragment extends SelectAppFragment {
     @Override
     protected void reloadSelectedPackage() {
         super.reloadSelectedPackage();
-        if (isAtLeastQ()) {
+        if (Build.VERSION.SDK_INT >= VERSION_CODES.Q) {
             updateLockdown();
         }
     }
@@ -129,7 +128,7 @@ public class AlwaysOnVpnFragment extends SelectAppFragment {
     @Override
     protected void setSelectedPackage(String pkg) {
         try {
-            if (isAtLeastQ()) {
+            if (Build.VERSION.SDK_INT >= VERSION_CODES.Q) {
                 setAlwaysOnVpnPackageQPlus(pkg);
             } else {
                 mDpm.setAlwaysOnVpnPackage(mWho, pkg, /* lockdownEnabled */ true);

@@ -24,10 +24,10 @@ import android.app.admin.NetworkEvent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Build.VERSION_CODES;
 import android.os.Process;
 import android.preference.PreferenceManager;
-import android.support.v4.os.BuildCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
@@ -92,7 +92,7 @@ public class CommonReceiverOperations {
                 context.getString(R.string.on_network_logs_available_success, batchToken));
 
         ArrayList<String> loggedEvents = new ArrayList<>();
-        if (BuildCompat.isAtLeastP()) {
+        if (Build.VERSION.SDK_INT >= VERSION_CODES.P) {
             for (NetworkEvent event : events) {
                 loggedEvents.add(event.toString());
             }

@@ -23,9 +23,9 @@ import android.app.admin.SecurityLog;
 import android.app.admin.SecurityLog.SecurityEvent;
 import android.content.ComponentName;
 import android.content.Context;
+import android.os.Build;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
-import android.support.v4.os.BuildCompat;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -99,7 +99,7 @@ public class SecurityLogsFragment extends ListFragment {
             for (SecurityEvent event : logs) {
                 StringBuilder sb = new StringBuilder();
                 sb.append(getStringEventTagFromId(event.getTag()));
-                if (BuildCompat.isAtLeastP()) {
+                if (Build.VERSION.SDK_INT >= VERSION_CODES.P) {
                     sb.append(" (id: " + getEventId(event) + ")");
                 }
                 sb.append(" (").append(new Date(TimeUnit.NANOSECONDS.toMillis(

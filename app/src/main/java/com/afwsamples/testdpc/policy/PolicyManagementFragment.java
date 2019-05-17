@@ -17,7 +17,6 @@
 package com.afwsamples.testdpc.policy;
 
 import static android.os.UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES;
-import static com.afwsamples.testdpc.common.Util.isAtLeastQ;
 import static com.afwsamples.testdpc.common.preference.DpcPreferenceHelper.NO_CUSTOM_CONSTRIANT;
 
 import android.accessibilityservice.AccessibilityServiceInfo;
@@ -63,7 +62,6 @@ import android.support.annotation.RequiresApi;
 import android.support.annotation.StringRes;
 import android.support.v14.preference.SwitchPreference;
 import android.support.v4.content.FileProvider;
-import android.support.v4.os.BuildCompat;
 import android.support.v7.preference.EditTextPreference;
 import android.support.v7.preference.ListPreference;
 import android.support.v7.preference.Preference;
@@ -400,7 +398,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     private static final SparseIntArray PASSWORD_COMPLEXITY = new SparseIntArray(4);
     static {
-        if (isAtLeastQ()) {
+        if (Build.VERSION.SDK_INT >= VERSION_CODES.Q) {
             final int[] complexityIds = new int[]{
                 DevicePolicyManager.PASSWORD_COMPLEXITY_NONE,
                 DevicePolicyManager.PASSWORD_COMPLEXITY_LOW,
@@ -727,7 +725,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     private void constrainSpecialCasePreferences() {
         // Reset password can be used in all contexts since N
-        if (BuildCompat.isAtLeastN()) {
+        if (Build.VERSION.SDK_INT >= VERSION_CODES.N) {
             ((DpcPreference) findPreference(RESET_PASSWORD_KEY)).clearNonCustomConstraints();
         }
     }
@@ -805,7 +803,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 showFragment(new SetLockTaskFeaturesFragment());
                 return true;
             case RESET_PASSWORD_KEY:
-                if (BuildCompat.isAtLeastO()) {
+                if (Build.VERSION.SDK_INT >= VERSION_CODES.O) {
                     showFragment(new ResetPasswordWithTokenFragment());
                     return true;
                 } else {
@@ -1218,9 +1216,10 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     @TargetApi(VERSION_CODES.O)
     private void lockNow() {
-        if (BuildCompat.isAtLeastO() && Util.isManagedProfileOwner(getActivity())) {
+        if (Build.VERSION.SDK_INT >= VERSION_CODES.O && Util.isManagedProfileOwner(getActivity())) {
             showLockNowPrompt();
-        } else if (BuildCompat.isAtLeastN() && Util.isManagedProfileOwner(getActivity())) {
+        } else if (Build.VERSION.SDK_INT >= VERSION_CODES.N
+                && Util.isManagedProfileOwner(getActivity())) {
             // Always call lock now on the parent for managed profile on N
             mDevicePolicyManager.getParentProfileInstance(mAdminComponentName).lockNow();
         } else {
@@ -1419,7 +1418,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private boolean installKeyPair(final PrivateKey key, final Certificate cert, final String alias,
                                    boolean isUserSelectable) {
         try {
-            if (BuildCompat.isAtLeastP()) {
+            if (Build.VERSION.SDK_INT >= VERSION_CODES.P) {
 
                 return mDevicePolicyManager.installKeyPair(
                         mAdminComponentName, key, new Certificate[]{cert}, alias,
@@ -1968,7 +1967,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
      * {@link DevicePolicyManager#getSecondaryUsers} is not available.
      */
     private void showRemoveUserPrompt() {
-        if (BuildCompat.isAtLeastP()) {
+        if (Build.VERSION.SDK_INT >= VERSION_CODES.P) {
             showChooseUserPrompt(R.string.remove_user, userHandle -> {
                 boolean success =
                         mDevicePolicyManager.removeUser(mAdminComponentName, userHandle);
@@ -2428,8 +2427,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
         final CheckBox userSelectableCheckbox = passwordInputView.findViewById(
                 R.id.alias_user_selectable);
-        userSelectableCheckbox.setEnabled(BuildCompat.isAtLeastP());
-        userSelectableCheckbox.setChecked(!BuildCompat.isAtLeastP());
+        userSelectableCheckbox.setEnabled(Build.VERSION.SDK_INT >= VERSION_CODES.P);
+        userSelectableCheckbox.setChecked(Build.VERSION.SDK_INT < VERSION_CODES.P);
 
         new AlertDialog.Builder(getActivity())
                 .setTitle(getString(R.string.certificate_alias_prompt_title))
@@ -2476,7 +2475,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
         final CheckBox userSelectableCheckbox = aliasNamingView.findViewById(
                 R.id.alias_user_selectable);
-        userSelectableCheckbox.setChecked(!BuildCompat.isAtLeastP());
+        userSelectableCheckbox.setChecked(Build.VERSION.SDK_INT < VERSION_CODES.P);
 
         final CheckBox ecKeyCheckbox = aliasNamingView.findViewById(
                 R.id.generate_ec_key);

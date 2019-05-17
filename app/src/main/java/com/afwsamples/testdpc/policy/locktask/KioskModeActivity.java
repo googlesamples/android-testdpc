@@ -35,7 +35,6 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
-import android.support.v4.os.BuildCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -203,7 +202,7 @@ public class KioskModeActivity extends Activity {
 
     @TargetApi(VERSION_CODES.N)
     private void saveCurrentConfiguration() {
-        if (BuildCompat.isAtLeastN()) {
+        if (Build.VERSION.SDK_INT >= VERSION_CODES.N) {
             Bundle settingsBundle = mDevicePolicyManager.getUserRestrictions(mAdminComponentName);
             SharedPreferences.Editor editor = getSharedPreferences(KIOSK_PREFERENCE_FILE,
                     MODE_PRIVATE).edit();
@@ -217,7 +216,7 @@ public class KioskModeActivity extends Activity {
     }
 
     private void restorePreviousConfiguration() {
-        if (BuildCompat.isAtLeastN()) {
+        if (Build.VERSION.SDK_INT >= VERSION_CODES.N) {
             SharedPreferences sharedPreferences = getSharedPreferences(KIOSK_PREFERENCE_FILE,
                     MODE_PRIVATE);
 
