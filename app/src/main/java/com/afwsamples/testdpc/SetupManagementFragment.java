@@ -333,8 +333,7 @@ public class SetupManagementFragment extends Fragment implements
     private void specifySkipUserConsent(Intent intent) {
         if (BuildCompat.isAtLeastO() && ACTION_PROVISION_MANAGED_PROFILE.equals(intent.getAction())
                 && mSkipUserConsent.getVisibility() == View.VISIBLE) {
-            // TODO: use action string in Android SDK
-            intent.putExtra("android.app.extra.PROVISIONING_SKIP_USER_CONSENT",
+            intent.putExtra(DevicePolicyManager.EXTRA_PROVISIONING_SKIP_USER_CONSENT,
                     mSkipUserConsent.isChecked());
         }
     }
@@ -342,8 +341,7 @@ public class SetupManagementFragment extends Fragment implements
     private void specifyKeepAccountMigrated(Intent intent) {
         if (BuildCompat.isAtLeastO() && ACTION_PROVISION_MANAGED_PROFILE.equals(intent.getAction())
                 && mKeepAccountMigrated.getVisibility() == View.VISIBLE) {
-            // TODO: use action string in Android SDK
-            intent.putExtra("android.app.extra.PROVISIONING_KEEP_ACCOUNT_ON_MIGRATION",
+            intent.putExtra(DevicePolicyManager.EXTRA_PROVISIONING_KEEP_ACCOUNT_ON_MIGRATION,
                     mKeepAccountMigrated.isChecked());
         }
     }

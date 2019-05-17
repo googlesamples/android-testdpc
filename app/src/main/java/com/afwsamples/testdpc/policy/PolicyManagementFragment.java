@@ -648,7 +648,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         mInstallNonMarketAppsPreference.setCustomConstraint(
                 () -> (mUserManager.hasUserRestriction(DISALLOW_INSTALL_UNKNOWN_SOURCES) ||
                     mUserManager.hasUserRestriction(
-                        UserRestriction.DISALLOW_INSTALL_UNKNOWN_SOURCES_GLOBALLY))
+                        UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES_GLOBALLY))
                         ? R.string.user_restricted
                         : NO_CUSTOM_CONSTRIANT);
         mInstallNonMarketAppsPreference.setOnPreferenceChangeListener(this);
