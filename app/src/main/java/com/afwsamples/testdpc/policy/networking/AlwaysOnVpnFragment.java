@@ -118,7 +118,7 @@ public class AlwaysOnVpnFragment extends SelectAppFragment {
         }
     }
 
-    @TargetApi(29)
+    @TargetApi(VERSION_CODES.Q)
     private void updateLockdown() {
         mLockdown.setChecked(mDpm.isAlwaysOnVpnLockdownEnabled(mWho));
         final Set<String> exemptedPackages = mDpm.getAlwaysOnVpnLockdownWhitelist(mWho);
@@ -145,7 +145,7 @@ public class AlwaysOnVpnFragment extends SelectAppFragment {
         }
     }
 
-    @TargetApi(29)
+    @TargetApi(VERSION_CODES.Q)
     private void setAlwaysOnVpnPackageQPlus(String pkg)
             throws PackageManager.NameNotFoundException {
         final boolean lockdown = mLockdown.isChecked();

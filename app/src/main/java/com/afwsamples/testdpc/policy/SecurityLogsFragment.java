@@ -140,7 +140,7 @@ public class SecurityLogsFragment extends ListFragment {
         }
     }
 
-    @TargetApi(28)
+    @TargetApi(VERSION_CODES.P)
     private long getEventId(SecurityEvent event) {
         return event.getId();
     }

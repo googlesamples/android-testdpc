@@ -20,12 +20,12 @@ import android.annotation.TargetApi;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.os.AsyncTask;
+import android.os.Build.VERSION_CODES;
 import android.util.Log;
-
-import com.afwsamples.testdpc.policy.keymanagement.ShowToastCallback;
 import com.afwsamples.testdpc.R;
+import com.afwsamples.testdpc.policy.keymanagement.ShowToastCallback;
 
-@TargetApi(29)
+@TargetApi(VERSION_CODES.Q)
 final class SetPrivateDnsTask extends AsyncTask<Void, Void, String> {
     public static final String TAG = "Networking";
     private final ShowToastCallback mCallback;

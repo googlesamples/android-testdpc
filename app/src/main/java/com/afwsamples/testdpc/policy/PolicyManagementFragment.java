@@ -1415,7 +1415,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         }
     }
 
-    @TargetApi(28)
+    @TargetApi(VERSION_CODES.P)
     private boolean installKeyPair(final PrivateKey key, final Certificate cert, final String alias,
                                    boolean isUserSelectable) {
         try {
@@ -1983,7 +1983,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
      * For user switch:
      * Shows a prompt for choosing a user to be switched to.
      */
-    @TargetApi(28)
+    @TargetApi(VERSION_CODES.P)
     private void showSwitchUserPrompt() {
         showChooseUserPrompt(R.string.switch_user, userHandle -> {
             boolean success =
@@ -1996,7 +1996,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
      * For starting user in background:
      * Shows a prompt for choosing a user to be started in background.
      */
-    @TargetApi(28)
+    @TargetApi(VERSION_CODES.P)
     private void showStartUserInBackgroundPrompt() {
         showChooseUserPrompt(R.string.start_user_in_background, userHandle -> {
             int status = mDevicePolicyManager.startUserInBackground(mAdminComponentName, userHandle);
@@ -2010,7 +2010,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
      * For user stop:
      * Shows a prompt for choosing a user to be stopped.
      */
-    @TargetApi(28)
+    @TargetApi(VERSION_CODES.P)
     private void showStopUserPrompt() {
         showChooseUserPrompt(R.string.stop_user, userHandle -> {
             int status = mDevicePolicyManager.stopUser(mAdminComponentName, userHandle);
@@ -2026,7 +2026,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     /**
      * Shows a prompt for choosing a user. The callback will be invoked with chosen user.
      */
-    @TargetApi(28)
+    @TargetApi(VERSION_CODES.P)
     private void showChooseUserPrompt(int titleResId, UserCallback callback) {
         if (getActivity() == null || getActivity().isFinishing()) {
             return;
@@ -2052,7 +2052,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     /**
      * Logout the current user.
      */
-    @TargetApi(28)
+    @TargetApi(VERSION_CODES.P)
     private void logoutUser() {
         int status = mDevicePolicyManager.logoutUser(mAdminComponentName);
         showToast(status == USER_OPERATION_SUCCESS ? R.string.user_logouted
@@ -2144,7 +2144,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         securityPatchPreference.setSummary(display);
     }
 
-    @TargetApi(28)
+    @TargetApi(VERSION_CODES.P)
     private void loadSeparateChallenge() {
         final Preference separateChallengePreference = findPreference(SEPARATE_CHALLENGE_KEY);
         if (!separateChallengePreference.isEnabled()) {
@@ -2190,14 +2190,14 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     }
 
 
-    @TargetApi(28)
+    @TargetApi(VERSION_CODES.P)
     private void reloadEnableLogoutUi() {
         if (mEnableLogoutPreference.isEnabled()) {
             mEnableLogoutPreference.setChecked(mDevicePolicyManager.isLogoutEnabled());
         }
     }
 
-    @TargetApi(28)
+    @TargetApi(VERSION_CODES.P)
     private void reloadAutoBrightnessUi() {
         if (mAutoBrightnessPreference.isEnabled()) {
             final String brightnessMode = Settings.System.getString(
@@ -2206,7 +2206,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         }
     }
 
-    @TargetApi(28)
+    @TargetApi(VERSION_CODES.P)
     private void reloadAffiliatedApis() {
         if (mAffiliatedUserPreference.isEnabled()) {
             mAffiliatedUserPreference.setSummary(
@@ -2222,7 +2222,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         mReenableKeyguardPreference.refreshEnabledState();
     }
 
-    @TargetApi(28)
+    @TargetApi(VERSION_CODES.P)
     private void loadIsEphemeralUserUi() {
         if (mEphemeralUserPreference.isEnabled()) {
             boolean isEphemeralUser = mDevicePolicyManager.isEphemeralUser(mAdminComponentName);
@@ -2768,7 +2768,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     /**
      * Shows a prompt to ask for package name which is used to install an existing package.
      */
-    @TargetApi(28)
+    @TargetApi(VERSION_CODES.P)
     private void showInstallExistingPackagePrompt() {
         if (getActivity() == null || getActivity().isFinishing()) {
             return;
@@ -2794,7 +2794,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 .show();
     }
 
-    @TargetApi(23)
+    @TargetApi(VERSION_CODES.M)
     private void installApkPackageFromIntent(Intent intent) {
         if (getActivity() == null || getActivity().isFinishing()) {
             return;
@@ -2811,7 +2811,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         }
     }
 
-    @TargetApi(23)
+    @TargetApi(VERSION_CODES.M)
     private void showUninstallPackagePrompt() {
         final List<String> installedApps = new ArrayList<>();
         for (ResolveInfo res : getAllLauncherIntentResolversSorted()) {
@@ -2960,7 +2960,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     /**
      * Shows an alert dialog with a list of packages with metered data disabled.
      */
-    @TargetApi(28)
+    @TargetApi(VERSION_CODES.P)
     private void showSetMeteredDataPrompt() {
         final Activity activity = getActivity();
         if (activity == null || activity.isFinishing()) {
@@ -2993,7 +2993,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 .show();
     }
 
-    @TargetApi(28)
+    @TargetApi(VERSION_CODES.P)
     private List<String> getMeteredDataRestrictedPkgs() {
         return mDevicePolicyManager.getMeteredDataDisabledPackages(mAdminComponentName);
     }
@@ -3002,7 +3002,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
      * Shows an alert dialog which displays a list of apps. Clicking an app in the dialog clear the
      * app data.
      */
-    @TargetApi(28)
+    @TargetApi(VERSION_CODES.P)
     private void showClearAppDataPrompt() {
         final List<String> packageNameList =
                 getAllInstalledApplicationsSorted()
@@ -3024,7 +3024,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         }
     }
 
-    @TargetApi(28)
+    @TargetApi(VERSION_CODES.P)
     private void clearApplicationUserData(String packageName) {
         mDevicePolicyManager.clearApplicationUserData(
                 mAdminComponentName,
@@ -3317,7 +3317,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 .replace(R.id.container, fragment, tag).commit();
     }
 
-    @TargetApi(28)
+    @TargetApi(VERSION_CODES.P)
     private void relaunchInLockTaskMode() {
         final Intent intent = new Intent(getActivity(), getActivity().getClass());
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -3381,7 +3381,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
      * Shows a dialog that asks the user for a screen brightness value, then sets the screen
      * brightness to these values.
      */
-    @TargetApi(28)
+    @TargetApi(VERSION_CODES.P)
     private void showSetScreenBrightnessDialog() {
         if (getActivity() == null || getActivity().isFinishing()) {
             return;
@@ -3466,7 +3466,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     /**
      * Shows a dialog that asks the user for a timestamp, then sets the system time to this value.
      */
-    @TargetApi(28)
+    @TargetApi(VERSION_CODES.P)
     private void showSetTimeDialog() {
         if (getActivity() == null || getActivity().isFinishing()) {
             return;
@@ -3505,7 +3505,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
      * Shows a dialog that asks the user for a timezone id, then sets the system timezone to
      * this value.
      */
-    @TargetApi(28)
+    @TargetApi(VERSION_CODES.P)
     private void showSetTimeZoneDialog() {
         if (getActivity() == null || getActivity().isFinishing()) {
             return;
@@ -3541,7 +3541,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     /**
      * Shows a dialog that asks the user to set a profile name.
      */
-    @TargetApi(28)
+    @TargetApi(VERSION_CODES.P)
     private void showSetProfileNameDialog() {
         if (getActivity() == null || getActivity().isFinishing()) {
             return;
@@ -3607,7 +3607,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         }, null);
     }
 
-    @TargetApi(28)
+    @TargetApi(VERSION_CODES.P)
     private int validateAffiliatedUserAfterP() {
         if (Build.VERSION.SDK_INT >= VERSION_CODES.P) {
             if (!mDevicePolicyManager.isAffiliatedUser()) {

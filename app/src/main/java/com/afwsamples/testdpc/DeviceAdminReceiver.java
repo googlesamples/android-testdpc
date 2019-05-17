@@ -504,7 +504,7 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
         }
     }
 
-    @TargetApi(28)
+    @TargetApi(VERSION_CODES.P)
     private static Boolean isUsingUnifiedPassword(Context context) {
         if (!BuildCompat.isAtLeastP()) {
             return false;

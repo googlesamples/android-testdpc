@@ -27,6 +27,7 @@ import android.annotation.TargetApi;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.support.v7.preference.Preference;
 import android.util.ArrayMap;
@@ -155,12 +156,12 @@ public class SetLockTaskFeaturesFragment
         }
     }
 
-    @TargetApi(28)
+    @TargetApi(VERSION_CODES.P)
     private int getLockTaskFeatures() {
         return mDpm.getLockTaskFeatures(mAdmin);
     }
 
-    @TargetApi(28)
+    @TargetApi(VERSION_CODES.P)
     private void setLockTaskFeatures(int flags) {
        mDpm.setLockTaskFeatures(mAdmin, flags);
     }

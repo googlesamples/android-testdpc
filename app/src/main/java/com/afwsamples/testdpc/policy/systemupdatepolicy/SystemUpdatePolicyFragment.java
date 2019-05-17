@@ -91,7 +91,7 @@ public class SystemUpdatePolicyFragment extends Fragment implements View.OnClick
             return mEnd.atYear(LocalDate.now().getYear());
         }
 
-        @TargetApi(28)
+        @TargetApi(VERSION_CODES.P)
         public FreezePeriod toFreezePeriod() {
             return new FreezePeriod(mStart, mEnd);
         }
@@ -260,7 +260,7 @@ public class SystemUpdatePolicyFragment extends Fragment implements View.OnClick
                 });
     }
 
-    @TargetApi(28)
+    @TargetApi(VERSION_CODES.P)
     private boolean setSystemUpdatePolicy() {
         SystemUpdatePolicy newPolicy;
         switch (mSystemUpdatePolicySelection.getCheckedRadioButtonId()) {
@@ -307,7 +307,7 @@ public class SystemUpdatePolicyFragment extends Fragment implements View.OnClick
         mSetMaintenanceWindowEnd.setText(formatMinutes(mMaintenanceEnd));
     }
 
-    @TargetApi(28)
+    @TargetApi(VERSION_CODES.P)
     private void reloadSystemUpdatePolicy() {
         SystemUpdatePolicy policy = mDpm.getSystemUpdatePolicy();
         String policyDescription = "Unknown";

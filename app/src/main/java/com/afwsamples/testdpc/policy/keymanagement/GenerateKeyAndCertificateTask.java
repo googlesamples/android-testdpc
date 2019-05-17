@@ -22,6 +22,7 @@ import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Build.VERSION_CODES;
 import android.security.AttestedKeyPair;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
@@ -30,15 +31,10 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.policy.utils.Attestation;
 import com.afwsamples.testdpc.policy.utils.AuthorizationList;
 import com.afwsamples.testdpc.policy.utils.CertificateUtils;
-
-import org.bouncycastle.operator.OperatorCreationException;
-
 import java.io.IOException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
@@ -46,8 +42,8 @@ import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.security.auth.x500.X500Principal;
+import org.bouncycastle.operator.OperatorCreationException;
 
 
 public class GenerateKeyAndCertificateTask extends AsyncTask<Void, Integer, AttestedKeyPair> {
@@ -84,7 +80,7 @@ public class GenerateKeyAndCertificateTask extends AsyncTask<Void, Integer, Atte
                 (DevicePolicyManager) activity.getSystemService(Context.DEVICE_POLICY_SERVICE);
     }
 
-    @TargetApi(28)
+    @TargetApi(VERSION_CODES.P)
     @Override
     protected AttestedKeyPair doInBackground(Void... voids) {
         try {
@@ -171,7 +167,7 @@ public class GenerateKeyAndCertificateTask extends AsyncTask<Void, Integer, Atte
                 Toast.LENGTH_SHORT).show();
     }
 
-    @TargetApi(28)
+    @TargetApi(VERSION_CODES.P)
     private void showKeyGenerationResult(AttestedKeyPair keyPair) {
         if (mActivity == null || mActivity.isFinishing() || keyPair == null) {
             return;
