@@ -93,10 +93,6 @@ public class DpcPreferenceHelper {
      *         not yet assigned.
      */
     private int getDeviceSdkInt() {
-        // TODO(b/117767701): Remove this when Q version code is finalized.
-        if (Util.isAtLeastQ()) {
-            return VERSION_CODES.CUR_DEVELOPMENT;
-        }
         return Build.VERSION.SDK_INT;
     }
 

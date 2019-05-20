@@ -98,7 +98,7 @@ public class UserRestrictionsDisplayFragment extends BaseSearchablePolicyPrefere
             } else {
                 mDevicePolicyManager.clearUserRestriction(mAdminComponentName, restriction);
                 if (DISALLOW_INSTALL_UNKNOWN_SOURCES.equals(restriction) ||
-                        UserRestriction.DISALLOW_INSTALL_UNKNOWN_SOURCES_GLOBALLY.equals(
+                        UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES_GLOBALLY.equals(
                                 restriction)) {
                     new AlertDialog.Builder(getActivity())
                             .setMessage(R.string.check_setting_disallow_install_unknown_sources)
@@ -107,7 +107,7 @@ public class UserRestrictionsDisplayFragment extends BaseSearchablePolicyPrefere
                 }
             }
             updateUserRestriction(restriction);
-            if (UserRestriction.DISALLOW_UNIFIED_PASSWORD.equals(restriction)) {
+            if (UserManager.DISALLOW_UNIFIED_PASSWORD.equals(restriction)) {
                 DeviceAdminReceiver.sendPasswordRequirementsChanged(getActivity());
             }
             return true;
@@ -150,8 +150,7 @@ public class UserRestrictionsDisplayFragment extends BaseSearchablePolicyPrefere
         }
         for (String restriction: UserRestriction.QT_PLUS_RESTRICTIONS) {
             DpcPreferenceBase pref = (DpcPreferenceBase) findPreference(restriction);
-            // Replace this with Q when available
-            pref.setMinSdkVersion(VERSION_CODES.CUR_DEVELOPMENT);
+            pref.setMinSdkVersion(VERSION_CODES.Q);
         }
         for (String restriction : UserRestriction.PRIMARY_USER_ONLY_RESTRICTIONS) {
             DpcPreferenceBase pref = (DpcPreferenceBase) findPreference(restriction);

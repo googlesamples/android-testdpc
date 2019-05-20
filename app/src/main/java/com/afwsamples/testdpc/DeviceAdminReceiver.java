@@ -478,7 +478,7 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
             problems.add(context.getText(R.string.password_not_compliant_title));
         }
 
-        if (um.hasUserRestriction(UserRestriction.DISALLOW_UNIFIED_PASSWORD)
+        if (um.hasUserRestriction(UserManager.DISALLOW_UNIFIED_PASSWORD)
                 && Util.isManagedProfileOwner(context)
                 && isUsingUnifiedPassword(context)) {
             problems.add(context.getText(R.string.separate_challenge_required_title));
