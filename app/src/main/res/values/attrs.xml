@@ -28,7 +28,7 @@
             <enum name="O" value="26" />
             <enum name="O_MR1" value="27" />
             <enum name="P" value="28" />
-            <enum name="Q" value="10000" />
+            <enum name="Q" value="29" />
         </attr>
 
         <!-- Constrain a preference to DO or PO admins. -->
