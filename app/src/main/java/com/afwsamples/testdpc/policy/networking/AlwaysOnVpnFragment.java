@@ -24,7 +24,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.VpnService;
-import android.os.Build;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.util.Log;
@@ -37,6 +36,7 @@ import android.widget.Toast;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.SelectAppFragment;
+import com.afwsamples.testdpc.common.Util;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -83,7 +83,7 @@ public class AlwaysOnVpnFragment extends SelectAppFragment {
             Bundle savedInstanceState) {
         final View view = super.onCreateView(layoutInflater, container, savedInstanceState);
 
-        if (Build.VERSION.SDK_INT >= VERSION_CODES.Q) {
+        if (Util.SDK_INT >= VERSION_CODES.Q) {
             final ViewGroup extension = getExtensionLayout(view);
             extension.setVisibility(View.VISIBLE);
             layoutInflater.inflate(R.layout.lockdown_settings, extension);
@@ -112,7 +112,7 @@ public class AlwaysOnVpnFragment extends SelectAppFragment {
     @Override
     protected void reloadSelectedPackage() {
         super.reloadSelectedPackage();
-        if (Build.VERSION.SDK_INT >= VERSION_CODES.Q) {
+        if (Util.SDK_INT >= VERSION_CODES.Q) {
             updateLockdown();
         }
     }
@@ -128,7 +128,7 @@ public class AlwaysOnVpnFragment extends SelectAppFragment {
     @Override
     protected void setSelectedPackage(String pkg) {
         try {
-            if (Build.VERSION.SDK_INT >= VERSION_CODES.Q) {
+            if (Util.SDK_INT >= VERSION_CODES.Q) {
                 setAlwaysOnVpnPackageQPlus(pkg);
             } else {
                 mDpm.setAlwaysOnVpnPackage(mWho, pkg, /* lockdownEnabled */ true);

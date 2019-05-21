@@ -31,6 +31,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
+import com.afwsamples.testdpc.common.Util;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -99,7 +100,7 @@ public class SecurityLogsFragment extends ListFragment {
             for (SecurityEvent event : logs) {
                 StringBuilder sb = new StringBuilder();
                 sb.append(getStringEventTagFromId(event.getTag()));
-                if (Build.VERSION.SDK_INT >= VERSION_CODES.P) {
+                if (Util.SDK_INT >= VERSION_CODES.P) {
                     sb.append(" (id: " + getEventId(event) + ")");
                 }
                 sb.append(" (").append(new Date(TimeUnit.NANOSECONDS.toMillis(

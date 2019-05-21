@@ -27,7 +27,6 @@ import android.content.Intent;
 import android.content.RestrictionEntry;
 import android.content.RestrictionsManager;
 import android.content.pm.ApplicationInfo;
-import android.os.Build;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -197,7 +196,7 @@ public class ManageAppRestrictionsFragment extends ManageAppFragment
                     break;
             }
         }
-        int[] supportType = (Build.VERSION.SDK_INT < VERSION_CODES.M)
+        int[] supportType = (Util.SDK_INT < VERSION_CODES.M)
                 ? SUPPORTED_TYPES_PRE_M
                 : SUPPORTED_TYPES;
         KeyValuePairDialogFragment dialogFragment =

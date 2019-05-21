@@ -86,16 +86,6 @@ public class DpcPreferenceHelper {
     private @UserKind int mUserConstraint;
     private String mDelegationConstraint;
 
-    /**
-     * Update this method as {@link Build.VERSION_CODES} and Android releases are updated.
-     *
-     * @return The version SDK int or {@link VERSION_CODES.CUR_DEVELOPMENT} if the SDK int is
-     *         not yet assigned.
-     */
-    private int getDeviceSdkInt() {
-        return Build.VERSION.SDK_INT;
-    }
-
     public DpcPreferenceHelper(Context context, Preference preference, AttributeSet attrs) {
         mContext = context;
         mPreference = preference;
@@ -234,7 +224,7 @@ public class DpcPreferenceHelper {
      * found.
      */
     private CharSequence findConstraintViolation() {
-        if (getDeviceSdkInt() < mMinSdkVersion) {
+        if (Util.SDK_INT < mMinSdkVersion) {
             return mContext.getString(R.string.requires_android_api_level, mMinSdkVersion);
         }
 
@@ -270,7 +260,7 @@ public class DpcPreferenceHelper {
     }
 
     private List<String> getCurrentDelegations() {
-        if (Build.VERSION.SDK_INT < VERSION_CODES.O) {
+        if (Util.SDK_INT < VERSION_CODES.O) {
             return Collections.EMPTY_LIST;
         }
         final DevicePolicyManager dpm =

@@ -31,6 +31,7 @@ import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
+import com.afwsamples.testdpc.common.Util;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -92,7 +93,7 @@ public class CommonReceiverOperations {
                 context.getString(R.string.on_network_logs_available_success, batchToken));
 
         ArrayList<String> loggedEvents = new ArrayList<>();
-        if (Build.VERSION.SDK_INT >= VERSION_CODES.P) {
+        if (Util.SDK_INT >= VERSION_CODES.P) {
             for (NetworkEvent event : events) {
                 loggedEvents.add(event.toString());
             }

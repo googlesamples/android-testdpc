@@ -31,7 +31,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PermissionInfo;
-import android.os.Build;
 import android.os.Build.VERSION_CODES;
 import android.os.PersistableBundle;
 import android.util.Log;
@@ -86,7 +85,7 @@ public class PostProvisioningTask {
 
         // From M onwards, permissions are not auto-granted, so we need to manually grant
         // permissions for TestDPC.
-        if (Build.VERSION.SDK_INT >= VERSION_CODES.M) {
+        if (Util.SDK_INT >= VERSION_CODES.M) {
             autoGrantRequestedPermissionsToSelf();
         }
 
@@ -94,13 +93,13 @@ public class PostProvisioningTask {
         // TestDPCs launch.
         PersistableBundle extras = intent.getParcelableExtra(
                 EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE);
-        if (Build.VERSION.SDK_INT >= VERSION_CODES.O) {
+        if (Util.SDK_INT >= VERSION_CODES.O) {
             maybeSetAffiliationIds(extras);
         }
 
         // If TestDPC asked GmsCore to store its state in the FRP area before factory reset, the
         // state will be handed over to it during the next device setup.
-        if (Build.VERSION.SDK_INT >= VERSION_CODES.O_MR1
+        if (Util.SDK_INT >= VERSION_CODES.O_MR1
             && extras != null
             && extras.containsKey(KEY_DEVICE_OWNER_STATE)) {
             Util.setPersistentDoStateWithApplicationRestriction(

@@ -16,6 +16,8 @@
 
 package com.afwsamples.testdpc.policy.resetpassword;
 
+import static android.content.Intent.ACTION_USER_UNLOCKED;
+
 import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -27,17 +29,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.Build;
 import android.os.Build.VERSION_CODES;
 import android.os.IBinder;
 import android.os.UserManager;
 import android.support.annotation.Nullable;
 import android.util.Log;
-
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
-
-import static android.content.Intent.ACTION_USER_UNLOCKED;
 
 @TargetApi(VERSION_CODES.O)
 public class ResetPasswordService extends Service {

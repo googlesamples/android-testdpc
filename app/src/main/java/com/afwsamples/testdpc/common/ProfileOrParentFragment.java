@@ -66,7 +66,7 @@ public abstract class ProfileOrParentFragment extends BaseSearchablePolicyPrefer
 
             final boolean showDualTabs =
                 Util.isManagedProfileOwner(getActivity())
-                    && Build.VERSION.SDK_INT >= VERSION_CODES.N;
+                    && Util.SDK_INT >= VERSION_CODES.N;
 
             // Tab for the parent profile
             if (showDualTabs) {

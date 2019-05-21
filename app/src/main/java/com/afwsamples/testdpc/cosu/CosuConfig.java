@@ -28,6 +28,7 @@ import android.os.ParcelFileDescriptor;
 import android.util.Log;
 import android.util.Xml;
 import com.afwsamples.testdpc.common.PackageInstallationUtils;
+import com.afwsamples.testdpc.common.Util;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -156,7 +157,7 @@ import org.xmlpull.v1.XmlPullParserException;
             dpm.setGlobalSetting(admin, globalSetting.key, globalSetting.value);
         }
 
-        if (Build.VERSION.SDK_INT >= VERSION_CODES.M) {
+        if (Util.SDK_INT >= VERSION_CODES.M) {
             disableKeyGuardAndStatusBar(dpm, admin);
         }
         dpm.setScreenCaptureDisabled(admin, mDisableScreenCapture);

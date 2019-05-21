@@ -58,6 +58,18 @@ public class Util {
     private static final String GMSCORE_PACKAGE = "com.google.android.gms";
     private static final String PERSISTENT_DEVICE_OWNER_STATE = "persistentDeviceOwnerState";
 
+    // TODO:(133143789): Remove when we no longer need to support pre-release Q
+    private static final boolean IS_RUNNING_Q =
+        VERSION.CODENAME.length() == 1 && VERSION.CODENAME.charAt(0) == 'Q';
+
+    /**
+     * A replacement for {@link VERSION.SDK_INT} that is compatible with pre-release SDKs
+     *
+     * <p>This will be set to the version SDK, or {@link VERSION_CODES.CUR_DEVELOPMENT} if the SDK
+     * int is not yet assigned.
+     **/
+    public static final int SDK_INT = IS_RUNNING_Q ? VERSION_CODES.Q : VERSION.SDK_INT;
+
     /**
      * Format a friendly datetime for the current locale according to device policy documentation.
      * If the timestamp doesn't represent a real date, it will be interpreted as {@code null}.
@@ -108,7 +120,7 @@ public class Util {
     public static boolean isManagedProfileOwner(Context context) {
         final DevicePolicyManager dpm = getDevicePolicyManager(context);
 
-        if (Build.VERSION.SDK_INT >= VERSION_CODES.N) {
+        if (Util.SDK_INT >= VERSION_CODES.N) {
             try {
                 return dpm.isManagedProfile(DeviceAdminReceiver.getComponentName(context));
             } catch (SecurityException ex) {
@@ -125,7 +137,7 @@ public class Util {
 
     @TargetApi(VERSION_CODES.M)
     public static boolean isPrimaryUser(Context context) {
-        if (Build.VERSION.SDK_INT >= VERSION_CODES.M) {
+        if (Util.SDK_INT >= VERSION_CODES.M) {
             UserManager userManager = (UserManager) context.getSystemService(Context.USER_SERVICE);
             return userManager.isSystemUser();
         } else {
@@ -149,7 +161,7 @@ public class Util {
 
     @TargetApi(VERSION_CODES.O)
     public static List<UserHandle> getBindDeviceAdminTargetUsers(Context context) {
-        if (Build.VERSION.SDK_INT < VERSION_CODES.O) {
+        if (Util.SDK_INT < VERSION_CODES.O) {
             return Collections.emptyList();
         }
 
@@ -246,12 +258,10 @@ public class Util {
     }
 
     public static boolean hasDelegation(Context context, String delegation) {
-        if (Build.VERSION.SDK_INT < VERSION_CODES.O) {
+        if (Util.SDK_INT < VERSION_CODES.O) {
             return false;
         }
         DevicePolicyManager dpm = context.getSystemService(DevicePolicyManager.class);
         return dpm.getDelegatedScopes(null, context.getPackageName()).contains(delegation);
     }
-
-
 }

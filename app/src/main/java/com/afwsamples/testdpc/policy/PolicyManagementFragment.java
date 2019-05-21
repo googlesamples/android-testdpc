@@ -398,7 +398,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     private static final SparseIntArray PASSWORD_COMPLEXITY = new SparseIntArray(4);
     static {
-        if (Build.VERSION.SDK_INT >= VERSION_CODES.Q) {
+        if (Util.SDK_INT >= VERSION_CODES.Q) {
             final int[] complexityIds = new int[]{
                 DevicePolicyManager.PASSWORD_COMPLEXITY_NONE,
                 DevicePolicyManager.PASSWORD_COMPLEXITY_LOW,
@@ -725,7 +725,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     private void constrainSpecialCasePreferences() {
         // Reset password can be used in all contexts since N
-        if (Build.VERSION.SDK_INT >= VERSION_CODES.N) {
+        if (Util.SDK_INT >= VERSION_CODES.N) {
             ((DpcPreference) findPreference(RESET_PASSWORD_KEY)).clearNonCustomConstraints();
         }
     }
@@ -736,7 +736,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
      * restriction for those restriction so further restricting them, if necessary
      */
     private void maybeDisableLockTaskPreferences() {
-        if (Build.VERSION.SDK_INT < VERSION_CODES.O) {
+        if (Util.SDK_INT < VERSION_CODES.O) {
             String[] lockTaskPreferences = { MANAGE_LOCK_TASK_LIST_KEY,
                     CHECK_LOCK_TASK_PERMITTED_KEY, START_LOCK_TASK, STOP_LOCK_TASK };
             for (String preference : lockTaskPreferences) {
@@ -747,7 +747,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     }
 
     private boolean isDelegatedApp() {
-        if (Build.VERSION.SDK_INT < VERSION_CODES.O) {
+        if (Util.SDK_INT < VERSION_CODES.O) {
             return false;
         }
         DevicePolicyManager dpm = getActivity().getSystemService(DevicePolicyManager.class);
@@ -803,7 +803,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 showFragment(new SetLockTaskFeaturesFragment());
                 return true;
             case RESET_PASSWORD_KEY:
-                if (Build.VERSION.SDK_INT >= VERSION_CODES.O) {
+                if (Util.SDK_INT >= VERSION_CODES.O) {
                     showFragment(new ResetPasswordWithTokenFragment());
                     return true;
                 } else {
@@ -1216,9 +1216,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     @TargetApi(VERSION_CODES.O)
     private void lockNow() {
-        if (Build.VERSION.SDK_INT >= VERSION_CODES.O && Util.isManagedProfileOwner(getActivity())) {
+        if (Util.SDK_INT >= VERSION_CODES.O && Util.isManagedProfileOwner(getActivity())) {
             showLockNowPrompt();
-        } else if (Build.VERSION.SDK_INT >= VERSION_CODES.N
+        } else if (Util.SDK_INT >= VERSION_CODES.N
                 && Util.isManagedProfileOwner(getActivity())) {
             // Always call lock now on the parent for managed profile on N
             mDevicePolicyManager.getParentProfileInstance(mAdminComponentName).lockNow();
@@ -1418,7 +1418,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private boolean installKeyPair(final PrivateKey key, final Certificate cert, final String alias,
                                    boolean isUserSelectable) {
         try {
-            if (Build.VERSION.SDK_INT >= VERSION_CODES.P) {
+            if (Util.SDK_INT >= VERSION_CODES.P) {
 
                 return mDevicePolicyManager.installKeyPair(
                         mAdminComponentName, key, new Certificate[]{cert}, alias,
@@ -1877,7 +1877,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 R.id.make_user_ephemeral_checkbox);
         final CheckBox leaveAllSystemAppsEnabled = (CheckBox) dialogView.findViewById(
                 R.id.leave_all_system_apps_enabled_checkbox);
-        if (Build.VERSION.SDK_INT < VERSION_CODES.P) {
+        if (Util.SDK_INT < VERSION_CODES.P) {
             makeUserEphemeralCheckBox.setEnabled(false);
             leaveAllSystemAppsEnabled.setEnabled(false);
         }
@@ -1967,7 +1967,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
      * {@link DevicePolicyManager#getSecondaryUsers} is not available.
      */
     private void showRemoveUserPrompt() {
-        if (Build.VERSION.SDK_INT >= VERSION_CODES.P) {
+        if (Util.SDK_INT >= VERSION_CODES.P) {
             showChooseUserPrompt(R.string.remove_user, userHandle -> {
                 boolean success =
                         mDevicePolicyManager.removeUser(mAdminComponentName, userHandle);
@@ -2427,8 +2427,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
         final CheckBox userSelectableCheckbox = passwordInputView.findViewById(
                 R.id.alias_user_selectable);
-        userSelectableCheckbox.setEnabled(Build.VERSION.SDK_INT >= VERSION_CODES.P);
-        userSelectableCheckbox.setChecked(Build.VERSION.SDK_INT < VERSION_CODES.P);
+        userSelectableCheckbox.setEnabled(Util.SDK_INT >= VERSION_CODES.P);
+        userSelectableCheckbox.setChecked(Util.SDK_INT < VERSION_CODES.P);
 
         new AlertDialog.Builder(getActivity())
                 .setTitle(getString(R.string.certificate_alias_prompt_title))
@@ -2475,7 +2475,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
         final CheckBox userSelectableCheckbox = aliasNamingView.findViewById(
                 R.id.alias_user_selectable);
-        userSelectableCheckbox.setChecked(Build.VERSION.SDK_INT < VERSION_CODES.P);
+        userSelectableCheckbox.setChecked(Util.SDK_INT < VERSION_CODES.P);
 
         final CheckBox ecKeyCheckbox = aliasNamingView.findViewById(
                 R.id.generate_ec_key);
@@ -3608,7 +3608,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     @TargetApi(VERSION_CODES.P)
     private int validateAffiliatedUserAfterP() {
-        if (Build.VERSION.SDK_INT >= VERSION_CODES.P) {
+        if (Util.SDK_INT >= VERSION_CODES.P) {
             if (!mDevicePolicyManager.isAffiliatedUser()) {
                 return R.string.require_affiliated_user;
             }
@@ -3617,7 +3617,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     }
 
     private int validateDeviceOwnerBeforeP() {
-        if (Build.VERSION.SDK_INT < VERSION_CODES.P) {
+        if (Util.SDK_INT < VERSION_CODES.P) {
             if (!mDevicePolicyManager.isDeviceOwnerApp(mPackageName)) {
                 return R.string.requires_device_owner;
             }

@@ -26,7 +26,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Binder;
-import android.os.Build;
 import android.os.Build.VERSION_CODES;
 import android.os.ParcelFileDescriptor;
 import android.os.PersistableBundle;
@@ -38,7 +37,6 @@ import android.util.Log;
 import android.widget.Toast;
 import com.afwsamples.testdpc.common.NotificationUtil;
 import com.afwsamples.testdpc.common.Util;
-import com.afwsamples.testdpc.policy.UserRestriction;
 import com.afwsamples.testdpc.provision.PostProvisioningTask;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -506,7 +504,7 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
 
     @TargetApi(VERSION_CODES.P)
     private static Boolean isUsingUnifiedPassword(Context context) {
-        if (Build.VERSION.SDK_INT < VERSION_CODES.P) {
+        if (Util.SDK_INT < VERSION_CODES.P) {
             return false;
         }
         final DevicePolicyManager dpm = context.getSystemService(DevicePolicyManager.class);

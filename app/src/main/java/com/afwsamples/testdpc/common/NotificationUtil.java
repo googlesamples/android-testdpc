@@ -40,7 +40,7 @@ public class NotificationUtil {
     }
 
     public static NotificationCompat.Builder getNotificationBuilder(Context context) {
-        if (Build.VERSION.SDK_INT >= VERSION_CODES.O) {
+        if (Util.SDK_INT >= VERSION_CODES.O) {
             createDefaultNotificationChannel(context);
         }
         NotificationCompat.Builder builder

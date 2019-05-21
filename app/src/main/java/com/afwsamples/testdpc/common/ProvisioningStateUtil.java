@@ -93,13 +93,13 @@ public class ProvisioningStateUtil {
      */
     @TargetApi(VERSION_CODES.N)
     public static boolean isProvisioningAllowed(Context context, String action) {
-        if (Build.VERSION.SDK_INT >= VERSION_CODES.N) {
+        if (Util.SDK_INT >= VERSION_CODES.N) {
             DevicePolicyManager dpm = (DevicePolicyManager) context
                     .getSystemService(Context.DEVICE_POLICY_SERVICE);
             return dpm.isProvisioningAllowed(action);
         } else {
             if (ACTION_PROVISION_MANAGED_DEVICE.equals(action)) {
-                return (Build.VERSION.SDK_INT == VERSION_CODES.M)
+                return (Util.SDK_INT == VERSION_CODES.M)
                         ? isDeviceUnprovisionedAndNoDeviceOwner(context) : false;
             }
             if (ACTION_PROVISION_MANAGED_PROFILE.equals(action)) {

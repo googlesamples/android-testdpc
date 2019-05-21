@@ -20,13 +20,13 @@ import android.annotation.TargetApi;
 import android.app.admin.DevicePolicyManager;
 import android.content.Context;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.os.Build;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.text.TextUtils;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.SelectAppFragment;
+import com.afwsamples.testdpc.common.Util;
 
 /**
  * This fragment lets the user select an app that can manage application restrictions for the
@@ -60,7 +60,7 @@ public class AppRestrictionsManagingPackageFragment extends SelectAppFragment {
         if (TextUtils.isEmpty(pkgName)) {
             pkgName = null;
         }
-        if (Build.VERSION.SDK_INT >= VERSION_CODES.N) {
+        if (Util.SDK_INT >= VERSION_CODES.N) {
             setApplicationRestrictionsManagingPackage(pkgName);
         } else {
             setApplicationRestrictionsManagingPackageWithProxy(pkgName);
@@ -74,7 +74,7 @@ public class AppRestrictionsManagingPackageFragment extends SelectAppFragment {
 
     @Override
     protected String getSelectedPackage() {
-        if (Build.VERSION.SDK_INT >= VERSION_CODES.N) {
+        if (Util.SDK_INT >= VERSION_CODES.N) {
             return getApplicationRestrictionsManagingPackage();
         } else {
             return getApplicationRestrictionsManagingPackageWithProxy();

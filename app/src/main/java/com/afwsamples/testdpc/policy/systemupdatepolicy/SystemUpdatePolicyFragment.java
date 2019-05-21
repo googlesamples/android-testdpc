@@ -24,7 +24,6 @@ import android.app.admin.DevicePolicyManager;
 import android.app.admin.FreezePeriod;
 import android.app.admin.SystemUpdatePolicy;
 import android.content.Context;
-import android.os.Build;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
@@ -40,6 +39,7 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
+import com.afwsamples.testdpc.common.Util;
 import java.time.LocalDate;
 import java.time.MonthDay;
 import java.time.format.DateTimeFormatter;
@@ -185,7 +185,7 @@ public class SystemUpdatePolicyFragment extends Fragment implements View.OnClick
         mSystemUpdatePolicySelection.setOnCheckedChangeListener(this);
 
         mFreezePeriodPanel.setVisibility(
-            Build.VERSION.SDK_INT >= VERSION_CODES.P ?View.VISIBLE : View.GONE);
+            Util.SDK_INT >= VERSION_CODES.P ?View.VISIBLE : View.GONE);
         return view;
     }
 
@@ -281,7 +281,7 @@ public class SystemUpdatePolicyFragment extends Fragment implements View.OnClick
         }
 
         try {
-            if (Build.VERSION.SDK_INT >= VERSION_CODES.P
+            if (Util.SDK_INT >= VERSION_CODES.P
                     && newPolicy != null && mFreezePeriods.size() != 0) {
                 final List<FreezePeriod> periods = new ArrayList<>(mFreezePeriods.size());
                 for (Period p : mFreezePeriods) {
@@ -343,7 +343,7 @@ public class SystemUpdatePolicyFragment extends Fragment implements View.OnClick
                     mMaintenanceWindowDetails.setVisibility(View.INVISIBLE);
                     break;
             }
-            if (Build.VERSION.SDK_INT >= VERSION_CODES.P) {
+            if (Util.SDK_INT >= VERSION_CODES.P) {
                 List<FreezePeriod> freezePeriods = policy.getFreezePeriods();
                 mFreezePeriods.clear();
                 for (FreezePeriod period : freezePeriods) {
@@ -366,7 +366,7 @@ public class SystemUpdatePolicyFragment extends Fragment implements View.OnClick
             mMaintenanceWindowDetails.setVisibility(View.INVISIBLE);
         }
         if (checkedId == R.id.system_update_policy_none ||
-                Build.VERSION.SDK_INT < VERSION_CODES.P) {
+                Util.SDK_INT < VERSION_CODES.P) {
             mFreezePeriodPanel.setVisibility(View.GONE);
         } else {
             mFreezePeriodPanel.setVisibility(View.VISIBLE);

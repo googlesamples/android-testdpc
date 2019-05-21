@@ -26,6 +26,7 @@ import android.os.Build.VERSION_CODES;
 import android.text.TextUtils;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.ToggleComponentsArrayAdapter;
+import com.afwsamples.testdpc.common.Util;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -91,7 +92,7 @@ public class AvailableComponentsInfoArrayAdapter extends ToggleComponentsArrayAd
         // Input methods refer to the packages in primary profile. so, we
         // need to show them unbadged.
         // ApplicationInfo.loadUnbadgedIcon api is added in L-MR1, so can't get unbadged icon.
-        if (Build.VERSION.SDK_INT <= VERSION_CODES.LOLLIPOP) {
+        if (Util.SDK_INT <= VERSION_CODES.LOLLIPOP) {
             return mPackageManager.getApplicationIcon(applicationInfo);
         } else {
             return applicationInfo.loadUnbadgedIcon(mPackageManager);

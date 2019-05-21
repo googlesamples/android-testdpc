@@ -87,7 +87,7 @@ public class RestrictionManagerCompat {
 
     @TargetApi(VERSION_CODES.M)
     private static void addBundleRestrictionToBundle(Bundle bundle, RestrictionEntry entry) {
-        if (Build.VERSION.SDK_INT >= VERSION_CODES.M) {
+        if (Util.SDK_INT >= VERSION_CODES.M) {
             RestrictionEntry[] restrictions = entry.getRestrictions();
             Bundle childBundle = convertRestrictionsToBundle(Arrays.asList(restrictions));
             bundle.putBundle(entry.getKey(), childBundle);
@@ -98,7 +98,7 @@ public class RestrictionManagerCompat {
 
     @TargetApi(VERSION_CODES.M)
     private static void addBundleArrayRestrictionToBundle(Bundle bundle, RestrictionEntry entry) {
-        if (Build.VERSION.SDK_INT >= VERSION_CODES.M) {
+        if (Util.SDK_INT >= VERSION_CODES.M) {
             RestrictionEntry[] bundleRestrictionArray = entry.getRestrictions();
             Bundle[] bundleArray = new Bundle[bundleRestrictionArray.length];
             for (int i = 0; i < bundleRestrictionArray.length; i++) {

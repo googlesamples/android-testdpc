@@ -33,6 +33,7 @@ import android.util.ArrayMap;
 import android.widget.Toast;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.ProfileOrParentFragment;
+import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.common.preference.DpcPreferenceBase;
 import com.afwsamples.testdpc.common.preference.DpcPreferenceHelper;
 import java.util.Arrays;
@@ -260,7 +261,7 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
     @TargetApi(VERSION_CODES.O)
     private void setupAll() {
         setup(Keys.LOCK_SCREEN_MESSAGE,
-            Build.VERSION.SDK_INT >= VERSION_CODES.N && isDeviceOwner()
+            Util.SDK_INT >= VERSION_CODES.N && isDeviceOwner()
                         ? getDpm().getDeviceOwnerLockScreenInfo() : null);
         setup(Keys.MAX_FAILS_BEFORE_WIPE, getDpm().getMaximumFailedPasswordsForWipe(getAdmin()));
         setup(Keys.MAX_TIME_SCREEN_LOCK,
@@ -288,7 +289,7 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
         );
 
         // We do not allow user to add trust agent config in pre-N devices in managed profile.
-        if (Build.VERSION.SDK_INT < VERSION_CODES.N && key.equals(Keys.SET_TRUST_AGENT_CONFIG)) {
+        if (Util.SDK_INT < VERSION_CODES.N && key.equals(Keys.SET_TRUST_AGENT_CONFIG)) {
             dpcPref.setAdminConstraint(DpcPreferenceHelper.ADMIN_DEVICE_OWNER);
             return;
         }
@@ -311,7 +312,7 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
     }
 
     private void disableIncompatibleManagementOptionsInCurrentProfile() {
-        if (Build.VERSION.SDK_INT < VERSION_CODES.M) {
+        if (Util.SDK_INT < VERSION_CODES.M) {
             for (String preference : KEYGUARD_FEATURES.keySet()) {
                 ((DpcPreferenceBase) findPreference(preference))
                         .setAdminConstraint(DpcPreferenceHelper.ADMIN_DEVICE_OWNER);
