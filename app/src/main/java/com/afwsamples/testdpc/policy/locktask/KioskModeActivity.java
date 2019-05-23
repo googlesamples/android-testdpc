@@ -33,8 +33,8 @@ import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
-import android.support.v4.os.BuildCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,11 +44,10 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.PolicyManagementActivity;
 import com.afwsamples.testdpc.R;
-
+import com.afwsamples.testdpc.common.Util;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -66,7 +65,7 @@ import java.util.List;
  * home buttons will bring the user back to the app list. The list also contains a row to exit
  * single app mode and finish this activity.
  */
-@TargetApi(Build.VERSION_CODES.M)
+@TargetApi(VERSION_CODES.M)
 public class KioskModeActivity extends Activity {
     private static final String TAG = "KioskModeActivity";
 
@@ -143,7 +142,7 @@ public class KioskModeActivity extends Activity {
         // start lock task mode if it's not already active
         ActivityManager am = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         // ActivityManager.getLockTaskModeState api is not available in pre-M.
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+        if (Util.SDK_INT < VERSION_CODES.M) {
             if (!am.isInLockTaskMode()) {
                 startLockTask();
             }
@@ -202,9 +201,9 @@ public class KioskModeActivity extends Activity {
         editor.commit();
     }
 
-    @TargetApi(Build.VERSION_CODES.N)
+    @TargetApi(VERSION_CODES.N)
     private void saveCurrentConfiguration() {
-        if (BuildCompat.isAtLeastN()) {
+        if (Util.SDK_INT >= VERSION_CODES.N) {
             Bundle settingsBundle = mDevicePolicyManager.getUserRestrictions(mAdminComponentName);
             SharedPreferences.Editor editor = getSharedPreferences(KIOSK_PREFERENCE_FILE,
                     MODE_PRIVATE).edit();
@@ -218,7 +217,7 @@ public class KioskModeActivity extends Activity {
     }
 
     private void restorePreviousConfiguration() {
-        if (BuildCompat.isAtLeastN()) {
+        if (Util.SDK_INT >= VERSION_CODES.N) {
             SharedPreferences sharedPreferences = getSharedPreferences(KIOSK_PREFERENCE_FILE,
                     MODE_PRIVATE);
 

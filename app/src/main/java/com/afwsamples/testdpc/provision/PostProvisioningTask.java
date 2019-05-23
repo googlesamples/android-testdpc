@@ -16,6 +16,10 @@
 
 package com.afwsamples.testdpc.provision;
 
+import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE;
+import static android.app.admin.DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED;
+import static com.afwsamples.testdpc.DeviceAdminReceiver.getComponentName;
+
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.annotation.TargetApi;
@@ -27,25 +31,18 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PermissionInfo;
-import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.os.PersistableBundle;
-import android.support.v4.os.BuildCompat;
 import android.util.Log;
-
 import com.afwsamples.testdpc.AddAccountActivity;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.FinalizeActivity;
 import com.afwsamples.testdpc.common.LaunchIntentUtil;
 import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.cosu.EnableCosuActivity;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE;
-import static android.app.admin.DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED;
-import static com.afwsamples.testdpc.DeviceAdminReceiver.getComponentName;
 
 /**
  * Task executed after provisioning is done indicated by either the
@@ -88,7 +85,7 @@ public class PostProvisioningTask {
 
         // From M onwards, permissions are not auto-granted, so we need to manually grant
         // permissions for TestDPC.
-        if (Util.isAtLeastM()) {
+        if (Util.SDK_INT >= VERSION_CODES.M) {
             autoGrantRequestedPermissionsToSelf();
         }
 
@@ -96,13 +93,13 @@ public class PostProvisioningTask {
         // TestDPCs launch.
         PersistableBundle extras = intent.getParcelableExtra(
                 EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE);
-        if (BuildCompat.isAtLeastO()) {
+        if (Util.SDK_INT >= VERSION_CODES.O) {
             maybeSetAffiliationIds(extras);
         }
 
         // If TestDPC asked GmsCore to store its state in the FRP area before factory reset, the
         // state will be handed over to it during the next device setup.
-        if (BuildCompat.isAtLeastOMR1()
+        if (Util.SDK_INT >= VERSION_CODES.O_MR1
             && extras != null
             && extras.containsKey(KEY_DEVICE_OWNER_STATE)) {
             Util.setPersistentDoStateWithApplicationRestriction(
@@ -181,7 +178,7 @@ public class PostProvisioningTask {
         return mSharedPrefs.getBoolean(KEY_POST_PROV_DONE, false);
     }
 
-    @TargetApi(Build.VERSION_CODES.O)
+    @TargetApi(VERSION_CODES.O)
     private void maybeSetAffiliationIds(PersistableBundle extras) {
         if (extras == null) {
             return;
@@ -194,7 +191,7 @@ public class PostProvisioningTask {
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.M)
+    @TargetApi(VERSION_CODES.M)
     private void autoGrantRequestedPermissionsToSelf() {
         String packageName = mContext.getPackageName();
         ComponentName adminComponentName = getComponentName(mContext);

@@ -21,6 +21,7 @@ import android.app.Fragment;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -34,7 +35,7 @@ import android.widget.Toast;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 
-@TargetApi(29)
+@TargetApi(VERSION_CODES.Q)
 public class PrivateDnsModeFragment extends Fragment implements View.OnClickListener,
         RadioGroup.OnCheckedChangeListener {
     private static final String TAG = "PDNS_FRAG";
@@ -105,16 +106,20 @@ public class PrivateDnsModeFragment extends Fragment implements View.OnClickList
         switch (checkedId) {
             case R.id.private_dns_mode_off:
                 mSelectedMode = PRIVATE_DNS_MODE_OFF;
+                mSetButton.setEnabled(false);
                 break;
             case R.id.private_dns_mode_automatic:
                 mSelectedMode = PRIVATE_DNS_MODE_OPPORTUNISTIC;
+                mSetButton.setEnabled(true);
                 break;
             case R.id.private_dns_mode_specific_host:
                 mSelectedMode = PRIVATE_DNS_MODE_PROVIDER_HOSTNAME;
+                mSetButton.setEnabled(true);
                 break;
             case R.id.private_dns_mode_unknown:
             default:
                 mSelectedMode = PRIVATE_DNS_MODE_UNKNOWN;
+                mSetButton.setEnabled(false);
                 break;
         }
     }

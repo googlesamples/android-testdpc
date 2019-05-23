@@ -16,6 +16,10 @@
 
 package com.afwsamples.testdpc.policy.keyguard;
 
+import static com.afwsamples.testdpc.common.EditDeleteArrayAdapter.OnDeleteButtonClickListener;
+import static com.afwsamples.testdpc.common.EditDeleteArrayAdapter.OnEditButtonClickListener;
+import static com.afwsamples.testdpc.common.keyvaluepair.KeyValuePairDialogFragment.RESULT_VALUE;
+
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.admin.DevicePolicyManager;
@@ -24,29 +28,23 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.BaseAdapter;
 import android.widget.Toast;
-
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.BundleUtil;
 import com.afwsamples.testdpc.common.EditDeleteArrayAdapter;
 import com.afwsamples.testdpc.common.ManageResolveInfoFragment;
 import com.afwsamples.testdpc.common.keyvaluepair.KeyValuePairDialogFragment;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.afwsamples.testdpc.common.EditDeleteArrayAdapter.OnDeleteButtonClickListener;
-import static com.afwsamples.testdpc.common.EditDeleteArrayAdapter.OnEditButtonClickListener;
-import static com.afwsamples.testdpc.common.keyvaluepair.KeyValuePairDialogFragment.RESULT_VALUE;
-
-@TargetApi(Build.VERSION_CODES.M)
+@TargetApi(VERSION_CODES.M)
 public class SetTrustAgentConfigFragment extends ManageResolveInfoFragment
         implements View.OnClickListener, OnEditButtonClickListener<String>,
         OnDeleteButtonClickListener<String> {
@@ -259,7 +257,7 @@ public class SetTrustAgentConfigFragment extends ManageResolveInfoFragment
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.N)
+    @TargetApi(VERSION_CODES.N)
     private DevicePolicyManager getDevicePolicyManagerFromType(int type) {
         DevicePolicyManager devicePolicyManager =
                 (DevicePolicyManager) getActivity().getSystemService(Context.DEVICE_POLICY_SERVICE);

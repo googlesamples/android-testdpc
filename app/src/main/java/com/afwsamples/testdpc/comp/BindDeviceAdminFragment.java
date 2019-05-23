@@ -16,6 +16,8 @@
 
 package com.afwsamples.testdpc.comp;
 
+import static com.afwsamples.testdpc.common.preference.DpcPreferenceHelper.NO_CUSTOM_CONSTRIANT;
+
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.admin.DevicePolicyManager;
@@ -24,7 +26,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.net.Uri;
-import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.UserHandle;
 import android.os.UserManager;
@@ -41,8 +43,6 @@ import com.afwsamples.testdpc.common.preference.DpcPreference;
 import com.afwsamples.testdpc.common.preference.DpcSwitchPreference;
 import java.io.FileNotFoundException;
 import java.util.List;
-
-import static com.afwsamples.testdpc.common.preference.DpcPreferenceHelper.NO_CUSTOM_CONSTRIANT;
 
 /**
  * Features related to {@link DevicePolicyManager#bindDeviceAdminServiceAsUser}
@@ -169,7 +169,7 @@ public class BindDeviceAdminFragment extends BaseSearchablePolicyPreferenceFragm
         return isManagedProfileOwner() && mUserManager.isUserRunning(mProfileOwnerUser);
     }
 
-    @TargetApi(Build.VERSION_CODES.N)
+    @TargetApi(VERSION_CODES.N)
     private boolean isManagedProfileUnlocked() {
         return isManagedProfileOwner() && mUserManager.isUserUnlocked(mProfileOwnerUser);
     }

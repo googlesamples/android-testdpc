@@ -21,7 +21,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Process;
 import android.os.UserHandle;
-
 import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.comp.BindDeviceAdminServiceHelper;
 import com.afwsamples.testdpc.comp.DeviceOwnerService;

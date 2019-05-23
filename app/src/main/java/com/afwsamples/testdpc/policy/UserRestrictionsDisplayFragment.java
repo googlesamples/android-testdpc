@@ -22,14 +22,13 @@ import android.app.AlertDialog;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
-import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.UserManager;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceScreen;
 import android.util.Log;
 import android.widget.Toast;
-
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.BaseSearchablePolicyPreferenceFragment;
@@ -99,7 +98,7 @@ public class UserRestrictionsDisplayFragment extends BaseSearchablePolicyPrefere
             } else {
                 mDevicePolicyManager.clearUserRestriction(mAdminComponentName, restriction);
                 if (DISALLOW_INSTALL_UNKNOWN_SOURCES.equals(restriction) ||
-                        UserRestriction.DISALLOW_INSTALL_UNKNOWN_SOURCES_GLOBALLY.equals(
+                        UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES_GLOBALLY.equals(
                                 restriction)) {
                     new AlertDialog.Builder(getActivity())
                             .setMessage(R.string.check_setting_disallow_install_unknown_sources)
@@ -108,7 +107,7 @@ public class UserRestrictionsDisplayFragment extends BaseSearchablePolicyPrefere
                 }
             }
             updateUserRestriction(restriction);
-            if (UserRestriction.DISALLOW_UNIFIED_PASSWORD.equals(restriction)) {
+            if (UserManager.DISALLOW_UNIFIED_PASSWORD.equals(restriction)) {
                 DeviceAdminReceiver.sendPasswordRequirementsChanged(getActivity());
             }
             return true;
@@ -135,24 +134,23 @@ public class UserRestrictionsDisplayFragment extends BaseSearchablePolicyPrefere
     private void constrainPreferences() {
         for (String restriction : UserRestriction.MNC_PLUS_RESTRICTIONS) {
             DpcPreferenceBase pref = (DpcPreferenceBase) findPreference(restriction);
-            pref.setMinSdkVersion(Build.VERSION_CODES.M);
+            pref.setMinSdkVersion(VERSION_CODES.M);
         }
         for (String restriction : UserRestriction.NYC_PLUS_RESTRICTIONS) {
             DpcPreferenceBase pref = (DpcPreferenceBase) findPreference(restriction);
-            pref.setMinSdkVersion(Build.VERSION_CODES.N);
+            pref.setMinSdkVersion(VERSION_CODES.N);
         }
         for (String restriction : UserRestriction.OC_PLUS_RESTRICTIONS) {
             DpcPreferenceBase pref = (DpcPreferenceBase) findPreference(restriction);
-            pref.setMinSdkVersion(Build.VERSION_CODES.O);
+            pref.setMinSdkVersion(VERSION_CODES.O);
         }
         for (String restriction: UserRestriction.PIC_PLUS_RESTRICTIONS) {
             DpcPreferenceBase pref = (DpcPreferenceBase) findPreference(restriction);
-            pref.setMinSdkVersion(Build.VERSION_CODES.P);
+            pref.setMinSdkVersion(VERSION_CODES.P);
         }
         for (String restriction: UserRestriction.QT_PLUS_RESTRICTIONS) {
             DpcPreferenceBase pref = (DpcPreferenceBase) findPreference(restriction);
-            // Replace this with Q when available
-            pref.setMinSdkVersion(Build.VERSION_CODES.CUR_DEVELOPMENT);
+            pref.setMinSdkVersion(VERSION_CODES.Q);
         }
         for (String restriction : UserRestriction.PRIMARY_USER_ONLY_RESTRICTIONS) {
             DpcPreferenceBase pref = (DpcPreferenceBase) findPreference(restriction);

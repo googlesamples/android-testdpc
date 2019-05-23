@@ -16,19 +16,18 @@
 
 package com.afwsamples.testdpc.common;
 
+import static android.app.admin.DevicePolicyManager.ACTION_PROVISION_MANAGED_DEVICE;
+import static android.app.admin.DevicePolicyManager.ACTION_PROVISION_MANAGED_PROFILE;
+
 import android.annotation.TargetApi;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.provider.Settings;
-import android.support.v4.os.BuildCompat;
-
 import java.util.List;
-
-import static android.app.admin.DevicePolicyManager.ACTION_PROVISION_MANAGED_DEVICE;
-import static android.app.admin.DevicePolicyManager.ACTION_PROVISION_MANAGED_PROFILE;
 
 /**
  * Common utility functions used for retrieving information about the provisioning state of the
@@ -92,15 +91,15 @@ public class ProvisioningStateUtil {
      * @param context Calling activity's context
      * @return true, if provisioning is allowed for corresponding action
      */
-    @TargetApi(Build.VERSION_CODES.N)
+    @TargetApi(VERSION_CODES.N)
     public static boolean isProvisioningAllowed(Context context, String action) {
-        if (BuildCompat.isAtLeastN()) {
+        if (Util.SDK_INT >= VERSION_CODES.N) {
             DevicePolicyManager dpm = (DevicePolicyManager) context
                     .getSystemService(Context.DEVICE_POLICY_SERVICE);
             return dpm.isProvisioningAllowed(action);
         } else {
             if (ACTION_PROVISION_MANAGED_DEVICE.equals(action)) {
-                return (Build.VERSION.SDK_INT == Build.VERSION_CODES.M)
+                return (Util.SDK_INT == VERSION_CODES.M)
                         ? isDeviceUnprovisionedAndNoDeviceOwner(context) : false;
             }
             if (ACTION_PROVISION_MANAGED_PROFILE.equals(action)) {

@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.app.Fragment;
 import android.content.ComponentName;
 import android.content.pm.CrossProfileApps;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.UserHandle;
 import android.view.LayoutInflater;
@@ -13,8 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import java.util.List;
 
-// TODO: Replace it with P.
-@TargetApi(28)
+@TargetApi(VERSION_CODES.P)
 public class CrossProfileAppsFragment extends Fragment {
     private static final String TAG = "CrossProfileAppsFragmen";
 

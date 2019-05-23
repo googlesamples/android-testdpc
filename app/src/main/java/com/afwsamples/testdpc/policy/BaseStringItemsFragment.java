@@ -19,7 +19,7 @@ package com.afwsamples.testdpc.policy;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.support.annotation.StringRes;
 import android.text.TextUtils;
@@ -30,11 +30,9 @@ import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.SpinnerAdapter;
 import android.widget.Toast;
-
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.BaseManageComponentFragment;
 import com.afwsamples.testdpc.common.EditDeleteArrayAdapter;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -99,7 +97,7 @@ public abstract class BaseStringItemsFragment extends BaseManageComponentFragmen
     }
 
     @Override
-    @TargetApi(Build.VERSION_CODES.O)
+    @TargetApi(VERSION_CODES.O)
     protected void saveConfig() {
         saveItems(mItems);
         mLastItems = new ArrayList<>(mItems);
@@ -111,7 +109,7 @@ public abstract class BaseStringItemsFragment extends BaseManageComponentFragmen
     }
 
     @Override
-    @TargetApi(Build.VERSION_CODES.O)
+    @TargetApi(VERSION_CODES.O)
     protected void loadDefault() {
         mItemArrayAdapter.clear();
         mItemArrayAdapter.addAll(loadItems());

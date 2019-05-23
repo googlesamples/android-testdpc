@@ -17,21 +17,20 @@
 package com.afwsamples.testdpc.policy;
 
 import android.annotation.TargetApi;
-import android.app.admin.DevicePolicyManager;
 import android.app.Fragment;
+import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
-import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 
-@TargetApi(Build.VERSION_CODES.N)
+@TargetApi(VERSION_CODES.N)
 public class SetSupportMessageFragment extends Fragment
         implements View.OnClickListener {
     private static final String ARG_MESSAGE_TYPE = "message_type";

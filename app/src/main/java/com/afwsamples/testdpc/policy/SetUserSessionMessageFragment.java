@@ -21,6 +21,7 @@ import android.app.Fragment;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,7 +30,7 @@ import android.widget.EditText;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 
-@TargetApi(28)
+@TargetApi(VERSION_CODES.P)
 public class SetUserSessionMessageFragment extends Fragment
         implements View.OnClickListener {
     private static final String TAG = "SetUserSessionMessage";

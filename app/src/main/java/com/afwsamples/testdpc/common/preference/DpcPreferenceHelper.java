@@ -20,6 +20,7 @@ import android.app.admin.DevicePolicyManager;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.support.annotation.IntDef;
 import android.support.annotation.StringRes;
 import android.support.v7.preference.Preference;
@@ -28,10 +29,8 @@ import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.TextView;
-
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.Util;
-
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
@@ -87,20 +86,6 @@ public class DpcPreferenceHelper {
     private @UserKind int mUserConstraint;
     private String mDelegationConstraint;
 
-    /**
-     * Update this method as {@link Build.VERSION_CODES} and Android releases are updated.
-     *
-     * @return The version SDK int or {@link Build.VERSION_CODES.CUR_DEVELOPMENT} if the SDK int is
-     *         not yet assigned.
-     */
-    private int getDeviceSdkInt() {
-        // TODO(b/117767701): Remove this when Q version code is finalized.
-        if (Util.isAtLeastQ()) {
-            return Build.VERSION_CODES.CUR_DEVELOPMENT;
-        }
-        return Build.VERSION.SDK_INT;
-    }
-
     public DpcPreferenceHelper(Context context, Preference preference, AttributeSet attrs) {
         mContext = context;
         mPreference = preference;
@@ -110,7 +95,7 @@ public class DpcPreferenceHelper {
         mMinSdkVersion = a.getInt(R.styleable.DpcPreference_minSdkVersion, 0);
         if (attrs == null) {
             // Be more lenient when creating the preference from code
-            mMinSdkVersion = Build.VERSION_CODES.LOLLIPOP;
+            mMinSdkVersion = VERSION_CODES.LOLLIPOP;
         }
         if (mMinSdkVersion == 0) {
             throw new RuntimeException("testdpc:minSdkVersion must be specified.");
@@ -239,7 +224,7 @@ public class DpcPreferenceHelper {
      * found.
      */
     private CharSequence findConstraintViolation() {
-        if (getDeviceSdkInt() < mMinSdkVersion) {
+        if (Util.SDK_INT < mMinSdkVersion) {
             return mContext.getString(R.string.requires_android_api_level, mMinSdkVersion);
         }
 
@@ -275,7 +260,7 @@ public class DpcPreferenceHelper {
     }
 
     private List<String> getCurrentDelegations() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+        if (Util.SDK_INT < VERSION_CODES.O) {
             return Collections.EMPTY_LIST;
         }
         final DevicePolicyManager dpm =

@@ -24,51 +24,24 @@ import android.app.admin.SecurityLog.SecurityEvent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
-import android.support.v4.os.BuildCompat;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
+import com.afwsamples.testdpc.common.Util;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-@TargetApi(Build.VERSION_CODES.N)
+@TargetApi(VERSION_CODES.N)
 public class SecurityLogsFragment extends ListFragment {
-
     private static final String TAG = "ProcessLogsFragment";
 
     private static final String PRE_REBOOT_KEY = "pre-reboot";
-
-    // TODO: remove when it lands in the SDK:
-    private static final int TAG_OS_STARTUP = 210009;
-    private static final int TAG_OS_SHUTDOWN = 210010;
-    private static final int TAG_LOGGING_STARTED = 210011;
-    private static final int TAG_LOGGING_STOPPED = 210012;
-    private static final int TAG_MEDIA_MOUNTED = 210013;
-    private static final int TAG_MEDIA_UNMOUNTED = 210014;
-    private static final int TAG_LOG_BUFFER_SIZE_CRITICAL = 210015;
-    private static final int TAG_PASSWORD_EXPIRATION_SET = 210016;
-    private static final int TAG_PASSWORD_COMPLEXITY_SET = 210017;
-    private static final int TAG_PASSWORD_HISTORY_LENGTH_SET = 210018;
-    private static final int TAG_MAX_SCREEN_LOCK_TIMEOUT_SET = 210019;
-    private static final int TAG_MAX_PASSWORD_ATTEMPTS_SET = 210020;
-    private static final int TAG_KEYGUARD_DISABLED_FEATURES_SET = 210021;
-    private static final int TAG_REMOTE_LOCK = 210022;
-    private static final int TAG_WIPE_FAILED = 210023;
-    private static final int TAG_KEY_GENERATED = 210024;
-    private static final int TAG_KEY_IMPORTED = 210025;
-    private static final int TAG_KEY_DESTROYED = 210026;
-    private static final int TAG_USER_RESTRICTION_ADDED = 210027;
-    private static final int TAG_USER_RESTRICTION_REMOVED = 210028;
-    private static final int TAG_CERT_AUTHORITY_INSTALLED = 210029;
-    private static final int TAG_CERT_AUTHORITY_REMOVED = 210030;
-    private static final int TAG_CRYPTO_SELF_TEST_COMPLETED = 210031;
-    private static final int TAG_KEY_INTEGRITY_VIOLATION = 210032;
-    private static final int TAG_CERT_VALIDATION_FAILURE = 210033;
 
     private final ArrayList<String> mLogs = new ArrayList<>();
     private ArrayAdapter<String> mAdapter;
@@ -127,7 +100,7 @@ public class SecurityLogsFragment extends ListFragment {
             for (SecurityEvent event : logs) {
                 StringBuilder sb = new StringBuilder();
                 sb.append(getStringEventTagFromId(event.getTag()));
-                if (BuildCompat.isAtLeastP()) {
+                if (Util.SDK_INT >= VERSION_CODES.P) {
                     sb.append(" (id: " + getEventId(event) + ")");
                 }
                 sb.append(" (").append(new Date(TimeUnit.NANOSECONDS.toMillis(
@@ -140,7 +113,7 @@ public class SecurityLogsFragment extends ListFragment {
         }
     }
 
-    @TargetApi(28)
+    @TargetApi(VERSION_CODES.P)
     private long getEventId(SecurityEvent event) {
         return event.getId();
     }
@@ -172,79 +145,79 @@ public class SecurityLogsFragment extends ListFragment {
             case SecurityLog.TAG_KEYGUARD_SECURED:
                 eventTag = "KEYGUARD_SECURED";
                 break;
-            case TAG_OS_STARTUP:
+            case SecurityLog.TAG_OS_STARTUP:
                 eventTag = "OS_STARTUP";
                 break;
-            case TAG_OS_SHUTDOWN:
+            case SecurityLog.TAG_OS_SHUTDOWN:
                 eventTag = "OS_SHUTDOWN";
                 break;
-            case TAG_LOGGING_STARTED:
+            case SecurityLog.TAG_LOGGING_STARTED:
                 eventTag = "LOGGING_STARTED";
                 break;
-            case TAG_LOGGING_STOPPED:
+            case SecurityLog.TAG_LOGGING_STOPPED:
                 eventTag = "LOGGING_STOPPED";
                 break;
-            case TAG_MEDIA_MOUNTED:
-                eventTag = "MEDIA_MOUNTED";
+            case SecurityLog.TAG_MEDIA_MOUNT:
+                eventTag = "MEDIA_MOUNT";
                 break;
-            case TAG_MEDIA_UNMOUNTED:
-                eventTag = "MEDIA_UNMOUNTED";
+            case SecurityLog.TAG_MEDIA_UNMOUNT:
+                eventTag = "MEDIA_UNMOUNT";
                 break;
-            case TAG_LOG_BUFFER_SIZE_CRITICAL:
+            case SecurityLog.TAG_LOG_BUFFER_SIZE_CRITICAL:
                 eventTag = "LOG_BUFFER_SIZE_CRITICAL";
                 break;
-            case TAG_PASSWORD_EXPIRATION_SET:
+            case SecurityLog.TAG_PASSWORD_EXPIRATION_SET:
                 eventTag = "PASSWORD_EXPIRATION_SET";
                 break;
-            case TAG_PASSWORD_COMPLEXITY_SET:
+            case SecurityLog.TAG_PASSWORD_COMPLEXITY_SET:
                 eventTag = "PASSWORD_COMPLEXITY_SET";
                 break;
-            case TAG_PASSWORD_HISTORY_LENGTH_SET:
+            case SecurityLog.TAG_PASSWORD_HISTORY_LENGTH_SET:
                 eventTag = "PASSWORD_HISTORY_LENGTH_SET";
                 break;
-            case TAG_MAX_SCREEN_LOCK_TIMEOUT_SET:
+            case SecurityLog.TAG_MAX_SCREEN_LOCK_TIMEOUT_SET:
                 eventTag = "MAX_SCREEN_LOCK_TIMEOUT_SET";
                 break;
-            case TAG_MAX_PASSWORD_ATTEMPTS_SET:
+            case SecurityLog.TAG_MAX_PASSWORD_ATTEMPTS_SET:
                 eventTag = "MAX_PASSWORD_ATTEMPTS_SET";
                 break;
-            case TAG_KEYGUARD_DISABLED_FEATURES_SET:
+            case SecurityLog.TAG_KEYGUARD_DISABLED_FEATURES_SET:
                 eventTag = "KEYGUARD_DISABLED_FEATURES_SET";
                 break;
-            case TAG_REMOTE_LOCK:
+            case SecurityLog.TAG_REMOTE_LOCK:
                 eventTag = "REMOTE_LOCK";
                 break;
-            case TAG_WIPE_FAILED:
-                eventTag = "WIPE_FAILED";
+            case SecurityLog.TAG_WIPE_FAILURE:
+                eventTag = "WIPE_FAILURE";
                 break;
-            case TAG_KEY_GENERATED:
+            case SecurityLog.TAG_KEY_GENERATED:
                 eventTag = "KEY_GENERATED";
                 break;
-            case TAG_KEY_IMPORTED:
-                eventTag = "KEY_IMPORTED";
+            case SecurityLog.TAG_KEY_IMPORT:
+                eventTag = "KEY_IMPORT";
                 break;
-            case TAG_KEY_DESTROYED:
-                eventTag = "KEY_DESTROYED";
+            case SecurityLog.TAG_KEY_DESTRUCTION:
+                eventTag = "KEY_DESTRUCTION";
                 break;
-            case TAG_USER_RESTRICTION_ADDED:
+            case SecurityLog.TAG_USER_RESTRICTION_ADDED:
                 eventTag = "USER_RESTRICTION_ADDED";
                 break;
-            case TAG_USER_RESTRICTION_REMOVED:
+            case SecurityLog.TAG_USER_RESTRICTION_REMOVED:
                 eventTag = "USER_RESTRICTION_REMOVED";
                 break;
-            case TAG_CERT_AUTHORITY_INSTALLED:
+            case SecurityLog.TAG_CERT_AUTHORITY_INSTALLED:
                 eventTag = "CERT_AUTHORITY_INSTALLED";
                 break;
-            case TAG_CERT_AUTHORITY_REMOVED:
+            case SecurityLog.TAG_CERT_AUTHORITY_REMOVED:
                 eventTag = "CERT_AUTHORITY_REMOVED";
                 break;
-            case TAG_CRYPTO_SELF_TEST_COMPLETED:
+            case SecurityLog.TAG_CRYPTO_SELF_TEST_COMPLETED:
                 eventTag = "CRYPTO_SELF_TEST_COMPLETED";
                 break;
-            case TAG_KEY_INTEGRITY_VIOLATION:
+            case SecurityLog.TAG_KEY_INTEGRITY_VIOLATION:
                 eventTag = "KEY_INTEGRITY_VIOLATION";
                 break;
-            case TAG_CERT_VALIDATION_FAILURE:
+            case SecurityLog.TAG_CERT_VALIDATION_FAILURE:
                 eventTag = "CERT_VALIDATION_FAILURE";
                 break;
             default:

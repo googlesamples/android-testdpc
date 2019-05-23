@@ -16,16 +16,13 @@
 
 package com.afwsamples.testdpc.policy.utils;
 
-import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.support.annotation.RequiresApi;
-
 import com.google.common.base.CharMatcher;
 import com.google.common.io.BaseEncoding;
-
-import org.bouncycastle.asn1.ASN1Sequence;
-
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
+import org.bouncycastle.asn1.ASN1Sequence;
 
 /**
  * Parses an attestation certificate and provides an easy-to-use interface for examining the
@@ -62,7 +59,7 @@ public class Attestation {
      * @throws CertificateParsingException if the certificate does not contain a properly-formatted
      *                                     attestation extension.
      */
-    @RequiresApi(api = Build.VERSION_CODES.N)
+    @RequiresApi(api = VERSION_CODES.N)
     public Attestation(X509Certificate x509Cert) throws CertificateParsingException {
         ASN1Sequence seq = getAttestationSequence(x509Cert);
 

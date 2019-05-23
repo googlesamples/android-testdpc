@@ -24,11 +24,9 @@ import android.app.admin.DevicePolicyManager;
 import android.app.admin.FreezePeriod;
 import android.app.admin.SystemUpdatePolicy;
 import android.content.Context;
-import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
-import android.support.v4.os.BuildCompat;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,10 +37,9 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioGroup;
 import android.widget.Toast;
-
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
-
+import com.afwsamples.testdpc.common.Util;
 import java.time.LocalDate;
 import java.time.MonthDay;
 import java.time.format.DateTimeFormatter;
@@ -58,11 +55,11 @@ import java.util.List;
  * 2) {@link DevicePolicyManager#getSystemUpdatePolicy}
  * 3) {@link SystemUpdatePolicy}
  */
-@TargetApi(Build.VERSION_CODES.M)
+@TargetApi(VERSION_CODES.M)
 public class SystemUpdatePolicyFragment extends Fragment implements View.OnClickListener,
         RadioGroup.OnCheckedChangeListener {
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+    @RequiresApi(api = VERSION_CODES.O)
     static class Period {
         MonthDay mStart;
         MonthDay mEnd;
@@ -94,7 +91,7 @@ public class SystemUpdatePolicyFragment extends Fragment implements View.OnClick
             return mEnd.atYear(LocalDate.now().getYear());
         }
 
-        @TargetApi(28)
+        @TargetApi(VERSION_CODES.P)
         public FreezePeriod toFreezePeriod() {
             return new FreezePeriod(mStart, mEnd);
         }
@@ -129,7 +126,7 @@ public class SystemUpdatePolicyFragment extends Fragment implements View.OnClick
             this.mData = periods;
         }
 
-        @RequiresApi(api = Build.VERSION_CODES.O)
+        @RequiresApi(api = VERSION_CODES.O)
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             Period currentPeriod = getItem(position);
@@ -187,7 +184,8 @@ public class SystemUpdatePolicyFragment extends Fragment implements View.OnClick
 
         mSystemUpdatePolicySelection.setOnCheckedChangeListener(this);
 
-        mFreezePeriodPanel.setVisibility(BuildCompat.isAtLeastP() ? View.VISIBLE : View.GONE);
+        mFreezePeriodPanel.setVisibility(
+            Util.SDK_INT >= VERSION_CODES.P ?View.VISIBLE : View.GONE);
         return view;
     }
 
@@ -204,7 +202,7 @@ public class SystemUpdatePolicyFragment extends Fragment implements View.OnClick
         timePicker.show();
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+    @RequiresApi(api = VERSION_CODES.O)
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -237,7 +235,7 @@ public class SystemUpdatePolicyFragment extends Fragment implements View.OnClick
         void onResult(LocalDate pickedDate);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+    @RequiresApi(api = VERSION_CODES.O)
     private void showDatePicker(LocalDate hint, int titleResId, DatePickResult resultCallback) {
         DatePickerDialog picker = new DatePickerDialog(getActivity(),
                 (pickerObj, year, month, day) -> {
@@ -248,7 +246,7 @@ public class SystemUpdatePolicyFragment extends Fragment implements View.OnClick
         picker.show();
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+    @RequiresApi(api = VERSION_CODES.O)
     private void promptToSetFreezePeriod(FreezePeriodPickResult callback, final LocalDate startDate,
                                          final LocalDate endDate) {
         showDatePicker(startDate, R.string.system_update_policy_pick_start_free_period_title,
@@ -263,7 +261,7 @@ public class SystemUpdatePolicyFragment extends Fragment implements View.OnClick
                 });
     }
 
-    @TargetApi(28)
+    @TargetApi(VERSION_CODES.P)
     private boolean setSystemUpdatePolicy() {
         SystemUpdatePolicy newPolicy;
         switch (mSystemUpdatePolicySelection.getCheckedRadioButtonId()) {
@@ -283,7 +281,8 @@ public class SystemUpdatePolicyFragment extends Fragment implements View.OnClick
         }
 
         try {
-            if (BuildCompat.isAtLeastP() && newPolicy != null && mFreezePeriods.size() != 0) {
+            if (Util.SDK_INT >= VERSION_CODES.P
+                    && newPolicy != null && mFreezePeriods.size() != 0) {
                 final List<FreezePeriod> periods = new ArrayList<>(mFreezePeriods.size());
                 for (Period p : mFreezePeriods) {
                     periods.add(p.toFreezePeriod());
@@ -310,7 +309,7 @@ public class SystemUpdatePolicyFragment extends Fragment implements View.OnClick
         mSetMaintenanceWindowEnd.setText(formatMinutes(mMaintenanceEnd));
     }
 
-    @TargetApi(28)
+    @TargetApi(VERSION_CODES.P)
     private void reloadSystemUpdatePolicy() {
         SystemUpdatePolicy policy = mDpm.getSystemUpdatePolicy();
         String policyDescription = "Unknown";
@@ -344,7 +343,7 @@ public class SystemUpdatePolicyFragment extends Fragment implements View.OnClick
                     mMaintenanceWindowDetails.setVisibility(View.INVISIBLE);
                     break;
             }
-            if (BuildCompat.isAtLeastP()) {
+            if (Util.SDK_INT >= VERSION_CODES.P) {
                 List<FreezePeriod> freezePeriods = policy.getFreezePeriods();
                 mFreezePeriods.clear();
                 for (FreezePeriod period : freezePeriods) {
@@ -366,7 +365,8 @@ public class SystemUpdatePolicyFragment extends Fragment implements View.OnClick
         } else {
             mMaintenanceWindowDetails.setVisibility(View.INVISIBLE);
         }
-        if (checkedId == R.id.system_update_policy_none || !BuildCompat.isAtLeastP()) {
+        if (checkedId == R.id.system_update_policy_none ||
+                Util.SDK_INT < VERSION_CODES.P) {
             mFreezePeriodPanel.setVisibility(View.GONE);
         } else {
             mFreezePeriodPanel.setVisibility(View.VISIBLE);
