@@ -20,11 +20,10 @@ import android.annotation.TargetApi;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
-
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -52,14 +51,14 @@ public class ManageKeepUninstalledPackagesFragment extends BaseStringItemsFragme
         mAdminComponent = DeviceAdminReceiver.getComponentName(getActivity());
     }
 
-    @TargetApi(28)
+    @TargetApi(VERSION_CODES.P)
     @Override
     protected Collection<String> loadItems() {
         List<String> packages = mDevicePolicyManager.getKeepUninstalledPackages(mAdminComponent);
         return packages == null ? Collections.emptyList() : packages;
     }
 
-    @TargetApi(28)
+    @TargetApi(VERSION_CODES.P)
     @Override
     protected void saveItems(List<String> items) {
         mDevicePolicyManager.setKeepUninstalledPackages(mAdminComponent, items);

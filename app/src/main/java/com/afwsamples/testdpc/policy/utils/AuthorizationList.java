@@ -19,23 +19,14 @@ package com.afwsamples.testdpc.policy.utils;
 import static com.google.common.base.Functions.forMap;
 import static com.google.common.collect.Collections2.transform;
 
+import android.os.Build.VERSION_CODES;
+import android.security.keystore.KeyProperties;
+import android.support.annotation.RequiresApi;
+import android.util.Log;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-
-import android.os.Build;
-import android.security.keystore.KeyProperties;
-import android.support.annotation.RequiresApi;
-import android.util.Log;
-
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1Primitive;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.ASN1SequenceParser;
-import org.bouncycastle.asn1.ASN1TaggedObject;
-import org.bouncycastle.asn1.ASN1InputStream;
-
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.cert.CertificateParsingException;
@@ -44,6 +35,11 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1Primitive;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.ASN1SequenceParser;
+import org.bouncycastle.asn1.ASN1TaggedObject;
 
 public class AuthorizationList {
     // Algorithm values.
@@ -203,7 +199,7 @@ public class AuthorizationList {
     private boolean userPresenceRequired;
     private boolean confirmationRequired;
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
+    @RequiresApi(api = VERSION_CODES.N)
     public AuthorizationList(ASN1Encodable sequence) throws CertificateParsingException {
         if (!(sequence instanceof ASN1Sequence)) {
             throw new CertificateParsingException("Expected sequence for authorization list, found "

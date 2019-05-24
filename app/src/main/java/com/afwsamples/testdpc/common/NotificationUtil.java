@@ -5,11 +5,10 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.support.annotation.RequiresApi;
 import android.support.annotation.StringRes;
-import android.support.v4.os.BuildCompat;
 import android.support.v4.app.NotificationCompat;
-
 import com.afwsamples.testdpc.R;
 
 public class NotificationUtil {
@@ -41,7 +40,7 @@ public class NotificationUtil {
     }
 
     public static NotificationCompat.Builder getNotificationBuilder(Context context) {
-        if (BuildCompat.isAtLeastO()) {
+        if (Util.SDK_INT >= VERSION_CODES.O) {
             createDefaultNotificationChannel(context);
         }
         NotificationCompat.Builder builder
@@ -49,7 +48,7 @@ public class NotificationUtil {
         return builder;
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
+    @RequiresApi(VERSION_CODES.O)
     private static void createDefaultNotificationChannel(Context context) {
         NotificationManager notificationManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);

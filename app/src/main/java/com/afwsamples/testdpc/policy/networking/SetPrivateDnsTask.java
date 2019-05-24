@@ -20,12 +20,12 @@ import android.annotation.TargetApi;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.os.AsyncTask;
+import android.os.Build.VERSION_CODES;
 import android.util.Log;
-
-import com.afwsamples.testdpc.policy.keymanagement.ShowToastCallback;
 import com.afwsamples.testdpc.R;
+import com.afwsamples.testdpc.policy.keymanagement.ShowToastCallback;
 
-@TargetApi(29)
+@TargetApi(VERSION_CODES.Q)
 final class SetPrivateDnsTask extends AsyncTask<Void, Void, String> {
     public static final String TAG = "Networking";
     private final ShowToastCallback mCallback;
@@ -47,8 +47,27 @@ final class SetPrivateDnsTask extends AsyncTask<Void, Void, String> {
     @Override
     protected String doInBackground(Void... params) {
         try {
-            mDpm.setGlobalPrivateDns(mComponent, mMode, mResolver);
-            return null;
+            final int result;
+            switch (mMode) {
+                case DevicePolicyManager.PRIVATE_DNS_MODE_PROVIDER_HOSTNAME:
+                    result = mDpm.setGlobalPrivateDnsModeSpecifiedHost(mComponent, mResolver);
+                    break;
+                case DevicePolicyManager.PRIVATE_DNS_MODE_OPPORTUNISTIC:
+                    result = mDpm.setGlobalPrivateDnsModeOpportunistic(mComponent);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Invalid private dns mode: " + mMode);
+            }
+            switch (result) {
+                case DevicePolicyManager.PRIVATE_DNS_SET_NO_ERROR:
+                    return null;
+                case DevicePolicyManager.PRIVATE_DNS_SET_ERROR_FAILURE_SETTING:
+                    return "General failure to set the Private DNS mode";
+                case DevicePolicyManager.PRIVATE_DNS_SET_ERROR_HOST_NOT_SERVING:
+                    return "Provided host doesn't serve DNS-over-TLS";
+                default:
+                    return "Unexpected error setting private dns: " + result;
+            }
         } catch (SecurityException | IllegalArgumentException e) {
             Log.w(TAG, "Failed to invoke, cause", e);
             return e.getMessage();

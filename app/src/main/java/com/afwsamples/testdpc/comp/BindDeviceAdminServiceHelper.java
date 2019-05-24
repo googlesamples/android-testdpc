@@ -23,20 +23,18 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.os.UserHandle;
 import android.util.Log;
-import android.widget.SectionIndexer;
-
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 
 /**
  * Helper class for {@link DevicePolicyManager#bindDeviceAdminServiceAsUser(
  * ComponentName, Intent, ServiceConnection, int, UserHandle)}.
  */
-@TargetApi(Build.VERSION_CODES.O)
+@TargetApi(VERSION_CODES.O)
 public class BindDeviceAdminServiceHelper<T> {
     private static final String TAG = "BindDeviceAdminService";
 

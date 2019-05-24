@@ -81,7 +81,7 @@
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="cross_profile_calendar"
             android:title="@string/cross_profile_calendar"
-            testdpc:admin="any"
+            testdpc:admin="deviceOwner|profileOwner"
             testdpc:minSdkVersion="Q" />
     </PreferenceCategory>
 
@@ -178,6 +178,11 @@
             android:title="@string/metered_data_restriction"
             testdpc:admin="deviceOwner|profileOwner"
             testdpc:minSdkVersion="P" />
+        <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
+            android:key="app_feedback_notifications"
+            android:title="@string/app_feedback_notifications"
+            testdpc:admin="deviceOwner|profileOwner"
+            testdpc:minSdkVersion="N" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/delegation_title">

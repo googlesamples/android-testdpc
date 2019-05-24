@@ -26,12 +26,11 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
-import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.support.v14.preference.SwitchPreference;
 import android.support.v7.preference.Preference;
 import android.widget.Toast;
-
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.AppInfoArrayAdapter;
@@ -40,7 +39,6 @@ import com.afwsamples.testdpc.common.ColorPicker;
 import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.profilepolicy.crossprofileintentfilter.AddCrossProfileIntentFilterFragment;
 import com.afwsamples.testdpc.profilepolicy.crossprofilewidgetprovider.ManageCrossProfileWidgetProviderUtil;
-
 import java.util.List;
 
 /**
@@ -217,7 +215,7 @@ public class ProfilePolicyManagementFragment extends BaseSearchablePolicyPrefere
     }
 
     @Override
-    @TargetApi(Build.VERSION_CODES.N)
+    @TargetApi(VERSION_CODES.N)
     public void onColorSelected(int colorValue, String id) {
         if (ORGANIZATION_COLOR_ID.equals(id)) {
             mDevicePolicyManager.setOrganizationColor(mAdminComponentName, colorValue);
@@ -226,7 +224,7 @@ public class ProfilePolicyManagementFragment extends BaseSearchablePolicyPrefere
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.N)
+    @TargetApi(VERSION_CODES.N)
     private void initializeOrganizationInfoPreferences() {
         mSetOrganizationColorPreference = findPreference(SET_ORGANIZATION_COLOR_KEY);
         mSetOrganizationNamePreference = findPreference(SET_PROFILE_ORGANIZATION_NAME_KEY);
@@ -268,7 +266,7 @@ public class ProfilePolicyManagementFragment extends BaseSearchablePolicyPrefere
         reloadCrossProfileCallerIdDisableUi();
     }
 
-    @TargetApi(Build.VERSION_CODES.M)
+    @TargetApi(VERSION_CODES.M)
     private void reloadBluetoothContactSharing() {
         if (!mDisableBluetoothContactSharingSwitchPreference.isEnabled()) {
             return;
@@ -291,7 +289,7 @@ public class ProfilePolicyManagementFragment extends BaseSearchablePolicyPrefere
     }
 
 
-    @TargetApi(Build.VERSION_CODES.N)
+    @TargetApi(VERSION_CODES.N)
     private void reloadCrossProfileContactsSearchDisableUi() {
         if (!mDisableCrossProfileContactsSearchSwitchPreference.isEnabled()) {
             return;

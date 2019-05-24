@@ -14,22 +14,21 @@
 
 package com.afwsamples.testdpc.policy.utils;
 
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.ASN1Set;
-
-import java.security.cert.CertificateParsingException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.List;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.Signature;
-import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.support.annotation.RequiresApi;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateParsingException;
+import java.util.ArrayList;
+import java.util.List;
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.ASN1Set;
 
 public class AttestationApplicationId implements java.lang.Comparable<AttestationApplicationId> {
     private static final int PACKAGE_INFOS_INDEX = 0;
@@ -38,7 +37,7 @@ public class AttestationApplicationId implements java.lang.Comparable<Attestatio
     private final List<AttestationPackageInfo> packageInfos;
     private final List<byte[]> signatureDigests;
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
+    @RequiresApi(api = VERSION_CODES.N)
     public AttestationApplicationId(Context context)
             throws NoSuchAlgorithmException, NameNotFoundException {
         PackageManager pm = context.getPackageManager();
@@ -68,7 +67,7 @@ public class AttestationApplicationId implements java.lang.Comparable<Attestatio
         signatureDigests.sort(new ByteArrayComparator());
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
+    @RequiresApi(api = VERSION_CODES.N)
     public AttestationApplicationId(ASN1Encodable asn1Encodable)
             throws CertificateParsingException {
         if (!(asn1Encodable instanceof ASN1Sequence)) {

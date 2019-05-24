@@ -197,6 +197,12 @@
             </intent-filter>
         </service>
 
+        <service android:name=".feedback.AppStatesService">
+          <intent-filter>
+            <action android:name="androidx.enterprise.feedback.action.APP_STATES" />
+          </intent-filter>
+        </service>
+
     </application>
 
 </manifest>

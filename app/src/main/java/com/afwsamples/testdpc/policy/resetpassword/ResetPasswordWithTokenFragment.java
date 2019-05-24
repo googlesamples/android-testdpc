@@ -16,6 +16,8 @@
 
 package com.afwsamples.testdpc.policy.resetpassword;
 
+import static android.app.Activity.RESULT_OK;
+
 import android.annotation.TargetApi;
 import android.app.Fragment;
 import android.app.KeyguardManager;
@@ -23,7 +25,7 @@ import android.app.admin.DevicePolicyManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,22 +34,18 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
-
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
-
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Base64;
 
-import static android.app.Activity.RESULT_OK;
-
 
 /**
  * STOPSHIP: remove reflection once SDK is updated.
  */
-@TargetApi(Build.VERSION_CODES.O)
+@TargetApi(VERSION_CODES.O)
 public class ResetPasswordWithTokenFragment extends Fragment implements View.OnClickListener {
 
     private static final String PREFS_NAME = "password-token";

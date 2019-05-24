@@ -529,6 +529,7 @@
     <string name="all_ca_certificates_removed">All CA certificates have been removed.</string>
     <string name="user_selectability_description">User-selectability</string>
     <string name="user_selectability_checkbox">Make user-selectable</string>
+    <string name="ec_key_checkbox">Generate EC key (Default: RSA)</string>
     <string name="key_attestation_description">Key Attestation options</string>
     <string name="key_attestation_checkbox">Include key attestation challenge</string>
     <string name="device_id_attestation_description">Device ID attestation options</string>
@@ -547,6 +548,10 @@
     <string name="app_restrictions_info">%1$s - %2$s</string>
     <string name="plus">+</string>
     <string name="app_restrictions_managing_package">App restrictions manager</string>
+
+    <!-- Strings for app feedback -->
+    <!-- [CHAR LIMIT=40] Settings label. A user can toggle this setting to turn on notifications for app feedback. -->
+    <string name="app_feedback_notifications">App feedback notifications</string>
 
     <!-- Strings for metered data restriction -->
     <string name="metered_data_restriction">Disable metered data</string>
@@ -569,7 +574,6 @@
     <string name="delegation_scope_keep_uninstalled_packages">Keep uninstalled packages</string>
     <string name="delegation_scope_network_logging">Access network logging</string>
     <string name="delegation_scope_cert_selection">Choose private key</string>
-    <string name="delegation_scope_package_installation">Silently install APK</string>
     <string name="manage_cert_installer">Delegated cert installer</string>
 
     <!-- strings used in the alert dialog for editing application restrictions. -->

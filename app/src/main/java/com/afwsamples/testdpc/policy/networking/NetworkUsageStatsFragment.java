@@ -29,7 +29,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
-import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.text.Html;
@@ -47,9 +47,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
-
 import com.afwsamples.testdpc.R;
-
 import com.afwsamples.testdpc.common.OnBackPressedHandler;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -62,7 +60,7 @@ import java.util.List;
 /**
  * Fragment for checking network usage of apps using {@link android.app.usage.NetworkStatsManager}
  */
-@TargetApi(Build.VERSION_CODES.M)
+@TargetApi(VERSION_CODES.M)
 public class NetworkUsageStatsFragment extends ListFragment implements View.OnClickListener,
         AdapterView.OnItemSelectedListener, OnBackPressedHandler {
 

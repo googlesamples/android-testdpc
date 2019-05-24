@@ -16,8 +16,6 @@
 
 package com.afwsamples.testdpc.policy.networking;
 
-import static com.afwsamples.testdpc.common.Util.isAtLeastQ;
-
 import android.annotation.TargetApi;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
@@ -26,7 +24,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.VpnService;
-import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -35,11 +33,10 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
-
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.SelectAppFragment;
-
+import com.afwsamples.testdpc.common.Util;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -56,7 +53,7 @@ import java.util.stream.Collectors;
  * <li> {@link DevicePolicyManager#getAlwaysOnVpnPackage} </li>
  * </ul>
  */
-@TargetApi(Build.VERSION_CODES.N)
+@TargetApi(VERSION_CODES.N)
 public class AlwaysOnVpnFragment extends SelectAppFragment {
     private static final String TAG = "AlwaysOnVpnFragment";
 
@@ -86,7 +83,7 @@ public class AlwaysOnVpnFragment extends SelectAppFragment {
             Bundle savedInstanceState) {
         final View view = super.onCreateView(layoutInflater, container, savedInstanceState);
 
-        if (isAtLeastQ()) {
+        if (Util.SDK_INT >= VERSION_CODES.Q) {
             final ViewGroup extension = getExtensionLayout(view);
             extension.setVisibility(View.VISIBLE);
             layoutInflater.inflate(R.layout.lockdown_settings, extension);
@@ -115,15 +112,15 @@ public class AlwaysOnVpnFragment extends SelectAppFragment {
     @Override
     protected void reloadSelectedPackage() {
         super.reloadSelectedPackage();
-        if (isAtLeastQ()) {
+        if (Util.SDK_INT >= VERSION_CODES.Q) {
             updateLockdown();
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.Q)
+    @TargetApi(VERSION_CODES.Q)
     private void updateLockdown() {
         mLockdown.setChecked(mDpm.isAlwaysOnVpnLockdownEnabled(mWho));
-        final List<String> exemptedPackages = mDpm.getAlwaysOnVpnLockdownWhitelist(mWho);
+        final Set<String> exemptedPackages = mDpm.getAlwaysOnVpnLockdownWhitelist(mWho);
         mExemptedPackages.setText(
                 exemptedPackages != null ? String.join(",", exemptedPackages) : "");
     }
@@ -131,7 +128,7 @@ public class AlwaysOnVpnFragment extends SelectAppFragment {
     @Override
     protected void setSelectedPackage(String pkg) {
         try {
-            if (isAtLeastQ()) {
+            if (Util.SDK_INT >= VERSION_CODES.Q) {
                 setAlwaysOnVpnPackageQPlus(pkg);
             } else {
                 mDpm.setAlwaysOnVpnPackage(mWho, pkg, /* lockdownEnabled */ true);
@@ -147,15 +144,15 @@ public class AlwaysOnVpnFragment extends SelectAppFragment {
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.Q)
+    @TargetApi(VERSION_CODES.Q)
     private void setAlwaysOnVpnPackageQPlus(String pkg)
             throws PackageManager.NameNotFoundException {
         final boolean lockdown = mLockdown.isChecked();
-        final List<String> packages = lockdown ?
+        final Set<String> packages = lockdown ?
                 Arrays.stream(mExemptedPackages.getText().toString().split(","))
                         .map(String::trim)
                         .filter(s -> !s.isEmpty())
-                        .collect(Collectors.toList())
+                        .collect(Collectors.toSet())
                 : null;
         mDpm.setAlwaysOnVpnPackage(mWho, pkg, lockdown, packages);
     }

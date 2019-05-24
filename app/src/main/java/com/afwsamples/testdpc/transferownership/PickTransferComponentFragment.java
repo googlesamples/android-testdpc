@@ -26,6 +26,7 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.annotation.Nullable;
@@ -45,7 +46,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
-@TargetApi(28)
+@TargetApi(VERSION_CODES.P)
 public class PickTransferComponentFragment extends Fragment {
 
     private DevicePolicyManager mDevicePolicyManager;

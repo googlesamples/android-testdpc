@@ -7,11 +7,8 @@ import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.os.Build;
 import android.preference.PreferenceManager;
-
 import com.afwsamples.testdpc.BuildConfig;
-
 import java.util.ArrayList;
 import java.util.List;
 

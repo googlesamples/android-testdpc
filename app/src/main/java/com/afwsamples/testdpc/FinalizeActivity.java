@@ -17,7 +17,6 @@
 package com.afwsamples.testdpc;
 
 import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE;
-import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_DEVICE_ADMIN_COMPONENT_NAME;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
@@ -30,7 +29,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.afwsamples.testdpc.common.LaunchIntentUtil;
 import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.provision.ProvisioningUtil;

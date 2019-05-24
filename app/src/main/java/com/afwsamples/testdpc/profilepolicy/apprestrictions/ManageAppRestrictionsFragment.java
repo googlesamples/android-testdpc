@@ -16,6 +16,8 @@
 
 package com.afwsamples.testdpc.profilepolicy.apprestrictions;
 
+import static com.afwsamples.testdpc.common.keyvaluepair.KeyValuePairDialogFragment.RESULT_VALUE;
+
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.admin.DevicePolicyManager;
@@ -25,7 +27,7 @@ import android.content.Intent;
 import android.content.RestrictionEntry;
 import android.content.RestrictionsManager;
 import android.content.pm.ApplicationInfo;
-import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.text.TextUtils;
@@ -34,7 +36,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Toast;
-
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.EditDeleteArrayAdapter;
@@ -42,13 +43,10 @@ import com.afwsamples.testdpc.common.ManageAppFragment;
 import com.afwsamples.testdpc.common.RestrictionManagerCompat;
 import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.common.keyvaluepair.KeyValuePairDialogFragment;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-
-import static com.afwsamples.testdpc.common.keyvaluepair.KeyValuePairDialogFragment.RESULT_VALUE;
 
 /**
  * This fragment shows all installed apps and allows viewing and editing application restrictions
@@ -133,14 +131,14 @@ public class ManageAppRestrictionsFragment extends ManageAppFragment
         return restrictionEntries.toArray(new RestrictionEntry[0]);
     }
 
-    @TargetApi(Build.VERSION_CODES.M)
+    @TargetApi(VERSION_CODES.M)
     private void addBundleEntryToRestrictions(List<RestrictionEntry> restrictionEntries,
             String key, Bundle value) {
         restrictionEntries.add(RestrictionEntry.createBundleEntry(
                 key, convertBundleToRestrictions(value)));
     }
 
-    @TargetApi(Build.VERSION_CODES.M)
+    @TargetApi(VERSION_CODES.M)
     private void addBundleArrayToRestrictions(List<RestrictionEntry> restrictionEntries,
             String key, Parcelable[] value) {
         int length = value.length;
@@ -198,7 +196,7 @@ public class ManageAppRestrictionsFragment extends ManageAppFragment
                     break;
             }
         }
-        int[] supportType = (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
+        int[] supportType = (Util.SDK_INT < VERSION_CODES.M)
                 ? SUPPORTED_TYPES_PRE_M
                 : SUPPORTED_TYPES;
         KeyValuePairDialogFragment dialogFragment =
@@ -249,7 +247,7 @@ public class ManageAppRestrictionsFragment extends ManageAppFragment
 
     // TYPE_BUNDLE and TYPE_BUNDLE_ARRAY are only supported from M onward. It is blocked in the
     // UI side.
-    @TargetApi(Build.VERSION_CODES.M)
+    @TargetApi(VERSION_CODES.M)
     private void updateRestrictionEntryFromResultIntent(RestrictionEntry restrictionEntry,
             Intent intent) {
         switch (restrictionEntry.getType()) {
@@ -394,7 +392,7 @@ public class ManageAppRestrictionsFragment extends ManageAppFragment
                 ((ApplicationInfo) mManagedAppsSpinner.getSelectedItem()).packageName);
     }
 
-    @TargetApi(Build.VERSION_CODES.M)
+    @TargetApi(VERSION_CODES.M)
     private RestrictionEntry[] getRestrictionEntries(RestrictionEntry restrictionEntry) {
         return restrictionEntry.getRestrictions();
     }

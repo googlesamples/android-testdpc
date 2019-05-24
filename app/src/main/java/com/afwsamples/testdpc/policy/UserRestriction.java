@@ -4,19 +4,21 @@ import static android.os.UserManager.ALLOW_PARENT_PROFILE_APP_LINKING;
 import static android.os.UserManager.DISALLOW_ADD_MANAGED_PROFILE;
 import static android.os.UserManager.DISALLOW_ADD_USER;
 import static android.os.UserManager.DISALLOW_ADJUST_VOLUME;
+import static android.os.UserManager.DISALLOW_AIRPLANE_MODE;
+import static android.os.UserManager.DISALLOW_AMBIENT_DISPLAY;
 import static android.os.UserManager.DISALLOW_APPS_CONTROL;
 import static android.os.UserManager.DISALLOW_AUTOFILL;
 import static android.os.UserManager.DISALLOW_BLUETOOTH;
 import static android.os.UserManager.DISALLOW_BLUETOOTH_SHARING;
 import static android.os.UserManager.DISALLOW_CONFIG_BLUETOOTH;
+import static android.os.UserManager.DISALLOW_CONFIG_BRIGHTNESS;
 import static android.os.UserManager.DISALLOW_CONFIG_CELL_BROADCASTS;
 import static android.os.UserManager.DISALLOW_CONFIG_CREDENTIALS;
 import static android.os.UserManager.DISALLOW_CONFIG_DATE_TIME;
-import static android.os.UserManager.DISALLOW_AIRPLANE_MODE;
-import static android.os.UserManager.DISALLOW_CONFIG_BRIGHTNESS;
-import static android.os.UserManager.DISALLOW_CONFIG_SCREEN_TIMEOUT;
-import static android.os.UserManager.DISALLOW_AMBIENT_DISPLAY;
+import static android.os.UserManager.DISALLOW_CONFIG_LOCATION;
 import static android.os.UserManager.DISALLOW_CONFIG_MOBILE_NETWORKS;
+import static android.os.UserManager.DISALLOW_CONFIG_PRIVATE_DNS;
+import static android.os.UserManager.DISALLOW_CONFIG_SCREEN_TIMEOUT;
 import static android.os.UserManager.DISALLOW_CONFIG_TETHERING;
 import static android.os.UserManager.DISALLOW_CONFIG_VPN;
 import static android.os.UserManager.DISALLOW_CONFIG_WIFI;
@@ -28,18 +30,23 @@ import static android.os.UserManager.DISALLOW_FACTORY_RESET;
 import static android.os.UserManager.DISALLOW_FUN;
 import static android.os.UserManager.DISALLOW_INSTALL_APPS;
 import static android.os.UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES;
+import static android.os.UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES_GLOBALLY;
 import static android.os.UserManager.DISALLOW_MODIFY_ACCOUNTS;
 import static android.os.UserManager.DISALLOW_MOUNT_PHYSICAL_MEDIA;
 import static android.os.UserManager.DISALLOW_NETWORK_RESET;
 import static android.os.UserManager.DISALLOW_OUTGOING_BEAM;
 import static android.os.UserManager.DISALLOW_OUTGOING_CALLS;
+import static android.os.UserManager.DISALLOW_PRINTING;
 import static android.os.UserManager.DISALLOW_REMOVE_MANAGED_PROFILE;
 import static android.os.UserManager.DISALLOW_REMOVE_USER;
 import static android.os.UserManager.DISALLOW_SAFE_BOOT;
 import static android.os.UserManager.DISALLOW_SET_USER_ICON;
 import static android.os.UserManager.DISALLOW_SET_WALLPAPER;
+import static android.os.UserManager.DISALLOW_SHARE_INTO_MANAGED_PROFILE;
 import static android.os.UserManager.DISALLOW_SHARE_LOCATION;
 import static android.os.UserManager.DISALLOW_SMS;
+import static android.os.UserManager.DISALLOW_SYSTEM_ERROR_DIALOGS;
+import static android.os.UserManager.DISALLOW_UNIFIED_PASSWORD;
 import static android.os.UserManager.DISALLOW_UNINSTALL_APPS;
 import static android.os.UserManager.DISALLOW_UNMUTE_MICROPHONE;
 import static android.os.UserManager.DISALLOW_USB_FILE_TRANSFER;
@@ -49,15 +56,6 @@ import static android.os.UserManager.ENSURE_VERIFY_APPS;
 import com.afwsamples.testdpc.R;
 
 public class UserRestriction {
-    // TODO: remove it once available in SDK
-    public static final String DISALLOW_UNIFIED_PASSWORD = "no_unified_password";
-    public static final String DISALLOW_CONFIG_LOCATION = "no_config_location";
-    public static final String DISALLOW_PRINTING= "no_printing";
-    public static final String DISALLOW_INSTALL_UNKNOWN_SOURCES_GLOBALLY =
-            "no_install_unknown_sources_globally";
-    public static final String DISALLOW_CONFIG_PRIVATE_DNS =
-            "disallow_config_private_dns";
-
     public String key;
     public int titleResId;
 
@@ -65,12 +63,6 @@ public class UserRestriction {
         this.key = key;
         this.titleResId = titleResId;
     }
-
-    // TODO(68687253): Replace this hard-coded string with UserManager.DISALLOW_SYSTEM_ERROR_DIALOGS
-    private static final String DISALLOW_SYSTEM_ERROR_DIALOGS = "no_system_error_dialogs";
-
-    //TODO: Replace with UserManager.DISALLOW_SHARE_INTO_MANAGED_PROFILE
-    private static final String DISALLOW_SHARE_INTO_MANAGED_PROFILE = "no_sharing_into_profile";
 
     public static final UserRestriction[] ALL_USER_RESTRICTIONS = {
             new UserRestriction(

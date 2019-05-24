@@ -20,6 +20,7 @@ import android.app.admin.DevicePolicyManager;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.support.annotation.IntDef;
 import android.support.annotation.StringRes;
 import android.support.v7.preference.Preference;
@@ -28,10 +29,8 @@ import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.TextView;
-
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.Util;
-
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
@@ -81,25 +80,11 @@ public class DpcPreferenceHelper {
     private Preference mPreference;
 
     private CharSequence mConstraintViolationSummary = null;
-    private CustomConstraint mCustomConstraint = null;
+    private List<CustomConstraint> mCustomConstraints = new ArrayList<>();
     private int mMinSdkVersion;
     private @AdminKind int mAdminConstraint;
     private @UserKind int mUserConstraint;
     private String mDelegationConstraint;
-
-    /**
-     * Update this method as {@link Build.VERSION_CODES} and Android releases are updated.
-     *
-     * @return The version SDK int or {@link Build.VERSION_CODES.CUR_DEVELOPMENT} if the SDK int is
-     *         not yet assigned.
-     */
-    private int getDeviceSdkInt() {
-        // TODO(b/117767701): Remove this when Q version code is finalized.
-        if (Util.isAtLeastQ()) {
-            return Build.VERSION_CODES.CUR_DEVELOPMENT;
-        }
-        return Build.VERSION.SDK_INT;
-    }
 
     public DpcPreferenceHelper(Context context, Preference preference, AttributeSet attrs) {
         mContext = context;
@@ -110,7 +95,7 @@ public class DpcPreferenceHelper {
         mMinSdkVersion = a.getInt(R.styleable.DpcPreference_minSdkVersion, 0);
         if (attrs == null) {
             // Be more lenient when creating the preference from code
-            mMinSdkVersion = Build.VERSION_CODES.LOLLIPOP;
+            mMinSdkVersion = VERSION_CODES.LOLLIPOP;
         }
         if (mMinSdkVersion == 0) {
             throw new RuntimeException("testdpc:minSdkVersion must be specified.");
@@ -194,19 +179,37 @@ public class DpcPreferenceHelper {
     /**
      * Specify a custom constraint by setting a {{@link CustomConstraint}} object. The enabled
      * state of the preference will be updated accordingly.
+     *
+     * <p>This will remove all previously set custom constraints. If you do not want to do this, use
+     * {@link #addCustomConstraint(CustomConstraint)}.
      */
     public void setCustomConstraint(CustomConstraint customConstraint) {
-        mCustomConstraint = customConstraint;
+        clearCustomConstraints();
+        addCustomConstraint(customConstraint);
+    }
+
+    /**
+     * Add a {@link CustomConstraint} to be evaluated in addition to existing custom constraints.
+     *
+     * <p>The enabled state of the preference will be updated accordingly.
+     *
+     * <p>The new constraint will be enforced in addition to any previously set custom constraints.
+     * If you'd prefer that this constraint replaces previous constraints,
+     * use {@link #setCustomConstraint(CustomConstraint)}.
+     */
+    public void addCustomConstraint(CustomConstraint customConstraint) {
+        mCustomConstraints.add(customConstraint);
         disableIfConstraintsNotMet();
     }
 
     /**
-     * Remove any custom constraints set by {@link #setCustomConstraint(CustomConstraint)}.
-     * <p/>
-     * This method is safe to call if there is no current custom constraint.
+     * Remove any custom constraints set by {@link #setCustomConstraint(CustomConstraint)} and
+     * {@link #addCustomConstraint(CustomConstraint)}.
+     *
+     * <p>This method is safe to call if there is no current custom constraint.
      */
-    public void clearCustomConstraint() {
-        setCustomConstraint(null);
+    public void clearCustomConstraints() {
+        mCustomConstraints.clear();
     }
 
     public void disableIfConstraintsNotMet() {
@@ -221,7 +224,7 @@ public class DpcPreferenceHelper {
      * found.
      */
     private CharSequence findConstraintViolation() {
-        if (getDeviceSdkInt() < mMinSdkVersion) {
+        if (Util.SDK_INT < mMinSdkVersion) {
             return mContext.getString(R.string.requires_android_api_level, mMinSdkVersion);
         }
 
@@ -233,8 +236,8 @@ public class DpcPreferenceHelper {
             return getUserConstraintSummary();
         }
 
-        if (mCustomConstraint != null) {
-            @StringRes int strRes = mCustomConstraint.validateConstraint();
+        for (CustomConstraint customConstraint : mCustomConstraints) {
+            @StringRes int strRes = customConstraint.validateConstraint();
             if (strRes != NO_CUSTOM_CONSTRIANT) {
                 return mContext.getString(strRes);
             }
@@ -257,7 +260,7 @@ public class DpcPreferenceHelper {
     }
 
     private List<String> getCurrentDelegations() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+        if (Util.SDK_INT < VERSION_CODES.O) {
             return Collections.EMPTY_LIST;
         }
         final DevicePolicyManager dpm =

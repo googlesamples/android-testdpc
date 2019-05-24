@@ -104,6 +104,11 @@ public class DpcListPreference extends ListPreference implements DpcPreferenceBa
     }
 
     @Override
+    public void addCustomConstraint(@Nullable CustomConstraint customConstraint) {
+        mHelper.addCustomConstraint(customConstraint);
+    }
+
+    @Override
     public void refreshEnabledState() {
         mHelper.disableIfConstraintsNotMet();
     }

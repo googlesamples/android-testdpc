@@ -20,6 +20,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.security.KeyChain;
 import android.security.KeyChainException;
+import android.security.keystore.KeyProperties;
 import android.util.Log;
 
 import com.afwsamples.testdpc.R;
@@ -46,8 +47,14 @@ public class SignAndVerifyTask extends AsyncTask<String, Integer, String> {
     protected String doInBackground(String... aliases) {
         String alias = aliases[0];
         try {
-            final String algorithmIdentifier = "SHA256withRSA";
             PrivateKey privateKey = KeyChain.getPrivateKey(mContext, alias);
+
+            final String algorithmIdentifier;
+            if (privateKey.getAlgorithm().equals(KeyProperties.KEY_ALGORITHM_RSA)) {
+                algorithmIdentifier = "SHA256withRSA";
+            } else {
+                algorithmIdentifier = "SHA256withECDSA";
+            }
 
             byte[] data = new String("hello").getBytes();
             Signature signer = Signature.getInstance(algorithmIdentifier);

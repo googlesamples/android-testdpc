@@ -16,6 +16,15 @@
 
 package com.afwsamples.testdpc;
 
+import static android.app.admin.DevicePolicyManager.ACTION_PROVISION_MANAGED_DEVICE;
+import static android.app.admin.DevicePolicyManager.ACTION_PROVISION_MANAGED_PROFILE;
+import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_ACCOUNT_TO_MIGRATE;
+import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE;
+import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_DEVICE_ADMIN_COMPONENT_NAME;
+import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_DEVICE_ADMIN_PACKAGE_NAME;
+import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_LOGO_URI;
+import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_MAIN_COLOR;
+
 import android.accounts.Account;
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -28,11 +37,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.net.Uri;
-import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.PersistableBundle;
-import android.support.v4.os.BuildCompat;
-import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,26 +50,14 @@ import android.widget.ImageView;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.afwsamples.testdpc.common.ColorPicker;
 import com.afwsamples.testdpc.common.LaunchIntentUtil;
 import com.afwsamples.testdpc.common.ProvisioningStateUtil;
 import com.afwsamples.testdpc.common.Util;
 import com.android.setupwizardlib.GlifLayout;
-import com.android.setupwizardlib.view.NavigationBar;
-
 import java.security.SecureRandom;
 import java.util.Collections;
 import java.util.Set;
-
-import static android.app.admin.DevicePolicyManager.ACTION_PROVISION_MANAGED_DEVICE;
-import static android.app.admin.DevicePolicyManager.ACTION_PROVISION_MANAGED_PROFILE;
-import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_ACCOUNT_TO_MIGRATE;
-import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE;
-import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_DEVICE_ADMIN_COMPONENT_NAME;
-import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_DEVICE_ADMIN_PACKAGE_NAME;
-import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_LOGO_URI;
-import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_MAIN_COLOR;
 
 /**
  * This {@link Fragment} shows the UI that allows the user to start the setup of a managed profile
@@ -165,7 +160,7 @@ public class SetupManagementFragment extends Fragment implements
 
         if (setProvisioningMethodsVisibility()) {
             // The extra logo uri and color are supported only from N
-            if (BuildCompat.isAtLeastN()) {
+            if (Util.SDK_INT >= VERSION_CODES.N) {
                 getView().findViewById(R.id.params_title).setVisibility(View.VISIBLE);
                 if (canAnAppHandleGetContent()) {
                     getView().findViewById(
@@ -193,15 +188,19 @@ public class SetupManagementFragment extends Fragment implements
         final int setUpOptionId = mSetupOptions.getCheckedRadioButtonId();
         final boolean isManagedProfileAction = setUpOptionId == R.id.setup_managed_profile;
         final boolean isManagedDeviceAction = setUpOptionId == R.id.setup_device_owner;
-        mSkipUserConsent.setVisibility(BuildCompat.isAtLeastO() && isManagedProfileAction &&
-                Util.isDeviceOwner(getActivity())
+        mSkipUserConsent.setVisibility(
+            Util.SDK_INT >= VERSION_CODES.O
+                && isManagedProfileAction
+                && Util.isDeviceOwner(getActivity())
                 ? View.VISIBLE
                 : View.GONE);
-        mKeepAccountMigrated.setVisibility(BuildCompat.isAtLeastO() && isManagedProfileAction
+        mKeepAccountMigrated.setVisibility(
+            Util.SDK_INT >= VERSION_CODES.O && isManagedProfileAction
                 ? View.VISIBLE
                 : View.GONE);
-        mSkipEncryption.setVisibility((isManagedProfileAction && BuildCompat.isAtLeastN())
-                || (isManagedDeviceAction && Util.isAtLeastM())
+        mSkipEncryption.setVisibility(
+            (isManagedProfileAction && Util.SDK_INT >= VERSION_CODES.N)
+                || (isManagedDeviceAction && Util.SDK_INT >= VERSION_CODES.M)
                 ? View.VISIBLE
                 : View.GONE);
 
@@ -216,7 +215,7 @@ public class SetupManagementFragment extends Fragment implements
         Activity activity = getActivity();
 
         Intent intent = new Intent(intentAction);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (Util.SDK_INT >= VERSION_CODES.M) {
             intent.putExtra(EXTRA_PROVISIONING_DEVICE_ADMIN_COMPONENT_NAME,
                     DeviceAdminReceiver.getComponentName(getActivity()));
         } else {
@@ -259,7 +258,7 @@ public class SetupManagementFragment extends Fragment implements
         Account accountToMigrate = LaunchIntentUtil.getAddedAccount(launchIntent);
         if (accountToMigrate != null) {
             // EXTRA_PROVISIONING_ACCOUNT_TO_MIGRATE only supported in API 22+.
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+            if (Util.SDK_INT >= VERSION_CODES.LOLLIPOP_MR1) {
                 // Configure the account to migrate into the managed profile if setup
                 // completes.
                 intent.putExtra(EXTRA_PROVISIONING_ACCOUNT_TO_MIGRATE, accountToMigrate);
@@ -276,12 +275,12 @@ public class SetupManagementFragment extends Fragment implements
     private void maybePassAffiliationIds(Intent intent, PersistableBundle adminExtras) {
         if (Util.isDeviceOwner(getActivity())
                 && ACTION_PROVISION_MANAGED_PROFILE.equals(intent.getAction())
-                && BuildCompat.isAtLeastO()) {
+                && Util.SDK_INT >= VERSION_CODES.O) {
             passAffiliationIds(intent, adminExtras);
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.O)
+    @TargetApi(VERSION_CODES.O)
     private void passAffiliationIds(Intent intent, PersistableBundle adminExtras) {
         ComponentName admin = DeviceAdminReceiver.getComponentName(getActivity());
         DevicePolicyManager dpm = (DevicePolicyManager)
@@ -302,7 +301,7 @@ public class SetupManagementFragment extends Fragment implements
      * @return true if we can launch the intent
      */
     private boolean maybeSpecifyNExtras(Intent intent) {
-        if (BuildCompat.isAtLeastN()) {
+        if (Util.SDK_INT >= VERSION_CODES.N) {
             specifyLogoUri(intent);
             specifyColor(intent);
         }
@@ -310,7 +309,7 @@ public class SetupManagementFragment extends Fragment implements
     }
 
     private void specifyDefaultDisclaimers(Intent intent) {
-        if (BuildCompat.isAtLeastO()) {
+        if (Util.SDK_INT >= VERSION_CODES.O) {
             Bundle emmBundle = new Bundle();
             emmBundle.putString(DevicePolicyManager.EXTRA_PROVISIONING_DISCLAIMER_HEADER,
                     getString(R.string.default_disclaimer_emm_name));
@@ -334,19 +333,20 @@ public class SetupManagementFragment extends Fragment implements
     }
 
     private void specifySkipUserConsent(Intent intent) {
-        if (BuildCompat.isAtLeastO() && ACTION_PROVISION_MANAGED_PROFILE.equals(intent.getAction())
-                && mSkipUserConsent.getVisibility() == View.VISIBLE) {
-            // TODO: use action string in Android SDK
-            intent.putExtra("android.app.extra.PROVISIONING_SKIP_USER_CONSENT",
-                    mSkipUserConsent.isChecked());
+        if (Util.SDK_INT >= VERSION_CODES.O
+              && ACTION_PROVISION_MANAGED_PROFILE.equals(intent.getAction())
+              && mSkipUserConsent.getVisibility() == View.VISIBLE) {
+            intent.putExtra(
+                DevicePolicyManager.EXTRA_PROVISIONING_SKIP_USER_CONSENT,
+                mSkipUserConsent.isChecked());
         }
     }
 
     private void specifyKeepAccountMigrated(Intent intent) {
-        if (BuildCompat.isAtLeastO() && ACTION_PROVISION_MANAGED_PROFILE.equals(intent.getAction())
-                && mKeepAccountMigrated.getVisibility() == View.VISIBLE) {
-            // TODO: use action string in Android SDK
-            intent.putExtra("android.app.extra.PROVISIONING_KEEP_ACCOUNT_ON_MIGRATION",
+        if (Util.SDK_INT >= VERSION_CODES.O
+              && ACTION_PROVISION_MANAGED_PROFILE.equals(intent.getAction())
+              && mKeepAccountMigrated.getVisibility() == View.VISIBLE) {
+            intent.putExtra(DevicePolicyManager.EXTRA_PROVISIONING_KEEP_ACCOUNT_ON_MIGRATION,
                     mKeepAccountMigrated.isChecked());
         }
     }

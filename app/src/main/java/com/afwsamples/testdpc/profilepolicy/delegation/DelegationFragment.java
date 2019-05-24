@@ -20,7 +20,7 @@ import android.annotation.TargetApi;
 import android.app.admin.DevicePolicyManager;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
-import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -29,11 +29,9 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.Toast;
-
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.ManageAppFragment;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -97,7 +95,7 @@ public class DelegationFragment extends ManageAppFragment {
     /**
      * Query the DevicePolicyManager for the delegation scopes granted to pkgName.
      */
-    @TargetApi(Build.VERSION_CODES.O)
+    @TargetApi(VERSION_CODES.O)
     private void readScopesFromDpm(String pkgName) {
         // Get the scopes delegated to pkgName.
         List<String> scopes = mDpm.getDelegatedScopes(mIsDeviceOrProfileOwner
@@ -145,7 +143,7 @@ public class DelegationFragment extends ManageAppFragment {
     }
 
     @Override
-    @TargetApi(Build.VERSION_CODES.O)
+    @TargetApi(VERSION_CODES.O)
     protected void saveConfig() {
         if (!mIsDeviceOrProfileOwner) {
             Toast.makeText(getActivity(), getString(R.string.delegation_error),
@@ -195,7 +193,7 @@ public class DelegationFragment extends ManageAppFragment {
             this.granted = false;
         }
 
-        @TargetApi(Build.VERSION_CODES.O)
+        @TargetApi(VERSION_CODES.O)
         static List<DelegationScope> defaultDelegationScopes(boolean showDoOnlyDelegations) {
             List<DelegationScope> defaultDelegations = new ArrayList<>();
             defaultDelegations.add(
@@ -215,8 +213,6 @@ public class DelegationFragment extends ManageAppFragment {
             if (showDoOnlyDelegations) {
                 defaultDelegations.add(
                         new DelegationScope(DevicePolicyManager.DELEGATION_NETWORK_LOGGING));
-                defaultDelegations.add(
-                        new DelegationScope(DevicePolicyManager.DELEGATION_PACKAGE_INSTALLATION));
             }
             return defaultDelegations;
         }

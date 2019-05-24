@@ -16,19 +16,17 @@
 package com.afwsamples.testdpc.policy;
 
 import android.annotation.TargetApi;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.os.Build.VERSION_CODES;
 import android.util.Log;
 import android.widget.Toast;
-
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.ToggleComponentsArrayAdapter;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -96,7 +94,7 @@ public class MeteredDataRestrictionInfoAdapter extends ToggleComponentsArrayAdap
         }
     }
 
-    @TargetApi(28)
+    @TargetApi(VERSION_CODES.P)
     private void setMeteredDataRestrictedPkgs(List<String> pkgNames) {
         final List<String> excludedPkgs = mDevicePolicyManager.setMeteredDataDisabledPackages(
             DeviceAdminReceiver.getComponentName(mContext), pkgNames);

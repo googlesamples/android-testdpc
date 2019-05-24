@@ -79,10 +79,9 @@ public class WifiConfigCreationDialog extends DialogFragment implements
         // For a config to be updated we allow the current password if there is one.
         dialog.mPasswordDirty =
                 // Security type is neither WPA ...
-                !oldConfig.allowedKeyManagement.get(WifiConfiguration.KeyMgmt.WPA_PSK) &&
+                !oldConfig.allowedKeyManagement.get(WifiConfiguration.KeyMgmt.WPA_PSK)
                 // ... nor WEP.
-                !oldConfig.allowedAuthAlgorithms.get(
-                        WifiConfiguration.AuthAlgorithm.SHARED);
+                && !oldConfig.allowedAuthAlgorithms.get(WifiConfiguration.AuthAlgorithm.SHARED);
         return dialog;
     }
 
@@ -191,8 +190,8 @@ public class WifiConfigCreationDialog extends DialogFragment implements
                 if (length != 0) {
                     String password = mPasswordText.getText().toString();
                     // WEP-40, WEP-104, and 256-bit WEP (WEP-232?)
-                    if ((length == 10 || length == 26 || length == 58) &&
-                            password.matches("[0-9A-Fa-f]*")) {
+                    if ((length == 10 || length == 26 || length == 58)
+                            && password.matches("[0-9A-Fa-f]*")) {
                         config.wepKeys[0] = password;
                     } else {
                         config.wepKeys[0] = getQuotedString(password);
