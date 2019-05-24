@@ -13,7 +13,7 @@ ext {
 }
 
 android {
-    compileSdkVersion 'android-29'
+    compileSdkVersion 'android-Q'
     buildToolsVersion "28.0.0"
 
     defaultConfig {
