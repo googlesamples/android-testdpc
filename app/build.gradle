@@ -51,6 +51,12 @@ android {
         textOutput "stdout"
     }
 
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
+
     signingConfigs {
         debug {
             storeFile file("$projectDir/debug.keystore")
@@ -137,6 +143,8 @@ dependencies {
     implementation 'org.bouncycastle:bcpkix-jdk15on:1.56'
     implementation 'org.bouncycastle:bcprov-jdk15on:1.56'
     implementation 'com.google.guava:guava:23.6-android'
-
+    testImplementation 'org.robolectric:robolectric:4.2'
+    testImplementation "com.google.truth:truth:0.44"
+    testImplementation 'junit:junit:4.5'
     annotationProcessor "androidx.lifecycle:lifecycle-compiler:$lifecycle_version"
 }
