@@ -1,7 +1,7 @@
 package com.afwsamples.testdpc.search;
 
 import android.content.Context;
-import android.support.annotation.XmlRes;
+import androidx.annotation.XmlRes;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;

@@ -17,7 +17,7 @@
 package com.afwsamples.testdpc.policy.utils;
 
 import android.os.Build.VERSION_CODES;
-import android.support.annotation.RequiresApi;
+import androidx.annotation.RequiresApi;
 import com.google.common.base.CharMatcher;
 import com.google.common.io.BaseEncoding;
 import java.security.cert.CertificateParsingException;

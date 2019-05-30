@@ -13,7 +13,7 @@ ext {
 }
 
 android {
-    compileSdkVersion 'android-Q'
+    compileSdkVersion 'android-29'
     buildToolsVersion "28.0.0"
 
     defaultConfig {
@@ -125,14 +125,18 @@ private void stripTestOnlyForBuild(flavor, buildType) {
 }
 
 dependencies {
+    def lifecycle_version = "2.0.0"
+    implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
     implementation 'androidx.enterprise:enterprise-feedback:1.0.0-alpha01'
-    implementation 'com.android.support:multidex:1.0.1'
-    implementation 'com.android.support:preference-v14:28.0.0-SNAPSHOT'
-    implementation 'com.android.support:recyclerview-v7:28.0.0-SNAPSHOT'
-    implementation 'com.android.support:support-v13:28.0.0-SNAPSHOT'
-    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    implementation 'androidx.multidex:multidex:2.0.0'
+    implementation 'androidx.legacy:legacy-preference-v14:1.0.0'
+    implementation 'androidx.recyclerview:recyclerview:1.0.0'
+    implementation 'androidx.legacy:legacy-support-v13:1.0.0'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation(name: 'setup-wizard-lib-platform-release', ext: 'aar')
     implementation 'org.bouncycastle:bcpkix-jdk15on:1.56'
     implementation 'org.bouncycastle:bcprov-jdk15on:1.56'
     implementation 'com.google.guava:guava:23.6-android'
+
+    annotationProcessor "androidx.lifecycle:lifecycle-compiler:$lifecycle_version"
 }

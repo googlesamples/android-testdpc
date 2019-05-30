@@ -22,7 +22,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
-import android.support.v4.util.ArraySet;
+import androidx.collection.ArraySet;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import java.util.Collection;

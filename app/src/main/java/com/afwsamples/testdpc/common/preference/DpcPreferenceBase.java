@@ -16,7 +16,7 @@
 
 package com.afwsamples.testdpc.common.preference;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 /**
  * Common base class for the DpcPreference family of classes.
