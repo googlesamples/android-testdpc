@@ -1,7 +1,7 @@
 package com.afwsamples.testdpc.comp;
 
 import android.os.RemoteException;
-import android.support.annotation.UiThread;
+import androidx.annotation.UiThread;
 
 public interface OnServiceConnectedListener<T> {
     @UiThread

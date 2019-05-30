@@ -20,7 +20,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.Signature;
 import android.os.Build.VERSION_CODES;
-import android.support.annotation.RequiresApi;
+import androidx.annotation.RequiresApi;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateParsingException;

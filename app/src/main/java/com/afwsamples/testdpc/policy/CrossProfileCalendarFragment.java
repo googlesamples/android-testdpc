@@ -23,7 +23,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
-import android.support.v7.preference.Preference;
+import androidx.preference.Preference;
 import android.util.ArraySet;
 import android.view.View;
 import android.widget.EditText;

@@ -17,10 +17,10 @@
 package com.afwsamples.testdpc.common.preference;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
-import android.support.v14.preference.SwitchPreference;
-import android.support.v7.preference.PreferenceManager;
-import android.support.v7.preference.PreferenceViewHolder;
+import androidx.annotation.Nullable;
+import androidx.preference.SwitchPreference;
+import androidx.preference.PreferenceManager;
+import androidx.preference.PreferenceViewHolder;
 import android.util.AttributeSet;
 
 /**
@@ -41,7 +41,7 @@ public class DpcSwitchPreference extends SwitchPreference implements DpcPreferen
     }
 
     public DpcSwitchPreference(Context context, AttributeSet attrs) {
-        this(context, attrs, android.support.v14.preference.R.attr.switchPreferenceStyle);
+        this(context, attrs, androidx.preference.R.attr.switchPreferenceStyle);
     }
 
     public DpcSwitchPreference(Context context) {

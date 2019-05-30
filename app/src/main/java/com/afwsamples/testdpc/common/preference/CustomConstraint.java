@@ -16,7 +16,7 @@
 
 package com.afwsamples.testdpc.common.preference;
 
-import android.support.annotation.StringRes;
+import androidx.annotation.StringRes;
 
 public interface CustomConstraint {
 

@@ -32,7 +32,7 @@ import android.content.IntentFilter;
 import android.os.Build.VERSION_CODES;
 import android.os.IBinder;
 import android.os.UserManager;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.util.Log;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
