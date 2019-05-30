@@ -125,6 +125,8 @@ private void stripTestOnlyForBuild(flavor, buildType) {
 }
 
 dependencies {
+    def lifecycle_version = "2.0.0"
+    implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
     implementation 'androidx.enterprise:enterprise-feedback:1.0.0-alpha01'
     implementation 'androidx.multidex:multidex:2.0.0'
     implementation 'androidx.legacy:legacy-preference-v14:1.0.0'
@@ -135,4 +137,6 @@ dependencies {
     implementation 'org.bouncycastle:bcpkix-jdk15on:1.56'
     implementation 'org.bouncycastle:bcprov-jdk15on:1.56'
     implementation 'com.google.guava:guava:23.6-android'
+
+    annotationProcessor "androidx.lifecycle:lifecycle-compiler:$lifecycle_version"
 }

@@ -17,6 +17,7 @@
 package com.afwsamples.testdpc;
 
 import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_ACCOUNT_TO_MIGRATE;
+import static androidx.lifecycle.Lifecycle.State.STARTED;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
@@ -30,6 +31,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.UserManager;
 import android.text.TextUtils;
 import android.util.Log;
@@ -37,6 +39,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.Toast;
+import androidx.lifecycle.ProcessLifecycleOwner;
 import com.afwsamples.testdpc.common.Util;
 import com.android.setupwizardlib.GlifLayout;
 import java.io.IOException;
@@ -50,6 +53,7 @@ public class AddAccountActivity extends Activity {
 
     private static final String TAG = "AddAccountActivity";
     private static final String GOOGLE_ACCOUNT_TYPE = "com.google";
+    private static final long WAIT_FOR_FOREGROUND_DELAY_MS = 10;
 
     public static final String EXTRA_NEXT_ACTIVITY_INTENT = "nextActivityIntent";
 
@@ -100,26 +104,47 @@ public class AddAccountActivity extends Activity {
         }
 
         accountManager.addAccount(GOOGLE_ACCOUNT_TYPE, null, null, bundle, this,
-                accountManagerFuture -> {
-                    try {
-                        Bundle result = accountManagerFuture.getResult();
-                        String accountNameAdded = result.getString(AccountManager.KEY_ACCOUNT_NAME);
-                        Log.d(TAG, "addAccount - accountNameAdded: " + accountNameAdded);
-                        if (mNextActivityIntent != null) {
-                            startActivity(mNextActivityIntent);
-                        }
-                        final Intent resultIntent = new Intent();
-                        resultIntent.putExtra(EXTRA_PROVISIONING_ACCOUNT_TO_MIGRATE,
-                            new Account(accountNameAdded, GOOGLE_ACCOUNT_TYPE));
-                        setResult(RESULT_OK, resultIntent);
-                        finish();
-                    } catch (OperationCanceledException | AuthenticatorException
-                            | IOException e) {
-                        Log.e(TAG, "addAccount - failed", e);
-                        Toast.makeText(AddAccountActivity.this,
-                                R.string.fail_to_add_account, Toast.LENGTH_LONG).show();
-                    }
-                }, null);
+            accountManagerFuture -> {
+                try {
+                    Bundle result = accountManagerFuture.getResult();
+                    // This callback executes slightly before the app is back in the foreground
+                    // so we need to wait.
+                    waitForForeground(() -> accountCreated(result), 1000);
+                } catch (OperationCanceledException | AuthenticatorException | IOException e) {
+                    Log.e(TAG, "addAccount - failed", e);
+                    Toast.makeText(AddAccountActivity.this,
+                        R.string.fail_to_add_account, Toast.LENGTH_LONG).show();
+                }
+            }, null);
+    }
+
+    private void waitForForeground(Runnable r, long timeout) {
+        if (timeout <= 0) {
+            throw new RuntimeException("Timed out waiting for foreground.");
+        }
+        boolean isAppInForeground =
+            ProcessLifecycleOwner.get().getLifecycle().getCurrentState().isAtLeast(STARTED);
+        if (isAppInForeground) {
+            r.run();
+        } else {
+            new Handler().postDelayed(
+                () -> waitForForeground(r, timeout - WAIT_FOR_FOREGROUND_DELAY_MS),
+                WAIT_FOR_FOREGROUND_DELAY_MS);
+        }
+    }
+
+    private void accountCreated(Bundle result) {
+        String accountNameAdded = result.getString(AccountManager.KEY_ACCOUNT_NAME);
+        Log.d(TAG, "addAccount - accountNameAdded: " + accountNameAdded);
+        if (mNextActivityIntent != null) {
+            startActivity(mNextActivityIntent);
+        }
+        final Intent resultIntent = new Intent();
+        resultIntent.putExtra(EXTRA_PROVISIONING_ACCOUNT_TO_MIGRATE,
+            new Account(accountNameAdded, GOOGLE_ACCOUNT_TYPE));
+        setResult(RESULT_OK, resultIntent);
+        finish();
+
     }
 
     private void disableUserRestrictions() {
