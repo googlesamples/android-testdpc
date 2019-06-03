@@ -16,8 +16,6 @@
 
 package com.afwsamples.testdpc.policy.networking;
 
-import static com.afwsamples.testdpc.common.Util.Q_VERSION_CODE;
-
 import android.annotation.TargetApi;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
@@ -85,7 +83,7 @@ public class AlwaysOnVpnFragment extends SelectAppFragment {
             Bundle savedInstanceState) {
         final View view = super.onCreateView(layoutInflater, container, savedInstanceState);
 
-        if (Util.SDK_INT >= Q_VERSION_CODE) {
+        if (Util.SDK_INT >= VERSION_CODES.Q) {
             final ViewGroup extension = getExtensionLayout(view);
             extension.setVisibility(View.VISIBLE);
             layoutInflater.inflate(R.layout.lockdown_settings, extension);
@@ -114,12 +112,12 @@ public class AlwaysOnVpnFragment extends SelectAppFragment {
     @Override
     protected void reloadSelectedPackage() {
         super.reloadSelectedPackage();
-        if (Util.SDK_INT >= Q_VERSION_CODE) {
+        if (Util.SDK_INT >= VERSION_CODES.Q) {
             updateLockdown();
         }
     }
 
-    @TargetApi(Q_VERSION_CODE)
+    @TargetApi(VERSION_CODES.Q)
     private void updateLockdown() {
         mLockdown.setChecked(mDpm.isAlwaysOnVpnLockdownEnabled(mWho));
         final Set<String> exemptedPackages = mDpm.getAlwaysOnVpnLockdownWhitelist(mWho);
@@ -130,7 +128,7 @@ public class AlwaysOnVpnFragment extends SelectAppFragment {
     @Override
     protected void setSelectedPackage(String pkg) {
         try {
-            if (Util.SDK_INT >= Q_VERSION_CODE) {
+            if (Util.SDK_INT >= VERSION_CODES.Q) {
                 setAlwaysOnVpnPackageQPlus(pkg);
             } else {
                 mDpm.setAlwaysOnVpnPackage(mWho, pkg, /* lockdownEnabled */ true);
@@ -146,7 +144,7 @@ public class AlwaysOnVpnFragment extends SelectAppFragment {
         }
     }
 
-    @TargetApi(Q_VERSION_CODE)
+    @TargetApi(VERSION_CODES.Q)
     private void setAlwaysOnVpnPackageQPlus(String pkg)
             throws PackageManager.NameNotFoundException {
         final boolean lockdown = mLockdown.isChecked();

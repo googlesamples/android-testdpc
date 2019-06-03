@@ -16,8 +16,6 @@
 
 package com.afwsamples.testdpc.policy.networking;
 
-import static com.afwsamples.testdpc.common.Util.Q_VERSION_CODE;
-
 import android.annotation.TargetApi;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
@@ -27,7 +25,7 @@ import android.util.Log;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.policy.keymanagement.ShowToastCallback;
 
-@TargetApi(Q_VERSION_CODE)
+@TargetApi(VERSION_CODES.Q)
 final class SetPrivateDnsTask extends AsyncTask<Void, Void, String> {
     public static final String TAG = "Networking";
     private final ShowToastCallback mCallback;

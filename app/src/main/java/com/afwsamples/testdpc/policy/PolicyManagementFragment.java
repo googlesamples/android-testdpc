@@ -17,7 +17,6 @@
 package com.afwsamples.testdpc.policy;
 
 import static android.os.UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES;
-import static com.afwsamples.testdpc.common.Util.Q_VERSION_CODE;
 import static com.afwsamples.testdpc.common.preference.DpcPreferenceHelper.NO_CUSTOM_CONSTRIANT;
 
 import android.accessibilityservice.AccessibilityServiceInfo;
@@ -399,7 +398,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     private static final SparseIntArray PASSWORD_COMPLEXITY = new SparseIntArray(4);
     static {
-        if (Util.SDK_INT >= Q_VERSION_CODE) {
+        if (Util.SDK_INT >= VERSION_CODES.Q) {
             final int[] complexityIds = new int[]{
                 DevicePolicyManager.PASSWORD_COMPLEXITY_NONE,
                 DevicePolicyManager.PASSWORD_COMPLEXITY_LOW,
@@ -1142,7 +1141,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         return false;
     }
 
-    @TargetApi(Q_VERSION_CODE)
+    @TargetApi(VERSION_CODES.Q)
     private void promptInstallUpdate() {
         new AlertDialog.Builder(getActivity())
                 .setMessage(R.string.install_update_prompt)
@@ -1155,7 +1154,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 .show();
     }
 
-    @TargetApi(Q_VERSION_CODE)
+    @TargetApi(VERSION_CODES.Q)
     private void installUpdate() {
         File file = new File(getContext().getFilesDir(), "ota.zip");
         Uri uri = FileProvider.getUriForFile(
