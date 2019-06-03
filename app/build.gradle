@@ -9,11 +9,11 @@ ext {
     // exactly 1 digit
     versionMinor = 1
     // exactly 2 digits
-    versionBuild = 00
+    versionBuild = 02
 }
 
 android {
-    compileSdkVersion 'android-29'
+    compileSdkVersion 'android-Q'
     buildToolsVersion "28.0.0"
 
     defaultConfig {

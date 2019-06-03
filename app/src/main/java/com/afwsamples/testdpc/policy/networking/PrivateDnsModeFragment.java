@@ -16,6 +16,8 @@
 
 package com.afwsamples.testdpc.policy.networking;
 
+import static com.afwsamples.testdpc.common.Util.Q_VERSION_CODE;
+
 import android.annotation.TargetApi;
 import android.app.Fragment;
 import android.app.admin.DevicePolicyManager;
@@ -35,7 +37,7 @@ import android.widget.Toast;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 
-@TargetApi(VERSION_CODES.Q)
+@TargetApi(Q_VERSION_CODE)
 public class PrivateDnsModeFragment extends Fragment implements View.OnClickListener,
         RadioGroup.OnCheckedChangeListener {
     private static final String TAG = "PDNS_FRAG";
