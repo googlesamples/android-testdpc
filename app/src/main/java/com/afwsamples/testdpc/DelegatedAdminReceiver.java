@@ -16,13 +16,15 @@
 
 package com.afwsamples.testdpc;
 
+import static com.afwsamples.testdpc.common.Util.Q_VERSION_CODE;
+
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build.VERSION_CODES;
 
-@TargetApi(VERSION_CODES.Q)
+@TargetApi(Q_VERSION_CODE)
 public class DelegatedAdminReceiver extends android.app.admin.DelegatedAdminReceiver {
 
     @Override
