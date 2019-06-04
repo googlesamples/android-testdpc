@@ -17,6 +17,7 @@
 package com.afwsamples.testdpc.policy;
 
 import static android.os.UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES;
+import static com.afwsamples.testdpc.common.Util.Q_VERSION_CODE;
 
 import android.app.AlertDialog;
 import android.app.admin.DevicePolicyManager;
@@ -25,8 +26,8 @@ import android.content.Context;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.UserManager;
-import android.support.v7.preference.Preference;
-import android.support.v7.preference.PreferenceScreen;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceScreen;
 import android.util.Log;
 import android.widget.Toast;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
@@ -150,7 +151,7 @@ public class UserRestrictionsDisplayFragment extends BaseSearchablePolicyPrefere
         }
         for (String restriction: UserRestriction.QT_PLUS_RESTRICTIONS) {
             DpcPreferenceBase pref = (DpcPreferenceBase) findPreference(restriction);
-            pref.setMinSdkVersion(VERSION_CODES.Q);
+            pref.setMinSdkVersion(Q_VERSION_CODE);
         }
         for (String restriction : UserRestriction.PRIMARY_USER_ONLY_RESTRICTIONS) {
             DpcPreferenceBase pref = (DpcPreferenceBase) findPreference(restriction);

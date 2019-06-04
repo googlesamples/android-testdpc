@@ -2,11 +2,10 @@ package com.afwsamples.testdpc.feedback;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.os.Build;
 import android.os.Build.VERSION_CODES;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
-import android.support.v7.preference.PreferenceManager;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+import androidx.preference.PreferenceManager;
 import android.util.Log;
 import androidx.enterprise.feedback.KeyedAppState;
 import androidx.enterprise.feedback.KeyedAppStatesService;

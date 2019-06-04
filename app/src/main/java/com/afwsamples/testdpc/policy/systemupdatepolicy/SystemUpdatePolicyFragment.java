@@ -26,7 +26,7 @@ import android.app.admin.SystemUpdatePolicy;
 import android.content.Context;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
-import android.support.annotation.RequiresApi;
+import androidx.annotation.RequiresApi;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

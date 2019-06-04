@@ -21,7 +21,7 @@ import static com.google.common.collect.Collections2.transform;
 
 import android.os.Build.VERSION_CODES;
 import android.security.keystore.KeyProperties;
-import android.support.annotation.RequiresApi;
+import androidx.annotation.RequiresApi;
 import android.util.Log;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;

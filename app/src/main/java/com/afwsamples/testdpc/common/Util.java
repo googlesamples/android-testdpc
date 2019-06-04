@@ -26,13 +26,12 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.UserHandle;
 import android.os.UserManager;
-import android.support.v14.preference.PreferenceFragment;
+import androidx.preference.PreferenceFragment;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.widget.ImageView;
@@ -62,13 +61,15 @@ public class Util {
     private static final boolean IS_RUNNING_Q =
         VERSION.CODENAME.length() == 1 && VERSION.CODENAME.charAt(0) == 'Q';
 
+    public static final int Q_VERSION_CODE = 29;
+
     /**
      * A replacement for {@link VERSION.SDK_INT} that is compatible with pre-release SDKs
      *
      * <p>This will be set to the version SDK, or {@link VERSION_CODES.CUR_DEVELOPMENT} if the SDK
      * int is not yet assigned.
      **/
-    public static final int SDK_INT = IS_RUNNING_Q ? VERSION_CODES.Q : VERSION.SDK_INT;
+    public static final int SDK_INT = IS_RUNNING_Q ? Q_VERSION_CODE : VERSION.SDK_INT;
 
     /**
      * Format a friendly datetime for the current locale according to device policy documentation.

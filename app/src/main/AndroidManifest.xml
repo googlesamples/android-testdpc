@@ -163,7 +163,7 @@
 
         <provider
                 android:authorities="com.afwsamples.testdpc.fileprovider"
-                android:name="android.support.v4.content.FileProvider"
+                android:name="androidx.core.content.FileProvider"
                 android:grantUriPermissions="true"
                 android:exported="false">
             <meta-data

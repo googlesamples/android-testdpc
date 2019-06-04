@@ -17,10 +17,10 @@
 package com.afwsamples.testdpc.common.preference;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
-import android.support.v7.preference.ListPreference;
-import android.support.v7.preference.PreferenceManager;
-import android.support.v7.preference.PreferenceViewHolder;
+import androidx.annotation.Nullable;
+import androidx.preference.ListPreference;
+import androidx.preference.PreferenceManager;
+import androidx.preference.PreferenceViewHolder;
 import android.util.AttributeSet;
 
 /**
@@ -41,7 +41,7 @@ public class DpcListPreference extends ListPreference implements DpcPreferenceBa
     }
 
     public DpcListPreference(Context context, AttributeSet attrs) {
-        this(context, attrs, android.support.v7.preference.R.attr.dialogPreferenceStyle);
+        this(context, attrs, androidx.preference.R.attr.dialogPreferenceStyle);
     }
 
     public DpcListPreference(Context context) {

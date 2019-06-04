@@ -17,6 +17,7 @@
 package com.afwsamples.testdpc.policy;
 
 import static android.os.UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES;
+import static com.afwsamples.testdpc.common.Util.Q_VERSION_CODE;
 import static com.afwsamples.testdpc.common.preference.DpcPreferenceHelper.NO_CUSTOM_CONSTRIANT;
 
 import android.accessibilityservice.AccessibilityServiceInfo;
@@ -58,14 +59,14 @@ import android.provider.Settings;
 import android.security.KeyChain;
 import android.security.KeyChainAliasCallback;
 import android.service.notification.NotificationListenerService;
-import android.support.annotation.RequiresApi;
-import android.support.annotation.StringRes;
-import android.support.v14.preference.SwitchPreference;
-import android.support.v4.content.FileProvider;
-import android.support.v7.preference.EditTextPreference;
-import android.support.v7.preference.ListPreference;
-import android.support.v7.preference.Preference;
-import android.support.v7.preference.PreferenceManager;
+import androidx.annotation.RequiresApi;
+import androidx.annotation.StringRes;
+import androidx.preference.SwitchPreference;
+import androidx.core.content.FileProvider;
+import androidx.preference.EditTextPreference;
+import androidx.preference.ListPreference;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
 import android.text.InputType;
 import android.text.TextUtils;
@@ -398,7 +399,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     private static final SparseIntArray PASSWORD_COMPLEXITY = new SparseIntArray(4);
     static {
-        if (Util.SDK_INT >= VERSION_CODES.Q) {
+        if (Util.SDK_INT >= Q_VERSION_CODE) {
             final int[] complexityIds = new int[]{
                 DevicePolicyManager.PASSWORD_COMPLEXITY_NONE,
                 DevicePolicyManager.PASSWORD_COMPLEXITY_LOW,
@@ -1141,7 +1142,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         return false;
     }
 
-    @TargetApi(VERSION_CODES.Q)
+    @TargetApi(Q_VERSION_CODE)
     private void promptInstallUpdate() {
         new AlertDialog.Builder(getActivity())
                 .setMessage(R.string.install_update_prompt)
@@ -1154,7 +1155,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 .show();
     }
 
-    @TargetApi(VERSION_CODES.Q)
+    @TargetApi(Q_VERSION_CODE)
     private void installUpdate() {
         File file = new File(getContext().getFilesDir(), "ota.zip");
         Uri uri = FileProvider.getUriForFile(
