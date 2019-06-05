@@ -25,9 +25,9 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build.VERSION_CODES;
-import android.support.v7.preference.PreferenceManager;
 import androidx.enterprise.feedback.KeyedAppState;
 import androidx.enterprise.feedback.ReceivedKeyedAppState;
+import androidx.preference.PreferenceManager;
 import com.afwsamples.testdpc.R;
 import java.util.Arrays;
 import org.junit.Test;
@@ -37,8 +37,6 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowLog;
-import org.robolectric.shadows.ShadowNotification;
-import org.robolectric.shadows.ShadowNotificationManager;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(minSdk=VERSION_CODES.N) // Feedback channel is supported from N onwards
