@@ -66,28 +66,28 @@ public class AppStatesService extends KeyedAppStatesService {
   }
 
   private void showNotification(ReceivedKeyedAppState state, boolean requestSync) {
-    final String logMessage = state.timestamp() + " " +
-        state.packageName() + ":" +
-        state.key() + "=" +
-        state.data() + " (" +
-        state.message() + ")" + (requestSync ? " - SYNC REQUESTED" : "");
+    final String logMessage = state.getTimestamp() + " " +
+        state.getPackageName() + ":" +
+        state.getKey() + "=" +
+        state.getData() + " (" +
+        state.getMessage() + ")" + (requestSync ? " - SYNC REQUESTED" : "");
 
-    if (state.severity() == KeyedAppState.SEVERITY_ERROR) {
+    if (state.getSeverity() == KeyedAppState.SEVERITY_ERROR) {
       Log.e(TAG, logMessage);
     } else {
       Log.i(TAG, logMessage);
     }
 
-    final String severity = (state.severity() == KeyedAppState.SEVERITY_ERROR) ? "ERROR" :
-        (state.severity() == KeyedAppState.SEVERITY_INFO) ? "INFO" : "UNKNOWN";
+    final String severity = (state.getSeverity() == KeyedAppState.SEVERITY_ERROR) ? "ERROR" :
+        (state.getSeverity() == KeyedAppState.SEVERITY_INFO) ? "INFO" : "UNKNOWN";
 
     NotificationCompat.Builder notificationBuilder =
         new NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.arrow_down)
-            .setContentTitle(state.packageName() + ":" + state.key() + " " + severity)
-            .setContentText(state.timestamp() + " " +
-                state.data() +
-                " (" + state.message() +")" +
+            .setContentTitle(state.getPackageName() + ":" + state.getKey() + " " + severity)
+            .setContentText(state.getTimestamp() + " " +
+                state.getData() +
+                " (" + state.getMessage() +")" +
                 (requestSync ? "\nSYNC REQUESTED" : ""));
     NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
     notificationManager.notify(getIdForState(state), notificationBuilder.build());
@@ -103,7 +103,7 @@ public class AppStatesService extends KeyedAppStatesService {
   }
 
   private int getIdForState(ReceivedKeyedAppState state) {
-    String key = state.packageName() + ":" + state.key();
+    String key = state.getPackageName() + ":" + state.getKey();
 
     if (!idMapping.containsKey(key)) {
       idMapping.put(key, nextNotificationId++);

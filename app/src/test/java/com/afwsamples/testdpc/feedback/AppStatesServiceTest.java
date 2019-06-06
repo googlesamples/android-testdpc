@@ -116,11 +116,11 @@ public class AppStatesServiceTest {
 
   private void assertThatLogContainsRequiredInformation(
       ShadowLog.LogItem logItem, ReceivedKeyedAppState state) {
-    assertThat(logItem.msg).contains(Long.toString(state.timestamp()));
-    assertThat(logItem.msg).contains(state.packageName());
-    assertThat(logItem.msg).contains(state.key());
-    assertThat(logItem.msg).contains(state.data());
-    assertThat(logItem.msg).contains(state.message());
+    assertThat(logItem.msg).contains(Long.toString(state.getTimestamp()));
+    assertThat(logItem.msg).contains(state.getPackageName());
+    assertThat(logItem.msg).contains(state.getKey());
+    assertThat(logItem.msg).contains(state.getData());
+    assertThat(logItem.msg).contains(state.getMessage());
   }
 
   @Test
@@ -184,12 +184,12 @@ public class AppStatesServiceTest {
 
   private void assertThatNotificationContainsRequiredInformation(
       Notification notification, ReceivedKeyedAppState state) {
-    assertThat(shadowOf(notification).getContentTitle().toString()).contains(state.packageName());
-    assertThat(shadowOf(notification).getContentTitle().toString()).contains(state.key());
+    assertThat(shadowOf(notification).getContentTitle().toString()).contains(state.getPackageName());
+    assertThat(shadowOf(notification).getContentTitle().toString()).contains(state.getKey());
     assertThat(shadowOf(notification).getContentText().toString())
-      .contains(Long.toString(state.timestamp()));
-    assertThat(shadowOf(notification).getContentText().toString()).contains(state.data());
-    assertThat(shadowOf(notification).getContentText().toString()).contains(state.message());
+      .contains(Long.toString(state.getTimestamp()));
+    assertThat(shadowOf(notification).getContentText().toString()).contains(state.getData());
+    assertThat(shadowOf(notification).getContentText().toString()).contains(state.getMessage());
   }
 
   @Test
