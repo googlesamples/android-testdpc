@@ -22,39 +22,30 @@ import android.net.wifi.WifiManager;
 
 public class WifiConfigUtil {
 
-    /**
-     * Save or replace the wifi configuration.
-     *
-     * @param context
-     * @param wifiConfiguration
-     * @return success to add/replace the wifi configuration
-     */
-    public static boolean saveWifiConfiguration(Context context, WifiConfiguration
-            wifiConfiguration) {
-        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-        final int networkId;
+  /**
+   * Save or replace the wifi configuration.
+   *
+   * @return success to add/replace the wifi configuration
+   */
+  public static boolean saveWifiConfiguration(Context context, WifiConfiguration
+      wifiConfiguration) {
+    WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+    final int networkId;
 
-        if (wifiConfiguration.networkId == -1) {
-            // new wifi configuration, add it and then save it.
-            networkId = wifiManager.addNetwork(wifiConfiguration);
-        } else {
-            // existing wifi configuration, update it and then save it.
-            networkId = wifiManager.updateNetwork(wifiConfiguration);
-        }
-
-        if (networkId == -1) {
-            return false;
-        }
-
-        // Added successfully, try to save it now.
-        wifiManager.enableNetwork(networkId, /* disableOthers */ false);
-        if (wifiManager.saveConfiguration()) {
-            return true;
-        } else {
-            // Remove the added network that fail to save.
-            wifiManager.removeNetwork(networkId);
-            return false;
-        }
+    // WifiManager deprecated APIs including #addNetwork, #updateNetwork, #enableNetwork are restricted to system apps and DPCs
+    // https://developer.android.com/preview/privacy/camera-connectivity#wifi-network-config-restrictions
+    if (wifiConfiguration.networkId == -1) {
+      // new wifi configuration, add it and then save it.
+      networkId = wifiManager.addNetwork(wifiConfiguration);
+    } else {
+      // existing wifi configuration, update it and then save it.
+      networkId = wifiManager.updateNetwork(wifiConfiguration);
     }
 
+    if (networkId == -1) {
+      return false;
+    }
+    wifiManager.enableNetwork(networkId, /* disableOthers= */ false);
+    return true;
+  }
 }
