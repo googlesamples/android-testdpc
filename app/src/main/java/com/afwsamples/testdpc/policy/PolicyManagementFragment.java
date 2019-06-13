@@ -2102,8 +2102,13 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 .show();
     }
 
-    @TargetApi(VERSION_CODES.M)
+    @TargetApi(VERSION_CODES.N)
     private void loadAppFeedbackNotifications() {
+        if (Util.SDK_INT < VERSION_CODES.N) {
+            // This toggle is only available >= N due to device_policy_header.xml
+            // so this code not executing will not be noticed
+            return;
+        }
         mEnableAppFeedbackNotificationsPreference.setChecked(
             PreferenceManager.getDefaultSharedPreferences(getContext())
                 .getBoolean(getString(R.string.app_feedback_notifications), false));
