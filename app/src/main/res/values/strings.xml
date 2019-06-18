@@ -1096,4 +1096,47 @@
     <string name="vpn_exempted_packages">Exempted packages</string>
     <string name="vpn_lockdown">Lockdown</string>
 
+    <!-- This string is the title of a screen asking user how to set device up.
+
+      This screen will be shown if the user sets device up with a managed account, and we believe that the user may want to set up a managed profile rather than a managed device.[CHAR LIMIT=100] -->
+    <string name="selector_title">How will you use this phone?</string>
+    <!-- This string is the subtitle of a screen for setting up a managed device.
+
+          This screen will be shown if the user sets device up with a managed account, and we believe that the user may want to set up a managed profile rather than a managed device.[CHAR LIMIT=100] -->
+    <string name="do_selection_subtitle">Work</string>
+    <!-- This string is the detailed text of a screen for setting up a managed device, giving user more info on how their device will behave in this mode.
+
+        Text bullets that are part of a list. They describe one of the options a user can choose when setting up their new device, which would be to have their organization manage their entire device. That means that the data on the device won't be private (it will be visible to their IT admin), and it can be erased at any time.[CHAR LIMIT=200] -->
+    <string name="do_selection_detailed_text">
+        <li>This phone will be managed by your IT admin</li>\n\n
+        <li>Your data won\'t be private and can be erased at any time</li>
+    </string>
+    <!-- This string is for the button for setting up a managed device.
+
+        This screen will be shown if the user sets device up with a managed account, and we believe that the user may want to set up a managed profile rather than a managed device.[CHAR LIMIT=50] -->
+    <string name="do_selection_button_text">Use for work only</string>
+
+
+    <!-- This string is the subtitle of a screen for setting up a managed profile.
+
+          This screen will be shown if the user sets device up with a managed account, and we believe that the user may want to set up a managed profile rather than a managed device.[CHAR LIMIT=100] -->
+    <string name="po_selection_subtitle">Work and Personal</string>
+    <!-- This string is the detailed text of a screen for setting up a managed profile, giving user more info on how their device will behave in this mode.
+
+        This screen will be shown if the user sets device up with a managed account, and we believe that the user may want to set up a managed profile rather than a managed device.[CHAR LIMIT=200] -->
+    <string name="po_selection_detailed_text">
+        <li>Your work data will be kept in a separate profile</li>\n\n
+        <li>Your personal data stays private</li>
+    </string>
+    <!-- This string is for the button for setting up a managed profile.
+
+        This screen will be shown if the user sets device up with a managed account, and we believe that the user may want to set up a managed profile rather than a managed device.[CHAR LIMIT=50] -->
+    <string name="po_selection_button_text">Use for work &amp; personal</string>
+
+
+    <!-- This string is the text shown to divide the two options shown on the mode selection screen.
+
+        This screen will be shown if the user sets device up with a managed account, and we believe that the user may want to set up a managed profile rather than a managed device.[CHAR LIMIT=100] -->
+    <string name="selection_divider_text">or</string>
+
 </resources>

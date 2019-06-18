@@ -25,7 +25,6 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.robolectric.Shadows.shadowOf;
 
 import android.os.Build.VERSION_CODES;
-import android.widget.RadioButton;
 import androidx.test.core.app.ActivityScenario;
 import com.afwsamples.testdpc.R;
 import org.junit.Test;
@@ -39,12 +38,9 @@ import org.robolectric.annotation.Config;
 public class DpcLoginActivityTest {
 
   @Test
-  public void onNavigateNext_poRadioBoxSelected_shouldFinishWithCorrectIntent() {
+  public void onPoButtonClick_shouldFinishWithCorrectIntent() {
     ActivityScenario.launch(DpcLoginActivity.class).onActivity(activity -> {
-      RadioButton dpcLoginPo = activity.findViewById(R.id.dpc_login_po);
-      dpcLoginPo.setChecked(true);
-
-      activity.findViewById(R.id.suw_navbar_next).performClick();
+      activity.findViewById(R.id.po_selection_button).performClick();
 
       assertThat(shadowOf(activity).getResultCode()).isEqualTo(RESULT_OK);
       assertThat(shadowOf(activity).getResultIntent().getIntExtra(EXTRA_PROVISIONING_MODE, -1))
@@ -53,12 +49,9 @@ public class DpcLoginActivityTest {
   }
 
   @Test
-  public void onNavigateNext_doRadioBoxSelected_shouldFinishWithCorrectIntent() {
+  public void onDoButtonClick_shouldFinishWithCorrectIntent() {
     ActivityScenario.launch(DpcLoginActivity.class).onActivity(activity -> {
-      RadioButton dpcLoginDo = activity.findViewById(R.id.dpc_login_do);
-      dpcLoginDo.setChecked(true);
-
-      activity.findViewById(R.id.suw_navbar_next).performClick();
+      activity.findViewById(R.id.do_selection_button).performClick();
 
       assertThat(shadowOf(activity).getResultCode()).isEqualTo(RESULT_OK);
       assertThat(shadowOf(activity).getResultIntent().getIntExtra(EXTRA_PROVISIONING_MODE, -1))

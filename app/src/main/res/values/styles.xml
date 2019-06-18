@@ -25,6 +25,11 @@
         <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
     </style>
 
+    <style name="DpcLoginTheme" parent="AppTheme">
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
+
     <style name="contentContainer">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">match_parent</item>
@@ -86,5 +91,23 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_marginTop">8dp</item>
         <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="SelectionTitle">
+        <item name="android:textSize">@dimen/selection_detailed_title_size</item>
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+    </style>
+
+    <style name="SelectionDesc">
+        <item name="android:textSize">@dimen/selection_detailed_text_size</item>
+        <item name="android:textColor">@color/light_gray</item>
+        <item name="android:paddingTop">@dimen/selection_detailed_text_padding_top</item>
+        <item name="android:paddingBottom">@dimen/selection_detailed_text_padding_bottom</item>
+    </style>
+
+    <style name="SelectionButton" parent="SuwGlifButton.Primary">
+        <item name="android:textSize">@dimen/selection_detailed_title_size</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textColor">@android:color/white</item>
     </style>
 </resources>

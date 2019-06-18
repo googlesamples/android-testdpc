@@ -24,9 +24,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.RadioGroup;
+import android.widget.LinearLayout;
 import com.afwsamples.testdpc.R;
-import com.android.setupwizardlib.GlifLayout;
 
 /**
  * Activity that gets launched by the
@@ -34,39 +33,37 @@ import com.android.setupwizardlib.GlifLayout;
  */
 public class DpcLoginActivity extends Activity {
 
-    @Override
-    public void onCreate(Bundle icicle) {
-        super.onCreate(icicle);
-        setContentView(R.layout.activity_dpc_login);
-        GlifLayout layout = findViewById(R.id.dpc_login);
-        layout.findViewById(R.id.suw_navbar_next).setOnClickListener(this::onNavigateNext);
-    }
+  @Override
+  public void onCreate(Bundle icicle) {
+    super.onCreate(icicle);
+    setContentView(R.layout.activity_dpc_login);
+    final LinearLayout layout = findViewById(R.id.dpc_login);
+    layout.findViewById(R.id.do_selection_button).setOnClickListener(this::onDoButtonClick);
+    layout.findViewById(R.id.po_selection_button).setOnClickListener(this::onPoButtonClick);
+  }
 
-    @Override
-    public void onBackPressed() {
-        setResult(RESULT_CANCELED);
-        super.onBackPressed();
-    }
+  @Override
+  public void onBackPressed() {
+    setResult(RESULT_CANCELED);
+    super.onBackPressed();
+  }
 
-    private void onNavigateNext(View nextButton) {
-        final Intent intent = new Intent();
-        RadioGroup dpcLoginOptions = findViewById(R.id.dpc_login_options);
-        switch (dpcLoginOptions.getCheckedRadioButtonId()) {
-            case R.id.dpc_login_do:
-                intent.putExtra(EXTRA_PROVISIONING_MODE, PROVISIONING_MODE_FULLY_MANAGED_DEVICE);
-                finishWithIntent(intent);
-                return;
-            case R.id.dpc_login_po:
-                intent.putExtra(EXTRA_PROVISIONING_MODE, PROVISIONING_MODE_MANAGED_PROFILE);
-                finishWithIntent(intent);
-                return;
-            default:
-                finish();
-        }
-    }
+  private void onDoButtonClick(View button) {
+    final Intent intent = new Intent();
+    intent.putExtra(EXTRA_PROVISIONING_MODE, PROVISIONING_MODE_FULLY_MANAGED_DEVICE);
+    finishWithIntent(intent);
+    return;
+  }
 
-    private void finishWithIntent(Intent intent) {
-        setResult(RESULT_OK, intent);
-        finish();
-    }
+  private void onPoButtonClick(View button) {
+    final Intent intent = new Intent();
+    intent.putExtra(EXTRA_PROVISIONING_MODE, PROVISIONING_MODE_MANAGED_PROFILE);
+    finishWithIntent(intent);
+    return;
+  }
+
+  private void finishWithIntent(Intent intent) {
+    setResult(RESULT_OK, intent);
+    finish();
+  }
 }

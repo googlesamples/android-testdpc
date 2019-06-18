@@ -100,7 +100,8 @@
 
         <activity android:name=".provision.DpcLoginActivity"
                 android:exported="true"
-                android:permission="android.permission.BIND_DEVICE_ADMIN">
+                android:permission="android.permission.BIND_DEVICE_ADMIN"
+                android:theme="@style/DpcLoginTheme">
             <intent-filter>
                 <action android:name="android.app.action.GET_PROVISIONING_MODE" />
                 <category android:name="android.intent.category.DEFAULT"/>
