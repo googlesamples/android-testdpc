@@ -169,8 +169,8 @@
             testdpc:delegation="delegation-keep-uninstalled-packages"
             testdpc:minSdkVersion="P" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
-            android:key="manage_app_restrictions"
-            android:title="@string/manage_app_restrictions"
+            android:key="managed_configurations"
+            android:title="@string/managed_configurations"
             testdpc:minSdkVersion="L"
             testdpc:delegation="delegation-app-restrictions" />
         <com.afwsamples.testdpc.common.preference.DpcPreference

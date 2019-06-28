@@ -125,7 +125,7 @@ import com.afwsamples.testdpc.policy.wifimanagement.WifiModificationFragment;
 import com.afwsamples.testdpc.profilepolicy.ProfilePolicyManagementFragment;
 import com.afwsamples.testdpc.profilepolicy.addsystemapps.EnableSystemAppsByIntentFragment;
 import com.afwsamples.testdpc.profilepolicy.apprestrictions.AppRestrictionsManagingPackageFragment;
-import com.afwsamples.testdpc.profilepolicy.apprestrictions.ManageAppRestrictionsFragment;
+import com.afwsamples.testdpc.profilepolicy.apprestrictions.ManagedConfigurationsFragment;
 import com.afwsamples.testdpc.profilepolicy.delegation.DelegationFragment;
 import com.afwsamples.testdpc.profilepolicy.permission.ManageAppPermissionsFragment;
 import com.afwsamples.testdpc.transferownership.PickTransferComponentFragment;
@@ -293,7 +293,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             = "install_nonmarket_apps";
     private static final String LOCK_SCREEN_POLICY_KEY = "lock_screen_policy";
     private static final String MANAGE_APP_PERMISSIONS_KEY = "manage_app_permissions";
-    private static final String MANAGE_APP_RESTRICTIONS_KEY = "manage_app_restrictions";
+    private static final String MANAGED_CONFIGURATIONS_KEY = "managed_configurations";
     private static final String MANAGED_PROFILE_SPECIFIC_POLICIES_KEY = "managed_profile_policies";
     private static final String MANAGE_LOCK_TASK_LIST_KEY = "manage_lock_task";
     private static final String MUTE_AUDIO_KEY = "mute_audio";
@@ -621,7 +621,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(UNSUSPEND_APPS_KEY).setOnPreferenceClickListener(this);
         findPreference(CLEAR_APP_DATA_KEY).setOnPreferenceClickListener(this);
         findPreference(KEEP_UNINSTALLED_PACKAGES).setOnPreferenceClickListener(this);
-        findPreference(MANAGE_APP_RESTRICTIONS_KEY).setOnPreferenceClickListener(this);
+        findPreference(MANAGED_CONFIGURATIONS_KEY).setOnPreferenceClickListener(this);
         findPreference(DISABLE_METERED_DATA_KEY).setOnPreferenceClickListener(this);
         findPreference(GENERIC_DELEGATION_KEY).setOnPreferenceClickListener(this);
         findPreference(APP_RESTRICTIONS_MANAGING_PACKAGE_KEY).setOnPreferenceClickListener(this);
@@ -959,8 +959,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             case KEEP_UNINSTALLED_PACKAGES:
                 showFragment(new ManageKeepUninstalledPackagesFragment());
                 return true;
-            case MANAGE_APP_RESTRICTIONS_KEY:
-                showFragment(new ManageAppRestrictionsFragment());
+            case MANAGED_CONFIGURATIONS_KEY:
+                showFragment(new ManagedConfigurationsFragment());
                 return true;
             case DISABLE_METERED_DATA_KEY:
                 showSetMeteredDataPrompt();
