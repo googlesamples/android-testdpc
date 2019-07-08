@@ -69,4 +69,7 @@
     <dimen name="selection_title_text_size">24sp</dimen>
     <dimen name="constraint_layout_margin">10dp</dimen>
     <dimen name="text_divider_height">1dp</dimen>
+
+    <!-- Dimens used for add account activity -->
+    <dimen name="add_account_option_height">48dp</dimen>
 </resources>
