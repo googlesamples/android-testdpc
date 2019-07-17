@@ -540,7 +540,7 @@
     <string name="use_strongbox_checkbox">Use StrongBox</string>
 
     <!-- Strings for app restrictions -->
-    <string name="manage_app_restrictions">Manage app restrictions</string>
+    <string name="managed_configurations">Managed configurations</string>
     <string name="define_bundle">Define bundle</string>
     <string name="define_bundle_array">Define bundle array</string>
     <string name="load_manifest_restrictions">Load manifest restrictions</string>
