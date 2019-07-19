@@ -27,6 +27,7 @@ import android.accounts.OperationCanceledException;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.ActivityOptions;
 import android.app.AlertDialog;
 import android.app.DialogFragment;
@@ -750,8 +751,11 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         if (Util.SDK_INT < VERSION_CODES.O) {
             return false;
         }
+
         DevicePolicyManager dpm = getActivity().getSystemService(DevicePolicyManager.class);
-        return !dpm.getDelegatedScopes(null, getActivity().getPackageName()).isEmpty();
+        List<String> scopes = dpm.getDelegatedScopes(null, getActivity().getPackageName());
+
+        return scopes == null ? false : !scopes.isEmpty();
     }
 
     @Override
@@ -2206,7 +2210,15 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         if (mAutoBrightnessPreference.isEnabled()) {
             final String brightnessMode = Settings.System.getString(
                     getActivity().getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE);
-            mAutoBrightnessPreference.setChecked(Integer.parseInt(brightnessMode) == 1);
+            mAutoBrightnessPreference.setChecked(parseInt(brightnessMode, /* defaultValue= */ 0) == 1);
+        }
+    }
+
+    static private int parseInt(String str, int defaultValue) {
+        try {
+            return Integer.parseInt(str);
+        } catch (NumberFormatException e) {
+            return defaultValue;
         }
     }
 
@@ -3323,8 +3335,15 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     @TargetApi(VERSION_CODES.P)
     private void relaunchInLockTaskMode() {
+        ActivityManager activityManager = getContext().getSystemService(ActivityManager.class);
+
         final Intent intent = new Intent(getActivity(), getActivity().getClass());
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        // Ensure a new task is actually created if not already running in lock task mode
+        if (!activityManager.isInLockTaskMode()){
+            intent.addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+        }
 
         final ActivityOptions options = ActivityOptions.makeBasic();
         options.setLockTaskEnabled(true);
