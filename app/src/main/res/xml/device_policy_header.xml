@@ -522,6 +522,11 @@
             android:title="@string/system_update_pending"
             testdpc:admin="deviceOwner|profileOwner"
             testdpc:minSdkVersion="O" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="managed_system_updates"
+            android:title="@string/install_update"
+            testdpc:admin="deviceOwner"
+            testdpc:minSdkVersion="Q" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/user_management">
@@ -721,10 +726,4 @@
             testdpc:admin="any"
             testdpc:minSdkVersion="P" />
     </PreferenceCategory>
-
-    <com.afwsamples.testdpc.common.preference.DpcPreference
-        android:key="managed_system_updates"
-        android:title="@string/install_update"
-        testdpc:admin="deviceOwner"
-        testdpc:minSdkVersion="Q" />
 </PreferenceScreen>
