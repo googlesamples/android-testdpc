@@ -39,13 +39,15 @@ import org.robolectric.shadows.ShadowLog;
 @Config(minSdk = VERSION_CODES.M)
 public class PermissionsHelperTest {
 
-  private final Context context = RuntimeEnvironment.application;
-  private final DevicePolicyManager devicePolicyManager =
+  private static final ComponentName TESTDPC_ADMIN =
+      new ComponentName("com.afwsamples.testdpc", "TestCls");
+  private static final ComponentName NON_TESTDPC_ADMIN =
+      new ComponentName("TestPkg", "TestCls");
+
+  private final Context mContext = RuntimeEnvironment.application;
+  private final DevicePolicyManager mDevicePolicyManager =
       (DevicePolicyManager) ApplicationProvider.getApplicationContext()
           .getSystemService(Context.DEVICE_POLICY_SERVICE);
-  private final ComponentName testDpcAdmin =
-      new ComponentName("com.afwsamples.testdpc", "TestCls");
-  private final ComponentName nonTestDpcAdmin = new ComponentName("TestPkg", "TestCls");
 
   // Permission protection levels should be defined by the framework/shadows and should not be set
   // by the tests, however this is not the case now
@@ -57,7 +59,7 @@ public class PermissionsHelperTest {
   @Test
   public void ensureRequiredPermissions_ifPermissionMissingFromManifest_shouldReturnFalseAndLogError() {
     boolean requiredPermissionsGranted = PermissionsHelper
-        .ensureRequiredPermissions(new String[]{MISSING_PERMISSION}, nonTestDpcAdmin, context);
+        .ensureRequiredPermissions(new String[]{MISSING_PERMISSION}, NON_TESTDPC_ADMIN, mContext);
 
     assertFalse(requiredPermissionsGranted);
     assertTrue(ShadowLog.getLogsForTag(PermissionsHelper.TAG).get(0).msg
@@ -67,67 +69,67 @@ public class PermissionsHelperTest {
   @Test
   public void ensureRequiredPermissions_ifPermissionIsDangerousAndDpcIsProfileOwner_shouldReturnTrueAndSetPermissionGrantState() {
     addPermissionInfo(DANGEROUS_PERMISSION, PermissionInfo.PROTECTION_DANGEROUS);
-    shadowOf(devicePolicyManager).setProfileOwner(testDpcAdmin);
+    shadowOf(mDevicePolicyManager).setProfileOwner(TESTDPC_ADMIN);
 
     boolean requiredPermissionsGranted = PermissionsHelper
-        .ensureRequiredPermissions(new String[]{DANGEROUS_PERMISSION}, testDpcAdmin, context);
+        .ensureRequiredPermissions(new String[]{DANGEROUS_PERMISSION}, TESTDPC_ADMIN, mContext);
 
     assertTrue(requiredPermissionsGranted);
-    assertThat(devicePolicyManager
-        .getPermissionGrantState(testDpcAdmin, context.getPackageName(), DANGEROUS_PERMISSION))
+    assertThat(mDevicePolicyManager
+        .getPermissionGrantState(TESTDPC_ADMIN, mContext.getPackageName(), DANGEROUS_PERMISSION))
         .isEqualTo(DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED);
   }
 
   @Test
   public void ensureRequiredPermissions_ifPermissionIsDangerousAndDpcIsDeviceOwner_shouldReturnTrueAndSetPermissionGrantState() {
     addPermissionInfo(DANGEROUS_PERMISSION, PermissionInfo.PROTECTION_DANGEROUS);
-    shadowOf(devicePolicyManager).setDeviceOwner(testDpcAdmin);
+    shadowOf(mDevicePolicyManager).setDeviceOwner(TESTDPC_ADMIN);
 
     boolean requiredPermissionsGranted = PermissionsHelper
-        .ensureRequiredPermissions(new String[]{DANGEROUS_PERMISSION}, testDpcAdmin, context);
+        .ensureRequiredPermissions(new String[]{DANGEROUS_PERMISSION}, TESTDPC_ADMIN, mContext);
 
     assertTrue(requiredPermissionsGranted);
-    assertThat(devicePolicyManager
-        .getPermissionGrantState(testDpcAdmin, context.getPackageName(), DANGEROUS_PERMISSION))
+    assertThat(mDevicePolicyManager
+        .getPermissionGrantState(TESTDPC_ADMIN, mContext.getPackageName(), DANGEROUS_PERMISSION))
         .isEqualTo(DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED);
   }
 
   @Test
   public void ensureRequiredPermissions_ifPermissionIsDangerousAndPermissionGrantStateIsAlreadySet_shouldReturnTrue() {
     addPermissionInfo(DANGEROUS_PERMISSION, PermissionInfo.PROTECTION_DANGEROUS);
-    shadowOf(devicePolicyManager).setProfileOwner(testDpcAdmin);
-    devicePolicyManager.setPermissionGrantState(
-        testDpcAdmin,
-        context.getPackageName(),
+    shadowOf(mDevicePolicyManager).setProfileOwner(TESTDPC_ADMIN);
+    mDevicePolicyManager.setPermissionGrantState(
+        TESTDPC_ADMIN,
+        mContext.getPackageName(),
         DANGEROUS_PERMISSION,
         DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED);
 
     boolean requiredPermissionsGranted = PermissionsHelper
-        .ensureRequiredPermissions(new String[]{DANGEROUS_PERMISSION}, testDpcAdmin, context);
+        .ensureRequiredPermissions(new String[]{DANGEROUS_PERMISSION}, TESTDPC_ADMIN, mContext);
 
     assertTrue(requiredPermissionsGranted);
-    assertThat(devicePolicyManager
-        .getPermissionGrantState(testDpcAdmin, context.getPackageName(), DANGEROUS_PERMISSION))
+    assertThat(mDevicePolicyManager
+        .getPermissionGrantState(TESTDPC_ADMIN, mContext.getPackageName(), DANGEROUS_PERMISSION))
         .isEqualTo(DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED);
   }
 
   @Test
   public void ensureRequiredPermissions_ifPermissionIsDangerousAndDpcIsNotOwner_shouldReturnFalse() {
     addPermissionInfo(DANGEROUS_PERMISSION, PermissionInfo.PROTECTION_DANGEROUS);
-    shadowOf(devicePolicyManager).setProfileOwner(nonTestDpcAdmin);
+    shadowOf(mDevicePolicyManager).setProfileOwner(NON_TESTDPC_ADMIN);
 
     boolean requiredPermissionsGranted = PermissionsHelper
-        .ensureRequiredPermissions(new String[]{DANGEROUS_PERMISSION}, nonTestDpcAdmin, context);
+        .ensureRequiredPermissions(new String[]{DANGEROUS_PERMISSION}, NON_TESTDPC_ADMIN, mContext);
 
     assertFalse(requiredPermissionsGranted);
   }
 
   @Test
   public void ensureRequiredPermissions_ifPermissionInfoNotFound_shouldReturnTrueAndLogError() {
-    shadowOf(devicePolicyManager).setProfileOwner(testDpcAdmin);
+    shadowOf(mDevicePolicyManager).setProfileOwner(TESTDPC_ADMIN);
 
     boolean requiredPermissionsGranted = PermissionsHelper
-        .ensureRequiredPermissions(new String[]{MISSING_INFO_PERMISSION}, testDpcAdmin, context);
+        .ensureRequiredPermissions(new String[]{MISSING_INFO_PERMISSION}, TESTDPC_ADMIN, mContext);
 
     assertTrue(requiredPermissionsGranted);
     assertTrue(ShadowLog.getLogsForTag(PermissionsHelper.TAG).get(0).msg
@@ -137,14 +139,14 @@ public class PermissionsHelperTest {
   @Test
   public void ensureRequiredPermissions_ifPermissionIsNormal_shouldReturnTrueAndNotSetPermissionGrantState() {
     addPermissionInfo(NORMAL_PERMISSION, PermissionInfo.PROTECTION_NORMAL);
-    shadowOf(devicePolicyManager).setProfileOwner(testDpcAdmin);
+    shadowOf(mDevicePolicyManager).setProfileOwner(TESTDPC_ADMIN);
 
     boolean requiredPermissionsGranted = PermissionsHelper
-        .ensureRequiredPermissions(new String[]{NORMAL_PERMISSION}, testDpcAdmin, context);
+        .ensureRequiredPermissions(new String[]{NORMAL_PERMISSION}, TESTDPC_ADMIN, mContext);
 
     assertTrue(requiredPermissionsGranted);
-    assertThat(devicePolicyManager
-        .getPermissionGrantState(testDpcAdmin, context.getPackageName(), NORMAL_PERMISSION))
+    assertThat(mDevicePolicyManager
+        .getPermissionGrantState(TESTDPC_ADMIN, mContext.getPackageName(), NORMAL_PERMISSION))
         .isEqualTo(DevicePolicyManager.PERMISSION_GRANT_STATE_DEFAULT);
   }
 
@@ -152,18 +154,18 @@ public class PermissionsHelperTest {
   public void ensureRequiredPermissions_ifAllPermissionsAreGranted_shouldReturnTrue() {
     addPermissionInfo(NORMAL_PERMISSION, PermissionInfo.PROTECTION_NORMAL);
     addPermissionInfo(DANGEROUS_PERMISSION, PermissionInfo.PROTECTION_DANGEROUS);
-    shadowOf(devicePolicyManager).setProfileOwner(testDpcAdmin);
+    shadowOf(mDevicePolicyManager).setProfileOwner(TESTDPC_ADMIN);
 
     boolean requiredPermissionsGranted = PermissionsHelper
         .ensureRequiredPermissions(new String[]{NORMAL_PERMISSION, DANGEROUS_PERMISSION},
-            testDpcAdmin, context);
+            TESTDPC_ADMIN, mContext);
 
     assertTrue(requiredPermissionsGranted);
-    assertThat(devicePolicyManager
-        .getPermissionGrantState(testDpcAdmin, context.getPackageName(), NORMAL_PERMISSION))
+    assertThat(mDevicePolicyManager
+        .getPermissionGrantState(TESTDPC_ADMIN, mContext.getPackageName(), NORMAL_PERMISSION))
         .isEqualTo(DevicePolicyManager.PERMISSION_GRANT_STATE_DEFAULT);
-    assertThat(devicePolicyManager
-        .getPermissionGrantState(testDpcAdmin, context.getPackageName(), DANGEROUS_PERMISSION))
+    assertThat(mDevicePolicyManager
+        .getPermissionGrantState(TESTDPC_ADMIN, mContext.getPackageName(), DANGEROUS_PERMISSION))
         .isEqualTo(DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED);
   }
 
@@ -171,11 +173,11 @@ public class PermissionsHelperTest {
   public void ensureRequiredPermissions_ifAtLeastOnePermissionNotGranted_shouldReturnFalse() {
     addPermissionInfo(NORMAL_PERMISSION, PermissionInfo.PROTECTION_NORMAL);
     addPermissionInfo(DANGEROUS_PERMISSION, PermissionInfo.PROTECTION_DANGEROUS);
-    shadowOf(devicePolicyManager).setProfileOwner(nonTestDpcAdmin);
+    shadowOf(mDevicePolicyManager).setProfileOwner(NON_TESTDPC_ADMIN);
 
     boolean requiredPermissionsGranted = PermissionsHelper
         .ensureRequiredPermissions(new String[]{NORMAL_PERMISSION, DANGEROUS_PERMISSION},
-            nonTestDpcAdmin, context);
+            NON_TESTDPC_ADMIN, mContext);
 
     assertFalse(requiredPermissionsGranted);
   }
@@ -184,7 +186,7 @@ public class PermissionsHelperTest {
     PermissionInfo permissionInfo = new PermissionInfo();
     permissionInfo.name = permission;
     permissionInfo.protectionLevel = protectionLevel;
-    shadowOf(context.getPackageManager()).addPermissionInfo(permissionInfo);
+    shadowOf(mContext.getPackageManager()).addPermissionInfo(permissionInfo);
   }
 
 }

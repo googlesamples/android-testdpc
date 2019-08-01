@@ -78,28 +78,28 @@ public class AppStatesServiceTest {
   private static final ReceivedKeyedAppState INFO_STATE = STATE1;
   private static final ReceivedKeyedAppState ERROR_STATE = STATE2;
 
-  private final Context context = RuntimeEnvironment.application;
-  private final SharedPreferences preferences =
-      PreferenceManager.getDefaultSharedPreferences(context);
-  private final NotificationManager notificationManager =
-    context.getSystemService(NotificationManager.class);
-  private final AppStatesService service =
+  private final Context mContext = RuntimeEnvironment.application;
+  private final SharedPreferences mPreferences =
+      PreferenceManager.getDefaultSharedPreferences(mContext);
+  private final NotificationManager mNotificationManager =
+    mContext.getSystemService(NotificationManager.class);
+  private final AppStatesService mService =
     Robolectric.buildService(AppStatesService.class).get();
 
   @Test
   public void onReceive_shouldNotNotify_noNotification() {
     setNotificationPreference(false);
 
-    service.onReceive(Arrays.asList(STATE1), /* requestSync= */ false);
+    mService.onReceive(Arrays.asList(STATE1), /* requestSync= */ false);
 
-    assertThat(shadowOf(notificationManager).getActiveNotifications()).isEmpty();
+    assertThat(shadowOf(mNotificationManager).getActiveNotifications()).isEmpty();
   }
 
   @Test
   public void onReceive_shouldNotNotify_noLogs() {
     setNotificationPreference(false);
 
-    service.onReceive(Arrays.asList(STATE1), /* requestSync= */ false);
+    mService.onReceive(Arrays.asList(STATE1), /* requestSync= */ false);
 
     assertThat(ShadowLog.getLogsForTag(AppStatesService.TAG)).isEmpty();
   }
@@ -108,7 +108,7 @@ public class AppStatesServiceTest {
   public void onReceive_shouldNotify_logContainsRequiredInformation() {
     setNotificationPreference(true);
 
-    service.onReceive(Arrays.asList(STATE1), /* requestSync= */ false);
+    mService.onReceive(Arrays.asList(STATE1), /* requestSync= */ false);
 
     assertThatLogContainsRequiredInformation(
         ShadowLog.getLogsForTag(AppStatesService.TAG).get(0), STATE1);
@@ -127,7 +127,7 @@ public class AppStatesServiceTest {
   public void onReceive_infoLog_shouldNotify_logIsInfoLevel() {
     setNotificationPreference(true);
 
-    service.onReceive(Arrays.asList(INFO_STATE), /* requestSync= */ false);
+    mService.onReceive(Arrays.asList(INFO_STATE), /* requestSync= */ false);
 
     assertThat(ShadowLog.getLogsForTag(AppStatesService.TAG).get(0).type).isEqualTo(INFO);
   }
@@ -136,7 +136,7 @@ public class AppStatesServiceTest {
   public void onReceive_errorLog_shouldNotify_logIsErrorLevel() {
     setNotificationPreference(true);
 
-    service.onReceive(Arrays.asList(ERROR_STATE), /* requestSync= */ false);
+    mService.onReceive(Arrays.asList(ERROR_STATE), /* requestSync= */ false);
 
     assertThat(ShadowLog.getLogsForTag(AppStatesService.TAG).get(0).type).isEqualTo(ERROR);
   }
@@ -145,7 +145,7 @@ public class AppStatesServiceTest {
   public void onReceive_shouldNotify_noRequestSync_logDoesNotContainRequestSync() {
     setNotificationPreference(true);
 
-    service.onReceive(Arrays.asList(STATE1), /* requestSync= */ false);
+    mService.onReceive(Arrays.asList(STATE1), /* requestSync= */ false);
 
     ShadowLog.LogItem logItem = ShadowLog.getLogsForTag(AppStatesService.TAG).get(0);
     assertThat(logItem.msg).doesNotContain(REQUEST_SYNC_LOG_TEXT);
@@ -155,7 +155,7 @@ public class AppStatesServiceTest {
   public void onReceive_shouldNotify_requestSync_logContainsRequestSync() {
     setNotificationPreference(true);
 
-    service.onReceive(Arrays.asList(STATE1), /* requestSync= */ true);
+    mService.onReceive(Arrays.asList(STATE1), /* requestSync= */ true);
 
     ShadowLog.LogItem logItem = ShadowLog.getLogsForTag(AppStatesService.TAG).get(0);
     assertThat(logItem.msg).contains(REQUEST_SYNC_LOG_TEXT);
@@ -165,7 +165,7 @@ public class AppStatesServiceTest {
   public void onReceive_shouldNotify_oneLogPerState() {
     setNotificationPreference(true);
 
-    service.onReceive(Arrays.asList(STATE1, STATE2), /* requestSync= */ false);
+    mService.onReceive(Arrays.asList(STATE1, STATE2), /* requestSync= */ false);
 
     assertThat(ShadowLog.getLogsForTag(AppStatesService.TAG)).hasSize(2);
   }
@@ -174,10 +174,10 @@ public class AppStatesServiceTest {
   public void onReceive_shouldNotify_notificationContainsRequiredInformation() {
     setNotificationPreference(true);
 
-    service.onReceive(Arrays.asList(STATE1), /* requestSync= */ false);
+    mService.onReceive(Arrays.asList(STATE1), /* requestSync= */ false);
 
     assertThatNotificationContainsRequiredInformation(
-        shadowOf(notificationManager).getAllNotifications().get(0),
+        shadowOf(mNotificationManager).getAllNotifications().get(0),
         STATE1
     );
   }
@@ -196,9 +196,9 @@ public class AppStatesServiceTest {
   public void onReceive_infoLog_shouldNotify_notificationTitleIncludesInfo() {
     setNotificationPreference(true);
 
-    service.onReceive(Arrays.asList(INFO_STATE), /* requestSync= */ false);
+    mService.onReceive(Arrays.asList(INFO_STATE), /* requestSync= */ false);
 
-    final Notification notification = shadowOf(notificationManager).getAllNotifications().get(0);
+    final Notification notification = shadowOf(mNotificationManager).getAllNotifications().get(0);
     assertThat(
         shadowOf(notification).getContentTitle().toString()).contains("INFO");
   }
@@ -207,9 +207,9 @@ public class AppStatesServiceTest {
   public void onReceive_errorLog_shouldNotify_notificationTitleIncludesError() {
     setNotificationPreference(true);
 
-    service.onReceive(Arrays.asList(ERROR_STATE), /* requestSync= */ false);
+    mService.onReceive(Arrays.asList(ERROR_STATE), /* requestSync= */ false);
 
-    final Notification notification = shadowOf(notificationManager).getAllNotifications().get(0);
+    final Notification notification = shadowOf(mNotificationManager).getAllNotifications().get(0);
     assertThat(
         shadowOf(notification).getContentTitle().toString()).contains("ERROR");
   }
@@ -218,9 +218,9 @@ public class AppStatesServiceTest {
   public void onReceive_shouldNotify_noRequestSync_notificationDoesNotContainRequestSync() {
     setNotificationPreference(true);
 
-    service.onReceive(Arrays.asList(STATE1), /* requestSync= */ false);
+    mService.onReceive(Arrays.asList(STATE1), /* requestSync= */ false);
 
-    final Notification notification = shadowOf(notificationManager).getAllNotifications().get(0);
+    final Notification notification = shadowOf(mNotificationManager).getAllNotifications().get(0);
     assertThat(
         shadowOf(notification).getContentText().toString()).doesNotContain(REQUEST_SYNC_LOG_TEXT);
   }
@@ -229,9 +229,9 @@ public class AppStatesServiceTest {
   public void onReceive_shouldNotify_requestSync_notificationContainsRequestSync() {
     setNotificationPreference(true);
 
-    service.onReceive(Arrays.asList(STATE1), /* requestSync= */ true);
+    mService.onReceive(Arrays.asList(STATE1), /* requestSync= */ true);
 
-    final Notification notification = shadowOf(notificationManager).getAllNotifications().get(0);
+    final Notification notification = shadowOf(mNotificationManager).getAllNotifications().get(0);
     assertThat(shadowOf(notification).getContentText().toString()).contains(REQUEST_SYNC_LOG_TEXT);
   }
 
@@ -239,34 +239,34 @@ public class AppStatesServiceTest {
   public void onReceive_shouldNotify_oneNotificationPerKey() {
     setNotificationPreference(true);
 
-    service.onReceive(Arrays.asList(STATE1, STATE2), /* requestSync= */ false);
+    mService.onReceive(Arrays.asList(STATE1, STATE2), /* requestSync= */ false);
 
-    assertThat(shadowOf(notificationManager).getAllNotifications()).hasSize(2);
+    assertThat(shadowOf(mNotificationManager).getAllNotifications()).hasSize(2);
   }
 
   @Test
   public void onReceive_multiple_shouldNotify_oneNotificationPerKey() {
     setNotificationPreference(true);
-    service.onReceive(Arrays.asList(STATE1), /* requestSync= */ false);
+    mService.onReceive(Arrays.asList(STATE1), /* requestSync= */ false);
 
-    service.onReceive(Arrays.asList(STATE2), /* requestSync= */ false);
+    mService.onReceive(Arrays.asList(STATE2), /* requestSync= */ false);
 
-    assertThat(shadowOf(notificationManager).getAllNotifications()).hasSize(2);
+    assertThat(shadowOf(mNotificationManager).getAllNotifications()).hasSize(2);
   }
 
   @Test
   public void onReceive_shouldNotify_sameKeyUpdatesNotification() {
     setNotificationPreference(true);
-    service.onReceive(Arrays.asList(STATE1), /* requestSync= */ false);
+    mService.onReceive(Arrays.asList(STATE1), /* requestSync= */ false);
 
-    service.onReceive(Arrays.asList(STATE1_DIFFERENT_MESSAGE), /* requestSync= */ false);
+    mService.onReceive(Arrays.asList(STATE1_DIFFERENT_MESSAGE), /* requestSync= */ false);
 
-    assertThat(shadowOf(notificationManager).getAllNotifications()).hasSize(1);
+    assertThat(shadowOf(mNotificationManager).getAllNotifications()).hasSize(1);
   }
 
   private void setNotificationPreference(boolean shouldNotify) {
-    preferences.edit()
-        .putBoolean(context.getString(R.string.app_feedback_notifications), shouldNotify)
+    mPreferences.edit()
+        .putBoolean(mContext.getString(R.string.app_feedback_notifications), shouldNotify)
         .commit();
   }
 }
