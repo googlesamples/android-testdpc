@@ -260,12 +260,18 @@ public class DpcPreferenceHelper {
 
     private List<String> getCurrentDelegations() {
         if (Util.SDK_INT < VERSION_CODES.O) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
+
+        if (!Util.isDeviceOwner(mContext) && !Util.isProfileOwner(mContext)) {
+            return Collections.emptyList();
+        }
+
         final DevicePolicyManager dpm =
                 (DevicePolicyManager) mContext.getSystemService(Context.DEVICE_POLICY_SERVICE);
         final String packageName = mContext.getPackageName();
-            return dpm.getDelegatedScopes(null, packageName);
+        return dpm.getDelegatedScopes(null, packageName);
+
     }
 
     private int getCurrentUser() {
@@ -289,6 +295,10 @@ public class DpcPreferenceHelper {
     }
 
     private boolean hasDelegation(List<String> delegations) {
+        if (mDelegationConstraint == null) {
+            return false;
+        }
+
         return delegations.contains(mDelegationConstraint);
     }
 
