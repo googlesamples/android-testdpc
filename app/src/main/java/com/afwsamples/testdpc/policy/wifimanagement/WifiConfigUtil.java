@@ -32,29 +32,38 @@ public class WifiConfigUtil {
     public static boolean saveWifiConfiguration(Context context, WifiConfiguration
             wifiConfiguration) {
         WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-        final int networkId;
-
         if (wifiConfiguration.networkId == -1) {
             // new wifi configuration, add it and then save it.
-            networkId = wifiManager.addNetwork(wifiConfiguration);
+            int networkId = wifiManager.addNetwork(wifiConfiguration);
+            if (networkId != -1) {
+                // WifiManager.saveConfiguration() deprecated on API 26
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                    // Added successfully, try to save it now.
+                    if (wifiManager.saveConfiguration()) {
+                        return true;
+                    } else {
+                        // Remove the added network that fail to save.
+                        wifiManager.removeNetwork(networkId);
+                    }
+                } else {
+                    return true;
+                }
+            }
         } else {
             // existing wifi configuration, update it and then save it.
-            networkId = wifiManager.updateNetwork(wifiConfiguration);
+            int networkId = wifiManager.updateNetwork(wifiConfiguration);
+            if (networkId != -1) {
+                // WifiManager.saveConfiguration() deprecated on API 26
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                    if (wifiManager.saveConfiguration()) {
+                        return true;
+                    }
+                } else {
+                    return true;
+                }
+            }
         }
-
-        if (networkId == -1) {
-            return false;
-        }
-
-        // Added successfully, try to save it now.
-        wifiManager.enableNetwork(networkId, /* disableOthers */ false);
-        if (wifiManager.saveConfiguration()) {
-            return true;
-        } else {
-            // Remove the added network that fail to save.
-            wifiManager.removeNetwork(networkId);
-            return false;
-        }
+        return false;
     }
 
 }
