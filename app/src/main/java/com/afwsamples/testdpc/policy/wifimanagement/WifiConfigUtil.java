@@ -19,33 +19,63 @@ package com.afwsamples.testdpc.policy.wifimanagement;
 import android.content.Context;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 
 public class WifiConfigUtil {
 
   /**
-   * Save or replace the wifi configuration.
+   * Save or replace the WiFi configuration.
    *
-   * @return success to add/replace the wifi configuration
+   * <p>Correctly 'saves' the network with the {@link WifiManager} pre-O, as required.
+   *
+   * @return whether it was successful.
    */
-  public static boolean saveWifiConfiguration(Context context, WifiConfiguration
-      wifiConfiguration) {
+  public static boolean saveWifiConfiguration(
+      Context context, WifiConfiguration wifiConfiguration) {
     WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-    final int networkId;
+    return wifiConfiguration.networkId == -1
+        ? addWifiNetwork(wifiManager, wifiConfiguration)
+        : updateWifiNetwork(wifiManager, wifiConfiguration);
+  }
 
-    // WifiManager deprecated APIs including #addNetwork, #updateNetwork, #enableNetwork are restricted to system apps and DPCs
-    // https://developer.android.com/preview/privacy/camera-connectivity#wifi-network-config-restrictions
-    if (wifiConfiguration.networkId == -1) {
-      // new wifi configuration, add it and then save it.
-      networkId = wifiManager.addNetwork(wifiConfiguration);
-    } else {
-      // existing wifi configuration, update it and then save it.
-      networkId = wifiManager.updateNetwork(wifiConfiguration);
-    }
-
+  private static boolean addWifiNetwork(
+      WifiManager wifiManager, WifiConfiguration wifiConfiguration) {
+    // WifiManager APIs are marked as deprecated but still explicitly supported for DPCs.
+    int networkId = wifiManager.addNetwork(wifiConfiguration);
     if (networkId == -1) {
       return false;
     }
-    wifiManager.enableNetwork(networkId, /* disableOthers= */ false);
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+      // Saving the configuration is required pre-O.
+      return saveAddedWifiConfiguration(wifiManager, networkId);
+    }
     return true;
+  }
+
+  private static boolean saveAddedWifiConfiguration(WifiManager wifiManager, int networkId) {
+    boolean saveConfigurationSuccess = wifiManager.saveConfiguration();
+    if (!saveConfigurationSuccess) {
+      wifiManager.removeNetwork(networkId);
+      return false;
+    }
+    return true;
+  }
+
+  private static boolean updateWifiNetwork(
+      WifiManager wifiManager, WifiConfiguration wifiConfiguration) {
+    // WifiManager APIs are marked as deprecated but still explicitly supported for DPCs.
+    int networkId = wifiManager.updateNetwork(wifiConfiguration);
+    if (networkId == -1) {
+      return false;
+    }
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+      // Saving the configuration is required pre-O.
+      return saveUpdatedWifiConfiguration(wifiManager);
+    }
+    return true;
+  }
+
+  private static boolean saveUpdatedWifiConfiguration(WifiManager wifiManager) {
+    return wifiManager.saveConfiguration();
   }
 }
