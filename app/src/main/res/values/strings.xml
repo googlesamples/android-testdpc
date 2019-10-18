@@ -1013,21 +1013,6 @@
     <string name="transfer_ownership_affiliated_complete_title">Transfer of affiliated profile ownership is complete</string>
     <string name="transfer_ownership_affiliated_complete_message">The transferred user is %1$s</string>
 
-    <!-- SafetyNet -->
-    <string name="safetynet_preference_title">SafetyNet</string>
-    <string name="attest_preference_title">SafetyNet Attestation</string>
-    <string name="attest_preference_summary">Checking Device Compatibility with SafetyNet</string>
-    <string name="safetynet_dialog_title">SafetyNet Attestation</string>
-    <string name="safetynet_dialog_msg_running">Running...</string>
-    <string name="cancel_safetynet_msg">Cancel SafetyNet Attestation</string>
-    <string name="safetynet_fail_to_run_api">Fail to run SafetyNet Attestation API</string>
-    <string name="safetynet_fail_reason_no_internet">Error: No Internet connecion</string>
-    <string name="safetynet_fail_reason_gmscore_upgrade">Error: Google Play Service is out of date</string>
-    <string name="safetynet_fail_reason_error_code">Error code: %1$d</string>
-    <string name="safetynet_fail_reason_invalid_jws">Invalid JWS response</string>
-    <string name="safetynet_running">Running&#8230; Please wait</string>
-    <string name="safetynet_verify_on_server">You should verify the response in your server.</string>
-
     <string name="request_to_set_new_password">Request user to set new password</string>
     <string name="request_to_set_new_password_with_complexity">Set new password and specify minimum complexity</string>
     <string name="request_to_set_profile_parent_new_password">Request user to set profile parent new password</string>

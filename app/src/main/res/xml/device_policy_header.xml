@@ -711,14 +711,6 @@
             testdpc:minSdkVersion="P" />
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="@string/safetynet_preference_title">
-        <com.afwsamples.testdpc.common.preference.DpcPreference
-            android:key="safetynet_attest"
-            android:summary="@string/attest_preference_summary"
-            android:title="@string/attest_preference_title"
-            testdpc:minSdkVersion="L" />
-    </PreferenceCategory>
-
     <PreferenceCategory android:title="@string/cross_profile_section">
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="cross_profile_apps"
