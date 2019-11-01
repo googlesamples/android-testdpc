@@ -939,6 +939,7 @@
     <string name="password_complexity_low">Low</string>
     <string name="password_complexity_medium">Medium</string>
     <string name="password_complexity_high">High</string>
+    <string name="password_complexity_profile_summary">Personal: %1$s, Work: %2$s</string>
 
     <string name="separate_challenge_title">Separate challenge</string>
     <string name="separate_challenge_summary">Separate challenge enabled: %s</string>

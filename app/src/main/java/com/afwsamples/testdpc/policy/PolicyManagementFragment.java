@@ -2179,8 +2179,18 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             return;
         }
 
-        int complexity = mDevicePolicyManager.getPasswordComplexity();
-        passwordComplexityPreference.setSummary(PASSWORD_COMPLEXITY.get(complexity));
+        String summary;
+        int complexity = PASSWORD_COMPLEXITY.get(mDevicePolicyManager.getPasswordComplexity());
+        if (Util.isManagedProfileOwner(getActivity()) && Util.SDK_INT >= Util.R_VERSION_CODE) {
+            DevicePolicyManager parentDpm
+                    = mDevicePolicyManager.getParentProfileInstance(mAdminComponentName);
+            int parentComplexity = PASSWORD_COMPLEXITY.get(parentDpm.getPasswordComplexity());
+            summary = String.format(getString(R.string.password_complexity_profile_summary),
+                    getString(parentComplexity), getString(complexity));
+        } else {
+            summary = getString(complexity);
+        }
+        passwordComplexityPreference.setSummary(summary);
     }
 
     @TargetApi(VERSION_CODES.N)
