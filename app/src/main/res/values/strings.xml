@@ -139,6 +139,8 @@
     <string name="persistent_device_owner_state_hint">Test state to be restored alongside the device owner after factory reset.</string>
     <string name="set_persistent_device_owner_label">Set</string>
     <string name="clear_persistent_device_owner_label">Clear</string>
+    <!-- Corporate-owned work profile falls under device owner management, for convenience. -->
+    <string name="relinquish_device">Relinquish ownership of device</string>
 
     <!-- Strings for device reboot -->
     <string name="reboot">Reboot device</string>

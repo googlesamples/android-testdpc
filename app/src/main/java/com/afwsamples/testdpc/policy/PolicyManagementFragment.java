@@ -98,6 +98,8 @@ import com.afwsamples.testdpc.common.BaseSearchablePolicyPreferenceFragment;
 import com.afwsamples.testdpc.common.CertificateUtil;
 import com.afwsamples.testdpc.common.MediaDisplayFragment;
 import com.afwsamples.testdpc.common.PackageInstallationUtils;
+import com.afwsamples.testdpc.common.ReflectionUtil;
+import com.afwsamples.testdpc.common.ReflectionUtil.ReflectionIsTemporaryException;
 import com.afwsamples.testdpc.common.UserArrayAdapter;
 import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.common.preference.CustomConstraint;
@@ -388,6 +390,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     private static final String SET_PRIVATE_DNS_MODE_KEY = "set_private_dns_mode";
 
+    private static final String RELINQUISH_DEVICE = "relinquish_device";
+
     private static final String BATTERY_PLUGGED_ANY = Integer.toString(
             BatteryManager.BATTERY_PLUGGED_AC |
             BatteryManager.BATTERY_PLUGGED_USB |
@@ -673,6 +677,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(MANAGED_SYSTEM_UPDATES_KEY).setOnPreferenceClickListener(this);
 
         findPreference(CROSS_PROFILE_CALENDAR_KEY).setOnPreferenceClickListener(this);
+        findPreference(RELINQUISH_DEVICE).setOnPreferenceClickListener(this);
 
         DpcPreference bindDeviceAdminPreference =
                 (DpcPreference) findPreference(BIND_DEVICE_ADMIN_POLICIES);
@@ -1140,6 +1145,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 return true;
             case SET_PROFILE_NAME_KEY:
                 showSetProfileNameDialog();
+                return true;
+            case RELINQUISH_DEVICE:
+                relinquishDevice();
                 return true;
         }
         return false;
@@ -3638,6 +3646,16 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             }
         }
         return NO_CUSTOM_CONSTRIANT;
+    }
+
+    @TargetApi(30)
+    private void relinquishDevice() {
+        try {
+            ReflectionUtil.invoke(mDevicePolicyManager, "relinquishControl",
+                new Class<?>[]{ComponentName.class}, mAdminComponentName);
+        } catch (ReflectionIsTemporaryException e) {
+            Log.e(TAG, "Error invoking relinquishControl", e);
+        }
     }
 
     private int validateDeviceOwnerBeforeP() {
