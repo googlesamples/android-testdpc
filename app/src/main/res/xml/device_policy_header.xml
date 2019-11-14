@@ -643,8 +643,13 @@
         <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
             android:key="set_auto_time_required"
             android:title="@string/set_auto_time_required"
-            testdpc:admin="deviceOwner"
+            testdpc:admin="deviceOwner|profileOwner"
             testdpc:minSdkVersion="L" />
+        <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
+            android:key="set_auto_time"
+            android:title="@string/set_auto_time"
+            testdpc:admin="deviceOwner|profileOwner"
+            testdpc:minSdkVersion="R" />
         <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
             android:key="enable_security_logging"
             android:title="@string/enable_security_logging"

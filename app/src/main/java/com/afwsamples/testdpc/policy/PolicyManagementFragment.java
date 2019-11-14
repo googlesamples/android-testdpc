@@ -59,14 +59,6 @@ import android.provider.Settings;
 import android.security.KeyChain;
 import android.security.KeyChainAliasCallback;
 import android.service.notification.NotificationListenerService;
-import androidx.annotation.RequiresApi;
-import androidx.annotation.StringRes;
-import androidx.preference.SwitchPreference;
-import androidx.core.content.FileProvider;
-import androidx.preference.EditTextPreference;
-import androidx.preference.ListPreference;
-import androidx.preference.Preference;
-import androidx.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
 import android.text.InputType;
 import android.text.TextUtils;
@@ -86,6 +78,16 @@ import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
+
+import androidx.annotation.RequiresApi;
+import androidx.annotation.StringRes;
+import androidx.core.content.FileProvider;
+import androidx.preference.EditTextPreference;
+import androidx.preference.ListPreference;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceManager;
+import androidx.preference.SwitchPreference;
+
 import com.afwsamples.testdpc.AddAccountActivity;
 import com.afwsamples.testdpc.BuildConfig;
 import com.afwsamples.testdpc.CrossProfileAppsFragment;
@@ -133,6 +135,7 @@ import com.afwsamples.testdpc.profilepolicy.delegation.DelegationFragment;
 import com.afwsamples.testdpc.profilepolicy.permission.ManageAppPermissionsFragment;
 import com.afwsamples.testdpc.transferownership.PickTransferComponentFragment;
 import com.afwsamples.testdpc.util.MainThreadExecutor;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -332,6 +335,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String CLEAR_GLOBAL_HTTP_PROXY_KEY = "clear_global_http_proxy";
     private static final String SET_DEVICE_ORGANIZATION_NAME_KEY = "set_device_organization_name";
     private static final String SET_AUTO_TIME_REQUIRED_KEY = "set_auto_time_required";
+    private static final String SET_AUTO_TIME_KEY = "set_auto_time";
     private static final String SET_DISABLE_ACCOUNT_MANAGEMENT_KEY
             = "set_disable_account_management";
     private static final String SET_INPUT_METHODS_KEY = "set_input_methods";
@@ -449,7 +453,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private SwitchPreference mEnableBackupServicePreference;
     private SwitchPreference mEnableSecurityLoggingPreference;
     private SwitchPreference mEnableNetworkLoggingPreference;
-    private SwitchPreference mSetAutoTimeRequiredPreference;
+    private DpcSwitchPreference mSetAutoTimeRequiredPreference;
+    private DpcSwitchPreference mSetAutoTimePreference;
     private DpcPreference mLogoutUserPreference;
     private DpcPreference mManageLockTaskListPreference;
     private DpcPreference mSetLockTaskFeaturesPreference;
@@ -687,9 +692,12 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                         : R.string.require_one_po_to_bind);
         bindDeviceAdminPreference.setOnPreferenceClickListener(this);
 
-        mSetAutoTimeRequiredPreference = (SwitchPreference) findPreference(
+        mSetAutoTimeRequiredPreference = (DpcSwitchPreference) findPreference(
                 SET_AUTO_TIME_REQUIRED_KEY);
+        mSetAutoTimeRequiredPreference.addCustomConstraint(this::validateDeviceOwnerBeforeO);
         mSetAutoTimeRequiredPreference.setOnPreferenceChangeListener(this);
+        mSetAutoTimePreference = (DpcSwitchPreference) findPreference(SET_AUTO_TIME_KEY);
+        mSetAutoTimePreference.setOnPreferenceChangeListener(this);
 
         mSetDeviceOrganizationNamePreference =
         (EditTextPreference) findPreference(SET_DEVICE_ORGANIZATION_NAME_KEY);
@@ -710,6 +718,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         reloadEnableSecurityLoggingUi();
         reloadEnableNetworkLoggingUi();
         reloadSetAutoTimeRequiredUi();
+        reloadSetAutoTimeUi();
         reloadEnableLogoutUi();
         reloadAutoBrightnessUi();
     }
@@ -1330,6 +1339,16 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 mDevicePolicyManager.setAutoTimeRequired(mAdminComponentName,
                         newValue.equals(true));
                 reloadSetAutoTimeRequiredUi();
+                return true;
+            case SET_AUTO_TIME_KEY:
+                try {
+                    ReflectionUtil.invoke(mDevicePolicyManager, "setAutoTime",
+                            new Class<?>[]{ComponentName.class, boolean.class},
+                            mAdminComponentName, newValue.equals(true));
+                } catch (ReflectionIsTemporaryException e) {
+                    Log.e(TAG, "Error invoking setAutoTime", e);
+                }
+                reloadSetAutoTimeUi();
                 return true;
             case SET_DEVICE_ORGANIZATION_NAME_KEY:
                 mDevicePolicyManager.setOrganizationName(mAdminComponentName, (String) newValue);
@@ -2297,9 +2316,19 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     @TargetApi(VERSION_CODES.LOLLIPOP)
     private void reloadSetAutoTimeRequiredUi() {
-        if (mDevicePolicyManager.isDeviceOwnerApp(mPackageName)) {
-            boolean isAutoTimeRequired = mDevicePolicyManager.getAutoTimeRequired();
-            mSetAutoTimeRequiredPreference.setChecked(isAutoTimeRequired);
+        boolean isAutoTimeRequired = mDevicePolicyManager.getAutoTimeRequired();
+        mSetAutoTimeRequiredPreference.setChecked(isAutoTimeRequired);
+    }
+
+    @TargetApi(Util.R_VERSION_CODE)
+    private void reloadSetAutoTimeUi() {
+        try {
+            boolean isAutoTime = (Boolean) ReflectionUtil.invoke(mDevicePolicyManager,
+                    "getAutoTime", new Class<?>[]{ComponentName.class},
+                    mAdminComponentName);
+            mSetAutoTimePreference.setChecked(isAutoTime);
+        } catch (ReflectionIsTemporaryException e) {
+            Log.e(TAG, "Error invoking getAutoTime", e);
         }
     }
 
@@ -3656,6 +3685,15 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         } catch (ReflectionIsTemporaryException e) {
             Log.e(TAG, "Error invoking relinquishControl", e);
         }
+    }
+
+    private int validateDeviceOwnerBeforeO() {
+        if (Util.SDK_INT < VERSION_CODES.O) {
+            if (!mDevicePolicyManager.isDeviceOwnerApp(mPackageName)) {
+                return R.string.requires_device_owner;
+            }
+        }
+        return NO_CUSTOM_CONSTRIANT;
     }
 
     private int validateDeviceOwnerBeforeP() {
