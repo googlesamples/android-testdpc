@@ -613,6 +613,10 @@
             android:key="set_user_restrictions"
             android:title="@string/user_restrictions_preference_title"
             testdpc:minSdkVersion="L" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="set_user_restrictions_parent"
+            android:title="@string/user_restrictions_parent_preference_title"
+            testdpc:minSdkVersion="R" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/settings_management_title">

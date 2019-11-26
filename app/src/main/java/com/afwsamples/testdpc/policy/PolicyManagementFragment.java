@@ -348,6 +348,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String SET_PERMISSION_POLICY_KEY = "set_permission_policy";
     private static final String SET_SHORT_SUPPORT_MESSAGE_KEY = "set_short_support_message";
     private static final String SET_USER_RESTRICTIONS_KEY = "set_user_restrictions";
+    private static final String SET_USER_RESTRICTIONS_PARENT_KEY = "set_user_restrictions_parent";
     private static final String SHOW_WIFI_MAC_ADDRESS_KEY = "show_wifi_mac_address";
     private static final String START_KIOSK_MODE = "start_kiosk_mode";
     private static final String START_LOCK_TASK = "start_lock_task";
@@ -480,6 +481,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     private DpcSwitchPreference mSetLocationEnabledPreference;
     private DpcSwitchPreference mSetLocationModePreference;
+
+    private DpcPreference mUserRestrictionsParentPreference;
 
     private GetAccessibilityServicesTask mGetAccessibilityServicesTask = null;
     private GetInputMethodsTask mGetInputMethodsTask = null;
@@ -676,6 +679,10 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                         : NO_CUSTOM_CONSTRIANT);
         mInstallNonMarketAppsPreference.setOnPreferenceChangeListener(this);
         findPreference(SET_USER_RESTRICTIONS_KEY).setOnPreferenceClickListener(this);
+        mUserRestrictionsParentPreference = (DpcPreference) findPreference(SET_USER_RESTRICTIONS_PARENT_KEY);
+        mUserRestrictionsParentPreference.setOnPreferenceClickListener(this);
+        mUserRestrictionsParentPreference.setCustomConstraint(this::validateProfileOwnerOfOrganizationOwnedDevice);
+
         findPreference(REBOOT_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_SHORT_SUPPORT_MESSAGE_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_LONG_SUPPORT_MESSAGE_KEY).setOnPreferenceClickListener(this);
@@ -1121,6 +1128,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 return true;
             case SET_USER_RESTRICTIONS_KEY:
                 showFragment(new UserRestrictionsDisplayFragment());
+                return true;
+            case SET_USER_RESTRICTIONS_PARENT_KEY:
+                showFragment(new UserRestrictionsParentDisplayFragment());
                 return true;
             case REBOOT_KEY:
                 reboot();

@@ -206,6 +206,21 @@ public class UserRestriction {
     };
 
     /**
+     * These user restrictions are set on the parent DPM and can only be set by
+     * profile owners of an organization owned device.
+     */
+    public static final UserRestriction[] PROFILE_OWNER_ORG_DEVICE_RESTRICTIONS = {
+            new UserRestriction(DISALLOW_CONFIG_DATE_TIME,
+                    R.string.disallow_config_date_time),
+            new UserRestriction(DISALLOW_CONFIG_TETHERING,
+                    R.string.disallow_config_tethering),
+            new UserRestriction(DISALLOW_DATA_ROAMING,
+                    R.string.disallow_data_roaming),
+            new UserRestriction(DISALLOW_DEBUGGING_FEATURES,
+                    R.string.disallow_debugging_features)
+    };
+
+    /**
      * Setting these user restrictions only have effect on primary users.
      */
     public static final String[] PRIMARY_USER_ONLY_RESTRICTIONS = {
@@ -240,6 +255,17 @@ public class UserRestriction {
      */
     public static final String[] DEVICE_OWNER_ONLY_RESTRICTIONS = {
             DISALLOW_USER_SWITCH
+    };
+
+    /**
+     * These user restrictions are set on the parent DPM and can only be set by
+     * profile owners of an organization owned device.
+     */
+    public static final String[] PROFILE_OWNER_ORG_OWNED_RESTRICTIONS = {
+            DISALLOW_CONFIG_DATE_TIME,
+            DISALLOW_CONFIG_TETHERING,
+            DISALLOW_DATA_ROAMING,
+            DISALLOW_DEBUGGING_FEATURES
     };
 
     /**

@@ -424,6 +424,7 @@
 
     <!-- Strings for user restriction management -->
     <string name="user_restrictions_preference_title">Set user restrictions</string>
+    <string name="user_restrictions_parent_preference_title">Set user restrictions on parent</string>
     <string name="user_restrictions_management_title">User restrictions</string>
     <string name="allow_parent_profile_app_linking">Allow web links to apps of the parent</string>
     <string name="disallow_add_managed_profile">Disallow add managed profile</string>
