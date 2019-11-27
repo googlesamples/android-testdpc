@@ -140,7 +140,7 @@
     <string name="set_persistent_device_owner_label">Set</string>
     <string name="clear_persistent_device_owner_label">Clear</string>
     <!-- Corporate-owned work profile falls under device owner management, for convenience. -->
-    <string name="relinquish_device">Relinquish ownership of device</string>
+    <string name="factory_reset_org_owned">Factory reset Org-Owned Work Profile device</string>
 
     <!-- Strings for device reboot -->
     <string name="reboot">Reboot device</string>

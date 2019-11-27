@@ -390,7 +390,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     private static final String SET_PRIVATE_DNS_MODE_KEY = "set_private_dns_mode";
 
-    private static final String RELINQUISH_DEVICE = "relinquish_device";
+    private static final String FACTORY_RESET_ORG_OWNED_DEVICE = "factory_reset_org_owned_device";
 
     private static final String BATTERY_PLUGGED_ANY = Integer.toString(
             BatteryManager.BATTERY_PLUGGED_AC |
@@ -677,7 +677,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(MANAGED_SYSTEM_UPDATES_KEY).setOnPreferenceClickListener(this);
 
         findPreference(CROSS_PROFILE_CALENDAR_KEY).setOnPreferenceClickListener(this);
-        findPreference(RELINQUISH_DEVICE).setOnPreferenceClickListener(this);
+        findPreference(FACTORY_RESET_ORG_OWNED_DEVICE).setOnPreferenceClickListener(this);
 
         DpcPreference bindDeviceAdminPreference =
                 (DpcPreference) findPreference(BIND_DEVICE_ADMIN_POLICIES);
@@ -1146,8 +1146,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             case SET_PROFILE_NAME_KEY:
                 showSetProfileNameDialog();
                 return true;
-            case RELINQUISH_DEVICE:
-                relinquishDevice();
+            case FACTORY_RESET_ORG_OWNED_DEVICE:
+                factoryResetOrgOwnedDevice();
                 return true;
         }
         return false;
@@ -3659,13 +3659,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     }
 
     @TargetApi(30)
-    private void relinquishDevice() {
-        try {
-            ReflectionUtil.invoke(mDevicePolicyManager, "relinquishControl",
-                new Class<?>[]{ComponentName.class}, mAdminComponentName);
-        } catch (ReflectionIsTemporaryException e) {
-            Log.e(TAG, "Error invoking relinquishControl", e);
-        }
+    private void factoryResetOrgOwnedDevice() {
+        mDevicePolicyManager.getParentProfileInstance(mAdminComponentName).wipeData(/*flags=*/ 0);
     }
 
     private int validateDeviceOwnerBeforeP() {

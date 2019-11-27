@@ -702,8 +702,8 @@
             testdpc:admin="deviceOwner"
             testdpc:minSdkVersion="O_MR1" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
-            android:key="relinquish_device"
-            android:title="@string/relinquish_device"
+            android:key="factory_reset_org_owned_device"
+            android:title="@string/factory_reset_org_owned"
             testdpc:admin="profileOwner"
             testdpc:minSdkVersion="R" />
     </PreferenceCategory>
