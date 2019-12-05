@@ -221,6 +221,10 @@
             android:key="disable_camera"
             android:title="@string/disable_camera"
             testdpc:minSdkVersion="L" />
+        <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
+            android:key="disable_camera_on_parent"
+            android:title="@string/disable_camera_on_parent"
+            testdpc:minSdkVersion="R" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="capture_image"
             android:title="@string/capture_image"
