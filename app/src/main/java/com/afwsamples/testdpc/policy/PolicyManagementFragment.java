@@ -45,6 +45,7 @@ import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.location.LocationManager;
 import android.net.ProxyInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -56,6 +57,7 @@ import android.os.UserHandle;
 import android.os.UserManager;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.provider.Settings.Secure;
 import android.security.KeyChain;
 import android.security.KeyChainAliasCallback;
 import android.service.notification.NotificationListenerService;
@@ -397,6 +399,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     private static final String FACTORY_RESET_ORG_OWNED_DEVICE = "factory_reset_org_owned_device";
 
+    private static final String SET_LOCATION_ENABLED_KEY = "set_location_enabled";
+    private static final String SET_LOCATION_MODE_KEY = "set_location_mode";
+
     private static final String BATTERY_PLUGGED_ANY = Integer.toString(
             BatteryManager.BATTERY_PLUGGED_AC |
             BatteryManager.BATTERY_PLUGGED_USB |
@@ -472,6 +477,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private DpcSwitchPreference mAutoBrightnessPreference;
 
     private DpcSwitchPreference mEnableAppFeedbackNotificationsPreference;
+
+    private DpcSwitchPreference mSetLocationEnabledPreference;
+    private DpcSwitchPreference mSetLocationModePreference;
 
     private GetAccessibilityServicesTask mGetAccessibilityServicesTask = null;
     private GetInputMethodsTask mGetInputMethodsTask = null;
@@ -709,6 +717,14 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         mSetDeviceOrganizationNamePreference =
         (EditTextPreference) findPreference(SET_DEVICE_ORGANIZATION_NAME_KEY);
         mSetDeviceOrganizationNamePreference.setOnPreferenceChangeListener(this);
+
+        mSetLocationEnabledPreference = (DpcSwitchPreference) findPreference(
+            SET_LOCATION_ENABLED_KEY);
+        mSetLocationEnabledPreference.setOnPreferenceChangeListener(this);
+
+        mSetLocationModePreference = (DpcSwitchPreference) findPreference(SET_LOCATION_MODE_KEY);
+        mSetLocationModePreference.setOnPreferenceChangeListener(this);
+
 
         onCreateSetNewPasswordWithComplexityPreference();
         constrainSpecialCasePreferences();
@@ -1388,6 +1404,29 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                     getString(
                         R.string.app_feedback_notifications), newValue.equals(true));
                 editor.commit();
+                return true;
+            case SET_LOCATION_ENABLED_KEY:
+                try {
+                    ReflectionUtil.invoke(mDevicePolicyManager, "setLocationEnabled",
+                        new Class<?>[]{ComponentName.class, boolean.class},
+                        mAdminComponentName, newValue.equals(true));
+                } catch (ReflectionIsTemporaryException e) {
+                    Log.e(TAG, "Error invoking setLocationEnabled", e);
+                }
+                reloadLocationEnabledUi();
+                reloadLocationModeUi();
+                return true;
+            case SET_LOCATION_MODE_KEY:
+                final int locationMode;
+                if (newValue.equals(true)) {
+                    locationMode = Secure.LOCATION_MODE_HIGH_ACCURACY;
+                } else {
+                    locationMode = Secure.LOCATION_MODE_OFF;
+                }
+                mDevicePolicyManager.setSecureSetting(mAdminComponentName, Secure.LOCATION_MODE,
+                    String.format("%d", locationMode));
+                reloadLocationEnabledUi();
+                reloadLocationModeUi();
                 return true;
         }
         return false;
@@ -2267,6 +2306,20 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                     getActivity().getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE);
             mAutoBrightnessPreference.setChecked(parseInt(brightnessMode, /* defaultValue= */ 0) == 1);
         }
+    }
+
+    @TargetApi(VERSION_CODES.JELLY_BEAN_MR2)
+    private void reloadLocationModeUi() {
+        final String locationMode = Settings.System.getString(
+            getActivity().getContentResolver(), Secure.LOCATION_MODE);
+        mSetLocationModePreference
+            .setChecked(parseInt(locationMode, 0) != Secure.LOCATION_MODE_OFF);
+    }
+
+    @TargetApi(Util.R_VERSION_CODE)
+    private void reloadLocationEnabledUi() {
+        LocationManager locationManager = getActivity().getSystemService(LocationManager.class);
+        mSetLocationEnabledPreference.setChecked(locationManager.isLocationEnabled());
     }
 
     static private int parseInt(String str, int defaultValue) {

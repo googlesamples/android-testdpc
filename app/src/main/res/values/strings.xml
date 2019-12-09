@@ -965,6 +965,8 @@
     <string name="settings_management_title">Settings management</string>
     <string name="stay_on_while_plugged_in">Keep the device on while plugged in</string>
     <string name="install_non_market_apps">Allow installs from unknown sources</string>
+    <string name="set_location_enabled">Set location enabled</string>
+    <string name="set_location_mode">Set location mode (deprecated version of set location enabled)</string>
 
     <!-- Strings for setting support messages -->
     <string name="support_messages">Support messages</string>

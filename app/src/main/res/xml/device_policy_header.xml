@@ -625,6 +625,16 @@
             android:key="install_nonmarket_apps"
             android:title="@string/install_non_market_apps"
             testdpc:minSdkVersion="L" />
+        <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
+            android:key="set_location_enabled"
+            android:title="@string/set_location_enabled"
+            testdpc:admin="deviceOwner|profileOwner"
+            testdpc:minSdkVersion="R" />
+        <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
+            android:key="set_location_mode"
+            android:title="@string/set_location_mode"
+            testdpc:admin="deviceOwner|profileOwner"
+            testdpc:minSdkVersion="L" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/support_messages">
