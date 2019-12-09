@@ -105,6 +105,7 @@
     <string name="secondary_user">secondary user</string>
     <string name="managed_profile">managed profile</string>
     <string name="requires_device_owner">Requires device owner</string>
+    <string name="requires_profile_owner_organization_owned_device">Requires profile owner of an organization owned device</string>
 
     <string name="not_for_parent_profile">Not applicable to parent profile</string>
     <string name="user_restricted">Disallowed by user restriction</string>
@@ -174,6 +175,7 @@
     <string name="camera_title">Camera, screen capture and audio</string>
     <string name="display_media">Display Media</string>
     <string name="disable_camera">Disable camera</string>
+    <string name="disable_camera_on_parent">Disable camera on parent</string>
     <string name="capture_image">Capture image</string>
     <string name="capture_video">Capture video</string>
     <string name="camera_app_not_found">Ensure that a camera app is enabled</string>

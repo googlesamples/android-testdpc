@@ -271,6 +271,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String PASSWORD_COMPLEXITY_KEY = "password_complexity";
     private static final String SEPARATE_CHALLENGE_KEY = "separate_challenge";
     private static final String DISABLE_CAMERA_KEY = "disable_camera";
+    private static final String DISABLE_CAMERA_ON_PARENT_KEY = "disable_camera_on_parent";
     private static final String DISABLE_KEYGUARD = "disable_keyguard";
     private static final String DISABLE_METERED_DATA_KEY = "disable_metered_data";
     private static final String DISABLE_SCREEN_CAPTURE_KEY = "disable_screen_capture";
@@ -439,6 +440,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private DpcPreference mInstallExistingPackagePreference;
 
     private SwitchPreference mDisableCameraSwitchPreference;
+    private DpcSwitchPreference mDisableCameraOnParentSwitchPreference;
     private SwitchPreference mDisableScreenCaptureSwitchPreference;
     private SwitchPreference mMuteAudioSwitchPreference;
 
@@ -535,9 +537,14 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         mAffiliatedUserPreference = findPreference(AFFILIATED_USER_KEY);
         mEphemeralUserPreference = findPreference(EPHEMERAL_USER_KEY);
         mDisableCameraSwitchPreference = (SwitchPreference) findPreference(DISABLE_CAMERA_KEY);
+        mDisableCameraSwitchPreference.setOnPreferenceChangeListener(this);
+        mDisableCameraOnParentSwitchPreference = (DpcSwitchPreference)
+                findPreference(DISABLE_CAMERA_ON_PARENT_KEY);
+        mDisableCameraOnParentSwitchPreference.setOnPreferenceChangeListener(this);
+        mDisableCameraOnParentSwitchPreference
+                .setCustomConstraint(this::validateProfileOwnerOfOrganizationOwnedDevice);
         findPreference(CAPTURE_IMAGE_KEY).setOnPreferenceClickListener(this);
         findPreference(CAPTURE_VIDEO_KEY).setOnPreferenceClickListener(this);
-        mDisableCameraSwitchPreference.setOnPreferenceChangeListener(this);
         mDisableScreenCaptureSwitchPreference = (SwitchPreference) findPreference(
                 DISABLE_SCREEN_CAPTURE_KEY);
         mDisableScreenCaptureSwitchPreference.setOnPreferenceChangeListener(this);
@@ -1294,6 +1301,10 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 // Reload UI to verify the camera is enable / disable correctly.
                 reloadCameraDisableUi();
                 return true;
+            case DISABLE_CAMERA_ON_PARENT_KEY:
+                setCameraDisabledOnParent((Boolean) newValue);
+                reloadCameraDisableOnParentUi();
+                return true;
             case ENABLE_BACKUP_SERVICE:
                 setBackupServiceEnabled((Boolean) newValue);
                 reloadEnableBackupServiceUi();
@@ -1385,6 +1396,13 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     @TargetApi(VERSION_CODES.M)
     private void setCameraDisabled(boolean disabled) {
         mDevicePolicyManager.setCameraDisabled(mAdminComponentName, disabled);
+    }
+
+    @TargetApi(Util.R_VERSION_CODE)
+    private void setCameraDisabledOnParent(boolean disabled) {
+        DevicePolicyManager parentDpm = mDevicePolicyManager
+                .getParentProfileInstance(mAdminComponentName);
+        parentDpm.setCameraDisabled(mAdminComponentName, disabled);
     }
 
     @TargetApi(VERSION_CODES.N)
@@ -2287,6 +2305,14 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private void reloadCameraDisableUi() {
         boolean isCameraDisabled = mDevicePolicyManager.getCameraDisabled(mAdminComponentName);
         mDisableCameraSwitchPreference.setChecked(isCameraDisabled);
+    }
+
+    @TargetApi(Util.R_VERSION_CODE)
+    private void reloadCameraDisableOnParentUi() {
+        DevicePolicyManager parentDpm
+                = mDevicePolicyManager.getParentProfileInstance(mAdminComponentName);
+        boolean isCameraDisabled = parentDpm.getCameraDisabled(mAdminComponentName);
+        mDisableCameraOnParentSwitchPreference.setChecked(isCameraDisabled);
     }
 
     @TargetApi(VERSION_CODES.O)
@@ -3706,6 +3732,14 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             if (!mDevicePolicyManager.isDeviceOwnerApp(mPackageName)) {
                 return R.string.requires_device_owner;
             }
+        }
+        return NO_CUSTOM_CONSTRIANT;
+    }
+
+    private int validateProfileOwnerOfOrganizationOwnedDevice() {
+        // TODO(b/144486887): Need to check if in COPE mode
+        if (!Util.isManagedProfileOwner(getActivity()) || Util.SDK_INT < Util.R_VERSION_CODE) {
+            return R.string.requires_profile_owner_organization_owned_device;
         }
         return NO_CUSTOM_CONSTRIANT;
     }
