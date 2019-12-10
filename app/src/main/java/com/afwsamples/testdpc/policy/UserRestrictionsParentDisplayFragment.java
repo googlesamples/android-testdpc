@@ -30,15 +30,13 @@ public class UserRestrictionsParentDisplayFragment extends BaseSearchablePolicyP
     @RequiresApi(api = Util.R_VERSION_CODE)
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
         DevicePolicyManager mDevicePolicyManager = (DevicePolicyManager)
                 getActivity().getSystemService(Context.DEVICE_POLICY_SERVICE);
         mUserManager = (UserManager) getActivity().getSystemService(Context.USER_SERVICE);
         mAdminComponentName = DeviceAdminReceiver.getComponentName(getActivity());
         mParentDevicePolicyManager = mDevicePolicyManager
                 .getParentProfileInstance(mAdminComponentName);
-
+        super.onCreate(savedInstanceState);
         getActivity().getActionBar().setTitle(R.string.user_restrictions_management_title);
     }
 
