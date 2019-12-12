@@ -126,6 +126,7 @@
     <string name="device_owner_management">Device owner management</string>
     <string name="set_auto_time_required">Set auto (network) time required</string>
     <string name="set_auto_time">Set auto (network) time</string>
+    <string name="set_auto_time_zone">Set auto (network) time zone</string>
     <string name="wipe_data">Wipe data</string>
     <string name="wipe_data_title">Wipe data?</string>
     <string name="wipe_data_confirmation">Are you sure you want to wipe the data?</string>

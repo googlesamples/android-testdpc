@@ -339,6 +339,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String SET_DEVICE_ORGANIZATION_NAME_KEY = "set_device_organization_name";
     private static final String SET_AUTO_TIME_REQUIRED_KEY = "set_auto_time_required";
     private static final String SET_AUTO_TIME_KEY = "set_auto_time";
+    private static final String SET_AUTO_TIME_ZONE_KEY = "set_auto_time_zone";
     private static final String SET_DISABLE_ACCOUNT_MANAGEMENT_KEY
             = "set_disable_account_management";
     private static final String SET_INPUT_METHODS_KEY = "set_input_methods";
@@ -463,6 +464,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private SwitchPreference mEnableNetworkLoggingPreference;
     private DpcSwitchPreference mSetAutoTimeRequiredPreference;
     private DpcSwitchPreference mSetAutoTimePreference;
+    private DpcSwitchPreference mSetAutoTimeZonePreference;
     private DpcPreference mLogoutUserPreference;
     private DpcPreference mManageLockTaskListPreference;
     private DpcPreference mSetLockTaskFeaturesPreference;
@@ -720,6 +722,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         mSetAutoTimeRequiredPreference.setOnPreferenceChangeListener(this);
         mSetAutoTimePreference = (DpcSwitchPreference) findPreference(SET_AUTO_TIME_KEY);
         mSetAutoTimePreference.setOnPreferenceChangeListener(this);
+        mSetAutoTimeZonePreference = (DpcSwitchPreference) findPreference(SET_AUTO_TIME_ZONE_KEY);
+        mSetAutoTimeZonePreference.setOnPreferenceChangeListener(this);
 
         mSetDeviceOrganizationNamePreference =
         (EditTextPreference) findPreference(SET_DEVICE_ORGANIZATION_NAME_KEY);
@@ -749,6 +753,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         reloadEnableNetworkLoggingUi();
         reloadSetAutoTimeRequiredUi();
         reloadSetAutoTimeUi();
+        reloadSetAutoTimeZoneUi();
         reloadEnableLogoutUi();
         reloadAutoBrightnessUi();
     }
@@ -1386,6 +1391,16 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                     Log.e(TAG, "Error invoking setAutoTime", e);
                 }
                 reloadSetAutoTimeUi();
+                return true;
+            case SET_AUTO_TIME_ZONE_KEY:
+                try {
+                    ReflectionUtil.invoke(mDevicePolicyManager, "setAutoTimeZone",
+                            new Class<?>[]{ComponentName.class, boolean.class},
+                            mAdminComponentName, newValue.equals(true));
+                } catch (ReflectionIsTemporaryException e) {
+                    Log.e(TAG, "Error invoking setAutoTimeZone", e);
+                }
+                reloadSetAutoTimeZoneUi();
                 return true;
             case SET_DEVICE_ORGANIZATION_NAME_KEY:
                 mDevicePolicyManager.setOrganizationName(mAdminComponentName, (String) newValue);
@@ -2428,6 +2443,18 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             mSetAutoTimePreference.setChecked(isAutoTime);
         } catch (ReflectionIsTemporaryException e) {
             Log.e(TAG, "Error invoking getAutoTime", e);
+        }
+    }
+
+    @TargetApi(Util.R_VERSION_CODE)
+    private void reloadSetAutoTimeZoneUi() {
+        try {
+            boolean isAutoTimeZone = (Boolean) ReflectionUtil.invoke(mDevicePolicyManager,
+                    "getAutoTimeZone", new Class<?>[]{ComponentName.class},
+                    mAdminComponentName);
+            mSetAutoTimeZonePreference.setChecked(isAutoTimeZone);
+        } catch (ReflectionIsTemporaryException e) {
+            Log.e(TAG, "Error invoking getAutoTimeZone", e);
         }
     }
 
