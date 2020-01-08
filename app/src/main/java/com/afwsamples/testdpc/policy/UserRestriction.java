@@ -15,6 +15,7 @@ import static android.os.UserManager.DISALLOW_CONFIG_BRIGHTNESS;
 import static android.os.UserManager.DISALLOW_CONFIG_CELL_BROADCASTS;
 import static android.os.UserManager.DISALLOW_CONFIG_CREDENTIALS;
 import static android.os.UserManager.DISALLOW_CONFIG_DATE_TIME;
+import static android.os.UserManager.DISALLOW_CONFIG_LOCALE;
 import static android.os.UserManager.DISALLOW_CONFIG_LOCATION;
 import static android.os.UserManager.DISALLOW_CONFIG_MOBILE_NETWORKS;
 import static android.os.UserManager.DISALLOW_CONFIG_PRIVATE_DNS;
@@ -22,6 +23,8 @@ import static android.os.UserManager.DISALLOW_CONFIG_SCREEN_TIMEOUT;
 import static android.os.UserManager.DISALLOW_CONFIG_TETHERING;
 import static android.os.UserManager.DISALLOW_CONFIG_VPN;
 import static android.os.UserManager.DISALLOW_CONFIG_WIFI;
+import static android.os.UserManager.DISALLOW_CONTENT_CAPTURE;
+import static android.os.UserManager.DISALLOW_CONTENT_SUGGESTIONS;
 import static android.os.UserManager.DISALLOW_CREATE_WINDOWS;
 import static android.os.UserManager.DISALLOW_CROSS_PROFILE_COPY_PASTE;
 import static android.os.UserManager.DISALLOW_DATA_ROAMING;
@@ -217,7 +220,37 @@ public class UserRestriction {
             new UserRestriction(DISALLOW_DATA_ROAMING,
                     R.string.disallow_data_roaming),
             new UserRestriction(DISALLOW_DEBUGGING_FEATURES,
-                    R.string.disallow_debugging_features)
+                    R.string.disallow_debugging_features),
+            new UserRestriction(DISALLOW_ADD_USER,
+                    R.string.disallow_add_user),
+            new UserRestriction(DISALLOW_BLUETOOTH,
+                    R.string.disallow_bluetooth),
+            new UserRestriction(DISALLOW_BLUETOOTH_SHARING,
+                    R.string.disallow_bluetooth_sharing),
+            new UserRestriction(DISALLOW_CONFIG_BLUETOOTH,
+                    R.string.disallow_config_bluetooth),
+            new UserRestriction(DISALLOW_CONFIG_CELL_BROADCASTS,
+                    R.string.disallow_config_cell_broadcasts),
+            new UserRestriction(DISALLOW_CONFIG_LOCATION,
+                    R.string.disallow_config_location),
+            new UserRestriction(DISALLOW_CONFIG_MOBILE_NETWORKS,
+                    R.string.disallow_config_mobile_networks),
+            new UserRestriction(DISALLOW_CONFIG_PRIVATE_DNS,
+                    R.string.disallow_config_private_dns),
+            new UserRestriction(DISALLOW_CONFIG_WIFI,
+                    R.string.disallow_config_wifi),
+            new UserRestriction(DISALLOW_CONTENT_CAPTURE,
+                    R.string.disallow_content_capture),
+            new UserRestriction(DISALLOW_CONTENT_SUGGESTIONS,
+                    R.string.disallow_content_suggestions),
+            new UserRestriction(DISALLOW_SAFE_BOOT,
+                    R.string.disallow_safe_boot),
+            new UserRestriction(DISALLOW_SHARE_LOCATION,
+                    R.string.disallow_share_location),
+            new UserRestriction(DISALLOW_SMS,
+                    R.string.disallow_sms),
+            new UserRestriction(DISALLOW_USB_FILE_TRANSFER,
+                    R.string.disallow_usb_file_transfer),
     };
 
     /**

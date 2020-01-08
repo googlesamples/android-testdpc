@@ -483,6 +483,8 @@
     <string name="disallow_share_into_work_profile">Disallow sharing data into the profile</string>
     <string name="disallow_printing">Disallow printing</string>
     <string name="disallow_config_private_dns">Disallow config Private DNS</string>
+    <string name="disallow_content_capture">Disallow content capture</string>
+    <string name="disallow_content_suggestions">Disallow content suggestions</string>
     <string name="user_restriction_error_msg">Operation not allowed</string>
 
     <!-- Strings for select app -->
