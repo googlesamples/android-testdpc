@@ -305,7 +305,7 @@
         <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
             android:key="enable_wifi_config_lockdown"
             android:title="@string/enable_wifi_config_lockdown"
-            testdpc:admin="deviceOwner"
+            testdpc:admin="deviceOwner|profileOwner"
             testdpc:minSdkVersion="M" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="modify_wifi_configuration"

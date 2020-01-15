@@ -373,8 +373,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String MODIFY_WIFI_CONFIGURATION_KEY = "modify_wifi_configuration";
     private static final String TRANSFER_OWNERSHIP_KEY = "transfer_ownership_to_component";
     private static final String TAG_WIFI_CONFIG_CREATION = "wifi_config_creation";
-    private static final String WIFI_CONFIG_LOCKDOWN_ON = "1";
-    private static final String WIFI_CONFIG_LOCKDOWN_OFF = "0";
     private static final String SECURITY_PATCH_FORMAT = "yyyy-MM-dd";
     private static final String SET_NEW_PASSWORD = "set_new_password";
     private static final String SET_NEW_PASSWORD_WITH_COMPLEXITY =
@@ -485,6 +483,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private DpcSwitchPreference mSetLocationModePreference;
 
     private DpcPreference mUserRestrictionsParentPreference;
+
+    private DpcSwitchPreference mLockdownAdminConfiguredNetworksPreference;
 
     private GetAccessibilityServicesTask mGetAccessibilityServicesTask = null;
     private GetInputMethodsTask mGetInputMethodsTask = null;
@@ -667,7 +667,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(MANAGE_APP_PERMISSIONS_KEY).setOnPreferenceClickListener(this);
         findPreference(CREATE_WIFI_CONFIGURATION_KEY).setOnPreferenceClickListener(this);
         findPreference(CREATE_EAP_TLS_WIFI_CONFIGURATION_KEY).setOnPreferenceClickListener(this);
-        findPreference(WIFI_CONFIG_LOCKDOWN_ENABLE_KEY).setOnPreferenceChangeListener(this);
+        mLockdownAdminConfiguredNetworksPreference = (DpcSwitchPreference)
+                findPreference(WIFI_CONFIG_LOCKDOWN_ENABLE_KEY);
+        mLockdownAdminConfiguredNetworksPreference.setOnPreferenceChangeListener(this);
         findPreference(MODIFY_WIFI_CONFIGURATION_KEY).setOnPreferenceClickListener(this);
         findPreference(TRANSFER_OWNERSHIP_KEY).setOnPreferenceClickListener(this);
         findPreference(SHOW_WIFI_MAC_ADDRESS_KEY).setOnPreferenceClickListener(this);
@@ -1366,10 +1368,15 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 updateStayOnWhilePluggedInPreference();
                 return true;
             case WIFI_CONFIG_LOCKDOWN_ENABLE_KEY:
-                mDevicePolicyManager.setGlobalSetting(mAdminComponentName,
-                        Settings.Global.WIFI_DEVICE_OWNER_CONFIGS_LOCKDOWN,
-                        newValue.equals(Boolean.TRUE) ?
-                                WIFI_CONFIG_LOCKDOWN_ON : WIFI_CONFIG_LOCKDOWN_OFF);
+                try {
+                    ReflectionUtil.invoke(mDevicePolicyManager,
+                            "setLockdownAdminConfiguredNetworks",
+                            new Class<?>[]{ComponentName.class, boolean.class},
+                            mAdminComponentName, newValue.equals(true));
+                } catch (ReflectionIsTemporaryException e) {
+                    Log.e(TAG, "Error invoking setLockdownAdminConfiguredNetworks", e);
+                }
+                reloadLockdownAdminConfiguredNetworksUi();
                 return true;
             case INSTALL_NONMARKET_APPS_KEY:
                 mDevicePolicyManager.setSecureSetting(mAdminComponentName,
@@ -2345,6 +2352,18 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private void reloadLocationEnabledUi() {
         LocationManager locationManager = getActivity().getSystemService(LocationManager.class);
         mSetLocationEnabledPreference.setChecked(locationManager.isLocationEnabled());
+    }
+
+    @TargetApi(Util.R_VERSION_CODE)
+    private void reloadLockdownAdminConfiguredNetworksUi() {
+        try {
+            boolean lockdown = (Boolean) ReflectionUtil.invoke(mDevicePolicyManager,
+                    "isLockdownAdminConfiguredNetworks",
+                    new Class<?>[]{ComponentName.class}, mAdminComponentName);
+            mLockdownAdminConfiguredNetworksPreference.setChecked(lockdown);
+        } catch (ReflectionIsTemporaryException e) {
+            Log.e(TAG, "Error invoking isLockdownAdminConfiguredNetworks", e);
+        }
     }
 
     static private int parseInt(String str, int defaultValue) {
