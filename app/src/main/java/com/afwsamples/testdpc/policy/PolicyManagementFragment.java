@@ -359,7 +359,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String SYSTEM_UPDATE_POLICY_KEY = "system_update_policy";
     private static final String SYSTEM_UPDATE_PENDING_KEY = "system_update_pending";
     private static final String TEST_KEY_USABILITY_KEY = "test_key_usability";
-
     private static final String UNHIDE_APPS_KEY = "unhide_apps";
     private static final String UNSUSPEND_APPS_KEY = "unsuspend_apps";
     private static final String CLEAR_APP_DATA_KEY = "clear_app_data";
@@ -382,27 +381,20 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String SET_PROFILE_PARENT_NEW_PASSWORD = "set_profile_parent_new_password";
     private static final String BIND_DEVICE_ADMIN_POLICIES = "bind_device_admin_policies";
     private static final String CROSS_PROFILE_APPS = "cross_profile_apps";
-
     private static final String SET_SCREEN_BRIGHTNESS_KEY = "set_screen_brightness";
     private static final String AUTO_BRIGHTNESS_KEY = "auto_brightness";
     private static final String CROSS_PROFILE_CALENDAR_KEY = "cross_profile_calendar";
     private static final String SET_SCREEN_OFF_TIMEOUT_KEY = "set_screen_off_timeout";
-
     private static final String SET_TIME_KEY = "set_time";
     private static final String SET_TIME_ZONE_KEY = "set_time_zone";
-
     private static final String SET_PROFILE_NAME_KEY = "set_profile_name";
-
     private static final String MANAGE_OVERRIDE_APN_KEY = "manage_override_apn";
-
     private static final String MANAGED_SYSTEM_UPDATES_KEY = "managed_system_updates";
-
     private static final String SET_PRIVATE_DNS_MODE_KEY = "set_private_dns_mode";
-
     private static final String FACTORY_RESET_ORG_OWNED_DEVICE = "factory_reset_org_owned_device";
-
     private static final String SET_LOCATION_ENABLED_KEY = "set_location_enabled";
     private static final String SET_LOCATION_MODE_KEY = "set_location_mode";
+    private static final String SUSPEND_PERSONAL_APPS_KEY = "suspend_personal_apps";
 
     private static final String BATTERY_PLUGGED_ANY = Integer.toString(
             BatteryManager.BATTERY_PLUGGED_AC |
@@ -485,6 +477,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private DpcSwitchPreference mSetLocationModePreference;
 
     private DpcPreference mUserRestrictionsParentPreference;
+    private DpcSwitchPreference mSuspendPersonalApps;
 
     private GetAccessibilityServicesTask mGetAccessibilityServicesTask = null;
     private GetInputMethodsTask mGetInputMethodsTask = null;
@@ -736,6 +729,10 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         mSetLocationModePreference = (DpcSwitchPreference) findPreference(SET_LOCATION_MODE_KEY);
         mSetLocationModePreference.setOnPreferenceChangeListener(this);
 
+        mSuspendPersonalApps = (DpcSwitchPreference) findPreference(SUSPEND_PERSONAL_APPS_KEY);
+        mSuspendPersonalApps.setOnPreferenceChangeListener(this);
+        mSuspendPersonalApps.setCustomConstraint(
+                this::validateProfileOwnerOfOrganizationOwnedDevice);
 
         onCreateSetNewPasswordWithComplexityPreference();
         constrainSpecialCasePreferences();
@@ -756,6 +753,40 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         reloadSetAutoTimeZoneUi();
         reloadEnableLogoutUi();
         reloadAutoBrightnessUi();
+        reloadPersonalAppsSuspendedUi();
+    }
+
+    @TargetApi(Util.R_VERSION_CODE)
+    private void reloadPersonalAppsSuspendedUi() {
+        // TODO: nuke it when R sdk is available
+        final int PERSONAL_APPS_NOT_SUSPENDED = 0;
+        if (mSuspendPersonalApps.isEnabled()) {
+            int suspendReasons = getPersonalAppsSuspensionReasons();
+            mSuspendPersonalApps.setChecked(suspendReasons != 0);
+        }
+    }
+
+    // TODO: nuke it when R sdk is available.
+    int getPersonalAppsSuspensionReasons() {
+        try {
+            return (Integer) ReflectionUtil.invoke(mDevicePolicyManager,
+                    "getPersonalAppsSuspendedReasons", new Class<?>[]{ComponentName.class},
+                    mAdminComponentName);
+        } catch (ReflectionIsTemporaryException e) {
+            Log.e(TAG, "Error invoking getPersonalAppsSuspendedReasons", e);
+            return 0;
+        }
+    }
+
+    // TODO: nuke it when R sdk is available.
+    void setPersonalAppsSuspended(boolean suspended) {
+        try {
+            ReflectionUtil.invoke(mDevicePolicyManager, "setPersonalAppsSuspended",
+                    new Class<?>[]{ComponentName.class, boolean.class},
+                    mAdminComponentName, suspended);
+        } catch (ReflectionIsTemporaryException e) {
+            Log.e(TAG, "Error invoking setPersonalAppsSuspended", e);
+        }
     }
 
     private void onCreateSetNewPasswordWithComplexityPreference() {
@@ -1452,6 +1483,10 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                     String.format("%d", locationMode));
                 reloadLocationEnabledUi();
                 reloadLocationModeUi();
+                return true;
+            case SUSPEND_PERSONAL_APPS_KEY:
+                setPersonalAppsSuspended((Boolean) newValue);
+                reloadPersonalAppsSuspendedUi();
                 return true;
         }
         return false;
@@ -3826,15 +3861,25 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         return NO_CUSTOM_CONSTRIANT;
     }
 
+    // TODO: nuke it when R sdk is available
+    private boolean isOrganizationOwnedDeviceWithManagedProfile() {
+        try {
+            return (Boolean) ReflectionUtil.invoke(
+                    mDevicePolicyManager, "isOrganizationOwnedDeviceWithManagedProfile");
+        } catch (ReflectionIsTemporaryException e) {
+            Log.e(TAG, "Error invoking isOrganizationOwnedDeviceWithManagedProfile", e);
+            return false;
+        }
+    }
+
     private int validateProfileOwnerOfOrganizationOwnedDevice() {
-        // TODO(b/144486887): Need to check if in COPE mode
-        if (!Util.isManagedProfileOwner(getActivity()) || Util.SDK_INT < Util.R_VERSION_CODE) {
+        if (Util.SDK_INT < Util.R_VERSION_CODE || !isOrganizationOwnedDeviceWithManagedProfile()) {
             return R.string.requires_profile_owner_organization_owned_device;
         }
         return NO_CUSTOM_CONSTRIANT;
     }
 
-    abstract class ManageLockTaskListCallback {
+    abstract static class ManageLockTaskListCallback {
         public abstract void onPositiveButtonClicked(String[] lockTaskArray);
     }
 }
