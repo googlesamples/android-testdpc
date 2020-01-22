@@ -739,6 +739,14 @@
             android:title="@string/suspend_personal_apps"
             testdpc:admin="profileOwner"
             testdpc:minSdkVersion="R" />
+        <com.afwsamples.testdpc.common.preference.DpcEditTextPreference
+            android:defaultValue="0"
+            android:dialogTitle="@string/profile_max_time_off"
+            android:inputType="number"
+            android:key="profile_max_time_off"
+            android:title="@string/profile_max_time_off"
+            testdpc:admin="profileOwner"
+            testdpc:minSdkVersion="R" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/transfer_ownership">
