@@ -361,14 +361,20 @@
     <string name="install_apk_package_title">Install package from APK file</string>
     <string name="uninstall_packages_title">Uninstall package</string>
     <string name="hide_apps_title">Hide apps</string>
+    <string name="hide_apps_parent_title">Hide apps on parent</string>
     <string name="hide_apps_empty">All apps are hidden.</string>
     <string name="hide_apps_success">%s is now hidden.</string>
     <string name="hide_apps_failure">%s cannot be hidden, because it is an active admin or
         required by the system.</string>
+    <string name="hide_apps_system_failure">%s cannot be hidden, because the provided package
+        is not a system package.</string>
     <string name="unhide_apps_title">Unhide apps</string>
+    <string name="unhide_apps_parent_title">Unhide apps on parent</string>
     <string name="unhide_apps_empty">No apps are currently hidden.</string>
     <string name="unhide_apps_success">%s is no longer hidden.</string>
     <string name="unhide_apps_failure">%s cannot be unhidden.</string>
+    <string name="unhide_apps_system_failure">%s cannot be unhidden, because the provided package
+        is not a system package.</string>
     <string name="suspend_apps_title">Suspend apps</string>
     <string name="suspend_apps_empty">All apps are suspended.</string>
     <string name="suspend_apps_success">%s is now suspended.</string>

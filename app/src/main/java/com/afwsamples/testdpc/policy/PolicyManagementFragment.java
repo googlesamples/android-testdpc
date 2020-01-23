@@ -296,6 +296,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String ADD_ACCOUNT_KEY = "add_account";
     private static final String REMOVE_ACCOUNT_KEY = "remove_account";
     private static final String HIDE_APPS_KEY = "hide_apps";
+    private static final String HIDE_APPS_PARENT_KEY = "hide_apps_parent";
     private static final String INSTALL_CA_CERTIFICATE_KEY = "install_ca_certificate";
     private static final String INSTALL_KEY_CERTIFICATE_KEY = "install_key_certificate";
     private static final String INSTALL_NONMARKET_APPS_KEY
@@ -360,6 +361,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String SYSTEM_UPDATE_PENDING_KEY = "system_update_pending";
     private static final String TEST_KEY_USABILITY_KEY = "test_key_usability";
     private static final String UNHIDE_APPS_KEY = "unhide_apps";
+    private static final String UNHIDE_APPS_PARENT_KEY = "unhide_apps_parent";
     private static final String UNSUSPEND_APPS_KEY = "unsuspend_apps";
     private static final String CLEAR_APP_DATA_KEY = "clear_app_data";
     private static final String KEEP_UNINSTALLED_PACKAGES = "keep_uninstalled_packages";
@@ -458,6 +460,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private DpcPreference mLogoutUserPreference;
     private DpcPreference mManageLockTaskListPreference;
     private DpcPreference mSetLockTaskFeaturesPreference;
+    private DpcPreference mUnhideAppsParentPreference;
+    private DpcPreference mHideAppsParentPreference;
 
     private DpcSwitchPreference mEnableLogoutPreference;
     private Preference mAffiliatedUserPreference;
@@ -639,7 +643,15 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(INSTALL_APK_PACKAGE_KEY).setOnPreferenceClickListener(this);
         findPreference(UNINSTALL_PACKAGE_KEY).setOnPreferenceClickListener(this);
         findPreference(HIDE_APPS_KEY).setOnPreferenceClickListener(this);
+        mHideAppsParentPreference = (DpcPreference) findPreference(HIDE_APPS_PARENT_KEY);
+        mHideAppsParentPreference.setOnPreferenceClickListener(this);
+        mHideAppsParentPreference.setCustomConstraint(
+                this::validateProfileOwnerOfOrganizationOwnedDevice);
         findPreference(UNHIDE_APPS_KEY).setOnPreferenceClickListener(this);
+        mUnhideAppsParentPreference = (DpcPreference) findPreference(UNHIDE_APPS_PARENT_KEY);
+        mUnhideAppsParentPreference.setOnPreferenceClickListener(this);
+        mUnhideAppsParentPreference.setCustomConstraint(
+                this::validateProfileOwnerOfOrganizationOwnedDevice);
         findPreference(SUSPEND_APPS_KEY).setOnPreferenceClickListener(this);
         findPreference(UNSUSPEND_APPS_KEY).setOnPreferenceClickListener(this);
         findPreference(CLEAR_APP_DATA_KEY).setOnPreferenceClickListener(this);
@@ -1030,8 +1042,14 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             case HIDE_APPS_KEY:
                 showHideAppsPrompt(false);
                 return true;
+            case HIDE_APPS_PARENT_KEY:
+                showHideAppsOnParentPrompt(false);
+                return true;
             case UNHIDE_APPS_KEY:
                 showHideAppsPrompt(true);
+                return true;
+            case UNHIDE_APPS_PARENT_KEY:
+                showHideAppsOnParentPrompt(true);
                 return true;
             case SUSPEND_APPS_KEY:
                 showSuspendAppsPrompt(false);
@@ -3126,6 +3144,52 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                     })
                     .show();
         }
+    }
+
+    @RequiresApi(api = Util.R_VERSION_CODE)
+    private void showHideAppsOnParentPrompt(final boolean showHiddenApps) {
+        final int dialogTitleResId;
+        final int successResId;
+        final int failureResId;
+        final int failureSystemResId;
+        if (showHiddenApps) {
+            // showing a dialog to unhide an app
+            dialogTitleResId = R.string.unhide_apps_parent_title;
+            successResId = R.string.unhide_apps_success;
+            failureResId = R.string.unhide_apps_failure;
+            failureSystemResId = R.string.unhide_apps_system_failure;
+        } else {
+            // showing a dialog to hide an app
+            dialogTitleResId = R.string.hide_apps_parent_title;
+            successResId = R.string.hide_apps_success;
+            failureResId = R.string.hide_apps_failure;
+            failureSystemResId = R.string.hide_apps_system_failure;
+        }
+
+        View view = getActivity().getLayoutInflater().inflate(R.layout.simple_edittext, null);
+        final EditText input = view.findViewById(R.id.input);
+        input.setHint(getString(R.string.input_package_name_hints));
+
+        new AlertDialog.Builder(getActivity())
+                .setTitle(getString(dialogTitleResId))
+                .setView(view)
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                    String packageName = input.getText().toString();
+                    try {
+                        if (mDevicePolicyManager.getParentProfileInstance(mAdminComponentName)
+                                .setApplicationHidden(mAdminComponentName, packageName,
+                                        !showHiddenApps)) {
+                            showToast(successResId, packageName);
+                        } else {
+                            showToast(getString(failureResId, packageName), Toast.LENGTH_LONG);
+                        }
+                    } catch (IllegalArgumentException e) {
+                        showToast(getString(failureSystemResId, packageName), Toast.LENGTH_LONG);
+                    }
+                    dialog.dismiss();
+                })
+                .setNegativeButton(android.R.string.cancel, (dialog, which) -> dialog.dismiss())
+                .show();
     }
 
     /**

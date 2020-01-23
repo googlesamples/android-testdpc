@@ -144,9 +144,19 @@
             testdpc:minSdkVersion="L"
             testdpc:delegation="delegation-package-access" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="hide_apps_parent"
+            android:title="@string/hide_apps_parent_title"
+            testdpc:minSdkVersion="R"
+            testdpc:delegation="delegation-package-access" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="unhide_apps"
             android:title="@string/unhide_apps_title"
             testdpc:minSdkVersion="L"
+            testdpc:delegation="delegation-package-access" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="unhide_apps_parent"
+            android:title="@string/unhide_apps_parent_title"
+            testdpc:minSdkVersion="R"
             testdpc:delegation="delegation-package-access" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="suspend_apps"
