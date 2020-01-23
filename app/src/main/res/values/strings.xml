@@ -613,6 +613,9 @@
     <!-- Backup and Restore for Device Owner -->
     <string name="enable_backup_service">Enable backup service</string>
 
+    <!-- Suspension of personal apps -->
+    <string name="suspend_personal_apps">Suspend personal apps</string>
+
     <!-- Enterprise security logging -->
     <string name="enable_security_logging">Enable security logging</string>
     <string name="request_security_logs">Request security logs</string>

@@ -734,6 +734,11 @@
             android:title="@string/factory_reset_org_owned"
             testdpc:admin="profileOwner"
             testdpc:minSdkVersion="R" />
+        <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
+            android:key="suspend_personal_apps"
+            android:title="@string/suspend_personal_apps"
+            testdpc:admin="profileOwner"
+            testdpc:minSdkVersion="R" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/transfer_ownership">
