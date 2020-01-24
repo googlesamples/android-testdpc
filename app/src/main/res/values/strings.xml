@@ -622,6 +622,9 @@
     <!-- Suspension of personal apps -->
     <string name="suspend_personal_apps">Suspend personal apps</string>
 
+    <!-- Maximum time work profile is allowed to be off -->
+    <string name="profile_max_time_off">Work profile max time off (seconds)</string>
+
     <!-- Enterprise security logging -->
     <string name="enable_security_logging">Enable security logging</string>
     <string name="request_security_logs">Request security logs</string>

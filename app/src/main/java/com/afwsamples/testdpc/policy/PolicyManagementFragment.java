@@ -107,6 +107,7 @@ import com.afwsamples.testdpc.common.ReflectionUtil.ReflectionIsTemporaryExcepti
 import com.afwsamples.testdpc.common.UserArrayAdapter;
 import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.common.preference.CustomConstraint;
+import com.afwsamples.testdpc.common.preference.DpcEditTextPreference;
 import com.afwsamples.testdpc.common.preference.DpcPreference;
 import com.afwsamples.testdpc.common.preference.DpcPreferenceBase;
 import com.afwsamples.testdpc.common.preference.DpcPreferenceHelper;
@@ -395,6 +396,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String SET_LOCATION_ENABLED_KEY = "set_location_enabled";
     private static final String SET_LOCATION_MODE_KEY = "set_location_mode";
     private static final String SUSPEND_PERSONAL_APPS_KEY = "suspend_personal_apps";
+    private static final String PROFILE_MAX_TIME_OFF_KEY = "profile_max_time_off";
 
     private static final String BATTERY_PLUGGED_ANY = Integer.toString(
             BatteryManager.BATTERY_PLUGGED_AC |
@@ -480,6 +482,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     private DpcPreference mUserRestrictionsParentPreference;
     private DpcSwitchPreference mSuspendPersonalApps;
+    private DpcEditTextPreference mProfileMaxTimeOff;
 
     private DpcSwitchPreference mLockdownAdminConfiguredNetworksPreference;
 
@@ -748,6 +751,12 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         mSuspendPersonalApps.setCustomConstraint(
                 this::validateProfileOwnerOfOrganizationOwnedDevice);
 
+        mProfileMaxTimeOff = (DpcEditTextPreference) findPreference(PROFILE_MAX_TIME_OFF_KEY);
+        mProfileMaxTimeOff.setOnPreferenceChangeListener(this);
+        mProfileMaxTimeOff.setCustomConstraint(
+                this::validateProfileOwnerOfOrganizationOwnedDevice);
+        maybeUpdateProfileMaxTimeOff();
+
         onCreateSetNewPasswordWithComplexityPreference();
         constrainSpecialCasePreferences();
 
@@ -770,6 +779,14 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         reloadPersonalAppsSuspendedUi();
     }
 
+    private void maybeUpdateProfileMaxTimeOff() {
+        if (mProfileMaxTimeOff.isEnabled()) {
+            final String currentValueAsString = Long.toString(getManagedProfileMaximumTimeOff());
+            mProfileMaxTimeOff.setText(currentValueAsString);
+            mProfileMaxTimeOff.setSummary(currentValueAsString);
+        }
+    }
+
     @TargetApi(Util.R_VERSION_CODE)
     private void reloadPersonalAppsSuspendedUi() {
         // TODO: nuke it when R sdk is available
@@ -787,7 +804,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                     "getPersonalAppsSuspendedReasons", new Class<?>[]{ComponentName.class},
                     mAdminComponentName);
         } catch (ReflectionIsTemporaryException e) {
-            Log.e(TAG, "Error invoking getPersonalAppsSuspendedReasons", e);
+            logAndShowToast("Error invoking getPersonalAppsSuspendedReasons", e);
             return 0;
         }
     }
@@ -799,8 +816,36 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                     new Class<?>[]{ComponentName.class, boolean.class},
                     mAdminComponentName, suspended);
         } catch (ReflectionIsTemporaryException e) {
-            Log.e(TAG, "Error invoking setPersonalAppsSuspended", e);
+            logAndShowToast("Error invoking setPersonalAppsSuspended", e);
         }
+    }
+
+    //TODO: nuke it when R sdk is available.
+    public long getManagedProfileMaximumTimeOff() {
+        try {
+            return (Long) ReflectionUtil.invoke(mDevicePolicyManager,
+                    "getManagedProfileMaximumTimeOff", new Class<?>[]{ComponentName.class},
+                    mAdminComponentName);
+        } catch (ReflectionIsTemporaryException e) {
+            logAndShowToast("Error invoking getManagedProfileMaximumTimeOff", e);
+            return 0;
+        }
+    }
+
+    //TODO: nuke it when R sdk is available.
+    public void setManagedProfileMaximumTimeOff(long timeoutMs) {
+        try {
+            ReflectionUtil.invoke(mDevicePolicyManager, "setManagedProfileMaximumTimeOff",
+                    new Class<?>[]{ComponentName.class, long.class},
+                    mAdminComponentName, timeoutMs);
+        } catch (ReflectionIsTemporaryException e) {
+            logAndShowToast("Error invoking setManagedProfileMaximumTimeOff", e);
+        }
+    }
+
+    private void logAndShowToast(String message, Exception e) {
+        Log.e(TAG, message, e);
+        showToast(message + ": " + e.getMessage());
     }
 
     private void onCreateSetNewPasswordWithComplexityPreference() {
@@ -1512,6 +1557,10 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             case SUSPEND_PERSONAL_APPS_KEY:
                 setPersonalAppsSuspended((Boolean) newValue);
                 reloadPersonalAppsSuspendedUi();
+                return true;
+            case PROFILE_MAX_TIME_OFF_KEY:
+                setManagedProfileMaximumTimeOff(Long.parseLong((String) newValue));
+                maybeUpdateProfileMaxTimeOff();
                 return true;
         }
         return false;
