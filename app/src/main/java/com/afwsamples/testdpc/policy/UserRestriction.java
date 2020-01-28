@@ -251,6 +251,14 @@ public class UserRestriction {
                     R.string.disallow_sms),
             new UserRestriction(DISALLOW_USB_FILE_TRANSFER,
                     R.string.disallow_usb_file_transfer),
+            new UserRestriction(DISALLOW_AIRPLANE_MODE,
+                    R.string.disallow_airplane_mode),
+            new UserRestriction(DISALLOW_MOUNT_PHYSICAL_MEDIA,
+                    R.string.disallow_mount_physical_media),
+            new UserRestriction(DISALLOW_OUTGOING_CALLS,
+                    R.string.disallow_outgoing_calls),
+            new UserRestriction(DISALLOW_UNMUTE_MICROPHONE,
+                    R.string.disallow_unmute_microphone),
     };
 
     /**
