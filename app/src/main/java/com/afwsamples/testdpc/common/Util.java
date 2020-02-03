@@ -167,13 +167,8 @@ public class Util {
             return Collections.emptyList();
         }
 
-        List<UserHandle> targetUsers = getDevicePolicyManager(context).
-            getBindDeviceAdminTargetUsers(DeviceAdminReceiver.getComponentName(context));
-        if (targetUsers != null){
-            return targetUsers;
-        }
-
-        return Collections.emptyList();
+        final DevicePolicyManager dpm = getDevicePolicyManager(context);
+        return dpm.getBindDeviceAdminTargetUsers(DeviceAdminReceiver.getComponentName(context));
     }
 
     public static void showFileViewer(PreferenceFragment fragment, int requestCode) {

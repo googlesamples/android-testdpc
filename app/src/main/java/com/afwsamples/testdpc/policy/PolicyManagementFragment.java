@@ -892,9 +892,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         }
 
         DevicePolicyManager dpm = getActivity().getSystemService(DevicePolicyManager.class);
-        List<String> scopes = dpm.getDelegatedScopes(null, getActivity().getPackageName());
-
-        return scopes == null ? false : !scopes.isEmpty();
+        return !dpm.getDelegatedScopes(null, getActivity().getPackageName()).isEmpty();
     }
 
     @Override

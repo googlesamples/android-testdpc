@@ -263,10 +263,6 @@ public class DpcPreferenceHelper {
             return Collections.emptyList();
         }
 
-        if (!Util.isDeviceOwner(mContext) && !Util.isProfileOwner(mContext)) {
-            return Collections.emptyList();
-        }
-
         final DevicePolicyManager dpm =
                 (DevicePolicyManager) mContext.getSystemService(Context.DEVICE_POLICY_SERVICE);
         final String packageName = mContext.getPackageName();
@@ -295,10 +291,6 @@ public class DpcPreferenceHelper {
     }
 
     private boolean hasDelegation(List<String> delegations) {
-        if (mDelegationConstraint == null) {
-            return false;
-        }
-
         return delegations.contains(mDelegationConstraint);
     }
 
