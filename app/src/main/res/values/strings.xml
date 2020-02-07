@@ -184,6 +184,7 @@
     <string name="stop_button_label">Stop</string>
     <string name="delete_button_label">Delete</string>
     <string name="disable_screen_capture">Disable screen capture</string>
+    <string name="disable_screen_capture_on_parent">Disable screen capture on parent</string>
     <string name="mute_audio">Mute audio</string>
 
     <!-- Stings for work profile management -->

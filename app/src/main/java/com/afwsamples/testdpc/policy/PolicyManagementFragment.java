@@ -278,6 +278,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String DISABLE_KEYGUARD = "disable_keyguard";
     private static final String DISABLE_METERED_DATA_KEY = "disable_metered_data";
     private static final String DISABLE_SCREEN_CAPTURE_KEY = "disable_screen_capture";
+    private static final String DISABLE_SCREEN_CAPTURE_ON_PARENT_KEY =
+            "disable_screen_capture_on_parent";
     private static final String DISABLE_STATUS_BAR = "disable_status_bar";
     private static final String ENABLE_BACKUP_SERVICE = "enable_backup_service";
     private static final String APP_FEEDBACK_NOTIFICATIONS = "app_feedback_notifications";
@@ -443,6 +445,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private SwitchPreference mDisableCameraSwitchPreference;
     private DpcSwitchPreference mDisableCameraOnParentSwitchPreference;
     private SwitchPreference mDisableScreenCaptureSwitchPreference;
+    private DpcSwitchPreference mDisableScreenCaptureOnParentSwitchPreference;
     private SwitchPreference mMuteAudioSwitchPreference;
 
     private DpcPreference mDisableStatusBarPreference;
@@ -561,6 +564,11 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         mDisableScreenCaptureSwitchPreference = (SwitchPreference) findPreference(
                 DISABLE_SCREEN_CAPTURE_KEY);
         mDisableScreenCaptureSwitchPreference.setOnPreferenceChangeListener(this);
+        mDisableScreenCaptureOnParentSwitchPreference = (DpcSwitchPreference) findPreference(
+                DISABLE_SCREEN_CAPTURE_ON_PARENT_KEY);
+        mDisableScreenCaptureOnParentSwitchPreference.setOnPreferenceChangeListener(this);
+        mDisableScreenCaptureOnParentSwitchPreference
+                .setCustomConstraint(this::validateProfileOwnerOfOrganizationOwnedDevice);
         mMuteAudioSwitchPreference = (SwitchPreference) findPreference(
                 MUTE_AUDIO_KEY);
         mMuteAudioSwitchPreference.setOnPreferenceChangeListener(this);
@@ -1450,6 +1458,10 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 // Reload UI to verify that screen capture was enabled / disabled correctly.
                 reloadScreenCaptureDisableUi();
                 return true;
+            case DISABLE_SCREEN_CAPTURE_ON_PARENT_KEY:
+                setScreenCaptureDisabledOnParent((Boolean) newValue);
+                reloadScreenCaptureDisableOnParentUi();
+                return true;
             case MUTE_AUDIO_KEY:
                 mDevicePolicyManager.setMasterVolumeMuted(mAdminComponentName,
                         (Boolean) newValue);
@@ -1603,6 +1615,13 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     @TargetApi(VERSION_CODES.LOLLIPOP)
     private void setScreenCaptureDisabled(boolean disabled) {
         mDevicePolicyManager.setScreenCaptureDisabled(mAdminComponentName, disabled);
+    }
+
+    @TargetApi(Util.R_VERSION_CODE)
+    private void setScreenCaptureDisabledOnParent(boolean disabled) {
+        DevicePolicyManager parentDpm = mDevicePolicyManager
+                .getParentProfileInstance(mAdminComponentName);
+        parentDpm.setScreenCaptureDisabled(mAdminComponentName, disabled);
     }
 
     @TargetApi(VERSION_CODES.O)
@@ -2547,6 +2566,14 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         boolean isScreenCaptureDisabled = mDevicePolicyManager.getScreenCaptureDisabled(
                 mAdminComponentName);
         mDisableScreenCaptureSwitchPreference.setChecked(isScreenCaptureDisabled);
+    }
+
+    @TargetApi(Util.R_VERSION_CODE)
+    private void reloadScreenCaptureDisableOnParentUi() {
+        DevicePolicyManager parentDpm
+                = mDevicePolicyManager.getParentProfileInstance(mAdminComponentName);
+        boolean isScreenCaptureDisabled = parentDpm.getScreenCaptureDisabled(mAdminComponentName);
+        mDisableScreenCaptureOnParentSwitchPreference.setChecked(isScreenCaptureDisabled);
     }
 
     @TargetApi(VERSION_CODES.LOLLIPOP)
