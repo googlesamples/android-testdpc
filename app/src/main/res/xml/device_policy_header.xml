@@ -250,6 +250,10 @@
             android:title="@string/disable_screen_capture"
             testdpc:minSdkVersion="L" />
         <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
+            android:key="disable_screen_capture_on_parent"
+            android:title="@string/disable_screen_capture_on_parent"
+            testdpc:minSdkVersion="R" />
+        <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
             android:key="mute_audio"
             android:title="@string/mute_audio"
             testdpc:minSdkVersion="L"
