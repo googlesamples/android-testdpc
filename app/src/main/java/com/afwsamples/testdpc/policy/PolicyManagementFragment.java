@@ -164,6 +164,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -789,7 +790,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     private void maybeUpdateProfileMaxTimeOff() {
         if (mProfileMaxTimeOff.isEnabled()) {
-            final String currentValueAsString = Long.toString(getManagedProfileMaximumTimeOff());
+            final String currentValueAsString = Long.toString(
+                    TimeUnit.MILLISECONDS.toSeconds(getManagedProfileMaximumTimeOff()));
             mProfileMaxTimeOff.setText(currentValueAsString);
             mProfileMaxTimeOff.setSummary(currentValueAsString);
         }
@@ -1569,7 +1571,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 reloadPersonalAppsSuspendedUi();
                 return true;
             case PROFILE_MAX_TIME_OFF_KEY:
-                setManagedProfileMaximumTimeOff(Long.parseLong((String) newValue));
+                final long timeoutSec = Long.parseLong((String) newValue);
+                setManagedProfileMaximumTimeOff(TimeUnit.SECONDS.toMillis(timeoutSec));
                 maybeUpdateProfileMaxTimeOff();
                 return true;
         }
