@@ -71,7 +71,6 @@
         <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
             android:key="keyguard_disable_secure_camera"
             android:title="@string/keyguard_disable_secure_camera"
-            testdpc:admin="deviceOwner"
             testdpc:minSdkVersion="L" />
         <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
             android:key="keyguard_disable_secure_notifications"
