@@ -1476,11 +1476,11 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             case WIFI_CONFIG_LOCKDOWN_ENABLE_KEY:
                 try {
                     ReflectionUtil.invoke(mDevicePolicyManager,
-                            "setLockdownAdminConfiguredNetworks",
+                            "setConfiguredNetworksLockdownState",
                             new Class<?>[]{ComponentName.class, boolean.class},
                             mAdminComponentName, newValue.equals(true));
                 } catch (ReflectionIsTemporaryException e) {
-                    Log.e(TAG, "Error invoking setLockdownAdminConfiguredNetworks", e);
+                    Log.e(TAG, "Error invoking setConfiguredNetworksLockdownState", e);
                 }
                 reloadLockdownAdminConfiguredNetworksUi();
                 return true;
@@ -2480,11 +2480,11 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private void reloadLockdownAdminConfiguredNetworksUi() {
         try {
             boolean lockdown = (Boolean) ReflectionUtil.invoke(mDevicePolicyManager,
-                    "isLockdownAdminConfiguredNetworks",
+                    "hasLockdownAdminConfiguredNetworks",
                     new Class<?>[]{ComponentName.class}, mAdminComponentName);
             mLockdownAdminConfiguredNetworksPreference.setChecked(lockdown);
         } catch (ReflectionIsTemporaryException e) {
-            Log.e(TAG, "Error invoking isLockdownAdminConfiguredNetworks", e);
+            Log.e(TAG, "Error invoking hasLockdownAdminConfiguredNetworks", e);
         }
     }
 
