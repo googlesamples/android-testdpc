@@ -23,7 +23,7 @@
             android:inputType="text"
             android:key="key_lock_screen_message"
             android:title="@string/lock_screen_message"
-            testdpc:admin="deviceOwner"
+            testdpc:admin="deviceOwner|orgOwnedProfileOwner"
             testdpc:minSdkVersion="N" />
     </PreferenceCategory>
 

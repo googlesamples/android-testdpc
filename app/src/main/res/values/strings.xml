@@ -100,6 +100,7 @@
     <string name="requires_delimiter">,\u0020</string>
     <string name="requires_or">\u0020or\u0020</string>
     <string name="device_owner">device owner</string>
+    <string name="org_owned_profile_owner">organization-owned profile owner</string>
     <string name="profile_owner">profile owner</string>
     <string name="primary_user">primary user</string>
     <string name="secondary_user">secondary user</string>
@@ -115,6 +116,7 @@
 
     <string name="this_is_a_device_owner">This app is the device owner.</string>
     <string name="this_is_a_profile_owner">This app is a profile owner.</string>
+    <string name="this_is_an_org_owned_profile_owner">This app is a profile owner of an organization-owned device.</string>
     <string name="this_is_a_delegated_app">This app has delegated permissions.</string>
     <string name="this_is_not_an_admin">This app is not an admin.</string>
 
@@ -316,7 +318,7 @@
     <string name="wifi_cancel">Cancel</string>
     <string name="wifi_config_success">WI-FI configuration saved.</string>
     <string name="wifi_config_fail">Failed to save the WI-FI configuration.</string>
-    <string name="enable_wifi_config_lockdown">DO created WI-FI configs are modifiable only by DO.</string>
+    <string name="enable_wifi_config_lockdown">DO created WI-FI configs are modifiable only by DO</string>
     <string name="modify_wifi_configuration">Modify WI-FI configuration</string>
     <string name="show_wifi_mac_address">Show Wi-Fi MAC address</string>
     <string name="show_wifi_mac_address_title">Wi-Fi MAC address</string>

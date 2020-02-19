@@ -29,6 +29,8 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.TextView;
 import com.afwsamples.testdpc.R;
+import com.afwsamples.testdpc.common.ReflectionUtil;
+import com.afwsamples.testdpc.common.ReflectionUtil.ReflectionIsTemporaryException;
 import com.afwsamples.testdpc.common.Util;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -47,15 +49,18 @@ import java.util.List;
  */
 public class DpcPreferenceHelper {
     @Retention(RetentionPolicy.SOURCE)
-    @IntDef(flag = true, value = {ADMIN_NONE, ADMIN_DEVICE_OWNER, ADMIN_PROFILE_OWNER})
+    @IntDef(flag = true, value = {ADMIN_NONE, ADMIN_DEVICE_OWNER, ADMIN_BYOD_PROFILE_OWNER,
+        ADMIN_ORG_OWNED_PROFILE_OWNER})
     public @interface AdminKind {}
     public static final int ADMIN_NONE = 0x1;
     public static final int ADMIN_DEVICE_OWNER = 0x2;
-    public static final int ADMIN_PROFILE_OWNER = 0x4;
-    public static final int ADMIN_ANY = ADMIN_NONE | ADMIN_DEVICE_OWNER | ADMIN_PROFILE_OWNER;
+    public static final int ADMIN_BYOD_PROFILE_OWNER = 0x4;
+    public static final int ADMIN_ORG_OWNED_PROFILE_OWNER = 0x8;
+    public static final int ADMIN_PROFILE_OWNER =
+        ADMIN_BYOD_PROFILE_OWNER | ADMIN_ORG_OWNED_PROFILE_OWNER;
+    public static final int ADMIN_ANY =
+        ADMIN_NONE | ADMIN_DEVICE_OWNER | ADMIN_PROFILE_OWNER | ADMIN_ORG_OWNED_PROFILE_OWNER;
     public static final int ADMIN_NOT_NONE = ADMIN_ANY & ~ADMIN_NONE;
-    public static final int ADMIN_NOT_DEVICE_OWNER = ADMIN_ANY & ~ADMIN_DEVICE_OWNER;
-    public static final int ADMIN_NOT_PROFILE_OWNER = ADMIN_ANY & ~ADMIN_PROFILE_OWNER;
     public static final @AdminKind int ADMIN_DEFAULT = ADMIN_NOT_NONE;
     public static final int NO_CUSTOM_CONSTRIANT = 0;
 
@@ -252,6 +257,16 @@ public class DpcPreferenceHelper {
         if (dpm.isDeviceOwnerApp(packageName)) {
             return ADMIN_DEVICE_OWNER;
         }
+        Boolean orgOwned;
+        try {
+            orgOwned = (Boolean) ReflectionUtil.invoke(dpm,
+                "isOrganizationOwnedDeviceWithManagedProfile");
+        } catch (ReflectionIsTemporaryException e) {
+            orgOwned = false;
+        }
+        if (orgOwned) {
+            return ADMIN_ORG_OWNED_PROFILE_OWNER;
+        }
         if (dpm.isProfileOwnerApp(packageName)) {
             return ADMIN_PROFILE_OWNER;
         }
@@ -304,7 +319,12 @@ public class DpcPreferenceHelper {
         if (isEnabledForAdmin(ADMIN_DEVICE_OWNER)) {
             admins.add(mContext.getString(R.string.device_owner));
         }
-        if (isEnabledForAdmin(ADMIN_PROFILE_OWNER)) {
+        // Only add the org-owned profile message if the constraint is specific to org-owned profile
+        // and not all profile types, to reduce verbosity of the message.
+        if (isEnabledForAdmin(ADMIN_ORG_OWNED_PROFILE_OWNER) &&
+            !isEnabledForAdmin(ADMIN_PROFILE_OWNER)) {
+            admins.add(mContext.getString(R.string.org_owned_profile_owner));
+        } else if (isEnabledForAdmin(ADMIN_PROFILE_OWNER)) {
             admins.add(mContext.getString(R.string.profile_owner));
         }
         if (!TextUtils.isEmpty(mDelegationConstraint)) {

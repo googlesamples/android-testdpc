@@ -36,13 +36,14 @@
         <attr name="admin">
             <flag name="none" value="0x1" />
             <flag name="deviceOwner" value="0x2" />
-            <flag name="profileOwner" value="0x4" />
+            <!-- A regular non-org-owned managed profile owner. -->
+            <flag name="byodProfileOwner" value="0x4" />
+            <flag name="orgOwnedProfileOwner" value="0x8" />
 
-            <flag name="notNone" value="0x6" /> <!-- default -->
-            <flag name="notDeviceOwner" value="0x5" />
-            <flag name="notProfileOwner" value="0x3" />
-
-            <flag name="any" value="0x7" />
+            <!-- A regular or org-owned managed profile owner. -->
+            <flag name="profileOwner" value="0xC" />
+            <flag name="notNone" value="0xE" /> <!-- default -->
+            <flag name="any" value="0xF" />
         </attr>
 
         <!-- Constrain a preference to a delegated scope. -->

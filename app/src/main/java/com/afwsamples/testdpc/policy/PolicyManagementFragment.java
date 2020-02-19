@@ -457,7 +457,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private SwitchPreference mStayOnWhilePluggedInSwitchPreference;
     private DpcSwitchPreference mInstallNonMarketAppsPreference;
 
-    private SwitchPreference mEnableBackupServicePreference;
+    private DpcSwitchPreference mEnableBackupServicePreference;
     private SwitchPreference mEnableSecurityLoggingPreference;
     private SwitchPreference mEnableNetworkLoggingPreference;
     private DpcSwitchPreference mSetAutoTimeRequiredPreference;
@@ -558,8 +558,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         mDisableCameraOnParentSwitchPreference = (DpcSwitchPreference)
                 findPreference(DISABLE_CAMERA_ON_PARENT_KEY);
         mDisableCameraOnParentSwitchPreference.setOnPreferenceChangeListener(this);
-        mDisableCameraOnParentSwitchPreference
-                .setCustomConstraint(this::validateProfileOwnerOfOrganizationOwnedDevice);
         findPreference(CAPTURE_IMAGE_KEY).setOnPreferenceClickListener(this);
         findPreference(CAPTURE_VIDEO_KEY).setOnPreferenceClickListener(this);
         mDisableScreenCaptureSwitchPreference = (SwitchPreference) findPreference(
@@ -568,8 +566,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         mDisableScreenCaptureOnParentSwitchPreference = (DpcSwitchPreference) findPreference(
                 DISABLE_SCREEN_CAPTURE_ON_PARENT_KEY);
         mDisableScreenCaptureOnParentSwitchPreference.setOnPreferenceChangeListener(this);
-        mDisableScreenCaptureOnParentSwitchPreference
-                .setCustomConstraint(this::validateProfileOwnerOfOrganizationOwnedDevice);
         mMuteAudioSwitchPreference = (SwitchPreference) findPreference(
                 MUTE_AUDIO_KEY);
         mMuteAudioSwitchPreference.setOnPreferenceChangeListener(this);
@@ -608,8 +604,10 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(WIPE_DATA_KEY).setOnPreferenceClickListener(this);
         findPreference(PERSISTENT_DEVICE_OWNER_KEY).setOnPreferenceClickListener(this);
         findPreference(REMOVE_DEVICE_OWNER_KEY).setOnPreferenceClickListener(this);
-        mEnableBackupServicePreference = (SwitchPreference) findPreference(ENABLE_BACKUP_SERVICE);
+        mEnableBackupServicePreference = (DpcSwitchPreference) findPreference(
+            ENABLE_BACKUP_SERVICE);
         mEnableBackupServicePreference.setOnPreferenceChangeListener(this);
+        mEnableBackupServicePreference.setCustomConstraint(this::validateDeviceOwnerBeforeQ);
         findPreference(REQUEST_BUGREPORT_KEY).setOnPreferenceClickListener(this);
         mEnableSecurityLoggingPreference =
             (SwitchPreference) findPreference(ENABLE_SECURITY_LOGGING);
@@ -657,13 +655,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(HIDE_APPS_KEY).setOnPreferenceClickListener(this);
         mHideAppsParentPreference = (DpcPreference) findPreference(HIDE_APPS_PARENT_KEY);
         mHideAppsParentPreference.setOnPreferenceClickListener(this);
-        mHideAppsParentPreference.setCustomConstraint(
-                this::validateProfileOwnerOfOrganizationOwnedDevice);
         findPreference(UNHIDE_APPS_KEY).setOnPreferenceClickListener(this);
         mUnhideAppsParentPreference = (DpcPreference) findPreference(UNHIDE_APPS_PARENT_KEY);
         mUnhideAppsParentPreference.setOnPreferenceClickListener(this);
-        mUnhideAppsParentPreference.setCustomConstraint(
-                this::validateProfileOwnerOfOrganizationOwnedDevice);
         findPreference(SUSPEND_APPS_KEY).setOnPreferenceClickListener(this);
         findPreference(UNSUSPEND_APPS_KEY).setOnPreferenceClickListener(this);
         findPreference(CLEAR_APP_DATA_KEY).setOnPreferenceClickListener(this);
@@ -702,7 +696,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(SET_USER_RESTRICTIONS_KEY).setOnPreferenceClickListener(this);
         mUserRestrictionsParentPreference = (DpcPreference) findPreference(SET_USER_RESTRICTIONS_PARENT_KEY);
         mUserRestrictionsParentPreference.setOnPreferenceClickListener(this);
-        mUserRestrictionsParentPreference.setCustomConstraint(this::validateProfileOwnerOfOrganizationOwnedDevice);
 
         findPreference(REBOOT_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_SHORT_SUPPORT_MESSAGE_KEY).setOnPreferenceClickListener(this);
@@ -757,13 +750,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
         mSuspendPersonalApps = (DpcSwitchPreference) findPreference(SUSPEND_PERSONAL_APPS_KEY);
         mSuspendPersonalApps.setOnPreferenceChangeListener(this);
-        mSuspendPersonalApps.setCustomConstraint(
-                this::validateProfileOwnerOfOrganizationOwnedDevice);
 
         mProfileMaxTimeOff = (DpcEditTextPreference) findPreference(PROFILE_MAX_TIME_OFF_KEY);
         mProfileMaxTimeOff.setOnPreferenceChangeListener(this);
-        mProfileMaxTimeOff.setCustomConstraint(
-                this::validateProfileOwnerOfOrganizationOwnedDevice);
         maybeUpdateProfileMaxTimeOff();
 
         onCreateSetNewPasswordWithComplexityPreference();
@@ -2359,7 +2348,11 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private void loadAppStatus() {
         final @StringRes int appStatusStringId;
         if (mDevicePolicyManager.isProfileOwnerApp(mPackageName)) {
-            appStatusStringId = R.string.this_is_a_profile_owner;
+            if (isOrganizationOwnedDeviceWithManagedProfile()) {
+                appStatusStringId = R.string.this_is_an_org_owned_profile_owner;
+            } else {
+                appStatusStringId = R.string.this_is_a_profile_owner;
+            }
         } else if (mDevicePolicyManager.isDeviceOwnerApp(mPackageName)) {
             appStatusStringId = R.string.this_is_a_device_owner;
         } else if (isDelegatedApp()) {
@@ -4021,6 +4014,15 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         return NO_CUSTOM_CONSTRIANT;
     }
 
+    private int validateDeviceOwnerBeforeQ() {
+        if (Util.SDK_INT < VERSION_CODES.Q) {
+            if (!mDevicePolicyManager.isDeviceOwnerApp(mPackageName)) {
+                return R.string.requires_device_owner;
+            }
+        }
+        return NO_CUSTOM_CONSTRIANT;
+    }
+
     // TODO: nuke it when R sdk is available
     private boolean isOrganizationOwnedDeviceWithManagedProfile() {
         try {
@@ -4030,13 +4032,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             Log.e(TAG, "Error invoking isOrganizationOwnedDeviceWithManagedProfile", e);
             return false;
         }
-    }
-
-    private int validateProfileOwnerOfOrganizationOwnedDevice() {
-        if (Util.SDK_INT < Util.R_VERSION_CODE || !isOrganizationOwnedDeviceWithManagedProfile()) {
-            return R.string.requires_profile_owner_organization_owned_device;
-        }
-        return NO_CUSTOM_CONSTRIANT;
     }
 
     abstract static class ManageLockTaskListCallback {
