@@ -1265,13 +1265,11 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 return true;
             case SET_TIME_KEY:
                 // Disable auto time before we could set time manually.
-                mDevicePolicyManager.setGlobalSetting(mAdminComponentName,
-                        Settings.Global.AUTO_TIME, "0");
+                setAutoTimeEnabled(false);
                 showSetTimeDialog();
                 return true;
             case SET_TIME_ZONE_KEY:
-                mDevicePolicyManager.setGlobalSetting(mAdminComponentName,
-                        Settings.Global.AUTO_TIME_ZONE, "0");
+                setAutoTimeZoneEnabled(false);
                 showSetTimeZoneDialog();
                 return true;
             case MANAGE_OVERRIDE_APN_KEY:
@@ -4036,5 +4034,32 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     abstract static class ManageLockTaskListCallback {
         public abstract void onPositiveButtonClicked(String[] lockTaskArray);
+    }
+
+    private void setAutoTimeEnabled(boolean enabled) {
+        try {
+            ReflectionUtil.invoke(mDevicePolicyManager, "setAutoTime",
+                new Class<?>[]{ComponentName.class, boolean.class},
+                mAdminComponentName, enabled);
+        } catch (ReflectionIsTemporaryException e) {
+            Log.e(TAG, "Error invoking setAutoTime", e);
+            // Prior to R, auto time is controlled by a global setting
+            mDevicePolicyManager.setGlobalSetting(mAdminComponentName,
+                Settings.Global.AUTO_TIME, enabled ? "1" : "0");
+        }
+    }
+
+    private void setAutoTimeZoneEnabled(boolean enabled) {
+        try {
+            ReflectionUtil.invoke(mDevicePolicyManager, "setAutoTimeZone",
+                new Class<?>[]{ComponentName.class, boolean.class},
+                mAdminComponentName, enabled);
+        } catch (ReflectionIsTemporaryException e) {
+            Log.e(TAG, "Error invoking setAutoTimeZone", e);
+            // Prior to R, auto timezone is controlled by a global setting
+            mDevicePolicyManager.setGlobalSetting(mAdminComponentName,
+                Settings.Global.AUTO_TIME_ZONE, enabled ? "1" : "0");
+        }
+
     }
 }
