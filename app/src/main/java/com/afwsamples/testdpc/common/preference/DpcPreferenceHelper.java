@@ -264,11 +264,12 @@ public class DpcPreferenceHelper {
         } catch (ReflectionIsTemporaryException e) {
             orgOwned = false;
         }
-        if (orgOwned) {
-            return ADMIN_ORG_OWNED_PROFILE_OWNER;
-        }
         if (dpm.isProfileOwnerApp(packageName)) {
-            return ADMIN_PROFILE_OWNER;
+            if (orgOwned) {
+                return ADMIN_ORG_OWNED_PROFILE_OWNER;
+            } else {
+                return ADMIN_PROFILE_OWNER;
+            }
         }
         return ADMIN_NONE;
     }
