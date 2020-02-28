@@ -326,7 +326,7 @@
             android:key="show_wifi_mac_address"
             android:title="@string/show_wifi_mac_address"
             testdpc:minSdkVersion="N"
-            testdpc:user="primaryUser" />
+            testdpc:admin="deviceOwner|orgOwnedProfileOwner" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/input_methods_title">
