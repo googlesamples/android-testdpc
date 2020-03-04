@@ -22,6 +22,7 @@ import android.net.wifi.WifiManager;
 import android.os.Build;
 
 public class WifiConfigUtil {
+  private static final int INVALID_NETWORK_ID = -1;
 
   /**
    * Save or replace the WiFi configuration.
@@ -33,23 +34,37 @@ public class WifiConfigUtil {
   public static boolean saveWifiConfiguration(
       Context context, WifiConfiguration wifiConfiguration) {
     WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-    return wifiConfiguration.networkId == -1
-        ? addWifiNetwork(wifiManager, wifiConfiguration)
-        : updateWifiNetwork(wifiManager, wifiConfiguration);
+    final int networkId;
+    if (wifiConfiguration.networkId == INVALID_NETWORK_ID) {
+      networkId = addWifiNetwork(wifiManager, wifiConfiguration);
+    } else {
+      networkId = updateWifiNetwork(wifiManager, wifiConfiguration);
+    }
+    if (networkId == INVALID_NETWORK_ID) {
+      return false;
+    }
+    wifiManager.enableNetwork(networkId, /* disableOthers= */ false);
+    return true;
   }
 
-  private static boolean addWifiNetwork(
+  /**
+   * Adds a new Wifi configuration, returning the configuration's networkId, or
+   * {@link #INVALID_NETWORK_ID} if the operation fails.
+   */
+  private static int addWifiNetwork(
       WifiManager wifiManager, WifiConfiguration wifiConfiguration) {
     // WifiManager APIs are marked as deprecated but still explicitly supported for DPCs.
     int networkId = wifiManager.addNetwork(wifiConfiguration);
-    if (networkId == -1) {
-      return false;
+    if (networkId == INVALID_NETWORK_ID) {
+      return INVALID_NETWORK_ID;
     }
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
       // Saving the configuration is required pre-O.
-      return saveAddedWifiConfiguration(wifiManager, networkId);
+      if (!saveAddedWifiConfiguration(wifiManager, networkId)) {
+        return INVALID_NETWORK_ID;
+      }
     }
-    return true;
+    return networkId;
   }
 
   private static boolean saveAddedWifiConfiguration(WifiManager wifiManager, int networkId) {
@@ -61,18 +76,24 @@ public class WifiConfigUtil {
     return true;
   }
 
-  private static boolean updateWifiNetwork(
+  /**
+   * Saves an existing Wifi configuration, returning the configuration's networkId, or
+   * {@link #INVALID_NETWORK_ID} if the operation fails.
+   */
+  private static int updateWifiNetwork(
       WifiManager wifiManager, WifiConfiguration wifiConfiguration) {
     // WifiManager APIs are marked as deprecated but still explicitly supported for DPCs.
     int networkId = wifiManager.updateNetwork(wifiConfiguration);
-    if (networkId == -1) {
-      return false;
+    if (networkId == INVALID_NETWORK_ID) {
+      return INVALID_NETWORK_ID;
     }
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
       // Saving the configuration is required pre-O.
-      return saveUpdatedWifiConfiguration(wifiManager);
+      if (!saveUpdatedWifiConfiguration(wifiManager)) {
+        return INVALID_NETWORK_ID;
+      }
     }
-    return true;
+    return networkId;
   }
 
   private static boolean saveUpdatedWifiConfiguration(WifiManager wifiManager) {
