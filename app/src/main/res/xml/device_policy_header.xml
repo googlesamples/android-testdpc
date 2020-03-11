@@ -723,6 +723,11 @@
             android:key="enable_backup_service"
             android:title="@string/enable_backup_service"
             testdpc:minSdkVersion="O" />
+        <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
+            android:key="common_criteria_mode"
+            android:title="@string/common_criteria_mode"
+            testdpc:admin="deviceOwner|orgOwnedProfileOwner"
+            testdpc:minSdkVersion="R" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="wipe_data"
             android:title="@string/wipe_data"

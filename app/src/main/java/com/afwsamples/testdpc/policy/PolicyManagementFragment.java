@@ -400,6 +400,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String SET_LOCATION_MODE_KEY = "set_location_mode";
     private static final String SUSPEND_PERSONAL_APPS_KEY = "suspend_personal_apps";
     private static final String PROFILE_MAX_TIME_OFF_KEY = "profile_max_time_off";
+    private static final String COMMON_CRITERIA_MODE_KEY = "common_criteria_mode";
 
     private static final String BATTERY_PLUGGED_ANY = Integer.toString(
             BatteryManager.BATTERY_PLUGGED_AC |
@@ -458,6 +459,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private DpcSwitchPreference mInstallNonMarketAppsPreference;
 
     private DpcSwitchPreference mEnableBackupServicePreference;
+    private DpcSwitchPreference mCommonCriteriaModePreference;
     private SwitchPreference mEnableSecurityLoggingPreference;
     private SwitchPreference mEnableNetworkLoggingPreference;
     private DpcSwitchPreference mSetAutoTimeRequiredPreference;
@@ -608,6 +610,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             ENABLE_BACKUP_SERVICE);
         mEnableBackupServicePreference.setOnPreferenceChangeListener(this);
         mEnableBackupServicePreference.setCustomConstraint(this::validateDeviceOwnerBeforeQ);
+        mCommonCriteriaModePreference = (DpcSwitchPreference) findPreference(
+            COMMON_CRITERIA_MODE_KEY);
         findPreference(REQUEST_BUGREPORT_KEY).setOnPreferenceClickListener(this);
         mEnableSecurityLoggingPreference =
             (SwitchPreference) findPreference(ENABLE_SECURITY_LOGGING);
@@ -1431,6 +1435,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 setBackupServiceEnabled((Boolean) newValue);
                 reloadEnableBackupServiceUi();
                 return true;
+            case COMMON_CRITERIA_MODE_KEY:
+                setCommonCriteriaModeEnabled((Boolean) newValue);
+                reloadCommonCriteriaModeUi();
             case ENABLE_SECURITY_LOGGING:
                 setSecurityLoggingEnabled((Boolean) newValue);
                 reloadEnableSecurityLoggingUi();
@@ -1586,6 +1593,18 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     @TargetApi(VERSION_CODES.O)
     private void setBackupServiceEnabled(boolean enabled) {
         mDevicePolicyManager.setBackupServiceEnabled(mAdminComponentName, enabled);
+    }
+
+    //@TargetApi(VERSION_CODES.R)
+    private void setCommonCriteriaModeEnabled(boolean enabled) {
+        try {
+            ReflectionUtil.invoke(mDevicePolicyManager,
+                "setCommonCriteriaModeEnabled",
+                new Class<?>[]{ComponentName.class, boolean.class},
+                mAdminComponentName, enabled);
+        } catch (ReflectionIsTemporaryException e) {
+            Log.e(TAG, "Error invoking setCommonCriteriaModeEnabled", e);
+        }
     }
 
     @TargetApi(VERSION_CODES.M)
@@ -2549,7 +2568,22 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private void reloadEnableBackupServiceUi() {
         if (mEnableBackupServicePreference.isEnabled()) {
             mEnableBackupServicePreference.setChecked(mDevicePolicyManager.isBackupServiceEnabled(
+                mAdminComponentName));
+        }
+    }
+
+    //@TargetApi(VERSION_CODES.R)
+    private void reloadCommonCriteriaModeUi() {
+        if (mCommonCriteriaModePreference.isEnabled()) {
+            try {
+                mCommonCriteriaModePreference.setChecked(
+                    (Boolean) ReflectionUtil.invoke(mDevicePolicyManager,
+                    "isCommonCriteriaModeEnabled",
+                        new Class<?>[]{ComponentName.class},
                     mAdminComponentName));
+            } catch (ReflectionIsTemporaryException e) {
+                Log.e(TAG, "Error invoking isCommonCriteriaModeEnabled", e);
+            }
         }
     }
 

@@ -622,6 +622,8 @@
     <!-- Backup and Restore for Device Owner -->
     <string name="enable_backup_service">Enable backup service</string>
 
+    <string name="common_criteria_mode">Enable Common Criteria mode</string>
+
     <!-- Suspension of personal apps -->
     <string name="suspend_personal_apps">Suspend personal apps</string>
 
