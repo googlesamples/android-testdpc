@@ -2575,15 +2575,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     //@TargetApi(VERSION_CODES.R)
     private void reloadCommonCriteriaModeUi() {
         if (mCommonCriteriaModePreference.isEnabled()) {
-            try {
-                mCommonCriteriaModePreference.setChecked(
-                    (Boolean) ReflectionUtil.invoke(mDevicePolicyManager,
-                    "isCommonCriteriaModeEnabled",
-                        new Class<?>[]{ComponentName.class},
-                    mAdminComponentName));
-            } catch (ReflectionIsTemporaryException e) {
-                Log.e(TAG, "Error invoking isCommonCriteriaModeEnabled", e);
-            }
+            mCommonCriteriaModePreference.setChecked(
+                mDevicePolicyManager.isCommonCriteriaModeEnabled(mAdminComponentName));
         }
     }
 
