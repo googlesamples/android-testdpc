@@ -396,6 +396,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String MANAGED_SYSTEM_UPDATES_KEY = "managed_system_updates";
     private static final String SET_PRIVATE_DNS_MODE_KEY = "set_private_dns_mode";
     private static final String FACTORY_RESET_ORG_OWNED_DEVICE = "factory_reset_org_owned_device";
+    private static final String SET_FACTORY_RESET_PROTECTION_POLICY_KEY =
+            "set_factory_reset_protection_policy";
     private static final String SET_LOCATION_ENABLED_KEY = "set_location_enabled";
     private static final String SET_LOCATION_MODE_KEY = "set_location_mode";
     private static final String SUSPEND_PERSONAL_APPS_KEY = "suspend_personal_apps";
@@ -723,6 +725,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
         findPreference(CROSS_PROFILE_CALENDAR_KEY).setOnPreferenceClickListener(this);
         findPreference(FACTORY_RESET_ORG_OWNED_DEVICE).setOnPreferenceClickListener(this);
+        findPreference(SET_FACTORY_RESET_PROTECTION_POLICY_KEY).setOnPreferenceClickListener(this);
 
         DpcPreference bindDeviceAdminPreference =
                 (DpcPreference) findPreference(BIND_DEVICE_ADMIN_POLICIES);
@@ -1290,6 +1293,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 return true;
             case FACTORY_RESET_ORG_OWNED_DEVICE:
                 factoryResetOrgOwnedDevice();
+                return true;
+            case SET_FACTORY_RESET_PROTECTION_POLICY_KEY:
+                showFragment(new FactoryResetProtectionPolicyFragment());
                 return true;
         }
         return false;
