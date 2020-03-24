@@ -146,6 +146,16 @@
     <string name="clear_persistent_device_owner_label">Clear</string>
     <!-- Corporate-owned work profile falls under device owner management, for convenience. -->
     <string name="factory_reset_org_owned">Factory reset Org-Owned Work Profile device</string>
+    <string name="set_factory_reset_protection_policy">Set factory reset protection policy</string>
+    <string name="factory_reset_protection_policy">Factory reset protection policy</string>
+    <string name="factory_reset_protection_policy_accounts">Accounts</string>
+    <string name="factory_reset_protection_policy_enabled">Enabled</string>
+    <string-array name="factory_reset_protection_policy_enabled_choices">
+        <item>Disabled</item>
+        <item>Enabled</item>
+    </string-array>
+    <string name="cleared_factory_reset_protection_policy">Cleared factory reset protection policy</string>
+    <string name="saved_factory_reset_protection_policy">Saved factory reset protection policy</string>
 
     <!-- Strings for device reboot -->
     <string name="reboot">Reboot device</string>
