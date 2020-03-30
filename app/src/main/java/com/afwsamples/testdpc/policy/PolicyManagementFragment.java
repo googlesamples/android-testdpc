@@ -1496,23 +1496,11 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 reloadSetAutoTimeRequiredUi();
                 return true;
             case SET_AUTO_TIME_KEY:
-                try {
-                    ReflectionUtil.invoke(mDevicePolicyManager, "setAutoTime",
-                            new Class<?>[]{ComponentName.class, boolean.class},
-                            mAdminComponentName, newValue.equals(true));
-                } catch (ReflectionIsTemporaryException e) {
-                    Log.e(TAG, "Error invoking setAutoTime", e);
-                }
+                setAutoTimeEnabled(newValue.equals(true));
                 reloadSetAutoTimeUi();
                 return true;
             case SET_AUTO_TIME_ZONE_KEY:
-                try {
-                    ReflectionUtil.invoke(mDevicePolicyManager, "setAutoTimeZone",
-                            new Class<?>[]{ComponentName.class, boolean.class},
-                            mAdminComponentName, newValue.equals(true));
-                } catch (ReflectionIsTemporaryException e) {
-                    Log.e(TAG, "Error invoking setAutoTimeZone", e);
-                }
+                setAutoTimeZoneEnabled(newValue.equals(true));
                 reloadSetAutoTimeZoneUi();
                 return true;
             case SET_DEVICE_ORGANIZATION_NAME_KEY:
@@ -2610,26 +2598,14 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     @TargetApi(Util.R_VERSION_CODE)
     private void reloadSetAutoTimeUi() {
-        try {
-            boolean isAutoTime = (Boolean) ReflectionUtil.invoke(mDevicePolicyManager,
-                    "getAutoTimeEnabled", new Class<?>[]{ComponentName.class},
-                    mAdminComponentName);
-            mSetAutoTimePreference.setChecked(isAutoTime);
-        } catch (ReflectionIsTemporaryException e) {
-            Log.e(TAG, "Error invoking getAutoTimeEnabled", e);
-        }
+        boolean isAutoTime = mDevicePolicyManager.getAutoTimeEnabled(mAdminComponentName);
+        mSetAutoTimePreference.setChecked(isAutoTime);
     }
 
     @TargetApi(Util.R_VERSION_CODE)
     private void reloadSetAutoTimeZoneUi() {
-        try {
-            boolean isAutoTimeZone = (Boolean) ReflectionUtil.invoke(mDevicePolicyManager,
-                    "getAutoTimeZoneEnabled", new Class<?>[]{ComponentName.class},
-                    mAdminComponentName);
-            mSetAutoTimeZonePreference.setChecked(isAutoTimeZone);
-        } catch (ReflectionIsTemporaryException e) {
-            Log.e(TAG, "Error invoking getAutoTimeZoneEnabled", e);
-        }
+        boolean isAutoTimeZone = mDevicePolicyManager.getAutoTimeZoneEnabled(mAdminComponentName);
+        mSetAutoTimeZonePreference.setChecked(isAutoTimeZone);
     }
 
     @TargetApi(VERSION_CODES.LOLLIPOP)
@@ -4059,30 +4035,13 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         public abstract void onPositiveButtonClicked(String[] lockTaskArray);
     }
 
+    @RequiresApi(Util.R_VERSION_CODE)
     private void setAutoTimeEnabled(boolean enabled) {
-        try {
-            ReflectionUtil.invoke(mDevicePolicyManager, "setAutoTimeEnabled",
-                new Class<?>[]{ComponentName.class, boolean.class},
-                mAdminComponentName, enabled);
-        } catch (ReflectionIsTemporaryException e) {
-            Log.e(TAG, "Error invoking setAutoTimeEnabled", e);
-            // Prior to R, auto time is controlled by a global setting
-            mDevicePolicyManager.setGlobalSetting(mAdminComponentName,
-                Settings.Global.AUTO_TIME, enabled ? "1" : "0");
-        }
+        mDevicePolicyManager.setAutoTimeEnabled(mAdminComponentName, enabled);
     }
 
+    @RequiresApi(Util.R_VERSION_CODE)
     private void setAutoTimeZoneEnabled(boolean enabled) {
-        try {
-            ReflectionUtil.invoke(mDevicePolicyManager, "setAutoTimeZoneEnabled",
-                new Class<?>[]{ComponentName.class, boolean.class},
-                mAdminComponentName, enabled);
-        } catch (ReflectionIsTemporaryException e) {
-            Log.e(TAG, "Error invoking setAutoTimeZoneEnabled", e);
-            // Prior to R, auto timezone is controlled by a global setting
-            mDevicePolicyManager.setGlobalSetting(mAdminComponentName,
-                Settings.Global.AUTO_TIME_ZONE, enabled ? "1" : "0");
-        }
-
+        mDevicePolicyManager.setAutoTimeZoneEnabled(mAdminComponentName, enabled);
     }
 }
