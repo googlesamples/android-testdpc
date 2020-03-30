@@ -2370,8 +2370,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     private void loadAppStatus() {
         final @StringRes int appStatusStringId;
+        boolean isOrgOwned = mDevicePolicyManager.isOrganizationOwnedDeviceWithManagedProfile();
         if (mDevicePolicyManager.isProfileOwnerApp(mPackageName)) {
-            if (isOrganizationOwnedDeviceWithManagedProfile()) {
+            if (mDevicePolicyManager.isOrganizationOwnedDeviceWithManagedProfile()) {
                 appStatusStringId = R.string.this_is_an_org_owned_profile_owner;
             } else {
                 appStatusStringId = R.string.this_is_a_profile_owner;
@@ -4052,17 +4053,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             }
         }
         return NO_CUSTOM_CONSTRIANT;
-    }
-
-    // TODO: nuke it when R sdk is available
-    private boolean isOrganizationOwnedDeviceWithManagedProfile() {
-        try {
-            return (Boolean) ReflectionUtil.invoke(
-                    mDevicePolicyManager, "isOrganizationOwnedDeviceWithManagedProfile");
-        } catch (ReflectionIsTemporaryException e) {
-            Log.e(TAG, "Error invoking isOrganizationOwnedDeviceWithManagedProfile", e);
-            return false;
-        }
     }
 
     abstract static class ManageLockTaskListCallback {
