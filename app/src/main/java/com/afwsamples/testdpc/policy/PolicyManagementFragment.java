@@ -2598,14 +2598,23 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     @TargetApi(Util.R_VERSION_CODE)
     private void reloadSetAutoTimeUi() {
-        boolean isAutoTime = mDevicePolicyManager.getAutoTimeEnabled(mAdminComponentName);
-        mSetAutoTimePreference.setChecked(isAutoTime);
+        if (mDevicePolicyManager.isDeviceOwnerApp(mPackageName)
+                || (mDevicePolicyManager.isProfileOwnerApp(mPackageName)
+                && mDevicePolicyManager.isOrganizationOwnedDeviceWithManagedProfile())) {
+            boolean isAutoTime = mDevicePolicyManager.getAutoTimeEnabled(mAdminComponentName);
+            mSetAutoTimePreference.setChecked(isAutoTime);
+        }
     }
 
     @TargetApi(Util.R_VERSION_CODE)
     private void reloadSetAutoTimeZoneUi() {
-        boolean isAutoTimeZone = mDevicePolicyManager.getAutoTimeZoneEnabled(mAdminComponentName);
-        mSetAutoTimeZonePreference.setChecked(isAutoTimeZone);
+        if (mDevicePolicyManager.isDeviceOwnerApp(mPackageName)
+                || (mDevicePolicyManager.isProfileOwnerApp(mPackageName)
+                && mDevicePolicyManager.isOrganizationOwnedDeviceWithManagedProfile())) {
+            boolean isAutoTimeZone = mDevicePolicyManager
+                    .getAutoTimeZoneEnabled(mAdminComponentName);
+            mSetAutoTimeZonePreference.setChecked(isAutoTimeZone);
+        }
     }
 
     @TargetApi(VERSION_CODES.LOLLIPOP)
