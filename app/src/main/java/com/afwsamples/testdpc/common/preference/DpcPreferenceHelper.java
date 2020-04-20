@@ -257,8 +257,9 @@ public class DpcPreferenceHelper {
         if (dpm.isDeviceOwnerApp(packageName)) {
             return ADMIN_DEVICE_OWNER;
         }
-        Boolean orgOwned = dpm.isOrganizationOwnedDeviceWithManagedProfile();
         if (dpm.isProfileOwnerApp(packageName)) {
+            Boolean orgOwned = Util.SDK_INT >= VERSION_CODES.R &&
+                    dpm.isOrganizationOwnedDeviceWithManagedProfile();
             if (orgOwned) {
                 return ADMIN_ORG_OWNED_PROFILE_OWNER;
             } else {

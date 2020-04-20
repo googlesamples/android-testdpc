@@ -2358,9 +2358,10 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     private void loadAppStatus() {
         final @StringRes int appStatusStringId;
-        boolean isOrgOwned = mDevicePolicyManager.isOrganizationOwnedDeviceWithManagedProfile();
+        boolean isOrgOwned = Util.SDK_INT >= VERSION_CODES.R &&
+                mDevicePolicyManager.isOrganizationOwnedDeviceWithManagedProfile();
         if (mDevicePolicyManager.isProfileOwnerApp(mPackageName)) {
-            if (mDevicePolicyManager.isOrganizationOwnedDeviceWithManagedProfile()) {
+            if (isOrgOwned) {
                 appStatusStringId = R.string.this_is_an_org_owned_profile_owner;
             } else {
                 appStatusStringId = R.string.this_is_a_profile_owner;
@@ -2598,9 +2599,12 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     @TargetApi(Util.R_VERSION_CODE)
     private void reloadSetAutoTimeUi() {
+        boolean isOrgOwned = Util.SDK_INT >= VERSION_CODES.R &&
+                mDevicePolicyManager.isOrganizationOwnedDeviceWithManagedProfile();
+
         if (mDevicePolicyManager.isDeviceOwnerApp(mPackageName)
                 || (mDevicePolicyManager.isProfileOwnerApp(mPackageName)
-                && mDevicePolicyManager.isOrganizationOwnedDeviceWithManagedProfile())) {
+                && isOrgOwned)) {
             boolean isAutoTime = mDevicePolicyManager.getAutoTimeEnabled(mAdminComponentName);
             mSetAutoTimePreference.setChecked(isAutoTime);
         }
@@ -2608,9 +2612,12 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     @TargetApi(Util.R_VERSION_CODE)
     private void reloadSetAutoTimeZoneUi() {
+        boolean isOrgOwned = Util.SDK_INT >= VERSION_CODES.R &&
+                mDevicePolicyManager.isOrganizationOwnedDeviceWithManagedProfile();
+
         if (mDevicePolicyManager.isDeviceOwnerApp(mPackageName)
                 || (mDevicePolicyManager.isProfileOwnerApp(mPackageName)
-                && mDevicePolicyManager.isOrganizationOwnedDeviceWithManagedProfile())) {
+                && isOrgOwned)) {
             boolean isAutoTimeZone = mDevicePolicyManager
                     .getAutoTimeZoneEnabled(mAdminComponentName);
             mSetAutoTimeZonePreference.setChecked(isAutoTimeZone);
