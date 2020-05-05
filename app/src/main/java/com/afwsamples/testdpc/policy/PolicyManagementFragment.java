@@ -614,6 +614,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         mEnableBackupServicePreference.setCustomConstraint(this::validateDeviceOwnerBeforeQ);
         mCommonCriteriaModePreference = (DpcSwitchPreference) findPreference(
             COMMON_CRITERIA_MODE_KEY);
+        mCommonCriteriaModePreference.setOnPreferenceChangeListener(this);
         findPreference(REQUEST_BUGREPORT_KEY).setOnPreferenceClickListener(this);
         mEnableSecurityLoggingPreference =
             (SwitchPreference) findPreference(ENABLE_SECURITY_LOGGING);
@@ -774,6 +775,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         reloadScreenCaptureDisableUi();
         reloadMuteAudioUi();
         reloadEnableBackupServiceUi();
+        reloadCommonCriteriaModeUi();
         reloadEnableSecurityLoggingUi();
         reloadEnableNetworkLoggingUi();
         reloadSetAutoTimeRequiredUi();
@@ -1444,6 +1446,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             case COMMON_CRITERIA_MODE_KEY:
                 setCommonCriteriaModeEnabled((Boolean) newValue);
                 reloadCommonCriteriaModeUi();
+                return true;
             case ENABLE_SECURITY_LOGGING:
                 setSecurityLoggingEnabled((Boolean) newValue);
                 reloadEnableSecurityLoggingUi();
@@ -1589,16 +1592,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         mDevicePolicyManager.setBackupServiceEnabled(mAdminComponentName, enabled);
     }
 
-    //@TargetApi(VERSION_CODES.R)
+    @TargetApi(VERSION_CODES.R)
     private void setCommonCriteriaModeEnabled(boolean enabled) {
-        try {
-            ReflectionUtil.invoke(mDevicePolicyManager,
-                "setCommonCriteriaModeEnabled",
-                new Class<?>[]{ComponentName.class, boolean.class},
-                mAdminComponentName, enabled);
-        } catch (ReflectionIsTemporaryException e) {
-            Log.e(TAG, "Error invoking setCommonCriteriaModeEnabled", e);
-        }
+        mDevicePolicyManager.setCommonCriteriaModeEnabled(mAdminComponentName, enabled);
     }
 
     @TargetApi(VERSION_CODES.M)
