@@ -795,34 +795,10 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     @TargetApi(Util.R_VERSION_CODE)
     private void reloadPersonalAppsSuspendedUi() {
-        // TODO: nuke it when R sdk is available
-        final int PERSONAL_APPS_NOT_SUSPENDED = 0;
         if (mSuspendPersonalApps.isEnabled()) {
-            int suspendReasons = getPersonalAppsSuspensionReasons();
+            int suspendReasons =
+                    mDevicePolicyManager.getPersonalAppsSuspendedReasons(mAdminComponentName);
             mSuspendPersonalApps.setChecked(suspendReasons != 0);
-        }
-    }
-
-    // TODO: nuke it when R sdk is available.
-    int getPersonalAppsSuspensionReasons() {
-        try {
-            return (Integer) ReflectionUtil.invoke(mDevicePolicyManager,
-                    "getPersonalAppsSuspendedReasons", new Class<?>[]{ComponentName.class},
-                    mAdminComponentName);
-        } catch (ReflectionIsTemporaryException e) {
-            logAndShowToast("Error invoking getPersonalAppsSuspendedReasons", e);
-            return 0;
-        }
-    }
-
-    // TODO: nuke it when R sdk is available.
-    void setPersonalAppsSuspended(boolean suspended) {
-        try {
-            ReflectionUtil.invoke(mDevicePolicyManager, "setPersonalAppsSuspended",
-                    new Class<?>[]{ComponentName.class, boolean.class},
-                    mAdminComponentName, suspended);
-        } catch (ReflectionIsTemporaryException e) {
-            logAndShowToast("Error invoking setPersonalAppsSuspended", e);
         }
     }
 
@@ -1555,7 +1531,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 reloadLocationModeUi();
                 return true;
             case SUSPEND_PERSONAL_APPS_KEY:
-                setPersonalAppsSuspended((Boolean) newValue);
+                mDevicePolicyManager.setPersonalAppsSuspended(
+                        mAdminComponentName, (Boolean) newValue);
                 reloadPersonalAppsSuspendedUi();
                 return true;
             case PROFILE_MAX_TIME_OFF_KEY:
