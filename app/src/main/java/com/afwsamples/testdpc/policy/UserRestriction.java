@@ -221,8 +221,6 @@ public class UserRestriction {
                     R.string.disallow_data_roaming),
             new UserRestriction(DISALLOW_DEBUGGING_FEATURES,
                     R.string.disallow_debugging_features),
-            new UserRestriction(DISALLOW_ADD_USER,
-                    R.string.disallow_add_user),
             new UserRestriction(DISALLOW_BLUETOOTH,
                     R.string.disallow_bluetooth),
             new UserRestriction(DISALLOW_BLUETOOTH_SHARING,
