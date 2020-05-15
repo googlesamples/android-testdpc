@@ -102,8 +102,6 @@ import com.afwsamples.testdpc.common.BaseSearchablePolicyPreferenceFragment;
 import com.afwsamples.testdpc.common.CertificateUtil;
 import com.afwsamples.testdpc.common.MediaDisplayFragment;
 import com.afwsamples.testdpc.common.PackageInstallationUtils;
-import com.afwsamples.testdpc.common.ReflectionUtil;
-import com.afwsamples.testdpc.common.ReflectionUtil.ReflectionIsTemporaryException;
 import com.afwsamples.testdpc.common.UserArrayAdapter;
 import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.common.preference.CustomConstraint;
@@ -789,7 +787,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private void maybeUpdateProfileMaxTimeOff() {
         if (mProfileMaxTimeOff.isEnabled()) {
             final String currentValueAsString = Long.toString(
-                    TimeUnit.MILLISECONDS.toSeconds(getManagedProfileMaximumTimeOff()));
+                    TimeUnit.MILLISECONDS.toSeconds(
+                        mDevicePolicyManager.getManagedProfileMaximumTimeOff(mAdminComponentName)));
             mProfileMaxTimeOff.setText(currentValueAsString);
             mProfileMaxTimeOff.setSummary(currentValueAsString);
         }
@@ -801,29 +800,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             int suspendReasons =
                     mDevicePolicyManager.getPersonalAppsSuspendedReasons(mAdminComponentName);
             mSuspendPersonalApps.setChecked(suspendReasons != 0);
-        }
-    }
-
-    //TODO: nuke it when R sdk is available.
-    public long getManagedProfileMaximumTimeOff() {
-        try {
-            return (Long) ReflectionUtil.invoke(mDevicePolicyManager,
-                    "getManagedProfileMaximumTimeOff", new Class<?>[]{ComponentName.class},
-                    mAdminComponentName);
-        } catch (ReflectionIsTemporaryException e) {
-            logAndShowToast("Error invoking getManagedProfileMaximumTimeOff", e);
-            return 0;
-        }
-    }
-
-    //TODO: nuke it when R sdk is available.
-    public void setManagedProfileMaximumTimeOff(long timeoutMs) {
-        try {
-            ReflectionUtil.invoke(mDevicePolicyManager, "setManagedProfileMaximumTimeOff",
-                    new Class<?>[]{ComponentName.class, long.class},
-                    mAdminComponentName, timeoutMs);
-        } catch (ReflectionIsTemporaryException e) {
-            logAndShowToast("Error invoking setManagedProfileMaximumTimeOff", e);
         }
     }
 
@@ -1453,14 +1429,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 updateStayOnWhilePluggedInPreference();
                 return true;
             case WIFI_CONFIG_LOCKDOWN_ENABLE_KEY:
-                try {
-                    ReflectionUtil.invoke(mDevicePolicyManager,
-                            "setConfiguredNetworksLockdownState",
-                            new Class<?>[]{ComponentName.class, boolean.class},
-                            mAdminComponentName, newValue.equals(true));
-                } catch (ReflectionIsTemporaryException e) {
-                    Log.e(TAG, "Error invoking setConfiguredNetworksLockdownState", e);
-                }
+                mDevicePolicyManager.setConfiguredNetworksLockdownState(
+                        mAdminComponentName, newValue.equals(true));
                 reloadLockdownAdminConfiguredNetworksUi();
                 return true;
             case INSTALL_NONMARKET_APPS_KEY:
@@ -1511,13 +1481,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 editor.commit();
                 return true;
             case SET_LOCATION_ENABLED_KEY:
-                try {
-                    ReflectionUtil.invoke(mDevicePolicyManager, "setLocationEnabled",
-                        new Class<?>[]{ComponentName.class, boolean.class},
-                        mAdminComponentName, newValue.equals(true));
-                } catch (ReflectionIsTemporaryException e) {
-                    Log.e(TAG, "Error invoking setLocationEnabled", e);
-                }
+                mDevicePolicyManager.setLocationEnabled(mAdminComponentName, newValue.equals(true));
                 reloadLocationEnabledUi();
                 reloadLocationModeUi();
                 return true;
@@ -1540,7 +1504,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 return true;
             case PROFILE_MAX_TIME_OFF_KEY:
                 final long timeoutSec = Long.parseLong((String) newValue);
-                setManagedProfileMaximumTimeOff(TimeUnit.SECONDS.toMillis(timeoutSec));
+                mDevicePolicyManager.setManagedProfileMaximumTimeOff(
+                        mAdminComponentName, TimeUnit.SECONDS.toMillis(timeoutSec));
                 maybeUpdateProfileMaxTimeOff();
                 return true;
         }
@@ -2457,14 +2422,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     @TargetApi(Util.R_VERSION_CODE)
     private void reloadLockdownAdminConfiguredNetworksUi() {
-        try {
-            boolean lockdown = (Boolean) ReflectionUtil.invoke(mDevicePolicyManager,
-                    "hasLockdownAdminConfiguredNetworks",
-                    new Class<?>[]{ComponentName.class}, mAdminComponentName);
-            mLockdownAdminConfiguredNetworksPreference.setChecked(lockdown);
-        } catch (ReflectionIsTemporaryException e) {
-            Log.e(TAG, "Error invoking hasLockdownAdminConfiguredNetworks", e);
-        }
+        boolean lockdown = mDevicePolicyManager.hasLockdownAdminConfiguredNetworks(
+                mAdminComponentName);
+        mLockdownAdminConfiguredNetworksPreference.setChecked(lockdown);
     }
 
     static private int parseInt(String str, int defaultValue) {
