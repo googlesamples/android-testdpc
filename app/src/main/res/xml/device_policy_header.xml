@@ -672,6 +672,7 @@
         <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
             android:key="set_auto_time_required"
             android:title="@string/set_auto_time_required"
+            testdpc:user="notManagedProfile"
             testdpc:minSdkVersion="L" />
         <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
             android:key="set_auto_time"
