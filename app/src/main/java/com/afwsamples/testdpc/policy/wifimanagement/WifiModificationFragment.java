@@ -16,12 +16,16 @@
 
 package com.afwsamples.testdpc.policy.wifimanagement;
 
+import static android.net.wifi.WifiEnterpriseConfig.Eap;
+
+import android.Manifest.permission;
 import android.app.AlertDialog;
 import android.app.DialogFragment;
 import android.app.Fragment;
 import android.content.Context;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,13 +35,13 @@ import android.widget.Button;
 import android.widget.CheckedTextView;
 import android.widget.ListView;
 import android.widget.TextView;
-
+import androidx.annotation.RequiresApi;
+import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
-
+import com.afwsamples.testdpc.common.PermissionsHelper;
+import com.afwsamples.testdpc.common.Util;
 import java.util.ArrayList;
 import java.util.List;
-
-import static android.net.wifi.WifiEnterpriseConfig.Eap;
 
 /**
  * Fragment for WiFi configuration editing.
@@ -46,7 +50,6 @@ public class WifiModificationFragment extends Fragment
         implements WifiConfigCreationDialog.Listener {
 
     private static final String TAG_WIFI_CONFIG_MODIFICATION = "wifi_config_modification";
-    private TextView mText;
     private ListView mConfigsList;
     private ConfigsAdapter mConfigsAdapter;
     private List<WifiConfiguration> mConfiguredNetworks = new ArrayList<>();
@@ -54,6 +57,8 @@ public class WifiModificationFragment extends Fragment
 
     private void updateConfigsList() {
         mConfiguredNetworks.clear();
+        // WifiManager deprecated APIs including #getConfiguredNetworks are restricted to system apps and DPCs
+        // https://developer.android.com/preview/privacy/camera-connectivity#wifi-network-config-restrictions
         List<WifiConfiguration> configuredNetworks = mWifiManager.getConfiguredNetworks();
         if (configuredNetworks != null) {
             mConfiguredNetworks.addAll(configuredNetworks);
@@ -110,6 +115,7 @@ public class WifiModificationFragment extends Fragment
         updateConfigsList();
     }
 
+    @RequiresApi(api = VERSION_CODES.M)
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
             Bundle savedInstanceState) {
@@ -125,6 +131,13 @@ public class WifiModificationFragment extends Fragment
         mConfigsAdapter = new ConfigsAdapter();
         mConfigsList.setAdapter(mConfigsAdapter);
         mConfigsList.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+
+        if (Util.SDK_INT >= VERSION_CODES.M) {
+            PermissionsHelper
+                .ensureRequiredPermissions(new String[]{permission.ACCESS_FINE_LOCATION},
+                    DeviceAdminReceiver.getComponentName(this.getActivity()), this.getContext());
+        }
+
         updateConfigsList();
 
         Button updateConfigButton = (Button) view.findViewById(R.id.updateSelectedConfig);

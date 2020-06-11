@@ -45,20 +45,20 @@
             <RadioButton
                 android:id="@+id/add_account"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true"
+                android:layout_height="@dimen/add_account_option_height"
                 android:text="@string/add_account" />
 
             <RadioButton
                 android:id="@+id/add_account_with_name"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/add_account_option_height"
                 android:text="@string/add_account_with_name" />
 
             <RadioButton
                 android:id="@+id/add_account_skip"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/add_account_option_height"
+                android:checked="true"
                 android:text="@string/add_account_skip" />
         </RadioGroup>
     </LinearLayout>

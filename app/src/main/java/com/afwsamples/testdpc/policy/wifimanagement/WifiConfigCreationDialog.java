@@ -19,10 +19,8 @@ package com.afwsamples.testdpc.policy.wifimanagement;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.net.wifi.WifiConfiguration;
-import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -191,7 +189,7 @@ public class WifiConfigCreationDialog extends DialogFragment implements
                     String password = mPasswordText.getText().toString();
                     // WEP-40, WEP-104, and 256-bit WEP (WEP-232?)
                     if ((length == 10 || length == 26 || length == 58)
-                            && password.matches("[0-9A-Fa-f]*")) {
+                        && password.matches("[0-9A-Fa-f]*")) {
                         config.wepKeys[0] = password;
                     } else {
                         config.wepKeys[0] = getQuotedString(password);
