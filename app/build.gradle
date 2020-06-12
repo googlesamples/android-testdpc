@@ -82,20 +82,28 @@ android {
         }
     }
 
-    task stripTestOnlyNormalDebug << {
-        stripTestOnlyForBuild("normal", "debug")
+    task stripTestOnlyNormalDebug {
+        doLast {
+            stripTestOnlyForBuild("normal", "debug")
+        }
     }
 
-    task stripTestOnlyNormalRelease << {
-        stripTestOnlyForBuild("normal", "release")
+    task stripTestOnlyNormalRelease {
+        doLast {
+            stripTestOnlyForBuild("normal", "release")
+        }
     }
 
-    task stripTestOnlyReplicaDebug << {
-        stripTestOnlyForBuild("replica", "debug")
+    task stripTestOnlyReplicaDebug {
+        doLast {
+            stripTestOnlyForBuild("replica", "debug")
+        }
     }
 
-    task stripTestOnlyReplicaRelease << {
-        stripTestOnlyForBuild("replica", "release")
+    task stripTestOnlyReplicaRelease {
+        doLast {
+            stripTestOnlyForBuild("replica", "release")
+        }
     }
 
     tasks.whenTaskAdded { task ->
