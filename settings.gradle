@@ -1,4 +1,2 @@
 include ':TestDPC'
 project(':TestDPC').projectDir = new File(rootDir, "vendor/unbundled_google/packages/TestDPC/app")
-include ':CosuApp'
-project(':CosuApp').projectDir = new File(rootDir, "vendor/unbundled_google/packages/TestDPC/cosuapp")
