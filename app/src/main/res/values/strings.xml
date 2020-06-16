@@ -565,7 +565,10 @@
     <string name="serial_num_attestation_checkbox">Include device serial number</string>
     <string name="imei_attestation_checkbox">Include device IMEI</string>
     <string name="meid_attestation_checkbox">Include device MEID</string>
+    <string name="strongbox_features_description">StrongBox-related options</string>
     <string name="use_strongbox_checkbox">Use StrongBox</string>
+    <string name="use_individual_attestation_checkbox">Use Individual Attestation Certificate</string>
+
 
     <!-- Strings for app restrictions -->
     <string name="managed_configurations">Managed configurations</string>
