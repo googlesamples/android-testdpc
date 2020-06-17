@@ -93,10 +93,21 @@
         android:layout_height="wrap_content"
         android:text="@string/meid_attestation_checkbox"/>
 
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/strongbox_features_description"/>
+
     <CheckBox
         android:id="@+id/use_strongbox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/use_strongbox_checkbox"/>
+
+    <CheckBox
+        android:id="@+id/use_individual_attestation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/use_individual_attestation_checkbox"/>
 
 </LinearLayout>
