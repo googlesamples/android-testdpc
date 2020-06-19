@@ -3,11 +3,11 @@ apply plugin: 'com.android.application'
 ext {
     /* Version code for *next* release, bump *after* a release is created. */
     // 1 or more digits
-    versionMajor = 6
+    versionMajor = 7
     // exactly 1 digit
-    versionMinor = 2
+    versionMinor = 0
     // exactly 2 digits
-    versionBuild = 02
+    versionBuild = 00
 }
 
 android {
