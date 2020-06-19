@@ -116,6 +116,7 @@ import com.afwsamples.testdpc.policy.certificate.DelegatedCertInstallerFragment;
 import com.afwsamples.testdpc.policy.keyguard.LockScreenPolicyFragment;
 import com.afwsamples.testdpc.policy.keyguard.PasswordConstraintsFragment;
 import com.afwsamples.testdpc.policy.keymanagement.GenerateKeyAndCertificateTask;
+import com.afwsamples.testdpc.policy.keymanagement.KeyGenerationParameters;
 import com.afwsamples.testdpc.policy.keymanagement.SignAndVerifyTask;
 import com.afwsamples.testdpc.policy.locktask.KioskModeActivity;
 import com.afwsamples.testdpc.policy.locktask.LockTaskAppInfoArrayAdapter;
@@ -1616,14 +1617,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         }
     }
 
-    private void generateKeyPair(final String alias, boolean isUserSelectable,
-                                 byte[] attestationChallenge,
-                                 int idAttestationFlags,
-                                 boolean useStrongBox,
-                                 boolean generateEcKey) {
-        new GenerateKeyAndCertificateTask(
-                alias, isUserSelectable, attestationChallenge, idAttestationFlags,
-                useStrongBox, generateEcKey, getActivity(), mAdminComponentName).execute();
+    private void generateKeyPair(final KeyGenerationParameters params) {
+        new GenerateKeyAndCertificateTask(params, getActivity(), mAdminComponentName).execute();
     }
 
     /**
@@ -2772,6 +2767,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 R.id.include_device_meid_in_attestation);
         final CheckBox useStrongBoxCheckbox = aliasNamingView.findViewById(
                 R.id.use_strongbox);
+        final CheckBox useIndividualAttestationCheckbox = aliasNamingView.findViewById(
+                R.id.use_individual_attestation);
+        useIndividualAttestationCheckbox.setEnabled(Util.SDK_INT >= VERSION_CODES.R);
 
         new AlertDialog.Builder(getActivity())
                 .setTitle(getString(R.string.certificate_alias_prompt_title))
@@ -2779,12 +2777,13 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        String alias = input.getText().toString();
-                        boolean isUserSelectable = userSelectableCheckbox.isChecked();
+                        KeyGenerationParameters.Builder paramsBuilder =
+                                new KeyGenerationParameters.Builder();
+                        paramsBuilder.setAlias(input.getText().toString());
+                        paramsBuilder.setIsUserSelectable(userSelectableCheckbox.isChecked());
 
-                        byte[] attestationChallenge = null;
                         if (includeAttestationChallengeCheckbox.isChecked()) {
-                            attestationChallenge = new byte[] {0x61, 0x62, 0x63};
+                            paramsBuilder.setAttestationChallenge(new byte[] {0x61, 0x62, 0x63});
                         }
 
                         int idAttestationFlags = 0;
@@ -2800,10 +2799,15 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                         if (deviceMeidAttestationCheckbox.isChecked()) {
                             idAttestationFlags |= DevicePolicyManager.ID_TYPE_MEID;
                         }
+                        if (useIndividualAttestationCheckbox.isChecked()) {
+                            idAttestationFlags |=
+                                    DevicePolicyManager.ID_TYPE_INDIVIDUAL_ATTESTATION;
+                        }
+                        paramsBuilder.setIdAttestationFlags(idAttestationFlags);
+                        paramsBuilder.setUseStrongBox(useStrongBoxCheckbox.isChecked());
+                        paramsBuilder.setGenerateEcKey(ecKeyCheckbox.isChecked());
 
-                        generateKeyPair(alias, isUserSelectable, attestationChallenge,
-                                idAttestationFlags, useStrongBoxCheckbox.isChecked(),
-                                ecKeyCheckbox.isChecked());
+                        generateKeyPair(paramsBuilder.build());
                     }
                 })
                 .setNegativeButton(android.R.string.cancel, null)
