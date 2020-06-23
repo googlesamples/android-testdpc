@@ -10,6 +10,8 @@ Getting Started
 
 This sample uses the Gradle build system. To build this project, use the "gradlew assemble" command or use "Import Project" in Android Studio.
 
+This app can also be found [on the Play store](https://play.google.com/store/apps/details?id=com.afwsamples.testdpc).
+
 Provisioning
 ------------
 

@@ -16,24 +16,16 @@
 
 package com.afwsamples.testdpc.provision;
 
-import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_ACCOUNT_TO_MIGRATE;
-import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE;
 import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_MODE;
 import static android.app.admin.DevicePolicyManager.PROVISIONING_MODE_FULLY_MANAGED_DEVICE;
 import static android.app.admin.DevicePolicyManager.PROVISIONING_MODE_MANAGED_PROFILE;
 
-import android.accounts.Account;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.PersistableBundle;
-import android.util.Log;
 import android.view.View;
-import android.widget.RadioGroup;
-import com.afwsamples.testdpc.AddAccountActivity;
+import android.widget.LinearLayout;
 import com.afwsamples.testdpc.R;
-import com.afwsamples.testdpc.common.LaunchIntentUtil;
-import com.android.setupwizardlib.GlifLayout;
 
 /**
  * Activity that gets launched by the
@@ -41,69 +33,37 @@ import com.android.setupwizardlib.GlifLayout;
  */
 public class DpcLoginActivity extends Activity {
 
-    private static final String LOG_TAG = "DpcLoginActivity";
-    private static final int ADD_ACCOUNT_REQUEST_CODE = 1;
+  @Override
+  public void onCreate(Bundle icicle) {
+    super.onCreate(icicle);
+    setContentView(R.layout.activity_dpc_login);
+    final LinearLayout layout = findViewById(R.id.dpc_login);
+    layout.findViewById(R.id.do_selection_button).setOnClickListener(this::onDoButtonClick);
+    layout.findViewById(R.id.po_selection_button).setOnClickListener(this::onPoButtonClick);
+  }
 
-    @Override
-    public void onCreate(Bundle icicle) {
-        super.onCreate(icicle);
-        setContentView(R.layout.activity_dpc_login);
-        GlifLayout layout = findViewById(R.id.dpc_login);
-        layout.findViewById(R.id.suw_navbar_next).setOnClickListener(this::onNavigateNext);
-    }
+  @Override
+  public void onBackPressed() {
+    setResult(RESULT_CANCELED);
+    super.onBackPressed();
+  }
 
-    @Override
-    public void onBackPressed() {
-        setResult(RESULT_CANCELED);
-        super.onBackPressed();
-    }
+  private void onDoButtonClick(View button) {
+    final Intent intent = new Intent();
+    intent.putExtra(EXTRA_PROVISIONING_MODE, PROVISIONING_MODE_FULLY_MANAGED_DEVICE);
+    finishWithIntent(intent);
+    return;
+  }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case ADD_ACCOUNT_REQUEST_CODE:
-                finishWithIntent(createResultIntentFromData(data));
-                break;
-            default:
-                Log.d(LOG_TAG, "Unknown result code: " + resultCode);
-                break;
-        }
-    }
+  private void onPoButtonClick(View button) {
+    final Intent intent = new Intent();
+    intent.putExtra(EXTRA_PROVISIONING_MODE, PROVISIONING_MODE_MANAGED_PROFILE);
+    finishWithIntent(intent);
+    return;
+  }
 
-    private Intent createResultIntentFromData(Intent data) {
-        final Intent resultIntent = new Intent();
-        resultIntent.putExtra(EXTRA_PROVISIONING_MODE, PROVISIONING_MODE_MANAGED_PROFILE);
-        if (data != null && data.hasExtra(EXTRA_PROVISIONING_ACCOUNT_TO_MIGRATE)) {
-            final Account accountToMigrate = data.getParcelableExtra(
-                EXTRA_PROVISIONING_ACCOUNT_TO_MIGRATE);
-            resultIntent.putExtra(EXTRA_PROVISIONING_ACCOUNT_TO_MIGRATE, accountToMigrate);
-            final PersistableBundle bundle = new PersistableBundle();
-            bundle.putString(LaunchIntentUtil.EXTRA_ACCOUNT_NAME, accountToMigrate.name);
-            resultIntent.putExtra(EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE, bundle);
-        }
-        return resultIntent;
-    }
-
-    private void onNavigateNext(View nextButton) {
-        final Intent intent = new Intent();
-        RadioGroup dpcLoginOptions = findViewById(R.id.dpc_login_options);
-        switch (dpcLoginOptions.getCheckedRadioButtonId()) {
-            case R.id.dpc_login_do:
-                intent.putExtra(EXTRA_PROVISIONING_MODE, PROVISIONING_MODE_FULLY_MANAGED_DEVICE);
-                finishWithIntent(intent);
-                return;
-            case R.id.dpc_login_po:
-                startActivityForResult(
-                    new Intent(getApplicationContext(), AddAccountActivity.class),
-                    ADD_ACCOUNT_REQUEST_CODE);
-                return;
-            default:
-                finish();
-        }
-    }
-
-    private void finishWithIntent(Intent intent) {
-        setResult(RESULT_OK, intent);
-        finish();
-    }
+  private void finishWithIntent(Intent intent) {
+    setResult(RESULT_OK, intent);
+    finish();
+  }
 }

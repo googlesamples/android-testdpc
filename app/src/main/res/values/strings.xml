@@ -100,11 +100,13 @@
     <string name="requires_delimiter">,\u0020</string>
     <string name="requires_or">\u0020or\u0020</string>
     <string name="device_owner">device owner</string>
+    <string name="org_owned_profile_owner">organization-owned profile owner</string>
     <string name="profile_owner">profile owner</string>
     <string name="primary_user">primary user</string>
     <string name="secondary_user">secondary user</string>
     <string name="managed_profile">managed profile</string>
     <string name="requires_device_owner">Requires device owner</string>
+    <string name="requires_profile_owner_organization_owned_device">Requires profile owner of an organization owned device</string>
 
     <string name="not_for_parent_profile">Not applicable to parent profile</string>
     <string name="user_restricted">Disallowed by user restriction</string>
@@ -114,6 +116,7 @@
 
     <string name="this_is_a_device_owner">This app is the device owner.</string>
     <string name="this_is_a_profile_owner">This app is a profile owner.</string>
+    <string name="this_is_an_org_owned_profile_owner">This app is a profile owner of an organization-owned device.</string>
     <string name="this_is_a_delegated_app">This app has delegated permissions.</string>
     <string name="this_is_not_an_admin">This app is not an admin.</string>
 
@@ -124,6 +127,8 @@
     <!-- Strings for device owner management -->
     <string name="device_owner_management">Device owner management</string>
     <string name="set_auto_time_required">Set auto (network) time required</string>
+    <string name="set_auto_time">Set auto (network) time</string>
+    <string name="set_auto_time_zone">Set auto (network) time zone</string>
     <string name="wipe_data">Wipe data</string>
     <string name="wipe_data_title">Wipe data?</string>
     <string name="wipe_data_confirmation">Are you sure you want to wipe the data?</string>
@@ -139,6 +144,18 @@
     <string name="persistent_device_owner_state_hint">Test state to be restored alongside the device owner after factory reset.</string>
     <string name="set_persistent_device_owner_label">Set</string>
     <string name="clear_persistent_device_owner_label">Clear</string>
+    <!-- Corporate-owned work profile falls under device owner management, for convenience. -->
+    <string name="factory_reset_org_owned">Factory reset Org-Owned Work Profile device</string>
+    <string name="set_factory_reset_protection_policy">Set factory reset protection policy</string>
+    <string name="factory_reset_protection_policy">Factory reset protection policy</string>
+    <string name="factory_reset_protection_policy_accounts">Accounts</string>
+    <string name="factory_reset_protection_policy_enabled">Enabled</string>
+    <string-array name="factory_reset_protection_policy_enabled_choices">
+        <item>Disabled</item>
+        <item>Enabled</item>
+    </string-array>
+    <string name="cleared_factory_reset_protection_policy">Cleared factory reset protection policy</string>
+    <string name="saved_factory_reset_protection_policy">Saved factory reset protection policy</string>
 
     <!-- Strings for device reboot -->
     <string name="reboot">Reboot device</string>
@@ -171,6 +188,7 @@
     <string name="camera_title">Camera, screen capture and audio</string>
     <string name="display_media">Display Media</string>
     <string name="disable_camera">Disable camera</string>
+    <string name="disable_camera_on_parent">Disable camera on parent</string>
     <string name="capture_image">Capture image</string>
     <string name="capture_video">Capture video</string>
     <string name="camera_app_not_found">Ensure that a camera app is enabled</string>
@@ -178,6 +196,7 @@
     <string name="stop_button_label">Stop</string>
     <string name="delete_button_label">Delete</string>
     <string name="disable_screen_capture">Disable screen capture</string>
+    <string name="disable_screen_capture_on_parent">Disable screen capture on parent</string>
     <string name="mute_audio">Mute audio</string>
 
     <!-- Stings for work profile management -->
@@ -212,8 +231,6 @@
     <!-- Strings for APN -->
     <string name="override_apn_title">Override APN management</string>
     <string name="manage_override_apn">Manage override APNs</string>
-    <string name="additional_settings">Additional Settings</string>
-
     <string name="insert_override_apn">Insert override APN</string>
     <string name="insert_override_apn_error">Fail to insert override APN, format incorrect</string>
     <string name="remove_override_apn">Remove all override APNs</string>
@@ -311,7 +328,7 @@
     <string name="wifi_cancel">Cancel</string>
     <string name="wifi_config_success">WI-FI configuration saved.</string>
     <string name="wifi_config_fail">Failed to save the WI-FI configuration.</string>
-    <string name="enable_wifi_config_lockdown">DO created WI-FI configs are modifiable only by DO.</string>
+    <string name="enable_wifi_config_lockdown">DO created WI-FI configs are modifiable only by DO</string>
     <string name="modify_wifi_configuration">Modify WI-FI configuration</string>
     <string name="show_wifi_mac_address">Show Wi-Fi MAC address</string>
     <string name="show_wifi_mac_address_title">Wi-Fi MAC address</string>
@@ -357,14 +374,20 @@
     <string name="install_apk_package_title">Install package from APK file</string>
     <string name="uninstall_packages_title">Uninstall package</string>
     <string name="hide_apps_title">Hide apps</string>
+    <string name="hide_apps_parent_title">Hide apps on parent</string>
     <string name="hide_apps_empty">All apps are hidden.</string>
     <string name="hide_apps_success">%s is now hidden.</string>
     <string name="hide_apps_failure">%s cannot be hidden, because it is an active admin or
         required by the system.</string>
+    <string name="hide_apps_system_failure">%s cannot be hidden, because the provided package
+        is not a system package.</string>
     <string name="unhide_apps_title">Unhide apps</string>
+    <string name="unhide_apps_parent_title">Unhide apps on parent</string>
     <string name="unhide_apps_empty">No apps are currently hidden.</string>
     <string name="unhide_apps_success">%s is no longer hidden.</string>
     <string name="unhide_apps_failure">%s cannot be unhidden.</string>
+    <string name="unhide_apps_system_failure">%s cannot be unhidden, because the provided package
+        is not a system package.</string>
     <string name="suspend_apps_title">Suspend apps</string>
     <string name="suspend_apps_empty">All apps are suspended.</string>
     <string name="suspend_apps_success">%s is now suspended.</string>
@@ -421,6 +444,7 @@
 
     <!-- Strings for user restriction management -->
     <string name="user_restrictions_preference_title">Set user restrictions</string>
+    <string name="user_restrictions_parent_preference_title">Set user restrictions on parent</string>
     <string name="user_restrictions_management_title">User restrictions</string>
     <string name="allow_parent_profile_app_linking">Allow web links to apps of the parent</string>
     <string name="disallow_add_managed_profile">Disallow add managed profile</string>
@@ -478,6 +502,8 @@
     <string name="disallow_share_into_work_profile">Disallow sharing data into the profile</string>
     <string name="disallow_printing">Disallow printing</string>
     <string name="disallow_config_private_dns">Disallow config Private DNS</string>
+    <string name="disallow_content_capture">Disallow content capture</string>
+    <string name="disallow_content_suggestions">Disallow content suggestions</string>
     <string name="user_restriction_error_msg">Operation not allowed</string>
 
     <!-- Strings for select app -->
@@ -542,7 +568,7 @@
     <string name="use_strongbox_checkbox">Use StrongBox</string>
 
     <!-- Strings for app restrictions -->
-    <string name="manage_app_restrictions">Manage app restrictions</string>
+    <string name="managed_configurations">Managed configurations</string>
     <string name="define_bundle">Define bundle</string>
     <string name="define_bundle_array">Define bundle array</string>
     <string name="load_manifest_restrictions">Load manifest restrictions</string>
@@ -605,6 +631,14 @@
 
     <!-- Backup and Restore for Device Owner -->
     <string name="enable_backup_service">Enable backup service</string>
+
+    <string name="common_criteria_mode">Enable Common Criteria mode</string>
+
+    <!-- Suspension of personal apps -->
+    <string name="suspend_personal_apps">Suspend personal apps</string>
+
+    <!-- Maximum time work profile is allowed to be off -->
+    <string name="profile_max_time_off">Work profile max time off (seconds)</string>
 
     <!-- Enterprise security logging -->
     <string name="enable_security_logging">Enable security logging</string>
@@ -939,6 +973,7 @@
     <string name="password_complexity_low">Low</string>
     <string name="password_complexity_medium">Medium</string>
     <string name="password_complexity_high">High</string>
+    <string name="password_complexity_profile_summary">Personal: %1$s, Work: %2$s</string>
 
     <string name="separate_challenge_title">Separate challenge</string>
     <string name="separate_challenge_summary">Separate challenge enabled: %s</string>
@@ -961,6 +996,8 @@
     <string name="settings_management_title">Settings management</string>
     <string name="stay_on_while_plugged_in">Keep the device on while plugged in</string>
     <string name="install_non_market_apps">Allow installs from unknown sources</string>
+    <string name="set_location_enabled">Set location enabled</string>
+    <string name="set_location_mode">Set location mode (deprecated version of set location enabled)</string>
 
     <!-- Strings for setting support messages -->
     <string name="support_messages">Support messages</string>
@@ -1014,21 +1051,6 @@
     <string name="transfer_ownership_complete_message">The new owner is %1$s</string>
     <string name="transfer_ownership_affiliated_complete_title">Transfer of affiliated profile ownership is complete</string>
     <string name="transfer_ownership_affiliated_complete_message">The transferred user is %1$s</string>
-
-    <!-- SafetyNet -->
-    <string name="safetynet_preference_title">SafetyNet</string>
-    <string name="attest_preference_title">SafetyNet Attestation</string>
-    <string name="attest_preference_summary">Checking Device Compatibility with SafetyNet</string>
-    <string name="safetynet_dialog_title">SafetyNet Attestation</string>
-    <string name="safetynet_dialog_msg_running">Running...</string>
-    <string name="cancel_safetynet_msg">Cancel SafetyNet Attestation</string>
-    <string name="safetynet_fail_to_run_api">Fail to run SafetyNet Attestation API</string>
-    <string name="safetynet_fail_reason_no_internet">Error: No Internet connecion</string>
-    <string name="safetynet_fail_reason_gmscore_upgrade">Error: Google Play Service is out of date</string>
-    <string name="safetynet_fail_reason_error_code">Error code: %1$d</string>
-    <string name="safetynet_fail_reason_invalid_jws">Invalid JWS response</string>
-    <string name="safetynet_running">Running&#8230; Please wait</string>
-    <string name="safetynet_verify_on_server">You should verify the response in your server.</string>
 
     <string name="request_to_set_new_password">Request user to set new password</string>
     <string name="request_to_set_new_password_with_complexity">Set new password and specify minimum complexity</string>
@@ -1097,11 +1119,48 @@
 
     <string name="vpn_exempted_packages">Exempted packages</string>
     <string name="vpn_lockdown">Lockdown</string>
-    <string name="additional_settings_title">Additional Settings</string>
-    <string name="grant_all_permission">Grant all Permissions</string>
-    <string name="check_permission_state">check permissions</string>
-    <string name="create_file_SDCard">Create Files in sdcard</string>
-    <string name="change_file_permissions">Change file Permissions</string>
-    <string name="copy_files">Copy files</string>
-    <string name="delete_files">Delete Files</string>
+
+    <!-- This string is the title of a screen asking user how to set device up.
+
+      This screen will be shown if the user sets device up with a managed account, and we believe that the user may want to set up a managed profile rather than a managed device.[CHAR LIMIT=100] -->
+    <string name="selector_title">How will you use this phone?</string>
+    <!-- This string is the subtitle of a screen for setting up a managed device.
+
+          This screen will be shown if the user sets device up with a managed account, and we believe that the user may want to set up a managed profile rather than a managed device.[CHAR LIMIT=100] -->
+    <string name="do_selection_subtitle">Work</string>
+    <!-- This string is the detailed text of a screen for setting up a managed device, giving user more info on how their device will behave in this mode.
+
+        Text bullets that are part of a list. They describe one of the options a user can choose when setting up their new device, which would be to have their organization manage their entire device. That means that the data on the device won't be private (it will be visible to their IT admin), and it can be erased at any time.[CHAR LIMIT=200] -->
+    <string name="do_selection_detailed_text">
+        <li>This phone will be managed by your IT admin</li>\n\n
+        <li>Your data won\'t be private and can be erased at any time</li>
+    </string>
+    <!-- This string is for the button for setting up a managed device.
+
+        This screen will be shown if the user sets device up with a managed account, and we believe that the user may want to set up a managed profile rather than a managed device.[CHAR LIMIT=50] -->
+    <string name="do_selection_button_text">Use for work only</string>
+
+
+    <!-- This string is the subtitle of a screen for setting up a managed profile.
+
+          This screen will be shown if the user sets device up with a managed account, and we believe that the user may want to set up a managed profile rather than a managed device.[CHAR LIMIT=100] -->
+    <string name="po_selection_subtitle">Work and Personal</string>
+    <!-- This string is the detailed text of a screen for setting up a managed profile, giving user more info on how their device will behave in this mode.
+
+        This screen will be shown if the user sets device up with a managed account, and we believe that the user may want to set up a managed profile rather than a managed device.[CHAR LIMIT=200] -->
+    <string name="po_selection_detailed_text">
+        <li>Your work data will be kept in a separate profile</li>\n\n
+        <li>Your personal data stays private</li>
+    </string>
+    <!-- This string is for the button for setting up a managed profile.
+
+        This screen will be shown if the user sets device up with a managed account, and we believe that the user may want to set up a managed profile rather than a managed device.[CHAR LIMIT=50] -->
+    <string name="po_selection_button_text">Use for work &amp; personal</string>
+
+
+    <!-- This string is the text shown to divide the two options shown on the mode selection screen.
+
+        This screen will be shown if the user sets device up with a managed account, and we believe that the user may want to set up a managed profile rather than a managed device.[CHAR LIMIT=100] -->
+    <string name="selection_divider_text">or</string>
+
 </resources>

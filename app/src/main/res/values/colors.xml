@@ -28,4 +28,5 @@
     <color name="primary_dark">#ff254FAE</color>
     <color name="primary">#ff3367d6</color>
     <color name="accent">#ff3367d6</color>
+    <color name="managed_provisioning_color">#4285f4</color>
 </resources>
