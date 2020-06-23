@@ -212,6 +212,8 @@
     <!-- Strings for APN -->
     <string name="override_apn_title">Override APN management</string>
     <string name="manage_override_apn">Manage override APNs</string>
+    <string name="additional_settings">Additional Settings</string>
+
     <string name="insert_override_apn">Insert override APN</string>
     <string name="insert_override_apn_error">Fail to insert override APN, format incorrect</string>
     <string name="remove_override_apn">Remove all override APNs</string>
@@ -1095,5 +1097,11 @@
 
     <string name="vpn_exempted_packages">Exempted packages</string>
     <string name="vpn_lockdown">Lockdown</string>
-
+    <string name="additional_settings_title">Additional Settings</string>
+    <string name="grant_all_permission">Grant all Permissions</string>
+    <string name="check_permission_state">check permissions</string>
+    <string name="create_file_SDCard">Create Files in sdcard</string>
+    <string name="change_file_permissions">Change file Permissions</string>
+    <string name="copy_files">Copy files</string>
+    <string name="delete_files">Delete Files</string>
 </resources>

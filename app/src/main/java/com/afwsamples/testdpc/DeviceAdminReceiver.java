@@ -23,6 +23,9 @@ import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PermissionInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Binder;
@@ -32,12 +35,15 @@ import android.os.PersistableBundle;
 import android.os.Process;
 import android.os.UserHandle;
 import android.os.UserManager;
-import androidx.core.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
+
+import androidx.core.app.NotificationCompat;
+
 import com.afwsamples.testdpc.common.NotificationUtil;
 import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.provision.PostProvisioningTask;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -53,6 +59,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
+
+import static android.app.admin.DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED;
 
 /**
  * Handles events related to the managed profile.
@@ -115,6 +124,7 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
 
     @Override
     public void onProfileProvisioningComplete(Context context, Intent intent) {
+        Log.e(TAG, "onProfileProvisioningComplete recieved");
         PostProvisioningTask task = new PostProvisioningTask(context);
         if (!task.performPostProvisioningOperations(intent)) {
             return;
@@ -472,6 +482,7 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
                 context.getSystemService(Context.NOTIFICATION_SERVICE);
 
         final ArrayList<CharSequence> problems = new ArrayList<>();
+        Log.i(TAG, "isActivePasswordSufficient() " + Boolean.toString(dpm.isActivePasswordSufficient()));
         if (!dpm.isActivePasswordSufficient()) {
             problems.add(context.getText(R.string.password_not_compliant_title));
         }
@@ -536,8 +547,14 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
                 NotificationUtil.PROFILE_OWNER_CHANGED_ID);
     }
 
+    private  PackageManager mPm;
     private void onDeviceOwnerChanged(Context context) {
         Log.i(TAG, "onDeviceOwnerChanged");
+        /*if (Util.SDK_INT >= VERSION_CODES.M) {
+            autoGrantRequestedPermissionsToSelf(context);
+        }*/
+        //mPm = context.getPackageManager();
+        //mPm.addWhitelistedRestrictedPermission("com.addd", Manifest.permission.SEND_SMS,FLAG_PERMISSION_WHITELIST_INSTALLER)
         NotificationUtil.showNotification(context,
                 R.string.transfer_ownership_device_owner_changed_title,
                 context.getString(R.string.transfer_ownership_device_owner_changed_title),
@@ -570,5 +587,58 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
                 userManager.getSerialNumberForUser(userHandle));
         Log.i(TAG, message);
         NotificationUtil.showNotification(context, titleResId, message, notificationId);
+    }
+
+    @TargetApi(VERSION_CODES.M)
+    private void autoGrantRequestedPermissionsToSelf(Context mContext) {
+        String packageName = mContext.getPackageName();
+        ComponentName adminComponentName = getComponentName(mContext);
+        Log.d(TAG, "autoGrantRequestedPermissionsToSelf Entering");
+        List<String> permissions = getRuntimePermissions(mContext.getPackageManager(), packageName);
+        final DevicePolicyManager dpm = mContext.getSystemService(DevicePolicyManager.class);
+        for (String permission : permissions) {
+            boolean success = dpm.setPermissionGrantState(adminComponentName,
+                    packageName, permission, PERMISSION_GRANT_STATE_GRANTED);
+            Log.d(TAG, "Auto-granting " + permission + ", success: " + success);
+            if (!success) {
+                Log.e(TAG, "Failed to auto grant permission to self: " + permission);
+            }
+        }
+    }
+
+    private List<String> getRuntimePermissions(PackageManager packageManager, String packageName) {
+        List<String> permissions = new ArrayList<>();
+        PackageInfo packageInfo;
+        try {
+            packageInfo =
+                    packageManager.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS);
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.e(TAG, "Could not retrieve info about the package: " + packageName, e);
+            return permissions;
+        }
+
+        if (packageInfo != null && packageInfo.requestedPermissions != null) {
+            for (String requestedPerm : packageInfo.requestedPermissions) {
+                if (isRuntimePermission(packageManager, requestedPerm)) {
+                    permissions.add(requestedPerm);
+                }
+            }
+        }
+        return permissions;
+    }
+
+    private boolean isRuntimePermission(PackageManager packageManager, String permission) {
+        try {
+            PermissionInfo pInfo = packageManager.getPermissionInfo(permission, 0);
+            if (pInfo != null) {
+                if ((pInfo.protectionLevel & PermissionInfo.PROTECTION_MASK_BASE)
+                        == PermissionInfo.PROTECTION_DANGEROUS) {
+                    return true;
+                }
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.i(TAG, "Could not retrieve info about the permission: " + permission);
+        }
+        return false;
     }
 }
