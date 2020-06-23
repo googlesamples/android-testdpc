@@ -16,6 +16,10 @@
 
 package com.afwsamples.testdpc.provision;
 
+import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE;
+import static android.app.admin.DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED;
+import static com.afwsamples.testdpc.DeviceAdminReceiver.getComponentName;
+
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.annotation.TargetApi;
@@ -30,21 +34,15 @@ import android.content.pm.PermissionInfo;
 import android.os.Build.VERSION_CODES;
 import android.os.PersistableBundle;
 import android.util.Log;
-
 import com.afwsamples.testdpc.AddAccountActivity;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.FinalizeActivity;
 import com.afwsamples.testdpc.common.LaunchIntentUtil;
 import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.cosu.EnableCosuActivity;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE;
-import static android.app.admin.DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED;
-import static com.afwsamples.testdpc.DeviceAdminReceiver.getComponentName;
 
 /**
  * Task executed after provisioning is done indicated by either the
@@ -87,17 +85,14 @@ public class PostProvisioningTask {
 
         // From M onwards, permissions are not auto-granted, so we need to manually grant
         // permissions for TestDPC.
-        /*if (Util.SDK_INT >= VERSION_CODES.M) {
+        if (Util.SDK_INT >= VERSION_CODES.M) {
             autoGrantRequestedPermissionsToSelf();
-        }*/
+        }
 
         // Retreive the admin extras bundle, which we can use to determine the original context for
         // TestDPCs launch.
         PersistableBundle extras = intent.getParcelableExtra(
                 EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE);
-        if (extras != null && extras.containsKey("enrollmentId")) {
-            Log.d(TAG, "Recieving Extras " + extras.getString("enrollmentId"));
-        }
         if (Util.SDK_INT >= VERSION_CODES.O) {
             maybeSetAffiliationIds(extras);
         }
@@ -130,10 +125,6 @@ public class PostProvisioningTask {
         // TestDPCs launch.
         PersistableBundle extras = intent.getParcelableExtra(
                 EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE);
-
-        if (extras != null && extras.containsKey("enrollmentId")) {
-            Log.d(TAG, "Recieving Extras " + extras.getString("enrollmentId"));
-        }
         String packageName = mContext.getPackageName();
         boolean synchronousAuthLaunch = LaunchIntentUtil.isSynchronousAuthLaunch(extras);
         boolean cosuLaunch = LaunchIntentUtil.isCosuLaunch(extras);
@@ -184,7 +175,6 @@ public class PostProvisioningTask {
     }
 
     private boolean isPostProvisioningDone() {
-        Log.e(TAG, "isPostProvisioningDone() " +mSharedPrefs.getBoolean(KEY_POST_PROV_DONE, false));
         return mSharedPrefs.getBoolean(KEY_POST_PROV_DONE, false);
     }
 
@@ -205,7 +195,7 @@ public class PostProvisioningTask {
     private void autoGrantRequestedPermissionsToSelf() {
         String packageName = mContext.getPackageName();
         ComponentName adminComponentName = getComponentName(mContext);
-        Log.d(TAG, "autoGrantRequestedPermissionsToSelf Entering");
+
         List<String> permissions = getRuntimePermissions(mContext.getPackageManager(), packageName);
         for (String permission : permissions) {
             boolean success = mDevicePolicyManager.setPermissionGrantState(adminComponentName,

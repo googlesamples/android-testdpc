@@ -2303,7 +2303,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             if (isOrgOwned) {
                 appStatusStringId = R.string.this_is_an_org_owned_profile_owner;
             } else {
-                appStatusStringId = R.string.this_is_a_profile_owner;
+            appStatusStringId = R.string.this_is_a_profile_owner;
             }
         } else if (mDevicePolicyManager.isDeviceOwnerApp(mPackageName)) {
             appStatusStringId = R.string.this_is_a_device_owner;
@@ -2510,6 +2510,14 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         }
     }
 
+    //@TargetApi(VERSION_CODES.R)
+    private void reloadCommonCriteriaModeUi() {
+        if (mCommonCriteriaModePreference.isEnabled()) {
+            mCommonCriteriaModePreference.setChecked(
+                mDevicePolicyManager.isCommonCriteriaModeEnabled(mAdminComponentName));
+        }
+    }
+
     @TargetApi(VERSION_CODES.LOLLIPOP)
     private void reloadScreenCaptureDisableUi() {
         boolean isScreenCaptureDisabled = mDevicePolicyManager.getScreenCaptureDisabled(
@@ -2527,9 +2535,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     @TargetApi(VERSION_CODES.LOLLIPOP)
     private void reloadSetAutoTimeRequiredUi() {
-        boolean isAutoTimeRequired = mDevicePolicyManager.getAutoTimeRequired();
-        mSetAutoTimeRequiredPreference.setChecked(isAutoTimeRequired);
-    }
+            boolean isAutoTimeRequired = mDevicePolicyManager.getAutoTimeRequired();
+            mSetAutoTimeRequiredPreference.setChecked(isAutoTimeRequired);
+        }
 
     @TargetApi(Util.R_VERSION_CODE)
     private void reloadSetAutoTimeUi() {

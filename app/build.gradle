@@ -80,26 +80,26 @@ android {
 
     task stripTestOnlyNormalDebug {
         doLast {
-            stripTestOnlyForBuild("normal", "debug")
-        }
+        stripTestOnlyForBuild("normal", "debug")
+    }
     }
 
     task stripTestOnlyNormalRelease {
         doLast {
-            stripTestOnlyForBuild("normal", "release")
-        }
+        stripTestOnlyForBuild("normal", "release")
+    }
     }
 
     task stripTestOnlyReplicaDebug {
         doLast {
-            stripTestOnlyForBuild("replica", "debug")
-        }
+        stripTestOnlyForBuild("replica", "debug")
+    }
     }
 
     task stripTestOnlyReplicaRelease {
         doLast {
-            stripTestOnlyForBuild("replica", "release")
-        }
+        stripTestOnlyForBuild("replica", "release")
+    }
     }
 
     tasks.whenTaskAdded { task ->
