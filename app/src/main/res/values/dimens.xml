@@ -55,4 +55,21 @@
 
     <!-- Dimens used for key value pair dialog -->
     <dimen name="key_value_pair_dialog_padding">8dp</dimen>
+
+    <!-- Dimens used for dpc login screen -->
+    <dimen name="selection_divider_margin_horizontal">10dp</dimen>
+    <dimen name="selection_detailed_text_padding_top">8dp</dimen>
+    <dimen name="selection_detailed_text_padding_bottom">32dp</dimen>
+    <dimen name="selection_guideline_padding">8dp</dimen>
+    <dimen name="selection_middle_padding">16dp</dimen>
+    <dimen name="selection_content_padding">32dp</dimen>
+    <dimen name="selection_detailed_title_size">16sp</dimen>
+    <dimen name="selection_detailed_text_size">14sp</dimen>
+    <dimen name="selection_title_top_margin">50dp</dimen>
+    <dimen name="selection_title_text_size">24sp</dimen>
+    <dimen name="constraint_layout_margin">10dp</dimen>
+    <dimen name="text_divider_height">1dp</dimen>
+
+    <!-- Dimens used for add account activity -->
+    <dimen name="add_account_option_height">48dp</dimen>
 </resources>

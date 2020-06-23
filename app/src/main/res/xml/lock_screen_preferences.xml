@@ -23,7 +23,7 @@
             android:inputType="text"
             android:key="key_lock_screen_message"
             android:title="@string/lock_screen_message"
-            testdpc:admin="deviceOwner"
+            testdpc:admin="deviceOwner|orgOwnedProfileOwner"
             testdpc:minSdkVersion="N" />
     </PreferenceCategory>
 
@@ -71,12 +71,10 @@
         <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
             android:key="keyguard_disable_secure_camera"
             android:title="@string/keyguard_disable_secure_camera"
-            testdpc:admin="deviceOwner"
             testdpc:minSdkVersion="L" />
         <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
             android:key="keyguard_disable_secure_notifications"
             android:title="@string/keyguard_disable_secure_notifications"
-            testdpc:admin="deviceOwner"
             testdpc:minSdkVersion="L" />
         <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
             android:key="keyguard_disable_unredacted_notifications"

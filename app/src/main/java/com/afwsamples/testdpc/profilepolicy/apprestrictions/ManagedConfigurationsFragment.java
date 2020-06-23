@@ -52,7 +52,7 @@ import java.util.Set;
  * This fragment shows all installed apps and allows viewing and editing application restrictions
  * for those apps. It also allows loading the default app restrictions for each of those apps.
  */
-public class ManageAppRestrictionsFragment extends ManageAppFragment
+public class ManagedConfigurationsFragment extends ManageAppFragment
         implements EditDeleteArrayAdapter.OnEditButtonClickListener<RestrictionEntry> {
     private List<RestrictionEntry> mRestrictionEntries = new ArrayList<>();
     private List<RestrictionEntry> mLastRestrictionEntries;
@@ -95,9 +95,9 @@ public class ManageAppRestrictionsFragment extends ManageAppFragment
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        getActivity().getActionBar().setTitle(R.string.manage_app_restrictions);
+    public void onResume() {
+        super.onResume();
+        getActivity().getActionBar().setTitle(R.string.managed_configurations);
     }
 
     protected void loadAppRestrictionsList(RestrictionEntry[] restrictionEntries) {

@@ -14,48 +14,171 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-<com.android.setupwizardlib.GlifLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/dpc_login"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:icon="@drawable/ic_enterprise_blue"
-    app:suwFooter="@layout/next_footer"
-    app:suwHeaderText="@string/dpc_login_title">
 
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:custom="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent">
   <LinearLayout
-      style="@style/SuwItemContainer"
+      android:id="@+id/dpc_login"
       android:layout_width="match_parent"
-      android:layout_height="match_parent"
+      android:layout_height="wrap_content"
       android:orientation="vertical">
 
     <TextView
-        style="@style/SuwItemTitle"
+        android:id="@+id/selection_title"
+        style="@style/SelectionTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/dpc_login_explanation" />
+        android:layout_marginTop="@dimen/selection_title_top_margin"
+        android:gravity="center_horizontal"
+        android:text="@string/selector_title"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textSize="@dimen/selection_title_text_size"
+        custom:layout_constraintEnd_toEndOf="parent"
+        custom:layout_constraintStart_toStartOf="parent"/>
 
-    <RadioGroup
-        android:id="@+id/dpc_login_options"
-        android:layout_width="match_parent"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingTop="@dimen/content_padding_between_text">
+        android:layout_marginTop="@dimen/selection_content_padding"
+        android:layout_marginBottom="@dimen/selection_content_padding"
+        android:layout_marginLeft="@dimen/constraint_layout_margin"
+        android:layout_marginRight="@dimen/constraint_layout_margin">
 
-      <RadioButton
-          android:id="@+id/dpc_login_do"
+      <androidx.constraintlayout.widget.Guideline
+          android:id="@+id/guideline_vertical_left"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:checked="true"
-          android:text="@string/dpc_login_do" />
+          android:paddingStart="@dimen/selection_guideline_padding"
+          android:paddingEnd="@dimen/selection_guideline_padding"
+          android:orientation="vertical"
+          custom:layout_constraintGuide_percent="0.368"/>
 
-      <RadioButton
-          android:id="@+id/dpc_login_po"
-          android:layout_width="wrap_content"
+      <ImageView
+          android:id="@+id/do_selection_image"
+          android:layout_width="0dp"
+          android:layout_height="0dp"
+          android:scaleType="fitCenter"
+          android:src="@drawable/managed_device_setup"
+          custom:layout_constraintBottom_toTopOf="@+id/do_selection_button"
+          custom:layout_constraintEnd_toStartOf="@+id/guideline_vertical_left"
+          custom:layout_constraintStart_toStartOf="parent"
+          custom:layout_constraintTop_toTopOf="@+id/do_selection_detailed_title"
+          tools:ignore="ContentDescription"/>
+
+      <TextView
+          android:id="@+id/do_selection_detailed_title"
+          style="@style/SelectionTitle"
+          android:layout_width="0dp"
           android:layout_height="wrap_content"
-          android:text="@string/dpc_login_po" />
-    </RadioGroup>
+          android:text="@string/do_selection_subtitle"
+          custom:layout_constraintBottom_toTopOf="@+id/do_selection_detailed_text"
+          custom:layout_constraintEnd_toEndOf="parent"
+          custom:layout_constraintHorizontal_bias="0.0"
+          custom:layout_constraintStart_toEndOf="@+id/guideline_vertical_left"/>
+
+      <TextView
+          android:id="@+id/do_selection_detailed_text"
+          style="@style/SelectionDesc"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:text="@string/do_selection_detailed_text"
+          custom:layout_constraintBottom_toTopOf="@+id/do_selection_button"
+          custom:layout_constraintEnd_toEndOf="parent"
+          custom:layout_constraintStart_toStartOf="@+id/guideline_vertical_left"/>
+
+      <Button
+          android:id="@+id/do_selection_button"
+          style="@style/SelectionButton"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:text="@string/do_selection_button_text"
+          custom:layout_constraintBottom_toTopOf="@+id/divider"
+          custom:layout_constraintEnd_toEndOf="parent"
+          custom:layout_constraintStart_toStartOf="@+id/guideline_vertical_left"/>
+
+      <RelativeLayout
+          android:id="@+id/divider"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:paddingTop="@dimen/selection_middle_padding"
+          android:paddingBottom="@dimen/selection_middle_padding"
+          custom:layout_constraintBottom_toTopOf="parent"
+          custom:layout_constraintEnd_toEndOf="parent"
+          custom:layout_constraintStart_toStartOf="parent"
+          custom:layout_constraintTop_toBottomOf="parent">
+
+        <TextView
+            android:id="@+id/breakText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/selection_divider_margin_horizontal"
+            android:layout_marginRight="@dimen/selection_divider_margin_horizontal"
+            android:layout_centerInParent="true"
+            android:text="@string/selection_divider_text"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/text_divider_height"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@id/breakText"
+            android:background="?android:attr/listDivider"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/text_divider_height"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@id/breakText"
+            android:background="?android:attr/listDivider"/>
+
+      </RelativeLayout>
+
+      <ImageView
+          android:id="@+id/po_selection_image"
+          android:layout_width="0dp"
+          android:layout_height="0dp"
+          android:scaleType="fitCenter"
+          android:src="@drawable/managed_profile_setup"
+          custom:layout_constraintBottom_toTopOf="@+id/po_selection_button"
+          custom:layout_constraintEnd_toStartOf="@+id/guideline_vertical_left"
+          custom:layout_constraintStart_toStartOf="parent"
+          custom:layout_constraintTop_toTopOf="@+id/po_selection_detailed_title"
+          tools:ignore="ContentDescription"/>
+
+      <TextView
+          android:id="@+id/po_selection_detailed_title"
+          style="@style/SelectionTitle"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:text="@string/po_selection_subtitle"
+          custom:layout_constraintEnd_toEndOf="parent"
+          custom:layout_constraintStart_toStartOf="@+id/guideline_vertical_left"
+          custom:layout_constraintTop_toBottomOf="@+id/divider"/>
+
+
+      <TextView
+          android:id="@+id/po_selection_detailed_text"
+          style="@style/SelectionDesc"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:text="@string/po_selection_detailed_text"
+          custom:layout_constraintEnd_toEndOf="parent"
+          custom:layout_constraintStart_toStartOf="@+id/guideline_vertical_left"
+          custom:layout_constraintTop_toBottomOf="@+id/po_selection_detailed_title"/>
+
+      <Button
+          android:id="@+id/po_selection_button"
+          style="@style/SelectionButton"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:text="@string/po_selection_button_text"
+          custom:layout_constraintEnd_toEndOf="parent"
+          custom:layout_constraintStart_toStartOf="@+id/guideline_vertical_left"
+          custom:layout_constraintTop_toBottomOf="@+id/po_selection_detailed_text"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
   </LinearLayout>
-
-</com.android.setupwizardlib.GlifLayout>
+</ScrollView>

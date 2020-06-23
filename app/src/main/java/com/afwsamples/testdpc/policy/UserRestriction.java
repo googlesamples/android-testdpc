@@ -15,6 +15,7 @@ import static android.os.UserManager.DISALLOW_CONFIG_BRIGHTNESS;
 import static android.os.UserManager.DISALLOW_CONFIG_CELL_BROADCASTS;
 import static android.os.UserManager.DISALLOW_CONFIG_CREDENTIALS;
 import static android.os.UserManager.DISALLOW_CONFIG_DATE_TIME;
+import static android.os.UserManager.DISALLOW_CONFIG_LOCALE;
 import static android.os.UserManager.DISALLOW_CONFIG_LOCATION;
 import static android.os.UserManager.DISALLOW_CONFIG_MOBILE_NETWORKS;
 import static android.os.UserManager.DISALLOW_CONFIG_PRIVATE_DNS;
@@ -22,6 +23,8 @@ import static android.os.UserManager.DISALLOW_CONFIG_SCREEN_TIMEOUT;
 import static android.os.UserManager.DISALLOW_CONFIG_TETHERING;
 import static android.os.UserManager.DISALLOW_CONFIG_VPN;
 import static android.os.UserManager.DISALLOW_CONFIG_WIFI;
+import static android.os.UserManager.DISALLOW_CONTENT_CAPTURE;
+import static android.os.UserManager.DISALLOW_CONTENT_SUGGESTIONS;
 import static android.os.UserManager.DISALLOW_CREATE_WINDOWS;
 import static android.os.UserManager.DISALLOW_CROSS_PROFILE_COPY_PASTE;
 import static android.os.UserManager.DISALLOW_DATA_ROAMING;
@@ -206,6 +209,57 @@ public class UserRestriction {
     };
 
     /**
+     * These user restrictions are set on the parent DPM and can only be set by
+     * profile owners of an organization owned device.
+     */
+    public static final UserRestriction[] PROFILE_OWNER_ORG_DEVICE_RESTRICTIONS = {
+            new UserRestriction(DISALLOW_CONFIG_DATE_TIME,
+                    R.string.disallow_config_date_time),
+            new UserRestriction(DISALLOW_CONFIG_TETHERING,
+                    R.string.disallow_config_tethering),
+            new UserRestriction(DISALLOW_DATA_ROAMING,
+                    R.string.disallow_data_roaming),
+            new UserRestriction(DISALLOW_DEBUGGING_FEATURES,
+                    R.string.disallow_debugging_features),
+            new UserRestriction(DISALLOW_BLUETOOTH,
+                    R.string.disallow_bluetooth),
+            new UserRestriction(DISALLOW_BLUETOOTH_SHARING,
+                    R.string.disallow_bluetooth_sharing),
+            new UserRestriction(DISALLOW_CONFIG_BLUETOOTH,
+                    R.string.disallow_config_bluetooth),
+            new UserRestriction(DISALLOW_CONFIG_CELL_BROADCASTS,
+                    R.string.disallow_config_cell_broadcasts),
+            new UserRestriction(DISALLOW_CONFIG_LOCATION,
+                    R.string.disallow_config_location),
+            new UserRestriction(DISALLOW_CONFIG_MOBILE_NETWORKS,
+                    R.string.disallow_config_mobile_networks),
+            new UserRestriction(DISALLOW_CONFIG_PRIVATE_DNS,
+                    R.string.disallow_config_private_dns),
+            new UserRestriction(DISALLOW_CONFIG_WIFI,
+                    R.string.disallow_config_wifi),
+            new UserRestriction(DISALLOW_CONTENT_CAPTURE,
+                    R.string.disallow_content_capture),
+            new UserRestriction(DISALLOW_CONTENT_SUGGESTIONS,
+                    R.string.disallow_content_suggestions),
+            new UserRestriction(DISALLOW_SAFE_BOOT,
+                    R.string.disallow_safe_boot),
+            new UserRestriction(DISALLOW_SHARE_LOCATION,
+                    R.string.disallow_share_location),
+            new UserRestriction(DISALLOW_SMS,
+                    R.string.disallow_sms),
+            new UserRestriction(DISALLOW_USB_FILE_TRANSFER,
+                    R.string.disallow_usb_file_transfer),
+            new UserRestriction(DISALLOW_AIRPLANE_MODE,
+                    R.string.disallow_airplane_mode),
+            new UserRestriction(DISALLOW_MOUNT_PHYSICAL_MEDIA,
+                    R.string.disallow_mount_physical_media),
+            new UserRestriction(DISALLOW_OUTGOING_CALLS,
+                    R.string.disallow_outgoing_calls),
+            new UserRestriction(DISALLOW_UNMUTE_MICROPHONE,
+                    R.string.disallow_unmute_microphone),
+    };
+
+    /**
      * Setting these user restrictions only have effect on primary users.
      */
     public static final String[] PRIMARY_USER_ONLY_RESTRICTIONS = {
@@ -240,6 +294,17 @@ public class UserRestriction {
      */
     public static final String[] DEVICE_OWNER_ONLY_RESTRICTIONS = {
             DISALLOW_USER_SWITCH
+    };
+
+    /**
+     * These user restrictions are set on the parent DPM and can only be set by
+     * profile owners of an organization owned device.
+     */
+    public static final String[] PROFILE_OWNER_ORG_OWNED_RESTRICTIONS = {
+            DISALLOW_CONFIG_DATE_TIME,
+            DISALLOW_CONFIG_TETHERING,
+            DISALLOW_DATA_ROAMING,
+            DISALLOW_DEBUGGING_FEATURES
     };
 
     /**

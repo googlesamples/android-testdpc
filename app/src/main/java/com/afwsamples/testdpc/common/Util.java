@@ -57,9 +57,11 @@ public class Util {
     private static final String GMSCORE_PACKAGE = "com.google.android.gms";
     private static final String PERSISTENT_DEVICE_OWNER_STATE = "persistentDeviceOwnerState";
 
-    // TODO:(133143789): Remove when we no longer need to support pre-release Q
-    private static final boolean IS_RUNNING_Q =
-        VERSION.CODENAME.length() == 1 && VERSION.CODENAME.charAt(0) == 'Q';
+    // TODO: Update to S when VERSION_CODES.R becomes available.
+    public static final int R_VERSION_CODE = 30;
+
+    private static final boolean IS_RUNNING_R =
+        VERSION.CODENAME.length() == 1 && VERSION.CODENAME.charAt(0) == 'R';
 
     public static final int Q_VERSION_CODE = 29;
 
@@ -69,7 +71,8 @@ public class Util {
      * <p>This will be set to the version SDK, or {@link VERSION_CODES.CUR_DEVELOPMENT} if the SDK
      * int is not yet assigned.
      **/
-    public static final int SDK_INT = IS_RUNNING_Q ? Q_VERSION_CODE : VERSION.SDK_INT;
+    public static final int SDK_INT =
+        IS_RUNNING_R ? VERSION_CODES.CUR_DEVELOPMENT : VERSION.SDK_INT;
 
     /**
      * Format a friendly datetime for the current locale according to device policy documentation.

@@ -32,6 +32,7 @@ import android.widget.ListView;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.Util;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -96,15 +97,16 @@ public class SecurityLogsFragment extends ListFragment {
                     : R.string.failed_to_retrieve_security_logs);
             mAdapter.add(message);
         } else {
+            SimpleDateFormat formatter = new SimpleDateFormat("MM-dd HH:mm:ss.SSS");
             Log.d(TAG, "Incoming logs size: " + logs.size());
             for (SecurityEvent event : logs) {
                 StringBuilder sb = new StringBuilder();
-                sb.append(getStringEventTagFromId(event.getTag()));
                 if (Util.SDK_INT >= VERSION_CODES.P) {
-                    sb.append(" (id: " + getEventId(event) + ")");
+                    sb.append(getEventId(event) + ": ");
                 }
-                sb.append(" (").append(new Date(TimeUnit.NANOSECONDS.toMillis(
-                        event.getTimeNanos()))).append("): ");
+                sb.append(getStringEventTagFromId(event.getTag()));
+                sb.append(" (").append(formatter.format(new Date(TimeUnit.NANOSECONDS.toMillis(
+                        event.getTimeNanos())))).append("): ");
                 printData(sb, event.getData());
                 mAdapter.add(sb.toString());
             }

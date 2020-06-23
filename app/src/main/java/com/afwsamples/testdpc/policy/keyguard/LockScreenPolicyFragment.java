@@ -80,8 +80,6 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
 
         static final Set<String> NOT_APPLICABLE_TO_PARENT
                 = new HashSet<>(Arrays.asList(new String[] {
-            KEYGUARD_DISABLE_SECURE_CAMERA,
-            KEYGUARD_DISABLE_SECURE_NOTIFICATIONS,
             KEYGUARD_DISABLE_UNREDACTED_NOTIFICATIONS,
         }));
     }
