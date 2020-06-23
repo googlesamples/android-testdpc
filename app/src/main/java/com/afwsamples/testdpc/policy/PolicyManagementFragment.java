@@ -16,10 +16,6 @@
 
 package com.afwsamples.testdpc.policy;
 
-import static android.os.UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES;
-import static com.afwsamples.testdpc.common.Util.Q_VERSION_CODE;
-import static com.afwsamples.testdpc.common.preference.DpcPreferenceHelper.NO_CUSTOM_CONSTRIANT;
-
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.accounts.Account;
 import android.accounts.AccountManager;
@@ -28,6 +24,7 @@ import android.accounts.OperationCanceledException;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.ActivityOptions;
 import android.app.AlertDialog;
 import android.app.DialogFragment;
@@ -45,6 +42,7 @@ import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.location.LocationManager;
 import android.net.ProxyInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -56,17 +54,10 @@ import android.os.UserHandle;
 import android.os.UserManager;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.provider.Settings.Secure;
 import android.security.KeyChain;
 import android.security.KeyChainAliasCallback;
 import android.service.notification.NotificationListenerService;
-import androidx.annotation.RequiresApi;
-import androidx.annotation.StringRes;
-import androidx.preference.SwitchPreference;
-import androidx.core.content.FileProvider;
-import androidx.preference.EditTextPreference;
-import androidx.preference.ListPreference;
-import androidx.preference.Preference;
-import androidx.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
 import android.text.InputType;
 import android.text.TextUtils;
@@ -86,6 +77,16 @@ import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
+
+import androidx.annotation.RequiresApi;
+import androidx.annotation.StringRes;
+import androidx.core.content.FileProvider;
+import androidx.preference.EditTextPreference;
+import androidx.preference.ListPreference;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceManager;
+import androidx.preference.SwitchPreference;
+
 import com.afwsamples.testdpc.AddAccountActivity;
 import com.afwsamples.testdpc.BuildConfig;
 import com.afwsamples.testdpc.CrossProfileAppsFragment;
@@ -101,6 +102,7 @@ import com.afwsamples.testdpc.common.PackageInstallationUtils;
 import com.afwsamples.testdpc.common.UserArrayAdapter;
 import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.common.preference.CustomConstraint;
+import com.afwsamples.testdpc.common.preference.DpcEditTextPreference;
 import com.afwsamples.testdpc.common.preference.DpcPreference;
 import com.afwsamples.testdpc.common.preference.DpcPreferenceBase;
 import com.afwsamples.testdpc.common.preference.DpcPreferenceHelper;
@@ -126,11 +128,12 @@ import com.afwsamples.testdpc.policy.wifimanagement.WifiModificationFragment;
 import com.afwsamples.testdpc.profilepolicy.ProfilePolicyManagementFragment;
 import com.afwsamples.testdpc.profilepolicy.addsystemapps.EnableSystemAppsByIntentFragment;
 import com.afwsamples.testdpc.profilepolicy.apprestrictions.AppRestrictionsManagingPackageFragment;
-import com.afwsamples.testdpc.profilepolicy.apprestrictions.ManageAppRestrictionsFragment;
+import com.afwsamples.testdpc.profilepolicy.apprestrictions.ManagedConfigurationsFragment;
 import com.afwsamples.testdpc.profilepolicy.delegation.DelegationFragment;
 import com.afwsamples.testdpc.profilepolicy.permission.ManageAppPermissionsFragment;
 import com.afwsamples.testdpc.transferownership.PickTransferComponentFragment;
 import com.afwsamples.testdpc.util.MainThreadExecutor;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -156,7 +159,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import static android.os.UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES;
+import static com.afwsamples.testdpc.common.Util.Q_VERSION_CODE;
+import static com.afwsamples.testdpc.common.preference.DpcPreferenceHelper.NO_CUSTOM_CONSTRIANT;
 
 /**
  * Provides several device management functions.
@@ -266,9 +274,12 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String PASSWORD_COMPLEXITY_KEY = "password_complexity";
     private static final String SEPARATE_CHALLENGE_KEY = "separate_challenge";
     private static final String DISABLE_CAMERA_KEY = "disable_camera";
+    private static final String DISABLE_CAMERA_ON_PARENT_KEY = "disable_camera_on_parent";
     private static final String DISABLE_KEYGUARD = "disable_keyguard";
     private static final String DISABLE_METERED_DATA_KEY = "disable_metered_data";
     private static final String DISABLE_SCREEN_CAPTURE_KEY = "disable_screen_capture";
+    private static final String DISABLE_SCREEN_CAPTURE_ON_PARENT_KEY =
+            "disable_screen_capture_on_parent";
     private static final String DISABLE_STATUS_BAR = "disable_status_bar";
     private static final String ENABLE_BACKUP_SERVICE = "enable_backup_service";
     private static final String APP_FEEDBACK_NOTIFICATIONS = "app_feedback_notifications";
@@ -288,13 +299,14 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String ADD_ACCOUNT_KEY = "add_account";
     private static final String REMOVE_ACCOUNT_KEY = "remove_account";
     private static final String HIDE_APPS_KEY = "hide_apps";
+    private static final String HIDE_APPS_PARENT_KEY = "hide_apps_parent";
     private static final String INSTALL_CA_CERTIFICATE_KEY = "install_ca_certificate";
     private static final String INSTALL_KEY_CERTIFICATE_KEY = "install_key_certificate";
     private static final String INSTALL_NONMARKET_APPS_KEY
             = "install_nonmarket_apps";
     private static final String LOCK_SCREEN_POLICY_KEY = "lock_screen_policy";
     private static final String MANAGE_APP_PERMISSIONS_KEY = "manage_app_permissions";
-    private static final String MANAGE_APP_RESTRICTIONS_KEY = "manage_app_restrictions";
+    private static final String MANAGED_CONFIGURATIONS_KEY = "managed_configurations";
     private static final String MANAGED_PROFILE_SPECIFIC_POLICIES_KEY = "managed_profile_policies";
     private static final String MANAGE_LOCK_TASK_LIST_KEY = "manage_lock_task";
     private static final String MUTE_AUDIO_KEY = "mute_audio";
@@ -330,6 +342,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String CLEAR_GLOBAL_HTTP_PROXY_KEY = "clear_global_http_proxy";
     private static final String SET_DEVICE_ORGANIZATION_NAME_KEY = "set_device_organization_name";
     private static final String SET_AUTO_TIME_REQUIRED_KEY = "set_auto_time_required";
+    private static final String SET_AUTO_TIME_KEY = "set_auto_time";
+    private static final String SET_AUTO_TIME_ZONE_KEY = "set_auto_time_zone";
     private static final String SET_DISABLE_ACCOUNT_MANAGEMENT_KEY
             = "set_disable_account_management";
     private static final String SET_INPUT_METHODS_KEY = "set_input_methods";
@@ -339,6 +353,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String SET_PERMISSION_POLICY_KEY = "set_permission_policy";
     private static final String SET_SHORT_SUPPORT_MESSAGE_KEY = "set_short_support_message";
     private static final String SET_USER_RESTRICTIONS_KEY = "set_user_restrictions";
+    private static final String SET_USER_RESTRICTIONS_PARENT_KEY = "set_user_restrictions_parent";
     private static final String SHOW_WIFI_MAC_ADDRESS_KEY = "show_wifi_mac_address";
     private static final String START_KIOSK_MODE = "start_kiosk_mode";
     private static final String START_LOCK_TASK = "start_lock_task";
@@ -350,6 +365,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String TEST_KEY_USABILITY_KEY = "test_key_usability";
 
     private static final String UNHIDE_APPS_KEY = "unhide_apps";
+    private static final String UNHIDE_APPS_PARENT_KEY = "unhide_apps_parent";
     private static final String UNSUSPEND_APPS_KEY = "unsuspend_apps";
     private static final String CLEAR_APP_DATA_KEY = "clear_app_data";
     private static final String KEEP_UNINSTALLED_PACKAGES = "keep_uninstalled_packages";
@@ -362,8 +378,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String MODIFY_WIFI_CONFIGURATION_KEY = "modify_wifi_configuration";
     private static final String TRANSFER_OWNERSHIP_KEY = "transfer_ownership_to_component";
     private static final String TAG_WIFI_CONFIG_CREATION = "wifi_config_creation";
-    private static final String WIFI_CONFIG_LOCKDOWN_ON = "1";
-    private static final String WIFI_CONFIG_LOCKDOWN_OFF = "0";
     private static final String SECURITY_PATCH_FORMAT = "yyyy-MM-dd";
     private static final String SET_NEW_PASSWORD = "set_new_password";
     private static final String SET_NEW_PASSWORD_WITH_COMPLEXITY =
@@ -387,6 +401,14 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String MANAGED_SYSTEM_UPDATES_KEY = "managed_system_updates";
 
     private static final String SET_PRIVATE_DNS_MODE_KEY = "set_private_dns_mode";
+    private static final String FACTORY_RESET_ORG_OWNED_DEVICE = "factory_reset_org_owned_device";
+    private static final String SET_FACTORY_RESET_PROTECTION_POLICY_KEY =
+            "set_factory_reset_protection_policy";
+    private static final String SET_LOCATION_ENABLED_KEY = "set_location_enabled";
+    private static final String SET_LOCATION_MODE_KEY = "set_location_mode";
+    private static final String SUSPEND_PERSONAL_APPS_KEY = "suspend_personal_apps";
+    private static final String PROFILE_MAX_TIME_OFF_KEY = "profile_max_time_off";
+    private static final String COMMON_CRITERIA_MODE_KEY = "common_criteria_mode";
 
     private static final String BATTERY_PLUGGED_ANY = Integer.toString(
             BatteryManager.BATTERY_PLUGGED_AC |
@@ -431,7 +453,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private DpcPreference mInstallExistingPackagePreference;
 
     private SwitchPreference mDisableCameraSwitchPreference;
+    private DpcSwitchPreference mDisableCameraOnParentSwitchPreference;
     private SwitchPreference mDisableScreenCaptureSwitchPreference;
+    private DpcSwitchPreference mDisableScreenCaptureOnParentSwitchPreference;
     private SwitchPreference mMuteAudioSwitchPreference;
 
     private DpcPreference mDisableStatusBarPreference;
@@ -442,13 +466,18 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private SwitchPreference mStayOnWhilePluggedInSwitchPreference;
     private DpcSwitchPreference mInstallNonMarketAppsPreference;
 
-    private SwitchPreference mEnableBackupServicePreference;
+    private DpcSwitchPreference mEnableBackupServicePreference;
+    private DpcSwitchPreference mCommonCriteriaModePreference;
     private SwitchPreference mEnableSecurityLoggingPreference;
     private SwitchPreference mEnableNetworkLoggingPreference;
-    private SwitchPreference mSetAutoTimeRequiredPreference;
+    private DpcSwitchPreference mSetAutoTimeRequiredPreference;
+    private DpcSwitchPreference mSetAutoTimePreference;
+    private DpcSwitchPreference mSetAutoTimeZonePreference;
     private DpcPreference mLogoutUserPreference;
     private DpcPreference mManageLockTaskListPreference;
     private DpcPreference mSetLockTaskFeaturesPreference;
+    private DpcPreference mUnhideAppsParentPreference;
+    private DpcPreference mHideAppsParentPreference;
 
     private DpcSwitchPreference mEnableLogoutPreference;
     private Preference mAffiliatedUserPreference;
@@ -461,6 +490,15 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private DpcSwitchPreference mAutoBrightnessPreference;
 
     private DpcSwitchPreference mEnableAppFeedbackNotificationsPreference;
+
+    private DpcSwitchPreference mSetLocationEnabledPreference;
+    private DpcSwitchPreference mSetLocationModePreference;
+
+    private DpcPreference mUserRestrictionsParentPreference;
+    private DpcSwitchPreference mSuspendPersonalApps;
+    private DpcEditTextPreference mProfileMaxTimeOff;
+
+    private DpcSwitchPreference mLockdownAdminConfiguredNetworksPreference;
 
     private GetAccessibilityServicesTask mGetAccessibilityServicesTask = null;
     private GetInputMethodsTask mGetInputMethodsTask = null;
@@ -526,12 +564,18 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         mAffiliatedUserPreference = findPreference(AFFILIATED_USER_KEY);
         mEphemeralUserPreference = findPreference(EPHEMERAL_USER_KEY);
         mDisableCameraSwitchPreference = (SwitchPreference) findPreference(DISABLE_CAMERA_KEY);
+        mDisableCameraSwitchPreference.setOnPreferenceChangeListener(this);
+        mDisableCameraOnParentSwitchPreference = (DpcSwitchPreference)
+                findPreference(DISABLE_CAMERA_ON_PARENT_KEY);
+        mDisableCameraOnParentSwitchPreference.setOnPreferenceChangeListener(this);
         findPreference(CAPTURE_IMAGE_KEY).setOnPreferenceClickListener(this);
         findPreference(CAPTURE_VIDEO_KEY).setOnPreferenceClickListener(this);
-        mDisableCameraSwitchPreference.setOnPreferenceChangeListener(this);
         mDisableScreenCaptureSwitchPreference = (SwitchPreference) findPreference(
                 DISABLE_SCREEN_CAPTURE_KEY);
         mDisableScreenCaptureSwitchPreference.setOnPreferenceChangeListener(this);
+        mDisableScreenCaptureOnParentSwitchPreference = (DpcSwitchPreference) findPreference(
+                DISABLE_SCREEN_CAPTURE_ON_PARENT_KEY);
+        mDisableScreenCaptureOnParentSwitchPreference.setOnPreferenceChangeListener(this);
         mMuteAudioSwitchPreference = (SwitchPreference) findPreference(
                 MUTE_AUDIO_KEY);
         mMuteAudioSwitchPreference.setOnPreferenceChangeListener(this);
@@ -570,8 +614,13 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(WIPE_DATA_KEY).setOnPreferenceClickListener(this);
         findPreference(PERSISTENT_DEVICE_OWNER_KEY).setOnPreferenceClickListener(this);
         findPreference(REMOVE_DEVICE_OWNER_KEY).setOnPreferenceClickListener(this);
-        mEnableBackupServicePreference = (SwitchPreference) findPreference(ENABLE_BACKUP_SERVICE);
+        mEnableBackupServicePreference = (DpcSwitchPreference) findPreference(
+            ENABLE_BACKUP_SERVICE);
         mEnableBackupServicePreference.setOnPreferenceChangeListener(this);
+        mEnableBackupServicePreference.setCustomConstraint(this::validateDeviceOwnerBeforeQ);
+        mCommonCriteriaModePreference = (DpcSwitchPreference) findPreference(
+            COMMON_CRITERIA_MODE_KEY);
+        mCommonCriteriaModePreference.setOnPreferenceChangeListener(this);
         findPreference(REQUEST_BUGREPORT_KEY).setOnPreferenceClickListener(this);
         mEnableSecurityLoggingPreference =
             (SwitchPreference) findPreference(ENABLE_SECURITY_LOGGING);
@@ -617,12 +666,16 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(INSTALL_APK_PACKAGE_KEY).setOnPreferenceClickListener(this);
         findPreference(UNINSTALL_PACKAGE_KEY).setOnPreferenceClickListener(this);
         findPreference(HIDE_APPS_KEY).setOnPreferenceClickListener(this);
+        mHideAppsParentPreference = (DpcPreference) findPreference(HIDE_APPS_PARENT_KEY);
+        mHideAppsParentPreference.setOnPreferenceClickListener(this);
         findPreference(UNHIDE_APPS_KEY).setOnPreferenceClickListener(this);
+        mUnhideAppsParentPreference = (DpcPreference) findPreference(UNHIDE_APPS_PARENT_KEY);
+        mUnhideAppsParentPreference.setOnPreferenceClickListener(this);
         findPreference(SUSPEND_APPS_KEY).setOnPreferenceClickListener(this);
         findPreference(UNSUSPEND_APPS_KEY).setOnPreferenceClickListener(this);
         findPreference(CLEAR_APP_DATA_KEY).setOnPreferenceClickListener(this);
         findPreference(KEEP_UNINSTALLED_PACKAGES).setOnPreferenceClickListener(this);
-        findPreference(MANAGE_APP_RESTRICTIONS_KEY).setOnPreferenceClickListener(this);
+        findPreference(MANAGED_CONFIGURATIONS_KEY).setOnPreferenceClickListener(this);
         findPreference(DISABLE_METERED_DATA_KEY).setOnPreferenceClickListener(this);
         findPreference(GENERIC_DELEGATION_KEY).setOnPreferenceClickListener(this);
         findPreference(APP_RESTRICTIONS_MANAGING_PACKAGE_KEY).setOnPreferenceClickListener(this);
@@ -638,7 +691,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(MANAGE_APP_PERMISSIONS_KEY).setOnPreferenceClickListener(this);
         findPreference(CREATE_WIFI_CONFIGURATION_KEY).setOnPreferenceClickListener(this);
         findPreference(CREATE_EAP_TLS_WIFI_CONFIGURATION_KEY).setOnPreferenceClickListener(this);
-        findPreference(WIFI_CONFIG_LOCKDOWN_ENABLE_KEY).setOnPreferenceChangeListener(this);
+        mLockdownAdminConfiguredNetworksPreference = (DpcSwitchPreference)
+                findPreference(WIFI_CONFIG_LOCKDOWN_ENABLE_KEY);
+        mLockdownAdminConfiguredNetworksPreference.setOnPreferenceChangeListener(this);
         findPreference(MODIFY_WIFI_CONFIGURATION_KEY).setOnPreferenceClickListener(this);
         findPreference(TRANSFER_OWNERSHIP_KEY).setOnPreferenceClickListener(this);
         findPreference(SHOW_WIFI_MAC_ADDRESS_KEY).setOnPreferenceClickListener(this);
@@ -652,6 +707,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                         : NO_CUSTOM_CONSTRIANT);
         mInstallNonMarketAppsPreference.setOnPreferenceChangeListener(this);
         findPreference(SET_USER_RESTRICTIONS_KEY).setOnPreferenceClickListener(this);
+        mUserRestrictionsParentPreference = (DpcPreference) findPreference(SET_USER_RESTRICTIONS_PARENT_KEY);
+        mUserRestrictionsParentPreference.setOnPreferenceClickListener(this);
+
         findPreference(REBOOT_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_SHORT_SUPPORT_MESSAGE_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_LONG_SUPPORT_MESSAGE_KEY).setOnPreferenceClickListener(this);
@@ -673,6 +731,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(MANAGED_SYSTEM_UPDATES_KEY).setOnPreferenceClickListener(this);
 
         findPreference(CROSS_PROFILE_CALENDAR_KEY).setOnPreferenceClickListener(this);
+        findPreference(FACTORY_RESET_ORG_OWNED_DEVICE).setOnPreferenceClickListener(this);
+        findPreference(SET_FACTORY_RESET_PROTECTION_POLICY_KEY).setOnPreferenceClickListener(this);
 
         DpcPreference bindDeviceAdminPreference =
                 (DpcPreference) findPreference(BIND_DEVICE_ADMIN_POLICIES);
@@ -682,13 +742,32 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                         : R.string.require_one_po_to_bind);
         bindDeviceAdminPreference.setOnPreferenceClickListener(this);
 
-        mSetAutoTimeRequiredPreference = (SwitchPreference) findPreference(
+        mSetAutoTimeRequiredPreference = (DpcSwitchPreference) findPreference(
                 SET_AUTO_TIME_REQUIRED_KEY);
+        mSetAutoTimeRequiredPreference.addCustomConstraint(this::validateDeviceOwnerBeforeO);
         mSetAutoTimeRequiredPreference.setOnPreferenceChangeListener(this);
+        mSetAutoTimePreference = (DpcSwitchPreference) findPreference(SET_AUTO_TIME_KEY);
+        mSetAutoTimePreference.setOnPreferenceChangeListener(this);
+        mSetAutoTimeZonePreference = (DpcSwitchPreference) findPreference(SET_AUTO_TIME_ZONE_KEY);
+        mSetAutoTimeZonePreference.setOnPreferenceChangeListener(this);
 
         mSetDeviceOrganizationNamePreference =
         (EditTextPreference) findPreference(SET_DEVICE_ORGANIZATION_NAME_KEY);
         mSetDeviceOrganizationNamePreference.setOnPreferenceChangeListener(this);
+
+        mSetLocationEnabledPreference = (DpcSwitchPreference) findPreference(
+            SET_LOCATION_ENABLED_KEY);
+        mSetLocationEnabledPreference.setOnPreferenceChangeListener(this);
+
+        mSetLocationModePreference = (DpcSwitchPreference) findPreference(SET_LOCATION_MODE_KEY);
+        mSetLocationModePreference.setOnPreferenceChangeListener(this);
+
+        mSuspendPersonalApps = (DpcSwitchPreference) findPreference(SUSPEND_PERSONAL_APPS_KEY);
+        mSuspendPersonalApps.setOnPreferenceChangeListener(this);
+
+        mProfileMaxTimeOff = (DpcEditTextPreference) findPreference(PROFILE_MAX_TIME_OFF_KEY);
+        mProfileMaxTimeOff.setOnPreferenceChangeListener(this);
+        maybeUpdateProfileMaxTimeOff();
 
         onCreateSetNewPasswordWithComplexityPreference();
         constrainSpecialCasePreferences();
@@ -702,11 +781,39 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         reloadScreenCaptureDisableUi();
         reloadMuteAudioUi();
         reloadEnableBackupServiceUi();
+        reloadCommonCriteriaModeUi();
         reloadEnableSecurityLoggingUi();
         reloadEnableNetworkLoggingUi();
         reloadSetAutoTimeRequiredUi();
+        reloadSetAutoTimeUi();
+        reloadSetAutoTimeZoneUi();
         reloadEnableLogoutUi();
         reloadAutoBrightnessUi();
+        reloadPersonalAppsSuspendedUi();
+    }
+
+    private void maybeUpdateProfileMaxTimeOff() {
+        if (mProfileMaxTimeOff.isEnabled()) {
+            final String currentValueAsString = Long.toString(
+                    TimeUnit.MILLISECONDS.toSeconds(
+                        mDevicePolicyManager.getManagedProfileMaximumTimeOff(mAdminComponentName)));
+            mProfileMaxTimeOff.setText(currentValueAsString);
+            mProfileMaxTimeOff.setSummary(currentValueAsString);
+        }
+    }
+
+    @TargetApi(Util.R_VERSION_CODE)
+    private void reloadPersonalAppsSuspendedUi() {
+        if (mSuspendPersonalApps.isEnabled()) {
+            int suspendReasons =
+                    mDevicePolicyManager.getPersonalAppsSuspendedReasons(mAdminComponentName);
+            mSuspendPersonalApps.setChecked(suspendReasons != 0);
+        }
+    }
+
+    private void logAndShowToast(String message, Exception e) {
+        Log.e(TAG, message, e);
+        showToast(message + ": " + e.getMessage());
     }
 
     private void onCreateSetNewPasswordWithComplexityPreference() {
@@ -945,8 +1052,14 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             case HIDE_APPS_KEY:
                 showHideAppsPrompt(false);
                 return true;
+            case HIDE_APPS_PARENT_KEY:
+                showHideAppsOnParentPrompt(false);
+                return true;
             case UNHIDE_APPS_KEY:
                 showHideAppsPrompt(true);
+                return true;
+            case UNHIDE_APPS_PARENT_KEY:
+                showHideAppsOnParentPrompt(true);
                 return true;
             case SUSPEND_APPS_KEY:
                 showSuspendAppsPrompt(false);
@@ -960,8 +1073,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             case KEEP_UNINSTALLED_PACKAGES:
                 showFragment(new ManageKeepUninstalledPackagesFragment());
                 return true;
-            case MANAGE_APP_RESTRICTIONS_KEY:
-                showFragment(new ManageAppRestrictionsFragment());
+            case MANAGED_CONFIGURATIONS_KEY:
+                showFragment(new ManagedConfigurationsFragment());
                 return true;
             case DISABLE_METERED_DATA_KEY:
                 showSetMeteredDataPrompt();
@@ -1082,6 +1195,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             case SET_USER_RESTRICTIONS_KEY:
                 showFragment(new UserRestrictionsDisplayFragment());
                 return true;
+            case SET_USER_RESTRICTIONS_PARENT_KEY:
+                showFragment(new UserRestrictionsParentDisplayFragment());
+                return true;
             case REBOOT_KEY:
                 reboot();
                 return true;
@@ -1117,13 +1233,11 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 return true;
             case SET_TIME_KEY:
                 // Disable auto time before we could set time manually.
-                mDevicePolicyManager.setGlobalSetting(mAdminComponentName,
-                        Settings.Global.AUTO_TIME, "0");
+                setAutoTimeEnabled(false);
                 showSetTimeDialog();
                 return true;
             case SET_TIME_ZONE_KEY:
-                mDevicePolicyManager.setGlobalSetting(mAdminComponentName,
-                        Settings.Global.AUTO_TIME_ZONE, "0");
+                setAutoTimeZoneEnabled(false);
                 showSetTimeZoneDialog();
                 return true;
             case MANAGE_OVERRIDE_APN_KEY:
@@ -1137,6 +1251,12 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 return true;
             case SET_PROFILE_NAME_KEY:
                 showSetProfileNameDialog();
+                return true;
+            case FACTORY_RESET_ORG_OWNED_DEVICE:
+                factoryResetOrgOwnedDevice();
+                return true;
+            case SET_FACTORY_RESET_PROTECTION_POLICY_KEY:
+                showFragment(new FactoryResetProtectionPolicyFragment());
                 return true;
         }
         return false;
@@ -1274,9 +1394,17 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 // Reload UI to verify the camera is enable / disable correctly.
                 reloadCameraDisableUi();
                 return true;
+            case DISABLE_CAMERA_ON_PARENT_KEY:
+                setCameraDisabledOnParent((Boolean) newValue);
+                reloadCameraDisableOnParentUi();
+                return true;
             case ENABLE_BACKUP_SERVICE:
                 setBackupServiceEnabled((Boolean) newValue);
                 reloadEnableBackupServiceUi();
+                return true;
+            case COMMON_CRITERIA_MODE_KEY:
+                setCommonCriteriaModeEnabled((Boolean) newValue);
+                reloadCommonCriteriaModeUi();
                 return true;
             case ENABLE_SECURITY_LOGGING:
                 setSecurityLoggingEnabled((Boolean) newValue);
@@ -1292,6 +1420,10 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 // Reload UI to verify that screen capture was enabled / disabled correctly.
                 reloadScreenCaptureDisableUi();
                 return true;
+            case DISABLE_SCREEN_CAPTURE_ON_PARENT_KEY:
+                setScreenCaptureDisabledOnParent((Boolean) newValue);
+                reloadScreenCaptureDisableOnParentUi();
+                return true;
             case MUTE_AUDIO_KEY:
                 mDevicePolicyManager.setMasterVolumeMuted(mAdminComponentName,
                         (Boolean) newValue);
@@ -1304,10 +1436,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 updateStayOnWhilePluggedInPreference();
                 return true;
             case WIFI_CONFIG_LOCKDOWN_ENABLE_KEY:
-                mDevicePolicyManager.setGlobalSetting(mAdminComponentName,
-                        Settings.Global.WIFI_DEVICE_OWNER_CONFIGS_LOCKDOWN,
-                        newValue.equals(Boolean.TRUE) ?
-                                WIFI_CONFIG_LOCKDOWN_ON : WIFI_CONFIG_LOCKDOWN_OFF);
+                mDevicePolicyManager.setConfiguredNetworksLockdownState(
+                        mAdminComponentName, newValue.equals(true));
+                reloadLockdownAdminConfiguredNetworksUi();
                 return true;
             case INSTALL_NONMARKET_APPS_KEY:
                 mDevicePolicyManager.setSecureSetting(mAdminComponentName,
@@ -1319,6 +1450,14 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 mDevicePolicyManager.setAutoTimeRequired(mAdminComponentName,
                         newValue.equals(true));
                 reloadSetAutoTimeRequiredUi();
+                return true;
+            case SET_AUTO_TIME_KEY:
+                setAutoTimeEnabled(newValue.equals(true));
+                reloadSetAutoTimeUi();
+                return true;
+            case SET_AUTO_TIME_ZONE_KEY:
+                setAutoTimeZoneEnabled(newValue.equals(true));
+                reloadSetAutoTimeZoneUi();
                 return true;
             case SET_DEVICE_ORGANIZATION_NAME_KEY:
                 mDevicePolicyManager.setOrganizationName(mAdminComponentName, (String) newValue);
@@ -1348,6 +1487,34 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                         R.string.app_feedback_notifications), newValue.equals(true));
                 editor.commit();
                 return true;
+            case SET_LOCATION_ENABLED_KEY:
+                mDevicePolicyManager.setLocationEnabled(mAdminComponentName, newValue.equals(true));
+                reloadLocationEnabledUi();
+                reloadLocationModeUi();
+                return true;
+            case SET_LOCATION_MODE_KEY:
+                final int locationMode;
+                if (newValue.equals(true)) {
+                    locationMode = Secure.LOCATION_MODE_HIGH_ACCURACY;
+                } else {
+                    locationMode = Secure.LOCATION_MODE_OFF;
+                }
+                mDevicePolicyManager.setSecureSetting(mAdminComponentName, Secure.LOCATION_MODE,
+                    String.format("%d", locationMode));
+                reloadLocationEnabledUi();
+                reloadLocationModeUi();
+                return true;
+            case SUSPEND_PERSONAL_APPS_KEY:
+                mDevicePolicyManager.setPersonalAppsSuspended(
+                        mAdminComponentName, (Boolean) newValue);
+                reloadPersonalAppsSuspendedUi();
+                return true;
+            case PROFILE_MAX_TIME_OFF_KEY:
+                final long timeoutSec = Long.parseLong((String) newValue);
+                mDevicePolicyManager.setManagedProfileMaximumTimeOff(
+                        mAdminComponentName, TimeUnit.SECONDS.toMillis(timeoutSec));
+                maybeUpdateProfileMaxTimeOff();
+                return true;
         }
         return false;
     }
@@ -1355,6 +1522,13 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     @TargetApi(VERSION_CODES.M)
     private void setCameraDisabled(boolean disabled) {
         mDevicePolicyManager.setCameraDisabled(mAdminComponentName, disabled);
+    }
+
+    @TargetApi(Util.R_VERSION_CODE)
+    private void setCameraDisabledOnParent(boolean disabled) {
+        DevicePolicyManager parentDpm = mDevicePolicyManager
+                .getParentProfileInstance(mAdminComponentName);
+        parentDpm.setCameraDisabled(mAdminComponentName, disabled);
     }
 
     @TargetApi(VERSION_CODES.N)
@@ -1365,6 +1539,11 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     @TargetApi(VERSION_CODES.O)
     private void setBackupServiceEnabled(boolean enabled) {
         mDevicePolicyManager.setBackupServiceEnabled(mAdminComponentName, enabled);
+    }
+
+    @TargetApi(VERSION_CODES.R)
+    private void setCommonCriteriaModeEnabled(boolean enabled) {
+        mDevicePolicyManager.setCommonCriteriaModeEnabled(mAdminComponentName, enabled);
     }
 
     @TargetApi(VERSION_CODES.M)
@@ -1382,6 +1561,13 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     @TargetApi(VERSION_CODES.LOLLIPOP)
     private void setScreenCaptureDisabled(boolean disabled) {
         mDevicePolicyManager.setScreenCaptureDisabled(mAdminComponentName, disabled);
+    }
+
+    @TargetApi(Util.R_VERSION_CODE)
+    private void setScreenCaptureDisabledOnParent(boolean disabled) {
+        DevicePolicyManager parentDpm = mDevicePolicyManager
+                .getParentProfileInstance(mAdminComponentName);
+        parentDpm.setScreenCaptureDisabled(mAdminComponentName, disabled);
     }
 
     @TargetApi(VERSION_CODES.O)
@@ -2103,8 +2289,13 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 .show();
     }
 
-    @TargetApi(VERSION_CODES.M)
+    @TargetApi(VERSION_CODES.N)
     private void loadAppFeedbackNotifications() {
+        if (Util.SDK_INT < VERSION_CODES.N) {
+            // This toggle is only available >= N due to device_policy_header.xml
+            // so this code not executing will not be noticed
+            return;
+        }
         mEnableAppFeedbackNotificationsPreference.setChecked(
             PreferenceManager.getDefaultSharedPreferences(getContext())
                 .getBoolean(getString(R.string.app_feedback_notifications), false));
@@ -2112,8 +2303,14 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     private void loadAppStatus() {
         final @StringRes int appStatusStringId;
+        boolean isOrgOwned = Util.SDK_INT >= VERSION_CODES.R &&
+                mDevicePolicyManager.isOrganizationOwnedDeviceWithManagedProfile();
         if (mDevicePolicyManager.isProfileOwnerApp(mPackageName)) {
+            if (isOrgOwned) {
+                appStatusStringId = R.string.this_is_an_org_owned_profile_owner;
+            } else {
             appStatusStringId = R.string.this_is_a_profile_owner;
+            }
         } else if (mDevicePolicyManager.isDeviceOwnerApp(mPackageName)) {
             appStatusStringId = R.string.this_is_a_device_owner;
         } else if (isDelegatedApp()) {
@@ -2163,8 +2360,18 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             return;
         }
 
-        int complexity = mDevicePolicyManager.getPasswordComplexity();
-        passwordComplexityPreference.setSummary(PASSWORD_COMPLEXITY.get(complexity));
+        String summary;
+        int complexity = PASSWORD_COMPLEXITY.get(mDevicePolicyManager.getPasswordComplexity());
+        if (Util.isManagedProfileOwner(getActivity()) && Util.SDK_INT >= Util.R_VERSION_CODE) {
+            DevicePolicyManager parentDpm
+                    = mDevicePolicyManager.getParentProfileInstance(mAdminComponentName);
+            int parentComplexity = PASSWORD_COMPLEXITY.get(parentDpm.getPasswordComplexity());
+            summary = String.format(getString(R.string.password_complexity_profile_summary),
+                    getString(parentComplexity), getString(complexity));
+        } else {
+            summary = getString(complexity);
+        }
+        passwordComplexityPreference.setSummary(summary);
     }
 
     @TargetApi(VERSION_CODES.N)
@@ -2202,7 +2409,36 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         if (mAutoBrightnessPreference.isEnabled()) {
             final String brightnessMode = Settings.System.getString(
                     getActivity().getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE);
-            mAutoBrightnessPreference.setChecked(Integer.parseInt(brightnessMode) == 1);
+            mAutoBrightnessPreference.setChecked(parseInt(brightnessMode, /* defaultValue= */ 0) == 1);
+        }
+    }
+
+    @TargetApi(VERSION_CODES.JELLY_BEAN_MR2)
+    private void reloadLocationModeUi() {
+        final String locationMode = Settings.System.getString(
+            getActivity().getContentResolver(), Secure.LOCATION_MODE);
+        mSetLocationModePreference
+            .setChecked(parseInt(locationMode, 0) != Secure.LOCATION_MODE_OFF);
+    }
+
+    @TargetApi(Util.R_VERSION_CODE)
+    private void reloadLocationEnabledUi() {
+        LocationManager locationManager = getActivity().getSystemService(LocationManager.class);
+        mSetLocationEnabledPreference.setChecked(locationManager.isLocationEnabled());
+    }
+
+    @TargetApi(Util.R_VERSION_CODE)
+    private void reloadLockdownAdminConfiguredNetworksUi() {
+        boolean lockdown = mDevicePolicyManager.hasLockdownAdminConfiguredNetworks(
+                mAdminComponentName);
+        mLockdownAdminConfiguredNetworksPreference.setChecked(lockdown);
+    }
+
+    static private int parseInt(String str, int defaultValue) {
+        try {
+            return Integer.parseInt(str);
+        } catch (NumberFormatException e) {
+            return defaultValue;
         }
     }
 
@@ -2236,6 +2472,14 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         mDisableCameraSwitchPreference.setChecked(isCameraDisabled);
     }
 
+    @TargetApi(Util.R_VERSION_CODE)
+    private void reloadCameraDisableOnParentUi() {
+        DevicePolicyManager parentDpm
+                = mDevicePolicyManager.getParentProfileInstance(mAdminComponentName);
+        boolean isCameraDisabled = parentDpm.getCameraDisabled(mAdminComponentName);
+        mDisableCameraOnParentSwitchPreference.setChecked(isCameraDisabled);
+    }
+
     @TargetApi(VERSION_CODES.O)
     private void reloadEnableNetworkLoggingUi() {
         if (mEnableNetworkLoggingPreference.isEnabled()) {
@@ -2264,6 +2508,14 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         }
     }
 
+    //@TargetApi(VERSION_CODES.R)
+    private void reloadCommonCriteriaModeUi() {
+        if (mCommonCriteriaModePreference.isEnabled()) {
+            mCommonCriteriaModePreference.setChecked(
+                mDevicePolicyManager.isCommonCriteriaModeEnabled(mAdminComponentName));
+        }
+    }
+
     @TargetApi(VERSION_CODES.LOLLIPOP)
     private void reloadScreenCaptureDisableUi() {
         boolean isScreenCaptureDisabled = mDevicePolicyManager.getScreenCaptureDisabled(
@@ -2271,11 +2523,44 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         mDisableScreenCaptureSwitchPreference.setChecked(isScreenCaptureDisabled);
     }
 
+    @TargetApi(Util.R_VERSION_CODE)
+    private void reloadScreenCaptureDisableOnParentUi() {
+        DevicePolicyManager parentDpm
+                = mDevicePolicyManager.getParentProfileInstance(mAdminComponentName);
+        boolean isScreenCaptureDisabled = parentDpm.getScreenCaptureDisabled(mAdminComponentName);
+        mDisableScreenCaptureOnParentSwitchPreference.setChecked(isScreenCaptureDisabled);
+    }
+
     @TargetApi(VERSION_CODES.LOLLIPOP)
     private void reloadSetAutoTimeRequiredUi() {
-        if (mDevicePolicyManager.isDeviceOwnerApp(mPackageName)) {
             boolean isAutoTimeRequired = mDevicePolicyManager.getAutoTimeRequired();
             mSetAutoTimeRequiredPreference.setChecked(isAutoTimeRequired);
+        }
+
+    @TargetApi(Util.R_VERSION_CODE)
+    private void reloadSetAutoTimeUi() {
+        boolean isOrgOwned = Util.SDK_INT >= VERSION_CODES.R &&
+                mDevicePolicyManager.isOrganizationOwnedDeviceWithManagedProfile();
+
+        if (mDevicePolicyManager.isDeviceOwnerApp(mPackageName)
+                || (mDevicePolicyManager.isProfileOwnerApp(mPackageName)
+                && isOrgOwned)) {
+            boolean isAutoTime = mDevicePolicyManager.getAutoTimeEnabled(mAdminComponentName);
+            mSetAutoTimePreference.setChecked(isAutoTime);
+        }
+    }
+
+    @TargetApi(Util.R_VERSION_CODE)
+    private void reloadSetAutoTimeZoneUi() {
+        boolean isOrgOwned = Util.SDK_INT >= VERSION_CODES.R &&
+                mDevicePolicyManager.isOrganizationOwnedDeviceWithManagedProfile();
+
+        if (mDevicePolicyManager.isDeviceOwnerApp(mPackageName)
+                || (mDevicePolicyManager.isProfileOwnerApp(mPackageName)
+                && isOrgOwned)) {
+            boolean isAutoTimeZone = mDevicePolicyManager
+                    .getAutoTimeZoneEnabled(mAdminComponentName);
+            mSetAutoTimeZonePreference.setChecked(isAutoTimeZone);
         }
     }
 
@@ -2895,6 +3180,52 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         }
     }
 
+    @RequiresApi(api = Util.R_VERSION_CODE)
+    private void showHideAppsOnParentPrompt(final boolean showHiddenApps) {
+        final int dialogTitleResId;
+        final int successResId;
+        final int failureResId;
+        final int failureSystemResId;
+        if (showHiddenApps) {
+            // showing a dialog to unhide an app
+            dialogTitleResId = R.string.unhide_apps_parent_title;
+            successResId = R.string.unhide_apps_success;
+            failureResId = R.string.unhide_apps_failure;
+            failureSystemResId = R.string.unhide_apps_system_failure;
+        } else {
+            // showing a dialog to hide an app
+            dialogTitleResId = R.string.hide_apps_parent_title;
+            successResId = R.string.hide_apps_success;
+            failureResId = R.string.hide_apps_failure;
+            failureSystemResId = R.string.hide_apps_system_failure;
+        }
+
+        View view = getActivity().getLayoutInflater().inflate(R.layout.simple_edittext, null);
+        final EditText input = view.findViewById(R.id.input);
+        input.setHint(getString(R.string.input_package_name_hints));
+
+        new AlertDialog.Builder(getActivity())
+                .setTitle(getString(dialogTitleResId))
+                .setView(view)
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                    String packageName = input.getText().toString();
+                    try {
+                        if (mDevicePolicyManager.getParentProfileInstance(mAdminComponentName)
+                                .setApplicationHidden(mAdminComponentName, packageName,
+                                        !showHiddenApps)) {
+                            showToast(successResId, packageName);
+                        } else {
+                            showToast(getString(failureResId, packageName), Toast.LENGTH_LONG);
+                        }
+                    } catch (IllegalArgumentException e) {
+                        showToast(getString(failureSystemResId, packageName), Toast.LENGTH_LONG);
+                    }
+                    dialog.dismiss();
+                })
+                .setNegativeButton(android.R.string.cancel, (dialog, which) -> dialog.dismiss())
+                .show();
+    }
+
     /**
      * Shows an alert dialog which displays a list of suspended/non-suspended apps.
      */
@@ -3319,8 +3650,15 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     @TargetApi(VERSION_CODES.P)
     private void relaunchInLockTaskMode() {
+        ActivityManager activityManager = getContext().getSystemService(ActivityManager.class);
+
         final Intent intent = new Intent(getActivity(), getActivity().getClass());
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        // Ensure a new task is actually created if not already running in lock task mode
+        if (!activityManager.isInLockTaskMode()){
+            intent.addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+        }
 
         final ActivityOptions options = ActivityOptions.makeBasic();
         options.setLockTaskEnabled(true);
@@ -3617,6 +3955,20 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         return NO_CUSTOM_CONSTRIANT;
     }
 
+    @TargetApi(30)
+    private void factoryResetOrgOwnedDevice() {
+        mDevicePolicyManager.getParentProfileInstance(mAdminComponentName).wipeData(/*flags=*/ 0);
+    }
+
+    private int validateDeviceOwnerBeforeO() {
+        if (Util.SDK_INT < VERSION_CODES.O) {
+            if (!mDevicePolicyManager.isDeviceOwnerApp(mPackageName)) {
+                return R.string.requires_device_owner;
+            }
+        }
+        return NO_CUSTOM_CONSTRIANT;
+    }
+
     private int validateDeviceOwnerBeforeP() {
         if (Util.SDK_INT < VERSION_CODES.P) {
             if (!mDevicePolicyManager.isDeviceOwnerApp(mPackageName)) {
@@ -3626,7 +3978,26 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         return NO_CUSTOM_CONSTRIANT;
     }
 
-    abstract class ManageLockTaskListCallback {
+    private int validateDeviceOwnerBeforeQ() {
+        if (Util.SDK_INT < VERSION_CODES.Q) {
+            if (!mDevicePolicyManager.isDeviceOwnerApp(mPackageName)) {
+                return R.string.requires_device_owner;
+            }
+        }
+        return NO_CUSTOM_CONSTRIANT;
+    }
+
+    abstract static class ManageLockTaskListCallback {
         public abstract void onPositiveButtonClicked(String[] lockTaskArray);
+    }
+
+    @RequiresApi(Util.R_VERSION_CODE)
+    private void setAutoTimeEnabled(boolean enabled) {
+        mDevicePolicyManager.setAutoTimeEnabled(mAdminComponentName, enabled);
+    }
+
+    @RequiresApi(Util.R_VERSION_CODE)
+    private void setAutoTimeZoneEnabled(boolean enabled) {
+        mDevicePolicyManager.setAutoTimeZoneEnabled(mAdminComponentName, enabled);
     }
 }
