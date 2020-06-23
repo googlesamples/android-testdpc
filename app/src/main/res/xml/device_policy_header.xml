@@ -76,16 +76,6 @@
             testdpc:minSdkVersion="P" />
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="@string/additional_settings_title">
-        <com.afwsamples.testdpc.common.preference.DpcPreference
-            android:key="additional_settings"
-            android:title="@string/additional_settings"
-            testdpc:admin="deviceOwner"
-            testdpc:minSdkVersion="P" />
-    </PreferenceCategory>
-
-
-
     <PreferenceCategory android:title="@string/cross_profile_calendar">
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="cross_profile_calendar"

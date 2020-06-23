@@ -16,6 +16,10 @@
 
 package com.afwsamples.testdpc.policy;
 
+import static android.os.UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES;
+import static com.afwsamples.testdpc.common.Util.Q_VERSION_CODE;
+import static com.afwsamples.testdpc.common.preference.DpcPreferenceHelper.NO_CUSTOM_CONSTRIANT;
+
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.accounts.Account;
 import android.accounts.AccountManager;
@@ -55,6 +59,14 @@ import android.provider.Settings;
 import android.security.KeyChain;
 import android.security.KeyChainAliasCallback;
 import android.service.notification.NotificationListenerService;
+import androidx.annotation.RequiresApi;
+import androidx.annotation.StringRes;
+import androidx.preference.SwitchPreference;
+import androidx.core.content.FileProvider;
+import androidx.preference.EditTextPreference;
+import androidx.preference.ListPreference;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
 import android.text.InputType;
 import android.text.TextUtils;
@@ -74,16 +86,6 @@ import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
-
-import androidx.annotation.RequiresApi;
-import androidx.annotation.StringRes;
-import androidx.core.content.FileProvider;
-import androidx.preference.EditTextPreference;
-import androidx.preference.ListPreference;
-import androidx.preference.Preference;
-import androidx.preference.PreferenceManager;
-import androidx.preference.SwitchPreference;
-
 import com.afwsamples.testdpc.AddAccountActivity;
 import com.afwsamples.testdpc.BuildConfig;
 import com.afwsamples.testdpc.CrossProfileAppsFragment;
@@ -129,7 +131,6 @@ import com.afwsamples.testdpc.profilepolicy.delegation.DelegationFragment;
 import com.afwsamples.testdpc.profilepolicy.permission.ManageAppPermissionsFragment;
 import com.afwsamples.testdpc.transferownership.PickTransferComponentFragment;
 import com.afwsamples.testdpc.util.MainThreadExecutor;
-
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -156,10 +157,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
-
-import static android.os.UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES;
-import static com.afwsamples.testdpc.common.Util.Q_VERSION_CODE;
-import static com.afwsamples.testdpc.common.preference.DpcPreferenceHelper.NO_CUSTOM_CONSTRIANT;
 
 /**
  * Provides several device management functions.
@@ -386,8 +383,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String SET_PROFILE_NAME_KEY = "set_profile_name";
 
     private static final String MANAGE_OVERRIDE_APN_KEY = "manage_override_apn";
-
-    private static final String ADDITIONAL_SETTINGS_KEY = "additional_settings";
 
     private static final String MANAGED_SYSTEM_UPDATES_KEY = "managed_system_updates";
 
@@ -675,8 +670,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(SET_PROFILE_NAME_KEY).setOnPreferenceClickListener(this);
 
         findPreference(MANAGE_OVERRIDE_APN_KEY).setOnPreferenceClickListener(this);
-        findPreference(ADDITIONAL_SETTINGS_KEY).setOnPreferenceClickListener(this);
-
         findPreference(MANAGED_SYSTEM_UPDATES_KEY).setOnPreferenceClickListener(this);
 
         findPreference(CROSS_PROFILE_CALENDAR_KEY).setOnPreferenceClickListener(this);
@@ -1135,9 +1128,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 return true;
             case MANAGE_OVERRIDE_APN_KEY:
                 showFragment(new OverrideApnFragment());
-                return true;
-            case ADDITIONAL_SETTINGS_KEY:
-                showFragment(new AdditionalSettings());
                 return true;
             case MANAGED_SYSTEM_UPDATES_KEY:
                 promptInstallUpdate();

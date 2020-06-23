@@ -11,7 +11,7 @@ ext {
 }
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 'android-Q'
     buildToolsVersion "28.0.0"
 
     defaultConfig {
@@ -71,28 +71,20 @@ android {
         }
     }
 
-    task stripTestOnlyNormalDebug {
-        doLast {
-            stripTestOnlyForBuild("normal", "debug")
-        }
+    task stripTestOnlyNormalDebug << {
+        stripTestOnlyForBuild("normal", "debug")
     }
 
-    task stripTestOnlyNormalRelease {
-        doLast {
-            stripTestOnlyForBuild("normal", "release")
-        }
+    task stripTestOnlyNormalRelease << {
+        stripTestOnlyForBuild("normal", "release")
     }
 
-    task stripTestOnlyReplicaDebug {
-        doLast {
-            stripTestOnlyForBuild("replica", "debug")
-        }
+    task stripTestOnlyReplicaDebug << {
+        stripTestOnlyForBuild("replica", "debug")
     }
 
-    task stripTestOnlyReplicaRelease {
-        doLast {
-            stripTestOnlyForBuild("replica", "release")
-        }
+    task stripTestOnlyReplicaRelease << {
+        stripTestOnlyForBuild("replica", "release")
     }
 
     tasks.whenTaskAdded { task ->
