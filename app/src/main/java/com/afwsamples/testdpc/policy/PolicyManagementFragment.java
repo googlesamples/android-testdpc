@@ -16,6 +16,10 @@
 
 package com.afwsamples.testdpc.policy;
 
+import static android.os.UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES;
+import static com.afwsamples.testdpc.common.Util.Q_VERSION_CODE;
+import static com.afwsamples.testdpc.common.preference.DpcPreferenceHelper.NO_CUSTOM_CONSTRIANT;
+
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.accounts.Account;
 import android.accounts.AccountManager;
@@ -161,10 +165,6 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
-import static android.os.UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES;
-import static com.afwsamples.testdpc.common.Util.Q_VERSION_CODE;
-import static com.afwsamples.testdpc.common.preference.DpcPreferenceHelper.NO_CUSTOM_CONSTRIANT;
 
 /**
  * Provides several device management functions.
@@ -363,7 +363,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String SYSTEM_UPDATE_POLICY_KEY = "system_update_policy";
     private static final String SYSTEM_UPDATE_PENDING_KEY = "system_update_pending";
     private static final String TEST_KEY_USABILITY_KEY = "test_key_usability";
-
     private static final String UNHIDE_APPS_KEY = "unhide_apps";
     private static final String UNHIDE_APPS_PARENT_KEY = "unhide_apps_parent";
     private static final String UNSUSPEND_APPS_KEY = "unsuspend_apps";
@@ -385,21 +384,15 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String SET_PROFILE_PARENT_NEW_PASSWORD = "set_profile_parent_new_password";
     private static final String BIND_DEVICE_ADMIN_POLICIES = "bind_device_admin_policies";
     private static final String CROSS_PROFILE_APPS = "cross_profile_apps";
-
     private static final String SET_SCREEN_BRIGHTNESS_KEY = "set_screen_brightness";
     private static final String AUTO_BRIGHTNESS_KEY = "auto_brightness";
     private static final String CROSS_PROFILE_CALENDAR_KEY = "cross_profile_calendar";
     private static final String SET_SCREEN_OFF_TIMEOUT_KEY = "set_screen_off_timeout";
-
     private static final String SET_TIME_KEY = "set_time";
     private static final String SET_TIME_ZONE_KEY = "set_time_zone";
-
     private static final String SET_PROFILE_NAME_KEY = "set_profile_name";
-
     private static final String MANAGE_OVERRIDE_APN_KEY = "manage_override_apn";
-
     private static final String MANAGED_SYSTEM_UPDATES_KEY = "managed_system_updates";
-
     private static final String SET_PRIVATE_DNS_MODE_KEY = "set_private_dns_mode";
     private static final String FACTORY_RESET_ORG_OWNED_DEVICE = "factory_reset_org_owned_device";
     private static final String SET_FACTORY_RESET_PROTECTION_POLICY_KEY =
@@ -858,6 +851,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         if (Util.SDK_INT < VERSION_CODES.O) {
             return false;
         }
+
         DevicePolicyManager dpm = getActivity().getSystemService(DevicePolicyManager.class);
         return !dpm.getDelegatedScopes(null, getActivity().getPackageName()).isEmpty();
     }
@@ -2504,7 +2498,15 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private void reloadEnableBackupServiceUi() {
         if (mEnableBackupServicePreference.isEnabled()) {
             mEnableBackupServicePreference.setChecked(mDevicePolicyManager.isBackupServiceEnabled(
-                    mAdminComponentName));
+                mAdminComponentName));
+        }
+    }
+
+    //@TargetApi(VERSION_CODES.R)
+    private void reloadCommonCriteriaModeUi() {
+        if (mCommonCriteriaModePreference.isEnabled()) {
+            mCommonCriteriaModePreference.setChecked(
+                mDevicePolicyManager.isCommonCriteriaModeEnabled(mAdminComponentName));
         }
     }
 
