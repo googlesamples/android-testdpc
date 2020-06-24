@@ -2527,8 +2527,11 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     @TargetApi(Util.R_VERSION_CODE)
     private void reloadSetAutoTimeUi() {
-        boolean isOrgOwned = Util.SDK_INT >= VERSION_CODES.R &&
-                mDevicePolicyManager.isOrganizationOwnedDeviceWithManagedProfile();
+        if (Util.SDK_INT < VERSION_CODES.R) {
+            return;
+        }
+        boolean isOrgOwned =
+            mDevicePolicyManager.isOrganizationOwnedDeviceWithManagedProfile();
 
         if (mDevicePolicyManager.isDeviceOwnerApp(mPackageName)
                 || (mDevicePolicyManager.isProfileOwnerApp(mPackageName)
@@ -2540,8 +2543,11 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     @TargetApi(Util.R_VERSION_CODE)
     private void reloadSetAutoTimeZoneUi() {
-        boolean isOrgOwned = Util.SDK_INT >= VERSION_CODES.R &&
-                mDevicePolicyManager.isOrganizationOwnedDeviceWithManagedProfile();
+        if (Util.SDK_INT < VERSION_CODES.R) {
+            return;
+        }
+        boolean isOrgOwned =
+            mDevicePolicyManager.isOrganizationOwnedDeviceWithManagedProfile();
 
         if (mDevicePolicyManager.isDeviceOwnerApp(mPackageName)
                 || (mDevicePolicyManager.isProfileOwnerApp(mPackageName)
