@@ -16,10 +16,6 @@
 
 package com.afwsamples.testdpc.policy;
 
-import static android.os.UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES;
-import static com.afwsamples.testdpc.common.Util.Q_VERSION_CODE;
-import static com.afwsamples.testdpc.common.preference.DpcPreferenceHelper.NO_CUSTOM_CONSTRIANT;
-
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.accounts.Account;
 import android.accounts.AccountManager;
@@ -166,6 +162,10 @@ import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import static android.os.UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES;
+import static com.afwsamples.testdpc.common.Util.Q_VERSION_CODE;
+import static com.afwsamples.testdpc.common.preference.DpcPreferenceHelper.NO_CUSTOM_CONSTRIANT;
+
 /**
  * Provides several device management functions.
  *
@@ -256,6 +256,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     public static final String OVERRIDE_KEY_SELECTION_KEY = "override_key_selection";
 
+ 	private static final String MANAGE_OVERRIDE_APN_KEY = "manage_override_apn";
+	private static final String ADDITIONAL_SETTINGS_KEY = "additional_settings";
+	
     private static final String GENERIC_DELEGATION_KEY = "generic_delegation";
     private static final String APP_RESTRICTIONS_MANAGING_PACKAGE_KEY
             = "app_restrictions_managing_package";
@@ -391,7 +394,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String SET_TIME_KEY = "set_time";
     private static final String SET_TIME_ZONE_KEY = "set_time_zone";
     private static final String SET_PROFILE_NAME_KEY = "set_profile_name";
-    private static final String MANAGE_OVERRIDE_APN_KEY = "manage_override_apn";
     private static final String MANAGED_SYSTEM_UPDATES_KEY = "managed_system_updates";
     private static final String SET_PRIVATE_DNS_MODE_KEY = "set_private_dns_mode";
     private static final String FACTORY_RESET_ORG_OWNED_DEVICE = "factory_reset_org_owned_device";
@@ -726,7 +728,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(CROSS_PROFILE_CALENDAR_KEY).setOnPreferenceClickListener(this);
         findPreference(FACTORY_RESET_ORG_OWNED_DEVICE).setOnPreferenceClickListener(this);
         findPreference(SET_FACTORY_RESET_PROTECTION_POLICY_KEY).setOnPreferenceClickListener(this);
-
+        findPreference(ADDITIONAL_SETTINGS_KEY).setOnPreferenceClickListener(this);
         DpcPreference bindDeviceAdminPreference =
                 (DpcPreference) findPreference(BIND_DEVICE_ADMIN_POLICIES);
         bindDeviceAdminPreference.setCustomConstraint(
@@ -1237,6 +1239,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             case MANAGE_OVERRIDE_APN_KEY:
                 showFragment(new OverrideApnFragment());
                 return true;
+			case ADDITIONAL_SETTINGS_KEY:
+				showFragment(new AdditionalSettings());
+				return true;	
             case MANAGED_SYSTEM_UPDATES_KEY:
                 promptInstallUpdate();
                 return true;
@@ -2499,14 +2504,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         if (mEnableBackupServicePreference.isEnabled()) {
             mEnableBackupServicePreference.setChecked(mDevicePolicyManager.isBackupServiceEnabled(
                 mAdminComponentName));
-        }
-    }
-
-    //@TargetApi(VERSION_CODES.R)
-    private void reloadCommonCriteriaModeUi() {
-        if (mCommonCriteriaModePreference.isEnabled()) {
-            mCommonCriteriaModePreference.setChecked(
-                mDevicePolicyManager.isCommonCriteriaModeEnabled(mAdminComponentName));
         }
     }
 

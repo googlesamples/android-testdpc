@@ -34,7 +34,7 @@ public class ProvisioningSuccessActivity extends Activity {
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
-
+        Log.e(TAG, "ProvisioningSuccessActivity.onCreate() recieved ");
         PostProvisioningTask task = new PostProvisioningTask(this);
         if (!task.performPostProvisioningOperations(getIntent())) {
             finish();

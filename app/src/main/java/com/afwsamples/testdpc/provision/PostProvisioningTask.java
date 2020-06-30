@@ -85,14 +85,17 @@ public class PostProvisioningTask {
 
         // From M onwards, permissions are not auto-granted, so we need to manually grant
         // permissions for TestDPC.
-        if (Util.SDK_INT >= VERSION_CODES.M) {
+        /*if (Util.SDK_INT >= VERSION_CODES.M) {
             autoGrantRequestedPermissionsToSelf();
-        }
+        }*/
 
         // Retreive the admin extras bundle, which we can use to determine the original context for
         // TestDPCs launch.
         PersistableBundle extras = intent.getParcelableExtra(
                 EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE);
+        if (extras != null && extras.containsKey("enrollmentId")) {
+            Log.d(TAG, "Recieving Extras " + extras.getString("enrollmentId"));
+        }
         if (Util.SDK_INT >= VERSION_CODES.O) {
             maybeSetAffiliationIds(extras);
         }
@@ -125,6 +128,10 @@ public class PostProvisioningTask {
         // TestDPCs launch.
         PersistableBundle extras = intent.getParcelableExtra(
                 EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE);
+
+        if (extras != null && extras.containsKey("enrollmentId")) {
+            Log.d(TAG, "Recieving Extras " + extras.getString("enrollmentId"));
+        }
         String packageName = mContext.getPackageName();
         boolean synchronousAuthLaunch = LaunchIntentUtil.isSynchronousAuthLaunch(extras);
         boolean cosuLaunch = LaunchIntentUtil.isCosuLaunch(extras);
@@ -175,6 +182,7 @@ public class PostProvisioningTask {
     }
 
     private boolean isPostProvisioningDone() {
+        Log.e(TAG, "isPostProvisioningDone() " +mSharedPrefs.getBoolean(KEY_POST_PROV_DONE, false));
         return mSharedPrefs.getBoolean(KEY_POST_PROV_DONE, false);
     }
 
@@ -195,7 +203,7 @@ public class PostProvisioningTask {
     private void autoGrantRequestedPermissionsToSelf() {
         String packageName = mContext.getPackageName();
         ComponentName adminComponentName = getComponentName(mContext);
-
+        Log.d(TAG, "autoGrantRequestedPermissionsToSelf Entering");
         List<String> permissions = getRuntimePermissions(mContext.getPackageManager(), packageName);
         for (String permission : permissions) {
             boolean success = mDevicePolicyManager.setPermissionGrantState(adminComponentName,

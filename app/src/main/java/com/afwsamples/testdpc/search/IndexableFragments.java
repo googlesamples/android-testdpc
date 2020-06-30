@@ -3,6 +3,7 @@ package com.afwsamples.testdpc.search;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.BaseSearchablePolicyPreferenceFragment;
 import com.afwsamples.testdpc.comp.BindDeviceAdminFragment;
+import com.afwsamples.testdpc.policy.AdditionalSettings;
 import com.afwsamples.testdpc.policy.OverrideApnFragment;
 import com.afwsamples.testdpc.policy.PolicyManagementFragment;
 import com.afwsamples.testdpc.policy.UserRestriction;
@@ -40,6 +41,8 @@ public class IndexableFragments {
         sIndexableFragments.add(new UserRestrictionIndexableFragment());
         sIndexableFragments.add(new XmlIndexableFragment(OverrideApnFragment.class,
                 R.xml.override_apn_preferences));
+        sIndexableFragments.add(new XmlIndexableFragment(AdditionalSettings.class,
+                R.xml.additional_settings_preference));
     }
 
     public static List<BaseIndexableFragment> values() {
