@@ -64,6 +64,18 @@
         android:layout_height="wrap_content"
         android:text="@string/key_attestation_checkbox"/>
 
+    <EditText
+        android:id="@+id/custom_challenge_input"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:lines="1"
+        android:maxLines="1"
+        android:scrollHorizontally="true"
+        android:ellipsize="end"
+        android:inputType="text"
+        android:text="YWJj"
+        android:hint="Custom Challenge (Base64)"/>
+
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"

@@ -64,6 +64,7 @@ import android.service.notification.NotificationListenerService;
 import android.telephony.TelephonyManager;
 import android.text.InputType;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.util.Log;
 import android.util.SparseIntArray;
 import android.view.LayoutInflater;
@@ -2777,6 +2778,10 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 R.id.use_individual_attestation);
         useIndividualAttestationCheckbox.setEnabled(Util.SDK_INT >= VERSION_CODES.R);
 
+        // Custom Challenge input
+        final EditText customChallengeInput = aliasNamingView.findViewById(
+                R.id.custom_challenge_input);
+
         new AlertDialog.Builder(getActivity())
                 .setTitle(getString(R.string.certificate_alias_prompt_title))
                 .setView(aliasNamingView)
@@ -2789,7 +2794,11 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                         paramsBuilder.setIsUserSelectable(userSelectableCheckbox.isChecked());
 
                         if (includeAttestationChallengeCheckbox.isChecked()) {
-                            paramsBuilder.setAttestationChallenge(new byte[] {0x61, 0x62, 0x63});
+                            String customChallenge = customChallengeInput.getText().toString()
+                                .trim();
+                            byte[] decodedChallenge = Base64.decode(customChallenge,
+                                Base64.DEFAULT);
+                            paramsBuilder.setAttestationChallenge(decodedChallenge);
                         }
 
                         int idAttestationFlags = 0;
