@@ -131,6 +131,7 @@ public class AuthorizationList {
     private static final int KM_TAG_ATTESTATION_ID_MODEL = KM_BYTES | 717;
     private static final int KM_TAG_VENDOR_PATCHLEVEL = KM_UINT | 718;
     private static final int KM_TAG_BOOT_PATCHLEVEL = KM_UINT | 719;
+    private static final int KM_TAG_DEVICE_UNIQUE_ATTESTATION = KM_BOOL | 720;
 
     // Map for converting padding values to strings
     private static final ImmutableMap<Integer, String> paddingMap = ImmutableMap
@@ -198,6 +199,7 @@ public class AuthorizationList {
     private String model;
     private boolean userPresenceRequired;
     private boolean confirmationRequired;
+    private boolean individualAttestation;
 
     @RequiresApi(api = VERSION_CODES.N)
     public AuthorizationList(ASN1Encodable sequence) throws CertificateParsingException {
@@ -322,6 +324,9 @@ public class AuthorizationList {
                     break;
                 case KM_TAG_TRUSTED_CONFIRMATION_REQUIRED & KEYMASTER_TAG_TYPE_MASK:
                     confirmationRequired = true;
+                    break;
+                case KM_TAG_DEVICE_UNIQUE_ATTESTATION & KEYMASTER_TAG_TYPE_MASK:
+                    individualAttestation = true;
                     break;
             }
         }
@@ -600,6 +605,10 @@ public class AuthorizationList {
         return confirmationRequired;
     }
 
+    public boolean isIndividualAttestation() {
+        return individualAttestation;
+    }
+
     private String getStringFromAsn1Value(ASN1Primitive value) throws CertificateParsingException {
         try {
             return Asn1Utils.getStringFromAsn1OctetStreamAssumingUTF8(value);
@@ -707,6 +716,10 @@ public class AuthorizationList {
 
         if (confirmationRequired) {
             s.append("\nConfirmation required");
+        }
+
+        if (individualAttestation) {
+            s.append("\nIndividual attestation");
         }
 
         if (brand != null) {
