@@ -94,6 +94,7 @@ import androidx.preference.SwitchPreference;
 import com.afwsamples.testdpc.AddAccountActivity;
 import com.afwsamples.testdpc.BuildConfig;
 import com.afwsamples.testdpc.CrossProfileAppsFragment;
+import com.afwsamples.testdpc.CrossProfileAppsWhitelistFragment;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.SetupManagementActivity;
@@ -385,6 +386,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String SET_PROFILE_PARENT_NEW_PASSWORD = "set_profile_parent_new_password";
     private static final String BIND_DEVICE_ADMIN_POLICIES = "bind_device_admin_policies";
     private static final String CROSS_PROFILE_APPS = "cross_profile_apps";
+    private static final String CROSS_PROFILE_APPS_WHITELIST = "cross_profile_apps_whitelist";
     private static final String SET_SCREEN_BRIGHTNESS_KEY = "set_screen_brightness";
     private static final String AUTO_BRIGHTNESS_KEY = "auto_brightness";
     private static final String CROSS_PROFILE_CALENDAR_KEY = "cross_profile_calendar";
@@ -710,6 +712,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(SET_NEW_PASSWORD).setOnPreferenceClickListener(this);
         findPreference(SET_PROFILE_PARENT_NEW_PASSWORD).setOnPreferenceClickListener(this);
         findPreference(CROSS_PROFILE_APPS).setOnPreferenceClickListener(this);
+        findPreference(CROSS_PROFILE_APPS_WHITELIST).setOnPreferenceClickListener(this);
 
         findPreference(SET_SCREEN_BRIGHTNESS_KEY).setOnPreferenceClickListener(this);
         mAutoBrightnessPreference = (DpcSwitchPreference) findPreference(AUTO_BRIGHTNESS_KEY);
@@ -1216,6 +1219,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 return true;
             case CROSS_PROFILE_APPS:
                 showFragment(new CrossProfileAppsFragment());
+                return true;
+            case CROSS_PROFILE_APPS_WHITELIST:
+                showFragment(new CrossProfileAppsWhitelistFragment());
                 return true;
             case SET_SCREEN_BRIGHTNESS_KEY:
                 showSetScreenBrightnessDialog();

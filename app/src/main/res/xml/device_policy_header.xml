@@ -786,5 +786,11 @@
             android:title="@string/cross_profile_apps_api"
             testdpc:admin="any"
             testdpc:minSdkVersion="P" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="cross_profile_apps_whitelist"
+            android:title="@string/cross_profile_apps_whitelist"
+            testdpc:admin="any"
+            testdpc:user="managedProfile"
+            testdpc:minSdkVersion="R" />
     </PreferenceCategory>
 </PreferenceScreen>
