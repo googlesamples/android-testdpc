@@ -18,12 +18,14 @@ package com.afwsamples.testdpc.common;
 
 import android.annotation.TargetApi;
 import android.app.Service;
+import android.app.UiModeManager;
 import android.app.admin.DevicePolicyManager;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Configuration;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build.VERSION;
@@ -255,6 +257,17 @@ public class Util {
         return filter;
     }
 
+    /** @return Intent for a launcher activity */
+    public static Intent getLauncherIntent(Context context) {
+        Intent launcherIntent = new Intent(Intent.ACTION_MAIN);
+        if (Util.isRunningOnTvDevice(context)) {
+            launcherIntent.addCategory(Intent.CATEGORY_LEANBACK_LAUNCHER);
+        } else {
+            launcherIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+        }
+        return launcherIntent;
+    }
+
     private static DevicePolicyManager getDevicePolicyManager(Context context) {
         return (DevicePolicyManager)context.getSystemService(Service.DEVICE_POLICY_SERVICE);
     }
@@ -265,5 +278,10 @@ public class Util {
         }
         DevicePolicyManager dpm = context.getSystemService(DevicePolicyManager.class);
         return dpm.getDelegatedScopes(null, context.getPackageName()).contains(delegation);
+    }
+
+    public static boolean isRunningOnTvDevice(Context context) {
+        UiModeManager uiModeManager = (UiModeManager) context.getSystemService(Context.UI_MODE_SERVICE);
+        return uiModeManager.getCurrentModeType() == Configuration.UI_MODE_TYPE_TELEVISION;
     }
 }

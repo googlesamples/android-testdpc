@@ -1666,8 +1666,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         if (getActivity() == null || getActivity().isFinishing()) {
             return;
         }
-        Intent launcherIntent = new Intent(Intent.ACTION_MAIN);
-        launcherIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+        Intent launcherIntent = Util.getLauncherIntent(getActivity());
         final List<ResolveInfo> primaryUserAppList = mPackageManager
                 .queryIntentActivities(launcherIntent, 0);
         Intent homeIntent = new Intent(Intent.ACTION_MAIN);
@@ -3396,8 +3395,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     }
 
     private List<ResolveInfo> getAllLauncherIntentResolversSorted() {
-        final Intent launcherIntent = new Intent(Intent.ACTION_MAIN);
-        launcherIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+        final Intent launcherIntent = Util.getLauncherIntent(getActivity());
         final List<ResolveInfo> launcherIntentResolvers = mPackageManager
                 .queryIntentActivities(launcherIntent, 0);
         Collections.sort(launcherIntentResolvers,
