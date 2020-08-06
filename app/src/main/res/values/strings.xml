@@ -133,7 +133,6 @@
     <string name="wipe_data_title">Wipe data?</string>
     <string name="wipe_data_confirmation">Are you sure you want to wipe the data?</string>
     <string name="wipe_data_include">Also wipe:</string>
-    <string name="persistent_device_owner">Persistent device owner state</string>
     <string name="external_storage">External storage</string>
     <string name="reset_protection_data">Factory reset protection</string>
     <string name="remove_device_owner">Remove this device owner</string>
@@ -141,9 +140,6 @@
     <string name="remove_device_owner_confirmation">Policies and restrictions will continue to be
         active and may require a factory reset to clear.</string>
     <string name="device_owner_removed">This app is no longer a device owner.</string>
-    <string name="persistent_device_owner_state_hint">Test state to be restored alongside the device owner after factory reset.</string>
-    <string name="set_persistent_device_owner_label">Set</string>
-    <string name="clear_persistent_device_owner_label">Clear</string>
     <!-- Corporate-owned work profile falls under device owner management, for convenience. -->
     <string name="factory_reset_org_owned">Factory reset Org-Owned Work Profile device</string>
     <string name="set_factory_reset_protection_policy">Set factory reset protection policy</string>
