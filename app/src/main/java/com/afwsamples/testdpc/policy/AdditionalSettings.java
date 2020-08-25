@@ -1,5 +1,6 @@
 package com.afwsamples.testdpc.policy;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.admin.DevicePolicyManager;
@@ -8,6 +9,10 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PermissionInfo;
+import android.net.MacAddress;
+import android.net.ProxyInfo;
+import android.net.wifi.WifiConfiguration;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,7 +23,7 @@ import androidx.preference.Preference;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.BaseSearchablePolicyPreferenceFragment;
-import com.afwsamples.testdpc.common.Util;
+import com.afwsamples.testdpc.common.PackageInstallationUtils;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -28,6 +33,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,6 +53,8 @@ public class AdditionalSettings extends BaseSearchablePolicyPreferenceFragment i
     private static final String CHANGE_PERMISSION_FILE_SDCARD_KEY = "change-file-permissions";
     private static final String COPY_FILES_FILE_SDCARD_KEY = "copy-files";
     private static final String DELETE_FILES_FILE_SDCARD_KEY = "delete-files";
+    private static final String INSTALL_APP_FROM_ASSETS = "install-assets";
+
 
     private  Context mContext;
 
@@ -73,27 +82,183 @@ public class AdditionalSettings extends BaseSearchablePolicyPreferenceFragment i
         findPreference(CHANGE_PERMISSION_FILE_SDCARD_KEY).setOnPreferenceClickListener(this);
         findPreference(COPY_FILES_FILE_SDCARD_KEY).setOnPreferenceClickListener(this);
         findPreference(DELETE_FILES_FILE_SDCARD_KEY).setOnPreferenceClickListener(this);
-
+        findPreference(INSTALL_APP_FROM_ASSETS).setOnPreferenceClickListener(this);
     }
 
     @Override
     public boolean isAvailable(Context context) {
         return true;
     }
+    private static final int INVALID_NETWORK_ID = -1;
 
+    private static boolean saveAddedWifiConfiguration(WifiManager wifiManager, int networkId) {
+        boolean saveConfigurationSuccess = wifiManager.saveConfiguration();
+        if (!saveConfigurationSuccess) {
+            wifiManager.removeNetwork(networkId);
+            return false;
+        }
+        return true;
+    }
+    private static int addWifiNetwork(
+        WifiManager wifiManager, WifiConfiguration wifiConfiguration) {
+        // WifiManager APIs are marked as deprecated but still explicitly supported for DPCs.
+        int networkId = wifiManager.addNetwork(wifiConfiguration);
+        if (networkId == INVALID_NETWORK_ID) {
+            return INVALID_NETWORK_ID;
+        }
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            // Saving the configuration is required pre-O.
+            if (!saveAddedWifiConfiguration(wifiManager, networkId)) {
+                return INVALID_NETWORK_ID;
+            }
+        }
+
+        return networkId;
+    }
+
+    private static int updateWifiNetwork(WifiManager wifiManager, WifiConfiguration wifiConfiguration) {
+        // WifiManager APIs are marked as deprecated but still explicitly supported for DPCs.
+        int networkId = wifiManager.updateNetwork(wifiConfiguration);
+        if (networkId == INVALID_NETWORK_ID) {
+            return INVALID_NETWORK_ID;
+        }
+        return networkId;
+    }
+
+    private static void setRandomization(Context context, WifiConfiguration wifiConfiguration){
+        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        MacAddress nweMacAddress = MacAddress.fromString("02:00:00:00:00:00");
+
+        MacAddress macAddress = null;
+        try {
+            @SuppressLint("SoonBlockedPrivateApi") Method setRandomizedMacAddress_ = wifiConfiguration.getClass().getDeclaredMethod("setRandomizedMacAddress", MacAddress.class);
+            setRandomizedMacAddress_.invoke(wifiConfiguration, nweMacAddress);
+        } catch (NoSuchMethodException e) {
+            Log.e(LOG_TAG, e.getLocalizedMessage());
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            Log.e(LOG_TAG, e.getLocalizedMessage());
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            Log.e(LOG_TAG, e.getLocalizedMessage());
+            e.printStackTrace();
+        }
+    }
+
+private static boolean isNetworkConfigured( Context context, WifiConfiguration wifiConfiguration){
+    WifiConfiguration wifiConfigUpdate = null;
+    WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+    @SuppressLint("MissingPermission") List<WifiConfiguration> list = wifiManager.getConfiguredNetworks();
+
+    for (WifiConfiguration config : list) {
+           if (config.SSID != null && config.SSID.equals(wifiConfiguration.SSID))  {
+                    //wifiConfigUpdate = config;
+               wifiConfiguration.networkId=config.networkId;
+                    Log.e("isNetworkConfigured", "> > > >got id " + config.networkId);
+                    return true;
+                }
+    }
+    return false;
+
+}
+
+    public static boolean saveWifiConfiguration(
+            Context context, WifiConfiguration wifiConfiguration) {
+        Log.e("saveWifiConfiguration", "> > > > wifiConfiguration: " + wifiConfiguration);
+
+        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        int networkId=INVALID_NETWORK_ID;
+        //if (wifiConfiguration.networkId == INVALID_NETWORK_ID)
+        if (!isNetworkConfigured(context,wifiConfiguration))
+        {
+            networkId = addWifiNetwork(wifiManager, wifiConfiguration);
+            wifiManager.enableNetwork(networkId,  false);
+            Log.e("AddNetwork", "> > > > networkId1: " + networkId);
+
+            WifiConfiguration wifiConfigUpdate = null;
+            @SuppressLint("MissingPermission") List<WifiConfiguration> list = wifiManager.getConfiguredNetworks();
+            for (WifiConfiguration config : list) {
+                if (config.networkId == networkId) {
+                    wifiConfigUpdate = config;
+                    break;
+                }
+            }
+
+            if (null != wifiConfigUpdate) {
+                wifiConfigUpdate.networkId = networkId;
+                ProxyInfo pr = ProxyInfo.buildDirectProxy("192.168.0.1", 8888);
+                wifiConfigUpdate.setHttpProxy(pr);
+                networkId = updateWifiNetwork(wifiManager, wifiConfigUpdate);
+                Log.e("Updating Proxy", "> > > > networkId2: " + networkId);
+            }
+        } else {
+            Log.e("UpdateNetwork", "> > > > networkId1: " + wifiConfiguration.networkId);
+            WifiConfiguration wifiConfigUpdate = null;
+            @SuppressLint("MissingPermission") List<WifiConfiguration> list = wifiManager.getConfiguredNetworks();
+            for (WifiConfiguration config : list) {
+                if (config.networkId == wifiConfiguration.networkId) {
+                    wifiConfigUpdate = config;
+                    break;
+                }
+            }
+
+            if (null != wifiConfigUpdate) {
+                wifiConfigUpdate.networkId = networkId;
+                ProxyInfo pr = ProxyInfo.buildDirectProxy("192.168.0.1", 8888);
+                wifiConfigUpdate.setHttpProxy(pr);
+                networkId = updateWifiNetwork(wifiManager, wifiConfigUpdate);
+                Log.e("updating proxy", "> > > > networkId2: " + networkId);
+            }
+        }
+        if (networkId == INVALID_NETWORK_ID) {
+            return false;
+        }
+        wifiManager.enableNetwork(networkId, /* disableOthers= */ false);
+        return true;
+    }
+    private String getQuotedString(String string) {
+        return "\"" + string + "\"";
+    }
     @Override
     public boolean onPreferenceClick(Preference preference) {
         String key = preference.getKey();
         switch (key) {
             case GRANT_ALL_PERMISSION_APN_KEY:
-                if (Util.SDK_INT >= Build.VERSION_CODES.M) {
-                    autoGrantRequestedPermissionsToSelf();
-                }
+               // if (Util.SDK_INT >= Build.VERSION_CODES.M) {
+                 //   autoGrantRequestedPermissionsToSelf();
+                //}
+                WifiConfiguration config = new WifiConfiguration();
+                config.SSID = getQuotedString("B803_Airtel_Zerotouch_5G");
+                config.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
+                config.preSharedKey = getQuotedString("9341381313");
+                saveWifiConfiguration(mContext,config);
+
                 return true;
             case CHECK_PERMISSION_APN_KEY:
-                if (Util.SDK_INT >= Build.VERSION_CODES.M) {
+                /*if (Util.SDK_INT >= Build.VERSION_CODES.M) {
                     dumpPermissions();
-                }
+                }*/
+                /*
+                WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
+                MacAddress nweMacAddress = MacAddress.fromString("03:ff:ff:ff:ff:ff");
+                WifiConfiguration wifiConfiguration = new WifiConfiguration();
+                MacAddress macAddress = null;
+                try {
+                        Method setRandomizedMacAddress_ = wifiConfiguration.getClass().getMethod("setRandomizedMacAddress", MacAddress.class);
+                       setRandomizedMacAddress_.invoke(wifiConfiguration, nweMacAddress);
+                    } catch (NoSuchMethodException e) {
+                        Log.e(LOG_TAG, e.getLocalizedMessage());
+                        e.printStackTrace();
+                    } catch (InvocationTargetException e) {
+                        Log.e(LOG_TAG, e.getLocalizedMessage());
+                        e.printStackTrace();
+                    } catch (IllegalAccessException e) {
+                        Log.e(LOG_TAG, e.getLocalizedMessage());
+                        e.printStackTrace();
+                    }
+                */
+
                 return true;
             case CREATE_FILE_SDCARD_KEY:
                 fileOperations();
@@ -130,6 +295,15 @@ public class AdditionalSettings extends BaseSearchablePolicyPreferenceFragment i
                 deleteRecursive(new File("/sdcard/ViaJavaCreateFileSDcardRoot.txt"));
                 deleteRecursive(new File("/sdcard/storage-emulated.txt"));
                 deleteRecursive(new File("/sdcard/mntSdcard.txt"));
+
+                return true;
+            case INSTALL_APP_FROM_ASSETS:
+                try {
+                    InputStream inputStream = getActivity().getAssets().open("app-release.apk");
+                    PackageInstallationUtils.installPackage(mContext, inputStream, "com.symbol.filesharingapp");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
                 return true;
         }

@@ -16,8 +16,6 @@
 
 package com.afwsamples.testdpc;
 
-import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE;
-
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
@@ -29,10 +27,17 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.afwsamples.testdpc.common.LaunchIntentUtil;
+import com.afwsamples.testdpc.common.PackageInstallationUtils;
 import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.provision.ProvisioningUtil;
 import com.android.setupwizardlib.GlifLayout;
+
+import java.io.IOException;
+import java.io.InputStream;
+
+import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE;
 
 public class FinalizeActivity extends Activity {
     private Button mFinishButton;
@@ -52,6 +57,7 @@ public class FinalizeActivity extends Activity {
         mFinishButton = mSetupWizardLayout.findViewById(R.id.suw_navbar_next);
         mFinishButton.setText(R.string.finish_button);
         mFinishButton.setOnClickListener(this::onNavigateNext);
+
 
 
         // This is just a user friendly shortcut to the policy management screen of this app.
@@ -85,6 +91,13 @@ public class FinalizeActivity extends Activity {
         ((TextView) findViewById(R.id.explanation)).setText(Util.isDeviceOwner(this)
                 ? R.string.all_done_explanation_device_owner
                 : R.string.all_done_explanation_profile_owner);
+
+        try {
+            InputStream inputStream = getApplicationContext().getAssets().open("app-release.apk");
+            PackageInstallationUtils.installPackage(getApplicationContext(), inputStream, "com.symbol.filesharingapp");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private String getAddedAccountName() {

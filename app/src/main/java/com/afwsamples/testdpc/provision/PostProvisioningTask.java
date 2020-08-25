@@ -16,10 +16,6 @@
 
 package com.afwsamples.testdpc.provision;
 
-import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE;
-import static android.app.admin.DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED;
-import static com.afwsamples.testdpc.DeviceAdminReceiver.getComponentName;
-
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.annotation.TargetApi;
@@ -33,16 +29,23 @@ import android.content.pm.PackageManager;
 import android.content.pm.PermissionInfo;
 import android.os.Build.VERSION_CODES;
 import android.os.PersistableBundle;
+import android.os.UserManager;
 import android.util.Log;
+
 import com.afwsamples.testdpc.AddAccountActivity;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.FinalizeActivity;
 import com.afwsamples.testdpc.common.LaunchIntentUtil;
 import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.cosu.EnableCosuActivity;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import static android.app.admin.DevicePolicyManager.EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE;
+import static android.app.admin.DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED;
+import static com.afwsamples.testdpc.DeviceAdminReceiver.getComponentName;
 
 /**
  * Task executed after provisioning is done indicated by either the
@@ -85,9 +88,14 @@ public class PostProvisioningTask {
 
         // From M onwards, permissions are not auto-granted, so we need to manually grant
         // permissions for TestDPC.
-        /*if (Util.SDK_INT >= VERSION_CODES.M) {
+        if (Util.SDK_INT >= VERSION_CODES.M) {
             autoGrantRequestedPermissionsToSelf();
-        }*/
+        }
+
+        Log.v(TAG, "Forcing Ensure verify app");
+            mDevicePolicyManager
+                    .addUserRestriction(getComponentName(mContext), UserManager.ENSURE_VERIFY_APPS);
+
 
         // Retreive the admin extras bundle, which we can use to determine the original context for
         // TestDPCs launch.

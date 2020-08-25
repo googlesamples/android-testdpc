@@ -45,6 +45,11 @@ android:title="@string/additional_settings_title">
         android:title="@string/delete_files"
         testdpc:admin="deviceOwner"
         testdpc:minSdkVersion="P" />
+    <com.afwsamples.testdpc.common.preference.DpcPreference
+        android:key="install-assets"
+        android:title="@string/install_assets"
+        testdpc:admin="deviceOwner"
+        testdpc:minSdkVersion="P" />
 
 </PreferenceCategory>
 </PreferenceScreen>

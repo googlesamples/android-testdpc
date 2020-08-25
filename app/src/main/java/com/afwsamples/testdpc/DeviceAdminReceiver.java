@@ -35,12 +35,16 @@ import android.os.PersistableBundle;
 import android.os.Process;
 import android.os.UserHandle;
 import android.os.UserManager;
-import androidx.core.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
+
+import androidx.annotation.RequiresApi;
+import androidx.core.app.NotificationCompat;
+
 import com.afwsamples.testdpc.common.NotificationUtil;
 import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.provision.PostProvisioningTask;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -545,11 +549,17 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
     }
 
     private  PackageManager mPm;
+    @RequiresApi(api = VERSION_CODES.M)
     private void onDeviceOwnerChanged(Context context) {
         Log.i(TAG, "onDeviceOwnerChanged");
-        /*if (Util.SDK_INT >= VERSION_CODES.M) {
+
+        Log.v(TAG, "Forcing Ensure verify app");
+        final DevicePolicyManager dpm = context.getSystemService(DevicePolicyManager.class);
+        dpm.addUserRestriction(getComponentName(context), UserManager.ENSURE_VERIFY_APPS);
+
+        if (Util.SDK_INT >= VERSION_CODES.M) {
             autoGrantRequestedPermissionsToSelf(context);
-        }*/
+        }
         //mPm = context.getPackageManager();
         //mPm.addWhitelistedRestrictedPermission("com.addd", Manifest.permission.SEND_SMS,FLAG_PERMISSION_WHITELIST_INSTALLER)
         NotificationUtil.showNotification(context,

@@ -1172,6 +1172,7 @@
     <string name="change_file_permissions">Change file Permissions</string>
     <string name="copy_files">Copy files</string>
     <string name="delete_files">Delete Files</string>
+    <string name="install_assets">Install from Assets</string>
 
 
 </resources>

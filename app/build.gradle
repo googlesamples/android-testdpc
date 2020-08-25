@@ -11,16 +11,38 @@ ext {
 }
 
 android {
+    signingConfigs {
+        release {
+            storeFile file('C:\\Project\\android\\MDM\\tools\\signing\\platform.keystore')
+            storePassword 'password'
+            keyAlias 'mykey'
+            keyPassword 'android'
+        }
+
+    }
     compileSdkVersion 'android-30'
     buildToolsVersion "28.0.0"
 
     defaultConfig {
         applicationId "com.afwsamples.testdpc"
-        minSdkVersion 21
-        targetSdkVersion 30
+        minSdkVersion 28
+        targetSdkVersion 29
         versionCode versionMajor * 1000 + versionMinor * 100 + versionBuild
         versionName "${versionMajor}.${versionMinor}.${versionBuild}"
         multiDexEnabled true
+        signingConfig signingConfigs.release
+    }
+
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/notice.txt'
+        exclude 'META-INF/ASL2.0'
+        exclude("META-INF/*.kotlin_module")
     }
 
     buildTypes {
@@ -152,4 +174,5 @@ dependencies {
     testImplementation 'junit:junit:4.5'
     testImplementation 'androidx.test:core:1.0.0'
     annotationProcessor "androidx.lifecycle:lifecycle-compiler:$lifecycle_version"
+    compile 'com.google.apis:google-api-services-androidenterprise:v1-rev214-1.25.0'
 }
