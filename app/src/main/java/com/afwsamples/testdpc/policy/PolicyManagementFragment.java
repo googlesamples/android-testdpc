@@ -1229,11 +1229,21 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 return true;
             case SET_TIME_KEY:
                 // Disable auto time before we could set time manually.
-                setAutoTimeEnabled(false);
+                if (Util.SDK_INT >= VERSION_CODES.R) {
+                    setAutoTimeEnabled(false);
+                } else {
+                    mDevicePolicyManager.setGlobalSetting(mAdminComponentName,
+                            Settings.Global.AUTO_TIME, "0");
+                }
                 showSetTimeDialog();
                 return true;
             case SET_TIME_ZONE_KEY:
-                setAutoTimeZoneEnabled(false);
+                if (Util.SDK_INT >= VERSION_CODES.R) {
+                    setAutoTimeZoneEnabled(false);
+                } else {
+                    mDevicePolicyManager.setGlobalSetting(mAdminComponentName,
+                            Settings.Global.AUTO_TIME_ZONE, "0");
+                }
                 showSetTimeZoneDialog();
                 return true;
             case MANAGE_OVERRIDE_APN_KEY:
