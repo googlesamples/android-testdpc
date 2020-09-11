@@ -33,6 +33,7 @@ import com.afwsamples.testdpc.common.ManageAppFragment;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import static com.afwsamples.testdpc.common.EditDeleteArrayAdapter.OnDeleteButtonClickListener;
 import static com.afwsamples.testdpc.common.EditDeleteArrayAdapter.OnEditButtonClickListener;
@@ -129,7 +130,14 @@ public class KeyValueBundleArrayFragment extends ManageAppFragment implements
 
     @Override
     protected void addNewRow() {
+
+        //Optimize for the case: create new bundle in Bundle array, if there is an existing bundle which contains multiple keys,
+        //no need to re-create all the keys again in new created bundle, just automatically copy all keys from the existing one. This is extremely useful when the first bundle contains lots of keys.
         Bundle bundle = new Bundle();
+
+        if(mBundleList != null && mBundleList.size() > 0) {
+            bundle = clearBundleValues((Bundle) mBundleList.get(0).clone());
+        }
         mAdapter.add(bundle);
         showEditDialog(bundle);
     }
@@ -187,5 +195,23 @@ public class KeyValueBundleArrayFragment extends ManageAppFragment implements
         protected String getDisplayName(Bundle entry) {
             return String.valueOf("Bundle #" + mBundleList.indexOf(entry));
         }
+    }
+
+    private Bundle clearBundleValues(Bundle bundle) {
+
+        Set<String> keySet = bundle.keySet();
+        for(String key : keySet) {
+            Object valueObject = bundle.get(key);
+            if(valueObject instanceof String) {
+                bundle.putString(key, "");
+            } else if(valueObject instanceof Integer) {
+                bundle.putInt(key, 0);
+            } else if(valueObject instanceof Boolean) {
+                bundle.putBoolean(key, false);
+            } else if(valueObject instanceof Bundle) {
+                bundle.putBundle(key, clearBundleValues((Bundle) valueObject));
+            }
+        }
+        return bundle;
     }
 }
