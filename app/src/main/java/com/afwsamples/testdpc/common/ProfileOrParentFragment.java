@@ -61,7 +61,7 @@ public abstract class ProfileOrParentFragment extends BaseSearchablePolicyPrefer
         public View onCreateView(
                 LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             FragmentTabHost tabHost = new FragmentTabHost(getActivity());
-            tabHost.setup(getActivity(), getChildFragmentManager(), View.generateViewId());
+            tabHost.setup(getActivity(), getChildFragmentManager(), container.getId());
 
             final boolean showDualTabs =
                 Util.isManagedProfileOwner(getActivity())
