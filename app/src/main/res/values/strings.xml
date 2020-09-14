@@ -133,7 +133,6 @@
     <string name="wipe_data_title">Wipe data?</string>
     <string name="wipe_data_confirmation">Are you sure you want to wipe the data?</string>
     <string name="wipe_data_include">Also wipe:</string>
-    <string name="persistent_device_owner">Persistent device owner state</string>
     <string name="external_storage">External storage</string>
     <string name="reset_protection_data">Factory reset protection</string>
     <string name="remove_device_owner">Remove this device owner</string>
@@ -565,7 +564,10 @@
     <string name="serial_num_attestation_checkbox">Include device serial number</string>
     <string name="imei_attestation_checkbox">Include device IMEI</string>
     <string name="meid_attestation_checkbox">Include device MEID</string>
+    <string name="strongbox_features_description">StrongBox-related options</string>
     <string name="use_strongbox_checkbox">Use StrongBox</string>
+    <string name="use_individual_attestation_checkbox">Use Individual Attestation Certificate</string>
+
 
     <!-- Strings for app restrictions -->
     <string name="managed_configurations">Managed configurations</string>
@@ -1102,6 +1104,14 @@
     <string name="cross_profile_apps_api_explanation">By using the CrossProfileApps APIs, apps can start an instance in another profile, provided that the app is also installed in that profile.</string>
     <string name="cross_profile_apps_available">TestDPC is installed in another profile, tap the icon to launch it in that profile.</string>
     <string name="cross_profile_apps_not_available">TestDPC is not installed in another profile, try installing it and come back to here.</string>
+
+    <string name="cross_profile_apps_whitelist">Whitelisted cross profile apps</string>
+    <string name="cross_profile_apps_enabled_title">Enabled cross profile apps</string>
+    <string name="cross_profile_apps_no_whitelisted_apps">No apps whitelisted</string>
+    <string name="cross_profile_apps_example_text">example.package.name</string>
+    <string name="cross_profile_apps_add_button_text">Add app</string>
+    <string name="cross_profile_apps_remove_button_text">Remove app</string>
+    <string name="cross_profile_apps_reset_button_text">Reset cross profile apps</string>
 
     <string name="install_update">Install update from file</string>
     <string name="install_update_prompt">This will attempt to install the update file ota.zip in the TestDPC files directory, if the file exists (i.e. if you pushed it there with adb). Do you want to continue?</string>

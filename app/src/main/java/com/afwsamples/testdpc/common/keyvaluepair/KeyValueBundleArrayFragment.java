@@ -135,11 +135,29 @@ public class KeyValueBundleArrayFragment extends ManageAppFragment implements
         //no need to re-create all the keys again in new created bundle, just automatically copy all keys from the existing one. This is extremely useful when the first bundle contains lots of keys.
         Bundle bundle = new Bundle();
 
-        if(mBundleList != null && mBundleList.size() > 0) {
+        if (mBundleList != null && mBundleList.size() > 0) {
             bundle = clearBundleValues((Bundle) mBundleList.get(0).clone());
         }
+
         mAdapter.add(bundle);
         showEditDialog(bundle);
+    }
+
+    private Bundle clearBundleValues(Bundle bundle) {
+        Set<String> keySet = bundle.keySet();
+        for(String key : keySet) {
+            Object valueObject = bundle.get(key);
+            if(valueObject instanceof String) {
+                bundle.putString(key, "");
+            } else if(valueObject instanceof Integer) {
+                bundle.putInt(key, 0);
+            } else if(valueObject instanceof Boolean) {
+                bundle.putBoolean(key, false);
+            } else if(valueObject instanceof Bundle) {
+                bundle.putBundle(key, clearBundleValues((Bundle) valueObject));
+            }
+        }
+        return bundle;
     }
 
     @Override
@@ -195,23 +213,5 @@ public class KeyValueBundleArrayFragment extends ManageAppFragment implements
         protected String getDisplayName(Bundle entry) {
             return String.valueOf("Bundle #" + mBundleList.indexOf(entry));
         }
-    }
-
-    private Bundle clearBundleValues(Bundle bundle) {
-
-        Set<String> keySet = bundle.keySet();
-        for(String key : keySet) {
-            Object valueObject = bundle.get(key);
-            if(valueObject instanceof String) {
-                bundle.putString(key, "");
-            } else if(valueObject instanceof Integer) {
-                bundle.putInt(key, 0);
-            } else if(valueObject instanceof Boolean) {
-                bundle.putBoolean(key, false);
-            } else if(valueObject instanceof Bundle) {
-                bundle.putBundle(key, clearBundleValues((Bundle) valueObject));
-            }
-        }
-        return bundle;
     }
 }

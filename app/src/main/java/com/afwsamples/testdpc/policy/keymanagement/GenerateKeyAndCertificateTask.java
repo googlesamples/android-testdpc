@@ -27,6 +27,7 @@ import android.security.AttestedKeyPair;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
 import android.security.keystore.StrongBoxUnavailableException;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -60,20 +61,15 @@ public class GenerateKeyAndCertificateTask extends AsyncTask<Void, Integer, Atte
     private final Activity mActivity;
 
     public GenerateKeyAndCertificateTask(
-            String alias,
-            boolean isUserSelectable,
-            byte[] attestationChallenge,
-            int idAttestationFlags,
-            boolean useStrongBox,
-            boolean generateEcKey,
+            KeyGenerationParameters params,
             Activity activity,
             ComponentName admin) {
-        mAlias = alias;
-        mIsUserSelectable = isUserSelectable;
-        mAttestationChallenge = attestationChallenge;
-        mIdAttestationFlags = idAttestationFlags;
-        mUseStrongBox = useStrongBox;
-        mGenerateEcKey = generateEcKey;
+        mAlias = params.alias;
+        mIsUserSelectable = params.isUserSelectable;
+        mAttestationChallenge = params.attestationChallenge;
+        mIdAttestationFlags = params.idAttestationFlags;
+        mUseStrongBox = params.useStrongBox;
+        mGenerateEcKey = params.generateEcKey;
         mActivity = activity;
         mAdminComponentName = admin;
         mDevicePolicyManager =
@@ -119,6 +115,15 @@ public class GenerateKeyAndCertificateTask extends AsyncTask<Void, Integer, Atte
 
             if (keyPair == null) {
                 return null;
+            }
+
+            List<Certificate> attestationRecord = keyPair.getAttestationRecord();
+            if (attestationRecord != null) {
+                Log.i(TAG, "Attestation record:");
+                for (Certificate cert : attestationRecord) {
+                    Log.i(TAG, Base64.encodeToString(cert.getEncoded(), Base64.NO_WRAP));
+                }
+                Log.i(TAG, "End of attestation record.");
             }
 
             X500Principal subject = new X500Principal("CN=TestDPC, O=Android, C=US");
@@ -199,6 +204,9 @@ public class GenerateKeyAndCertificateTask extends AsyncTask<Void, Integer, Atte
                     attestationDetails.append(
                             mActivity.getText(R.string.device_meid_description) + "\n");
                     attestationDetails.append(teeList.getMeid() + "\n");
+                    attestationDetails.append(
+                            "Individual Attestation:" + "\n");
+                    attestationDetails.append(teeList.isIndividualAttestation() + "\n");
                 }
 
                 Certificate root = attestationChain.get(attestationChain.size() - 1);

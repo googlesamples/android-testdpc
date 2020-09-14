@@ -269,7 +269,15 @@ public class KioskModeActivity extends Activity {
                 return;
             }
             PackageManager pm = getPackageManager();
-            startActivity(pm.getLaunchIntentForPackage(getItem(position)));
+            Intent launchAppIntent;
+            String appPackage = getItem(position);
+
+            if (Util.isRunningOnTvDevice(getContext())) {
+                launchAppIntent = pm.getLeanbackLaunchIntentForPackage(appPackage);
+            } else {
+                launchAppIntent = pm.getLaunchIntentForPackage(appPackage);
+            }
+            startActivity(launchAppIntent);
         }
     }
 }
