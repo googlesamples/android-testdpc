@@ -64,6 +64,7 @@ import android.service.notification.NotificationListenerService;
 import android.telephony.TelephonyManager;
 import android.text.InputType;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.util.Log;
 import android.util.SparseIntArray;
 import android.view.LayoutInflater;
@@ -93,6 +94,7 @@ import androidx.preference.SwitchPreference;
 import com.afwsamples.testdpc.AddAccountActivity;
 import com.afwsamples.testdpc.BuildConfig;
 import com.afwsamples.testdpc.CrossProfileAppsFragment;
+import com.afwsamples.testdpc.CrossProfileAppsWhitelistFragment;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.SetupManagementActivity;
@@ -369,7 +371,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String CLEAR_APP_DATA_KEY = "clear_app_data";
     private static final String KEEP_UNINSTALLED_PACKAGES = "keep_uninstalled_packages";
     private static final String WIPE_DATA_KEY = "wipe_data";
-    private static final String PERSISTENT_DEVICE_OWNER_KEY = "persistent_device_owner";
     private static final String CREATE_WIFI_CONFIGURATION_KEY = "create_wifi_configuration";
     private static final String CREATE_EAP_TLS_WIFI_CONFIGURATION_KEY
             = "create_eap_tls_wifi_configuration";
@@ -384,6 +385,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String SET_PROFILE_PARENT_NEW_PASSWORD = "set_profile_parent_new_password";
     private static final String BIND_DEVICE_ADMIN_POLICIES = "bind_device_admin_policies";
     private static final String CROSS_PROFILE_APPS = "cross_profile_apps";
+    private static final String CROSS_PROFILE_APPS_WHITELIST = "cross_profile_apps_whitelist";
     private static final String SET_SCREEN_BRIGHTNESS_KEY = "set_screen_brightness";
     private static final String AUTO_BRIGHTNESS_KEY = "auto_brightness";
     private static final String CROSS_PROFILE_CALENDAR_KEY = "cross_profile_calendar";
@@ -605,7 +607,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 STAY_ON_WHILE_PLUGGED_IN);
         mStayOnWhilePluggedInSwitchPreference.setOnPreferenceChangeListener(this);
         findPreference(WIPE_DATA_KEY).setOnPreferenceClickListener(this);
-        findPreference(PERSISTENT_DEVICE_OWNER_KEY).setOnPreferenceClickListener(this);
         findPreference(REMOVE_DEVICE_OWNER_KEY).setOnPreferenceClickListener(this);
         mEnableBackupServicePreference = (DpcSwitchPreference) findPreference(
             ENABLE_BACKUP_SERVICE);
@@ -709,6 +710,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(SET_NEW_PASSWORD).setOnPreferenceClickListener(this);
         findPreference(SET_PROFILE_PARENT_NEW_PASSWORD).setOnPreferenceClickListener(this);
         findPreference(CROSS_PROFILE_APPS).setOnPreferenceClickListener(this);
+        findPreference(CROSS_PROFILE_APPS_WHITELIST).setOnPreferenceClickListener(this);
 
         findPreference(SET_SCREEN_BRIGHTNESS_KEY).setOnPreferenceClickListener(this);
         mAutoBrightnessPreference = (DpcSwitchPreference) findPreference(AUTO_BRIGHTNESS_KEY);
@@ -932,9 +934,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 return true;
             case WIPE_DATA_KEY:
                 showWipeDataPrompt();
-                return true;
-            case PERSISTENT_DEVICE_OWNER_KEY:
-                showFragment(new PersistentDeviceOwnerFragment());
                 return true;
             case REMOVE_DEVICE_OWNER_KEY:
                 showRemoveDeviceOwnerPrompt();
@@ -1216,6 +1215,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             case CROSS_PROFILE_APPS:
                 showFragment(new CrossProfileAppsFragment());
                 return true;
+            case CROSS_PROFILE_APPS_WHITELIST:
+                showFragment(new CrossProfileAppsWhitelistFragment());
+                return true;
             case SET_SCREEN_BRIGHTNESS_KEY:
                 showSetScreenBrightnessDialog();
                 return true;
@@ -1227,11 +1229,21 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 return true;
             case SET_TIME_KEY:
                 // Disable auto time before we could set time manually.
-                setAutoTimeEnabled(false);
+                if (Util.SDK_INT >= VERSION_CODES.R) {
+                    setAutoTimeEnabled(false);
+                } else {
+                    mDevicePolicyManager.setGlobalSetting(mAdminComponentName,
+                            Settings.Global.AUTO_TIME, "0");
+                }
                 showSetTimeDialog();
                 return true;
             case SET_TIME_ZONE_KEY:
-                setAutoTimeZoneEnabled(false);
+                if (Util.SDK_INT >= VERSION_CODES.R) {
+                    setAutoTimeZoneEnabled(false);
+                } else {
+                    mDevicePolicyManager.setGlobalSetting(mAdminComponentName,
+                            Settings.Global.AUTO_TIME_ZONE, "0");
+                }
                 showSetTimeZoneDialog();
                 return true;
             case MANAGE_OVERRIDE_APN_KEY:
@@ -1659,8 +1671,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         if (getActivity() == null || getActivity().isFinishing()) {
             return;
         }
-        Intent launcherIntent = new Intent(Intent.ACTION_MAIN);
-        launcherIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+        Intent launcherIntent = Util.getLauncherIntent(getActivity());
         final List<ResolveInfo> primaryUserAppList = mPackageManager
                 .queryIntentActivities(launcherIntent, 0);
         Intent homeIntent = new Intent(Intent.ACTION_MAIN);
@@ -2777,6 +2788,10 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 R.id.use_individual_attestation);
         useIndividualAttestationCheckbox.setEnabled(Util.SDK_INT >= VERSION_CODES.R);
 
+        // Custom Challenge input
+        final EditText customChallengeInput = aliasNamingView.findViewById(
+                R.id.custom_challenge_input);
+
         new AlertDialog.Builder(getActivity())
                 .setTitle(getString(R.string.certificate_alias_prompt_title))
                 .setView(aliasNamingView)
@@ -2789,7 +2804,11 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                         paramsBuilder.setIsUserSelectable(userSelectableCheckbox.isChecked());
 
                         if (includeAttestationChallengeCheckbox.isChecked()) {
-                            paramsBuilder.setAttestationChallenge(new byte[] {0x61, 0x62, 0x63});
+                            String customChallenge = customChallengeInput.getText().toString()
+                                .trim();
+                            byte[] decodedChallenge = Base64.decode(customChallenge,
+                                Base64.DEFAULT);
+                            paramsBuilder.setAttestationChallenge(decodedChallenge);
                         }
 
                         int idAttestationFlags = 0;
@@ -3381,8 +3400,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     }
 
     private List<ResolveInfo> getAllLauncherIntentResolversSorted() {
-        final Intent launcherIntent = new Intent(Intent.ACTION_MAIN);
-        launcherIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+        final Intent launcherIntent = Util.getLauncherIntent(getActivity());
         final List<ResolveInfo> launcherIntentResolvers = mPackageManager
                 .queryIntentActivities(launcherIntent, 0);
         Collections.sort(launcherIntentResolvers,

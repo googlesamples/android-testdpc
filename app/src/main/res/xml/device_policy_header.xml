@@ -744,11 +744,6 @@
             testdpc:admin="deviceOwner"
             testdpc:minSdkVersion="N" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
-            android:key="persistent_device_owner"
-            android:title="@string/persistent_device_owner"
-            testdpc:admin="deviceOwner"
-            testdpc:minSdkVersion="O_MR1" />
-        <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="set_factory_reset_protection_policy"
             android:title="@string/set_factory_reset_protection_policy"
             testdpc:admin="deviceOwner|orgOwnedProfileOwner"
@@ -786,5 +781,11 @@
             android:title="@string/cross_profile_apps_api"
             testdpc:admin="any"
             testdpc:minSdkVersion="P" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="cross_profile_apps_whitelist"
+            android:title="@string/cross_profile_apps_whitelist"
+            testdpc:admin="any"
+            testdpc:user="managedProfile"
+            testdpc:minSdkVersion="R" />
     </PreferenceCategory>
 </PreferenceScreen>

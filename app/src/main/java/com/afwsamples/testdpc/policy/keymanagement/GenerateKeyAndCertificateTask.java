@@ -204,6 +204,9 @@ public class GenerateKeyAndCertificateTask extends AsyncTask<Void, Integer, Atte
                     attestationDetails.append(
                             mActivity.getText(R.string.device_meid_description) + "\n");
                     attestationDetails.append(teeList.getMeid() + "\n");
+                    attestationDetails.append(
+                            "Individual Attestation:" + "\n");
+                    attestationDetails.append(teeList.isIndividualAttestation() + "\n");
                 }
 
                 Certificate root = attestationChain.get(attestationChain.size() - 1);
