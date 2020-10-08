@@ -1442,9 +1442,15 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 updateStayOnWhilePluggedInPreference();
                 return true;
             case WIFI_CONFIG_LOCKDOWN_ENABLE_KEY:
-                mDevicePolicyManager.setConfiguredNetworksLockdownState(
-                        mAdminComponentName, newValue.equals(true));
-                reloadLockdownAdminConfiguredNetworksUi();
+                if (Util.SDK_INT >= VERSION_CODES.R) {
+                    mDevicePolicyManager.setConfiguredNetworksLockdownState(
+                            mAdminComponentName, newValue.equals(true));
+                    reloadLockdownAdminConfiguredNetworksUi();
+                } else {
+                    mDevicePolicyManager.setGlobalSetting(mAdminComponentName,
+                            Settings.Global.WIFI_DEVICE_OWNER_CONFIGS_LOCKDOWN,
+                            newValue.equals(Boolean.TRUE) ? "1" : "0");
+                }
                 return true;
             case INSTALL_NONMARKET_APPS_KEY:
                 mDevicePolicyManager.setSecureSetting(mAdminComponentName,
