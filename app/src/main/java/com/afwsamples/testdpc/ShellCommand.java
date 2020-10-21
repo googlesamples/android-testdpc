@@ -39,6 +39,7 @@ final class ShellCommand {
 
     private static final String CMD_CREATE_USER = "create-user";
     private static final String CMD_HELP = "help";
+    private static final String CMD_LOCK_NOW = "lock-now";
     private static final String ARG_FLAGS = "--flags";
 
     private final PrintWriter mWriter;
@@ -69,6 +70,9 @@ final class ShellCommand {
             case CMD_CREATE_USER:
                 execute(() -> createUser());
                 break;
+            case CMD_LOCK_NOW:
+                execute(() -> lockNow());
+                break;
             default:
                 mWriter.printf("Invalid command: %s\n\n", cmd);
                 showUsage();
@@ -80,6 +84,7 @@ final class ShellCommand {
         mWriter.printf("\t%s - show this help\n", CMD_HELP);
         mWriter.printf("\t%s [%s FLAGS] [NAME] - create a user with the optional flags and name\n",
                 CMD_CREATE_USER, ARG_FLAGS);
+        mWriter.printf("\t%s - locks the device (now! :-)\n", CMD_LOCK_NOW);
     }
 
     private void createUser() {
@@ -110,6 +115,17 @@ final class ShellCommand {
             onSuccess("User created: %s", userHandle);
         } catch (Exception e) {
             onError(e, "Error creating user %s", name);
+        }
+    }
+
+    private void lockNow() {
+        // TODO(b/171350084): add flags
+        Log.d(TAG, "lockNow()");
+        try {
+            mDevicePolicyManager.lockNow();
+            onSuccess("Device locked");
+        } catch (Exception e) {
+            onError(e, "Error locking device");
         }
     }
 
