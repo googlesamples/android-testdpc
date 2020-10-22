@@ -20,8 +20,6 @@ import java.util.Arrays;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import android.app.admin.DevicePolicyManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.os.UserHandle;
 import android.util.Log;
@@ -44,17 +42,15 @@ final class ShellCommand {
 
     private final PrintWriter mWriter;
     private final String[] mArgs;
-    private final DevicePolicyManager mDevicePolicyManager;
-    private final ComponentName mAdminComponentName;
+    private final DevicePolicyManagerGateway mDevicePolicyManagerGateway;
 
     public ShellCommand(@NonNull Context context, @NonNull PrintWriter writer,
             @Nullable String[] args) {
         mWriter = writer;
         mArgs = args;
-        mDevicePolicyManager = context.getSystemService(DevicePolicyManager.class);
-        mAdminComponentName = DeviceAdminReceiver.getComponentName(context);
-        Log.d(TAG, "context: " + context + ", admin: " + mAdminComponentName
-                + ", args: " + Arrays.toString(args));
+        mDevicePolicyManagerGateway = new DevicePolicyManagerGatewayImpl(context);
+
+        Log.d(TAG, "args=" + Arrays.toString(args));
     }
 
     public void run() {
@@ -93,7 +89,7 @@ final class ShellCommand {
         int nextArgIndex = 1;
         String nextArg = null;
 
-        String name = null;
+        final String name;
         int flags = 0;
 
         if (mArgs.length > nextArgIndex) {
@@ -103,30 +99,28 @@ final class ShellCommand {
                 if (mArgs.length > nextArgIndex) {
                     name = mArgs[nextArgIndex++];
                 }
+                else {
+                    name = null;
+                }
             } else {
                 name = nextArg;
             }
+        } else {
+            name = null;
         }
-        Log.d(TAG, "createUser(): name=" + name + ", flags=" + flags);
+        Log.i(TAG, "createUser(): name=" + name + ", flags=" + flags);
 
-        try {
-            UserHandle userHandle = mDevicePolicyManager.createAndManageUser(mAdminComponentName,
-                    name, mAdminComponentName, /* adminExtras= */ null, flags);
-            onSuccess("User created: %s", userHandle);
-        } catch (Exception e) {
-            onError(e, "Error creating user %s", name);
-        }
+        mDevicePolicyManagerGateway.createAndManageUser(name, flags,
+                (u) -> onSuccess("User created: %s", u),
+                (e) -> onError(e, "Error creating user %s", name));
     }
 
     private void lockNow() {
         // TODO(b/171350084): add flags
-        Log.d(TAG, "lockNow()");
-        try {
-            mDevicePolicyManager.lockNow();
-            onSuccess("Device locked");
-        } catch (Exception e) {
-            onError(e, "Error locking device");
-        }
+        Log.i(TAG, "lockNow()");
+        mDevicePolicyManagerGateway.lockNow(
+                (v) -> onSuccess("Device locked"),
+                (e) -> onError(e, "Error locking device"));
     }
 
     private void execute(@NonNull Runnable r) {
