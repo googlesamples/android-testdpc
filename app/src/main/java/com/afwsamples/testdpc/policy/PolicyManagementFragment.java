@@ -96,6 +96,8 @@ import com.afwsamples.testdpc.BuildConfig;
 import com.afwsamples.testdpc.CrossProfileAppsFragment;
 import com.afwsamples.testdpc.CrossProfileAppsWhitelistFragment;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
+import com.afwsamples.testdpc.DevicePolicyManagerGateway;
+import com.afwsamples.testdpc.DevicePolicyManagerGatewayImpl;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.SetupManagementActivity;
 import com.afwsamples.testdpc.common.AccountArrayAdapter;
@@ -438,6 +440,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     }
 
     private DevicePolicyManager mDevicePolicyManager;
+    private DevicePolicyManagerGateway mDevicePolicyManagerGateway;
     private PackageManager mPackageManager;
     private String mPackageName;
     private ComponentName mAdminComponentName;
@@ -512,6 +515,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         }
         mDevicePolicyManager = (DevicePolicyManager) getActivity().getSystemService(
                 Context.DEVICE_POLICY_SERVICE);
+        mDevicePolicyManagerGateway = new DevicePolicyManagerGatewayImpl(mDevicePolicyManager,
+                mAdminComponentName);
         mUserManager = (UserManager) getActivity().getSystemService(Context.USER_SERVICE);
         mTelephonyManager = (TelephonyManager) getActivity()
                 .getSystemService(Context.TELEPHONY_SERVICE);
@@ -1345,13 +1350,15 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private void lockNow() {
         if (Util.SDK_INT >= VERSION_CODES.O && Util.isManagedProfileOwner(getActivity())) {
             showLockNowPrompt();
-        } else if (Util.SDK_INT >= VERSION_CODES.N
+            return;
+        }
+        DevicePolicyManagerGateway gateway = mDevicePolicyManagerGateway;
+        if (Util.SDK_INT >= VERSION_CODES.N
                 && Util.isManagedProfileOwner(getActivity())) {
             // Always call lock now on the parent for managed profile on N
-            mDevicePolicyManager.getParentProfileInstance(mAdminComponentName).lockNow();
-        } else {
-            mDevicePolicyManager.lockNow();
+            gateway = getParentProfileDevicePolicyManagerGateway();
         }
+        gateway.lockNow((v) -> onSuccessLog("lockNow"), (e) -> onErrorLog("lockNow", e));
     }
 
     /**
@@ -2087,20 +2094,10 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                                 flags |= DevicePolicyManager.LEAVE_ALL_SYSTEM_APPS_ENABLED;
                             }
 
-                            UserHandle userHandle = mDevicePolicyManager.createAndManageUser(
-                                    mAdminComponentName,
-                                    name,
-                                    mAdminComponentName,
-                                    null,
-                                    flags);
-
-                            if (userHandle != null) {
-                                long serialNumber =
-                                        mUserManager.getSerialNumberForUser(userHandle);
-                                showToast(R.string.user_created, serialNumber);
-                                return;
-                            }
-                            showToast(R.string.failed_to_create_user);
+                            mDevicePolicyManagerGateway.createAndManageUser(name, flags,
+                                    (u) -> showToast(R.string.user_created,
+                                            mUserManager.getSerialNumberForUser(u)),
+                                    (e) -> showToast(R.string.failed_to_create_user));
                         }
                     }
                 })
@@ -4020,5 +4017,19 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     @RequiresApi(Util.R_VERSION_CODE)
     private void setAutoTimeZoneEnabled(boolean enabled) {
         mDevicePolicyManager.setAutoTimeZoneEnabled(mAdminComponentName, enabled);
+    }
+
+    private DevicePolicyManagerGateway getParentProfileDevicePolicyManagerGateway() {
+        return new DevicePolicyManagerGatewayImpl(
+                mDevicePolicyManager.getParentProfileInstance(mAdminComponentName),
+                mAdminComponentName);
+    }
+
+    private void onSuccessLog(String method) {
+        Log.d(TAG, method + "() succeeded");
+    }
+
+    private void onErrorLog(String method, Exception e) {
+        Log.d(TAG, method + "() failed: ", e);
     }
 }
