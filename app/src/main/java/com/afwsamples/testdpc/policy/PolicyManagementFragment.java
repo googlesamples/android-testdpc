@@ -802,7 +802,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         }
     }
 
-    @TargetApi(Util.R_VERSION_CODE)
+    @TargetApi(VERSION_CODES.R)
     private void reloadPersonalAppsSuspendedUi() {
         if (mSuspendPersonalApps.isEnabled()) {
             int suspendReasons =
@@ -1537,7 +1537,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         mDevicePolicyManager.setCameraDisabled(mAdminComponentName, disabled);
     }
 
-    @TargetApi(Util.R_VERSION_CODE)
+    @TargetApi(VERSION_CODES.R)
     private void setCameraDisabledOnParent(boolean disabled) {
         DevicePolicyManager parentDpm = mDevicePolicyManager
                 .getParentProfileInstance(mAdminComponentName);
@@ -1576,7 +1576,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         mDevicePolicyManager.setScreenCaptureDisabled(mAdminComponentName, disabled);
     }
 
-    @TargetApi(Util.R_VERSION_CODE)
+    @TargetApi(VERSION_CODES.R)
     private void setScreenCaptureDisabledOnParent(boolean disabled) {
         DevicePolicyManager parentDpm = mDevicePolicyManager
                 .getParentProfileInstance(mAdminComponentName);
@@ -2358,7 +2358,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
         String summary;
         int complexity = PASSWORD_COMPLEXITY.get(mDevicePolicyManager.getPasswordComplexity());
-        if (Util.isManagedProfileOwner(getActivity()) && Util.SDK_INT >= Util.R_VERSION_CODE) {
+        if (Util.isManagedProfileOwner(getActivity()) && Util.SDK_INT >= VERSION_CODES.R) {
             DevicePolicyManager parentDpm
                     = mDevicePolicyManager.getParentProfileInstance(mAdminComponentName);
             int parentComplexity = PASSWORD_COMPLEXITY.get(parentDpm.getPasswordComplexity());
@@ -2417,13 +2417,13 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             .setChecked(parseInt(locationMode, 0) != Secure.LOCATION_MODE_OFF);
     }
 
-    @TargetApi(Util.R_VERSION_CODE)
+    @TargetApi(VERSION_CODES.R)
     private void reloadLocationEnabledUi() {
         LocationManager locationManager = getActivity().getSystemService(LocationManager.class);
         mSetLocationEnabledPreference.setChecked(locationManager.isLocationEnabled());
     }
 
-    @TargetApi(Util.R_VERSION_CODE)
+    @TargetApi(VERSION_CODES.R)
     private void reloadLockdownAdminConfiguredNetworksUi() {
         boolean lockdown = mDevicePolicyManager.hasLockdownAdminConfiguredNetworks(
                 mAdminComponentName);
@@ -2468,7 +2468,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         mDisableCameraSwitchPreference.setChecked(isCameraDisabled);
     }
 
-    @TargetApi(Util.R_VERSION_CODE)
+    @TargetApi(VERSION_CODES.R)
     private void reloadCameraDisableOnParentUi() {
         DevicePolicyManager parentDpm
                 = mDevicePolicyManager.getParentProfileInstance(mAdminComponentName);
@@ -2519,7 +2519,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         mDisableScreenCaptureSwitchPreference.setChecked(isScreenCaptureDisabled);
     }
 
-    @TargetApi(Util.R_VERSION_CODE)
+    @TargetApi(VERSION_CODES.R)
     private void reloadScreenCaptureDisableOnParentUi() {
         DevicePolicyManager parentDpm
                 = mDevicePolicyManager.getParentProfileInstance(mAdminComponentName);
@@ -2533,7 +2533,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         mSetAutoTimeRequiredPreference.setChecked(isAutoTimeRequired);
     }
 
-    @TargetApi(Util.R_VERSION_CODE)
+    @TargetApi(VERSION_CODES.R)
     private void reloadSetAutoTimeUi() {
         if (Util.SDK_INT < VERSION_CODES.R) {
             return;
@@ -2549,7 +2549,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         }
     }
 
-    @TargetApi(Util.R_VERSION_CODE)
+    @TargetApi(VERSION_CODES.R)
     private void reloadSetAutoTimeZoneUi() {
         if (Util.SDK_INT < VERSION_CODES.R) {
             return;
@@ -3199,7 +3199,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         }
     }
 
-    @RequiresApi(api = Util.R_VERSION_CODE)
+    @RequiresApi(api = VERSION_CODES.R)
     private void showHideAppsOnParentPrompt(final boolean showHiddenApps) {
         final int dialogTitleResId;
         final int successResId;
@@ -4009,12 +4009,12 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         public abstract void onPositiveButtonClicked(String[] lockTaskArray);
     }
 
-    @RequiresApi(Util.R_VERSION_CODE)
+    @RequiresApi(VERSION_CODES.R)
     private void setAutoTimeEnabled(boolean enabled) {
         mDevicePolicyManager.setAutoTimeEnabled(mAdminComponentName, enabled);
     }
 
-    @RequiresApi(Util.R_VERSION_CODE)
+    @RequiresApi(VERSION_CODES.R)
     private void setAutoTimeZoneEnabled(boolean enabled) {
         mDevicePolicyManager.setAutoTimeZoneEnabled(mAdminComponentName, enabled);
     }
