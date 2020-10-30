@@ -357,6 +357,12 @@
             testdpc:admin="any"
             testdpc:minSdkVersion="Q"/>
         <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="required_password_complexity"
+            android:title="@string/required_password_complexity_title"
+            android:selectable="false"
+            testdpc:admin="deviceOwner|profileOwner"
+            testdpc:minSdkVersion="S"/>
+        <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="password_compliant"
             android:selectable="false"
             android:title="@string/password_compliant_title"
@@ -398,6 +404,11 @@
             android:title="@string/request_to_set_new_password_with_complexity"
             testdpc:admin="any"
             testdpc:minSdkVersion="Q"/>
+        <com.afwsamples.testdpc.common.preference.DpcListPreference
+            android:key="set_required_password_complexity"
+            android:title="@string/set_required_password_complexity"
+            testdpc:admin="deviceOwner|profileOwner"
+            testdpc:minSdkVersion="S"/>
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="set_profile_parent_new_password"
             android:title="@string/request_to_set_profile_parent_new_password"

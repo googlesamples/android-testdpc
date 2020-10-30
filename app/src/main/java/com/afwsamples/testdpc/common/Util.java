@@ -53,11 +53,8 @@ public class Util {
     private static final String TAG = "Util";
     private static final int DEFAULT_BUFFER_SIZE = 4096;
 
-    // TODO: Update to S when VERSION_CODES.R becomes available.
-    public static final int R_VERSION_CODE = 30;
-
-    private static final boolean IS_RUNNING_R =
-        VERSION.CODENAME.length() == 1 && VERSION.CODENAME.charAt(0) == 'R';
+    private static final boolean IS_RUNNING_S =
+        VERSION.CODENAME.length() == 1 && VERSION.CODENAME.charAt(0) == 'S';
 
     /**
      * A replacement for {@link VERSION.SDK_INT} that is compatible with pre-release SDKs
@@ -66,7 +63,7 @@ public class Util {
      * int is not yet assigned.
      **/
     public static final int SDK_INT =
-        IS_RUNNING_R ? VERSION_CODES.CUR_DEVELOPMENT : VERSION.SDK_INT;
+        IS_RUNNING_S ? VERSION_CODES.CUR_DEVELOPMENT : VERSION.SDK_INT;
 
     /**
      * Format a friendly datetime for the current locale according to device policy documentation.

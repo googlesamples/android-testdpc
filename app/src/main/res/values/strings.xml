@@ -973,6 +973,7 @@
     <string name="password_complexity_medium">Medium</string>
     <string name="password_complexity_high">High</string>
     <string name="password_complexity_profile_summary">Personal: %1$s, Work: %2$s</string>
+    <string name="required_password_complexity_title">Required password complexity</string>
 
     <string name="separate_challenge_title">Separate challenge</string>
     <string name="separate_challenge_summary">Separate challenge enabled: %s</string>
@@ -1053,6 +1054,7 @@
 
     <string name="request_to_set_new_password">Request user to set new password</string>
     <string name="request_to_set_new_password_with_complexity">Set new password and specify minimum complexity</string>
+    <string name="set_required_password_complexity">Set required password complexity</string>
     <string name="request_to_set_profile_parent_new_password">Request user to set profile parent new password</string>
 
     <!-- Device owner to profile owner communication (COMP and DO<->PO of secondary users) -->
