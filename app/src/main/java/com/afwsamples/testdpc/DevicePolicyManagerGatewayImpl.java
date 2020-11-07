@@ -77,6 +77,18 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
     }
 
     @Override
+    public void wipeData(int flags, Consumer<Void> onSuccess, Consumer<Exception> onError) {
+        Log.d(TAG, "wipeData(" + flags + ")");
+
+        try {
+            mDevicePolicyManager.wipeData(flags);
+            onSuccess.accept(null);
+        } catch (Exception e) {
+            onError.accept(e);
+        }
+    }
+
+    @Override
     public String toString() {
         return "DevicePolicyManagerGatewayImpl[" + mAdminComponentName + "]";
     }

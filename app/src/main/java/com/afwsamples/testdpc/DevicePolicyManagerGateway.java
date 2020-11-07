@@ -42,6 +42,12 @@ public interface DevicePolicyManagerGateway {
     void lockNow(@NonNull Consumer<Void> onSuccess, @NonNull Consumer<Exception> onError);
 
     /**
+     * See {@link android.app.admin.DevicePolicyManager#wipeData()}.
+     */
+    void wipeData(int flags, @NonNull Consumer<Void> onSuccess,
+            @NonNull Consumer<Exception> onError);
+
+    /**
      * Used on error callbacks to indicate that the operation returned {@code null}.
      */
     public static final class NullResultException extends Exception {
