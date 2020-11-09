@@ -1855,7 +1855,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                                         DevicePolicyManager.WIPE_EXTERNAL_STORAGE : 0);
                                 flags |= (resetProtectionCheckBox.isChecked() ?
                                         DevicePolicyManager.WIPE_RESET_PROTECTION_DATA : 0);
-                                mDevicePolicyManager.wipeData(flags);
+                                mDevicePolicyManagerGateway.wipeData(flags,
+                                        (v) -> onSuccessLog("wipeData"),
+                                        (e) -> onErrorLog("wipeData", e));
                             }
                         })
                 .setNegativeButton(android.R.string.cancel, null)
@@ -4048,7 +4050,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     @TargetApi(30)
     private void factoryResetOrgOwnedDevice() {
-        mDevicePolicyManager.getParentProfileInstance(mAdminComponentName).wipeData(/*flags=*/ 0);
+        getParentProfileDevicePolicyManagerGateway().wipeData(/* flags= */ 0,
+                (v) -> onSuccessLog("wipeData"),
+                (e) -> onErrorLog("wipeData", e));
     }
 
     private int validateDeviceOwnerBeforeO() {

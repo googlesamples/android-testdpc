@@ -39,6 +39,7 @@ final class ShellCommand {
     private static final String CMD_HELP = "help";
     private static final String CMD_LOCK_NOW = "lock-now";
     private static final String ARG_FLAGS = "--flags";
+    private static final String CMD_WIPE_DATA = "wipe-data";
 
     private final PrintWriter mWriter;
     private final String[] mArgs;
@@ -68,6 +69,9 @@ final class ShellCommand {
                 break;
             case CMD_LOCK_NOW:
                 execute(() -> lockNow());
+                break;
+            case CMD_WIPE_DATA:
+                execute(() -> wipeData());
                 break;
             default:
                 mWriter.printf("Invalid command: %s\n\n", cmd);
@@ -121,6 +125,14 @@ final class ShellCommand {
         mDevicePolicyManagerGateway.lockNow(
                 (v) -> onSuccess("Device locked"),
                 (e) -> onError(e, "Error locking device"));
+    }
+
+    private void wipeData() {
+        // TODO(b/171350084): add flags
+        Log.i(TAG, "wipeData()");
+        mDevicePolicyManagerGateway.wipeData(/* flags= */ 0,
+                (v) -> onSuccess("Data wiped"),
+                (e) -> onError(e, "Error wiping data"));
     }
 
     private void execute(@NonNull Runnable r) {
