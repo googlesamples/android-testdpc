@@ -104,6 +104,7 @@ import com.afwsamples.testdpc.common.AccountArrayAdapter;
 import com.afwsamples.testdpc.common.AppInfoArrayAdapter;
 import com.afwsamples.testdpc.common.BaseSearchablePolicyPreferenceFragment;
 import com.afwsamples.testdpc.common.CertificateUtil;
+import com.afwsamples.testdpc.common.Dumpable;
 import com.afwsamples.testdpc.common.MediaDisplayFragment;
 import com.afwsamples.testdpc.common.PackageInstallationUtils;
 import com.afwsamples.testdpc.common.ReflectionUtil;
@@ -146,9 +147,11 @@ import com.afwsamples.testdpc.util.MainThreadExecutor;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -245,7 +248,7 @@ import java.util.stream.Collectors;
  * </ul>
  */
 public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFragment implements
-        Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
+        Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener, Dumpable {
     // Tag for creating this fragment. This tag can be used to retrieve this fragment.
     public static final String FRAGMENT_TAG = "PolicyManagementFragment";
 
@@ -796,6 +799,26 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         reloadEnableLogoutUi();
         reloadAutoBrightnessUi();
         reloadPersonalAppsSuspendedUi();
+    }
+
+    @Override
+    public void dump(String prefix, PrintWriter pw, String[] args) {
+        // TODO(b/173541467): needs to compile against @SystemAPI SDK to get it
+        // pw.printf("%smUserId: %s\n", prefix, getActivity().getUserId());
+        pw.printf("%smAdminComponentName: %s\n", prefix, mAdminComponentName);
+        pw.printf("%smImageUri: %s\n", prefix, mImageUri);
+        pw.printf("%smmVideoUri: %s\n", prefix, mVideoUri);
+        pw.printf("%smmVideoUri: %s\n", prefix, mVideoUri);
+        pw.printf("%sisManagedProfileOwner(): %s\n", prefix, isManagedProfileOwner());
+        pw.printf("%sisDeviceOwner(): %s\n", prefix, Util.isDeviceOwner(getActivity()));
+        pw.printf("%sisSystemUser(): %s\n", prefix, mUserManager.isSystemUser());
+        pw.printf("%sisPrimaryUser(): %s\n", prefix, Util.isPrimaryUser(getActivity()));
+        pw.printf("%sisRunningOnTvDevice(): %s\n", prefix, Util.isRunningOnTvDevice(getActivity()));
+        pw.printf("%sisRunningOnAutomotiveDevice(): %s\n", prefix,
+                Util.isRunningOnAutomotiveDevice(getActivity()));
+        // TODO(b/173541467): need to expose it
+        //        pw.printf("%sisHeadlessSystemUserMode(): %s\n", prefix,
+        //                mUserManager.isHeadlessSystemUserMode());
     }
 
     private void maybeUpdateProfileMaxTimeOff() {
@@ -1364,15 +1387,18 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         }
     }
 
+    private boolean isManagedProfileOwner() {
+        return Util.isManagedProfileOwner(getActivity());
+    }
+
     @TargetApi(VERSION_CODES.O)
     private void lockNow() {
-        if (Util.SDK_INT >= VERSION_CODES.O && Util.isManagedProfileOwner(getActivity())) {
+        if (Util.SDK_INT >= VERSION_CODES.O && isManagedProfileOwner()) {
             showLockNowPrompt();
             return;
         }
         DevicePolicyManagerGateway gateway = mDevicePolicyManagerGateway;
-        if (Util.SDK_INT >= VERSION_CODES.N
-                && Util.isManagedProfileOwner(getActivity())) {
+        if (Util.SDK_INT >= VERSION_CODES.N && isManagedProfileOwner()) {
             // Always call lock now on the parent for managed profile on N
             gateway = getParentProfileDevicePolicyManagerGateway();
         }
@@ -2382,7 +2408,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
         String summary;
         int complexity = PASSWORD_COMPLEXITY.get(mDevicePolicyManager.getPasswordComplexity());
-        if (Util.isManagedProfileOwner(getActivity()) && Util.SDK_INT >= VERSION_CODES.R) {
+        if (isManagedProfileOwner() && Util.SDK_INT >= VERSION_CODES.R) {
             DevicePolicyManager parentDpm
                     = mDevicePolicyManager.getParentProfileInstance(mAdminComponentName);
             int parentComplexity = PASSWORD_COMPLEXITY.get(parentDpm.getPasswordComplexity());
@@ -2416,7 +2442,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
         String summary;
         int complexity = PASSWORD_COMPLEXITY.get(getRequiredComplexity(mDevicePolicyManager));
-        if (Util.isManagedProfileOwner(getActivity()) && Util.SDK_INT >= VERSION_CODES.S) {
+        if (isManagedProfileOwner() && Util.SDK_INT >= VERSION_CODES.S) {
             DevicePolicyManager parentDpm
                     = mDevicePolicyManager.getParentProfileInstance(mAdminComponentName);
             int parentComplexity = PASSWORD_COMPLEXITY.get(getRequiredComplexity(parentDpm));
@@ -2454,7 +2480,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
         String summary;
         boolean compliant = mDevicePolicyManager.isActivePasswordSufficient();
-        if (Util.isManagedProfileOwner(getActivity())) {
+        if (isManagedProfileOwner()) {
             DevicePolicyManager parentDpm
                     = mDevicePolicyManager.getParentProfileInstance(mAdminComponentName);
             boolean parentCompliant = parentDpm.isActivePasswordSufficient();

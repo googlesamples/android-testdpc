@@ -23,6 +23,10 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.io.FileDescriptor;
+import java.io.PrintWriter;
+
+import com.afwsamples.testdpc.common.DumpableActivity;
 import com.afwsamples.testdpc.common.OnBackPressedHandler;
 import com.afwsamples.testdpc.policy.PolicyManagementFragment;
 import com.afwsamples.testdpc.search.PolicySearchFragment;
@@ -31,7 +35,7 @@ import com.afwsamples.testdpc.search.PolicySearchFragment;
  * An entry activity that shows a profile setup fragment if the app is not a profile or device
  * owner. Otherwise, a policy management fragment is shown.
  */
-public class PolicyManagementActivity extends Activity implements
+public class PolicyManagementActivity extends DumpableActivity implements
         FragmentManager.OnBackStackChangedListener {
 
     @Override
