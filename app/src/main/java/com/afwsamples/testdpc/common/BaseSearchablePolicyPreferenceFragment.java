@@ -16,13 +16,19 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.afwsamples.testdpc.common.Dumpable;
+
+import java.io.FileDescriptor;
+import java.io.PrintWriter;
+
 import com.afwsamples.testdpc.R;
 
 /**
  * Base class of searchable policy preference fragment. With specified preference key,
  * it will scroll to the corresponding preference and highlight it.
  */
-public abstract class BaseSearchablePolicyPreferenceFragment extends PreferenceFragment {
+public abstract class BaseSearchablePolicyPreferenceFragment extends PreferenceFragment
+        implements Dumpable {
     protected LinearLayoutManager mLayoutManager;
     private HighlightablePreferenceGroupAdapter mAdapter;
     private String mPreferenceKey;
@@ -77,6 +83,40 @@ public abstract class BaseSearchablePolicyPreferenceFragment extends PreferenceF
     protected RecyclerView.Adapter onCreateAdapter(PreferenceScreen preferenceScreen) {
         mAdapter = new HighlightablePreferenceGroupAdapter(preferenceScreen);
         return mAdapter;
+    }
+
+    @Override // from Fragment
+    public final void dump(String prefix, FileDescriptor fd, PrintWriter pw, String[] args) {
+        dump(prefix, pw, fd, Dumpable.isQuietMode(args), args);
+    }
+
+    @Override // from Dumpable
+    public final void dump(String prefix, PrintWriter pw, FileDescriptor fd, boolean quietModeOnly,
+            String[] args) {
+        // Dump its own state
+        if (mAdapter == null) {
+            pw.printf("%sno adapter\n", prefix);
+        } else {
+            pw.printf("%smHighlightPosition: %d\n", prefix, mAdapter.mHighlightPosition);
+        }
+        pw.printf("%smPreferenceKey: %s\n", prefix, mPreferenceKey);
+        pw.printf("%smPreferenceHighlighted: %b\n", prefix, mPreferenceHighlighted);
+
+        // Dump subclass state
+        dump(prefix, pw, args);
+
+        if (quietModeOnly) return;
+
+        // Dump superclass state
+        super.dump(prefix, fd, pw, args);
+
+    }
+
+    /**
+     * Dumps just the subclass state.
+     */
+    protected void dump(String prefix, PrintWriter writer, String[] args) {
+
     }
 
     private void highlightPreferenceIfNeeded() {
