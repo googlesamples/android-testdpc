@@ -36,6 +36,7 @@ final class ShellCommand {
     private static final String TAG = "TestDPCShellCommand";
 
     private static final String CMD_CREATE_USER = "create-user";
+    private static final String CMD_REMOVE_USER = "remove-user";
     private static final String CMD_HELP = "help";
     private static final String CMD_LOCK_NOW = "lock-now";
     private static final String ARG_FLAGS = "--flags";
@@ -67,6 +68,9 @@ final class ShellCommand {
             case CMD_CREATE_USER:
                 execute(() -> createUser());
                 break;
+            case CMD_REMOVE_USER:
+                execute(() -> removeUser());
+                break;
             case CMD_LOCK_NOW:
                 execute(() -> lockNow());
                 break;
@@ -84,6 +88,7 @@ final class ShellCommand {
         mWriter.printf("\t%s - show this help\n", CMD_HELP);
         mWriter.printf("\t%s [%s FLAGS] [NAME] - create a user with the optional flags and name\n",
                 CMD_CREATE_USER, ARG_FLAGS);
+        mWriter.printf("\t%s <USER_SERIAL_NUMBER> - remove the given user\n", CMD_REMOVE_USER);
         mWriter.printf("\t%s - locks the device (now! :-)\n", CMD_LOCK_NOW);
     }
 
@@ -117,6 +122,15 @@ final class ShellCommand {
         mDevicePolicyManagerGateway.createAndManageUser(name, flags,
                 (u) -> onSuccess("User created: %s", u),
                 (e) -> onError(e, "Error creating user %s", name));
+    }
+
+    private void removeUser() {
+        long serialNumber = Long.parseLong(mArgs[1]);
+        Log.i(TAG, "removeUser(): serialNumber=" + serialNumber);
+
+        mDevicePolicyManagerGateway.removeUser(serialNumber,
+                (u) -> onSuccess("User removed"),
+                (e) -> onError(e, "Error removing user %d", serialNumber));
     }
 
     private void lockNow() {
