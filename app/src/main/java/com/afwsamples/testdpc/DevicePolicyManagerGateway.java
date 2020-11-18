@@ -37,6 +37,20 @@ public interface DevicePolicyManagerGateway {
             @NonNull Consumer<UserHandle> onSuccess, @NonNull Consumer<Exception> onError);
 
     /**
+     * See {@link android.app.admin.DevicePolicyManager#removeUser(android.content.ComponentName, UserHandle)}.
+     */
+    void removeUser(@NonNull UserHandle userHandle,
+            @NonNull Consumer<Void> onSuccess, @NonNull Consumer<Exception> onError);
+
+    /**
+     * Same as {@link #removeUser(UserHandle, Consumer<Void>, Consumer<Exception>)}, but it uses
+     * {@link android.os.UserManager#getSerialNumberForUser(UserHandle)}
+     * to get the {@link UserHandle} associated with the {@code serialNumber}.
+     */
+    void removeUser(@NonNull long serialNumber,
+            @NonNull Consumer<Void> onSuccess, @NonNull Consumer<Exception> onError);
+
+    /**
      * See {@link android.app.admin.DevicePolicyManager#lockNow()}.
      */
     void lockNow(@NonNull Consumer<Void> onSuccess, @NonNull Consumer<Exception> onError);
@@ -48,24 +62,30 @@ public interface DevicePolicyManagerGateway {
             @NonNull Consumer<Exception> onError);
 
     /**
-     * Used on error callbacks to indicate that the operation returned {@code null}.
+     * Used on error callbacks to indicate a {@link android.app.admin.DevicePolicyManager} method
+     * call failed.
      */
-    public static final class NullResultException extends Exception {
+    @SuppressWarnings("serial")
+    public static final class InvalidResultException extends Exception {
 
         private final String mMethod;
+        private final String mResult;
 
         /**
          * Default constructor.
          *
-         * @param method method name (without parenthesis).
+         * @param method method name template.
+         * @param args method arguments.
          */
-        public NullResultException(@NonNull String method) {
-            mMethod = method;
+        public InvalidResultException(@NonNull String result, @NonNull String method,
+                @NonNull Object...args) {
+            mResult = result;
+            mMethod = String.format(method, args);
         }
 
         @Override
         public String toString() {
-            return "DPM." + mMethod + "() returned null";
+            return "DPM." + mMethod + " returned " + mResult;
         }
     }
 }
