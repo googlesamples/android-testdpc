@@ -24,6 +24,7 @@ import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.os.UserHandle;
+import android.os.UserManager;
 import android.util.Log;
 
 public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManagerGateway {
@@ -31,16 +32,19 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
     private static final String TAG = DevicePolicyManagerGatewayImpl.class.getSimpleName();
 
     private final DevicePolicyManager mDevicePolicyManager;
+    private final UserManager mUserManager;
     private final ComponentName mAdminComponentName;
 
     public DevicePolicyManagerGatewayImpl(@NonNull Context context) {
         this(context.getSystemService(DevicePolicyManager.class),
+                context.getSystemService(UserManager.class),
                 DeviceAdminReceiver.getComponentName(context));
     }
 
-    public DevicePolicyManagerGatewayImpl(@NonNull DevicePolicyManager dpm,
+    public DevicePolicyManagerGatewayImpl(@NonNull DevicePolicyManager dpm, @NonNull UserManager um,
             @NonNull ComponentName admin) {
         mDevicePolicyManager = dpm;
+        mUserManager = um;
         mAdminComponentName = admin;
 
         Log.d(TAG, "constructor: admin=" + mAdminComponentName + ", dpm=" + dpm);
@@ -49,7 +53,7 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
     @Override
     public void createAndManageUser(String name, int flags, Consumer<UserHandle> onSuccess,
             Consumer<Exception> onError) {
-        Log.d(TAG, "createAndManageUser(" + name + ", " + flags);
+        Log.d(TAG, "createAndManageUser(" + name + ", " + flags + ")");
 
         try {
             UserHandle userHandle = mDevicePolicyManager.createAndManageUser(mAdminComponentName,
@@ -57,7 +61,39 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
             if (userHandle != null) {
                 onSuccess.accept(userHandle);
             } else {
-                onError.accept(new NullResultException("createAndManageUser"));
+                onError.accept(
+                        new InvalidResultException("null",
+                                "createAndManageUser(%s, %d)", name, flags));
+            }
+        } catch (Exception e) {
+            onError.accept(e);
+        }
+    }
+
+    @Override
+    public void removeUser(long serialNumber, Consumer<Void> onSuccess,
+            Consumer<Exception> onError) {
+        Log.d(TAG, "removeUser(" + serialNumber + ")");
+        UserHandle userHandle = mUserManager.getUserForSerialNumber(serialNumber);
+        if (userHandle == null) {
+            onError.accept(new InvalidResultException("null", "getUserForSerialNumber(%d)",
+                    serialNumber));
+            return;
+        }
+        removeUser(userHandle, onSuccess, onError);
+    }
+
+    @Override
+    public void removeUser(UserHandle userHandle, Consumer<Void> onSuccess,
+            Consumer<Exception> onError) {
+        Log.d(TAG, "removeUser(" + userHandle + ")");
+
+        try {
+            boolean success = mDevicePolicyManager.removeUser(mAdminComponentName, userHandle);
+            if (success) {
+                onSuccess.accept(null);
+            } else {
+                onError.accept(new InvalidResultException("false", "removeUser(%s)", userHandle));
             }
         } catch (Exception e) {
             onError.accept(e);

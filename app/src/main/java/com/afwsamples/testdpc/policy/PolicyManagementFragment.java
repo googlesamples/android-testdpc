@@ -523,9 +523,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         }
         mDevicePolicyManager = (DevicePolicyManager) getActivity().getSystemService(
                 Context.DEVICE_POLICY_SERVICE);
-        mDevicePolicyManagerGateway = new DevicePolicyManagerGatewayImpl(mDevicePolicyManager,
-                mAdminComponentName);
         mUserManager = (UserManager) getActivity().getSystemService(Context.USER_SERVICE);
+        mDevicePolicyManagerGateway = new DevicePolicyManagerGatewayImpl(mDevicePolicyManager,
+                mUserManager, mAdminComponentName);
         mTelephonyManager = (TelephonyManager) getActivity()
                 .getSystemService(Context.TELEPHONY_SERVICE);
         mAccountManager = AccountManager.get(getActivity());
@@ -2174,20 +2174,15 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        boolean success = false;
                         long serialNumber = -1;
                         try {
                             serialNumber = Long.parseLong(input.getText().toString());
-                            UserHandle userHandle = mUserManager
-                                    .getUserForSerialNumber(serialNumber);
-                            if (userHandle != null) {
-                                success = mDevicePolicyManager
-                                        .removeUser(mAdminComponentName, userHandle);
-                            }
+                            mDevicePolicyManagerGateway.removeUser(serialNumber,
+                                    (u) -> showToast(R.string.user_removed),
+                                    (e) -> showToast(R.string.failed_to_remove_user));
                         } catch (NumberFormatException e) {
                             // Error message is printed in the next line.
                         }
-                        showToast(success ? R.string.user_removed : R.string.failed_to_remove_user);
                     }
                 })
                 .show();
@@ -2202,9 +2197,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private void showRemoveUserPrompt() {
         if (Util.SDK_INT >= VERSION_CODES.P) {
             showChooseUserPrompt(R.string.remove_user, userHandle -> {
-                boolean success =
-                        mDevicePolicyManager.removeUser(mAdminComponentName, userHandle);
-                showToast(success ? R.string.user_removed : R.string.failed_to_remove_user);
+                mDevicePolicyManagerGateway.removeUser(userHandle,
+                        (u) -> showToast(R.string.user_removed),
+                        (e) -> showToast(R.string.failed_to_remove_user));
             });
         } else {
             showRemoveUserPromptLegacy();
@@ -4125,7 +4120,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private DevicePolicyManagerGateway getParentProfileDevicePolicyManagerGateway() {
         return new DevicePolicyManagerGatewayImpl(
                 mDevicePolicyManager.getParentProfileInstance(mAdminComponentName),
-                mAdminComponentName);
+                mUserManager, mAdminComponentName);
     }
 
     private void onSuccessLog(String method) {
