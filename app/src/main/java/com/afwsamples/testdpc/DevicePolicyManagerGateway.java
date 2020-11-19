@@ -15,12 +15,13 @@
  */
 package com.afwsamples.testdpc;
 
+import android.os.UserHandle;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.util.Set;
 import java.util.function.Consumer;
-
-import android.os.UserHandle;
 
 /**
  * Interface used to abstract calls to {@link android.app.admin.DevicePolicyManager}.
@@ -49,6 +50,30 @@ public interface DevicePolicyManagerGateway {
      */
     void removeUser(@NonNull long serialNumber,
             @NonNull Consumer<Void> onSuccess, @NonNull Consumer<Exception> onError);
+
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#getUserRestrictions(android.content.ComponentName)}.
+     */
+    @NonNull
+    Set<String> getUserRestrictions();
+
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#setUserRestriction(android.content.ComponentName, String)}
+     * and {@link android.app.admin.DevicePolicyManager#clearUserRestriction(android.content.ComponentName, String)}.
+     */
+    void setUserRestriction(@NonNull String userRestriction, boolean enabled,
+            @NonNull Consumer<Void> onSuccess, @NonNull Consumer<Exception> onError);
+
+    /**
+     * Same as {@link #setUserRestriction(String, boolean, Consumer, Consumer)}, but ignoring
+     * callbacks.
+     */
+    void setUserRestriction(@NonNull String userRestriction, boolean enabled);
+
+    /**
+     * See {@link android.os.UserManager#hasUserRestriction(String)}.
+     */
+    boolean hasUserRestriction(@NonNull String userRestriction);
 
     /**
      * See {@link android.app.admin.DevicePolicyManager#lockNow()}.

@@ -1,7 +1,5 @@
 package com.afwsamples.testdpc.policy;
 
-import android.app.admin.DevicePolicyManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
@@ -12,7 +10,11 @@ import androidx.annotation.RequiresApi;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceScreen;
 
+import java.util.Set;
+
 import com.afwsamples.testdpc.DeviceAdminReceiver;
+import com.afwsamples.testdpc.DevicePolicyManagerGateway;
+import com.afwsamples.testdpc.DevicePolicyManagerGatewayImpl;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.BaseSearchablePolicyPreferenceFragment;
 import com.afwsamples.testdpc.common.Util;
@@ -23,17 +25,13 @@ public class UserRestrictionsParentDisplayFragment extends BaseSearchablePolicyP
         implements Preference.OnPreferenceChangeListener {
     private static final String TAG = "UserRestrictionsParent";
 
-    private DevicePolicyManager mParentDevicePolicyManager;
-    private ComponentName mAdminComponentName;
+    private DevicePolicyManagerGateway mDevicePolicyManagerGateway;
 
     @RequiresApi(api = VERSION_CODES.R)
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        DevicePolicyManager mDevicePolicyManager = (DevicePolicyManager)
-                getActivity().getSystemService(Context.DEVICE_POLICY_SERVICE);
-        mAdminComponentName = DeviceAdminReceiver.getComponentName(getActivity());
-        mParentDevicePolicyManager = mDevicePolicyManager
-                .getParentProfileInstance(mAdminComponentName);
+        mDevicePolicyManagerGateway = DevicePolicyManagerGatewayImpl
+                .forParentProfile(getActivity());
         super.onCreate(savedInstanceState);
         getActivity().getActionBar().setTitle(R.string.user_restrictions_management_title);
     }
@@ -74,12 +72,10 @@ public class UserRestrictionsParentDisplayFragment extends BaseSearchablePolicyP
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         String restriction = preference.getKey();
+        boolean enabled = newValue.equals(true);
+
         try {
-            if (newValue.equals(true)) {
-                mParentDevicePolicyManager.addUserRestriction(mAdminComponentName, restriction);
-            } else {
-                mParentDevicePolicyManager.clearUserRestriction(mAdminComponentName, restriction);
-            }
+            mDevicePolicyManagerGateway.setUserRestriction(restriction, enabled);
             updateUserRestriction(restriction);
             return true;
         } catch (SecurityException e) {
@@ -100,8 +96,8 @@ public class UserRestrictionsParentDisplayFragment extends BaseSearchablePolicyP
     @RequiresApi(api = VERSION_CODES.R)
     private void updateUserRestriction(String userRestriction) {
         DpcSwitchPreference preference = (DpcSwitchPreference) findPreference(userRestriction);
-        Bundle restrictions = mParentDevicePolicyManager.getUserRestrictions(mAdminComponentName);
-        preference.setChecked(restrictions.containsKey(userRestriction));
+        Set<String> restrictions = mDevicePolicyManagerGateway.getUserRestrictions();
+        preference.setChecked(restrictions.contains(userRestriction));
     }
 
     private void constrainPreferences() {

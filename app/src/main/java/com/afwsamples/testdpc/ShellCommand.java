@@ -15,14 +15,16 @@
  */
 package com.afwsamples.testdpc;
 
-import java.io.PrintWriter;
-import java.util.Arrays;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import android.content.Context;
 import android.os.UserHandle;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import java.io.PrintWriter;
+import java.util.Arrays;
+import java.util.Collection;
 
 /**
  * Provides a CLI (command-line interface) to TestDPC through {@code dumpsys}.
@@ -37,6 +39,8 @@ final class ShellCommand {
 
     private static final String CMD_CREATE_USER = "create-user";
     private static final String CMD_REMOVE_USER = "remove-user";
+    private static final String CMD_LIST_USER_RESTRICTIONS = "list-user-restrictions";
+    private static final String CMD_SET_USER_RESTRICTION = "set-user-restriction";
     private static final String CMD_HELP = "help";
     private static final String CMD_LOCK_NOW = "lock-now";
     private static final String ARG_FLAGS = "--flags";
@@ -71,6 +75,12 @@ final class ShellCommand {
             case CMD_REMOVE_USER:
                 execute(() -> removeUser());
                 break;
+            case CMD_LIST_USER_RESTRICTIONS:
+                execute(() -> listUserRestrictions());
+                break;
+            case CMD_SET_USER_RESTRICTION:
+                execute(() -> setUserRestriction());
+                break;
             case CMD_LOCK_NOW:
                 execute(() -> lockNow());
                 break;
@@ -89,6 +99,9 @@ final class ShellCommand {
         mWriter.printf("\t%s [%s FLAGS] [NAME] - create a user with the optional flags and name\n",
                 CMD_CREATE_USER, ARG_FLAGS);
         mWriter.printf("\t%s <USER_SERIAL_NUMBER> - remove the given user\n", CMD_REMOVE_USER);
+        mWriter.printf("\t%s - list the user restrictions\n", CMD_LIST_USER_RESTRICTIONS);
+        mWriter.printf("\t%s <RESTRICTION> <true|false>- sets the given user restriction\n",
+                CMD_SET_USER_RESTRICTION);
         mWriter.printf("\t%s - locks the device (now! :-)\n", CMD_LOCK_NOW);
     }
 
@@ -125,12 +138,31 @@ final class ShellCommand {
     }
 
     private void removeUser() {
+        // TODO(b/171350084): check args
         long serialNumber = Long.parseLong(mArgs[1]);
         Log.i(TAG, "removeUser(): serialNumber=" + serialNumber);
 
         mDevicePolicyManagerGateway.removeUser(serialNumber,
-                (u) -> onSuccess("User removed"),
+                (v) -> onSuccess("User %d removed", serialNumber),
                 (e) -> onError(e, "Error removing user %d", serialNumber));
+    }
+
+    private void listUserRestrictions() {
+        Log.i(TAG, "listUserRestrictions()");
+
+        print("user restrictions", mDevicePolicyManagerGateway.getUserRestrictions());
+    }
+
+    private void setUserRestriction() {
+        // TODO(b/171350084): check args
+        String userRestriction = mArgs[1];
+        boolean enabled = Boolean.parseBoolean(mArgs[2]);
+        Log.i(TAG, "setUserRestriction(" + userRestriction + ", " + enabled + ")");
+
+        mDevicePolicyManagerGateway.setUserRestriction(userRestriction, enabled,
+                (v) -> onSuccess("User restriction '%s' set to %b", userRestriction, enabled),
+                (e) -> onError(e, "Error setting user restriction '%s' to %b", userRestriction,
+                        enabled));
     }
 
     private void lockNow() {
@@ -169,5 +201,16 @@ final class ShellCommand {
         String msg = String.format(pattern, args);
         Log.e(TAG, msg, e);
         mWriter.printf("%s: %s\n", msg, e);
+    }
+
+    private void print(String name, Collection<String> collection) {
+        if (collection.isEmpty()) {
+            mWriter.printf("No %s\n", name);
+            return;
+
+        }
+        int size = collection.size();
+        mWriter.printf("%d %s:\n", size, name);
+        collection.forEach((s) -> mWriter.printf("  %s\n", s));
     }
 }
