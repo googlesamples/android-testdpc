@@ -1382,7 +1382,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         DevicePolicyManagerGateway gateway = mDevicePolicyManagerGateway;
         if (Util.SDK_INT >= VERSION_CODES.N && isManagedProfileOwner()) {
             // Always call lock now on the parent for managed profile on N
-            gateway = getParentProfileDevicePolicyManagerGateway();
+            gateway = DevicePolicyManagerGatewayImpl.forParentProfile(getActivity());
         }
         gateway.lockNow((v) -> onSuccessLog("lockNow"), (e) -> onErrorLog("lockNow", e));
     }
@@ -4004,7 +4004,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     @TargetApi(30)
     private void factoryResetOrgOwnedDevice() {
-        getParentProfileDevicePolicyManagerGateway().wipeData(/* flags= */ 0,
+        DevicePolicyManagerGatewayImpl.forParentProfile(getActivity()).wipeData(/* flags= */ 0,
                 (v) -> onSuccessLog("wipeData"),
                 (e) -> onErrorLog("wipeData", e));
     }
@@ -4048,12 +4048,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     @RequiresApi(Util.R_VERSION_CODE)
     private void setAutoTimeZoneEnabled(boolean enabled) {
         mDevicePolicyManager.setAutoTimeZoneEnabled(mAdminComponentName, enabled);
-    }
-
-    private DevicePolicyManagerGateway getParentProfileDevicePolicyManagerGateway() {
-        return new DevicePolicyManagerGatewayImpl(
-                mDevicePolicyManager.getParentProfileInstance(mAdminComponentName),
-                mUserManager, mAdminComponentName);
     }
 
     private void onSuccessLog(String method) {

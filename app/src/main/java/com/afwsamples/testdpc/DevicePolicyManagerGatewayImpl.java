@@ -13,19 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.afwsamples.testdpc;
-
-import androidx.annotation.NonNull;
-
-import java.util.Arrays;
-import java.util.function.Consumer;
 
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.os.Bundle;
 import android.os.UserHandle;
 import android.os.UserManager;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
+
+import java.util.Arrays;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManagerGateway {
 
@@ -48,6 +52,14 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
         mAdminComponentName = admin;
 
         Log.d(TAG, "constructor: admin=" + mAdminComponentName + ", dpm=" + dpm);
+    }
+
+    public static DevicePolicyManagerGatewayImpl forParentProfile(@NonNull Context context) {
+        ComponentName admin = DeviceAdminReceiver.getComponentName(context);
+        DevicePolicyManager dpm = context.getSystemService(DevicePolicyManager.class)
+                .getParentProfileInstance(admin);
+        UserManager um = context.getSystemService(UserManager.class);
+        return new DevicePolicyManagerGatewayImpl(dpm, um, admin);
     }
 
     @Override
@@ -101,6 +113,47 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
     }
 
     @Override
+    public Set<String> getUserRestrictions() {
+        Log.d(TAG, "getUserRestrictions()");
+        Bundle restrictions = mDevicePolicyManager.getUserRestrictions(mAdminComponentName);
+        return restrictions.keySet().stream().filter(k -> restrictions.getBoolean(k))
+                .collect(Collectors.toSet());
+    }
+
+    @Override
+    public void setUserRestriction(String userRestriction, boolean enabled,
+            Consumer<Void> onSuccess, Consumer<Exception> onError) {
+        Log.d(TAG, "setUserRestriction(" + userRestriction + ", " + enabled + ")");
+
+        try {
+            if (enabled) {
+                mDevicePolicyManager.addUserRestriction(mAdminComponentName, userRestriction);
+            } else {
+                mDevicePolicyManager.clearUserRestriction(mAdminComponentName, userRestriction);
+            }
+            onSuccess.accept(null);
+        } catch (Exception e) {
+            onError.accept(e);
+        }
+    }
+
+    @Override
+    public void setUserRestriction(String userRestriction, boolean enabled) {
+        String message = String.format("setUserRestriction(%s, %b)", userRestriction, enabled);
+        setUserRestriction(userRestriction, enabled,
+                (v) -> onSuccessLog(message),
+                (e) -> onErrorLog(message));
+    }
+
+    @Override
+    public boolean hasUserRestriction(String userRestriction) {
+        if (Log.isLoggable(TAG, Log.VERBOSE)) {
+            Log.v(TAG, "hasUserRestriction(" + userRestriction + ")");
+        }
+        return mUserManager.hasUserRestriction(userRestriction);
+    }
+
+    @Override
     public void lockNow(Consumer<Void> onSuccess, Consumer<Exception> onError) {
         Log.d(TAG, "lockNow()");
 
@@ -128,4 +181,13 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
     public String toString() {
         return "DevicePolicyManagerGatewayImpl[" + mAdminComponentName + "]";
     }
+
+    private void onSuccessLog(String template, Object... args) {
+        Log.d(TAG, String.format(template, args) + " succeeded");
+    }
+
+    private void onErrorLog(String template, Object... args) {
+        Log.d(TAG, String.format(template, args) + " failed");
+    }
+
 }
