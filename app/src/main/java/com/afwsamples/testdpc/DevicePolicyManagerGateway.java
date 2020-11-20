@@ -81,17 +81,32 @@ public interface DevicePolicyManagerGateway {
     void lockNow(@NonNull Consumer<Void> onSuccess, @NonNull Consumer<Exception> onError);
 
     /**
-     * See {@link android.app.admin.DevicePolicyManager#wipeData()}.
+     * See {@link android.app.admin.DevicePolicyManager#wipeData(int)}.
      */
     void wipeData(int flags, @NonNull Consumer<Void> onSuccess,
             @NonNull Consumer<Exception> onError);
+
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#requestBugreport(android.content.ComponentName)}.
+     */
+    void requestBugreport(@NonNull Consumer<Void> onSuccess, @NonNull Consumer<Exception> onError);
+
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#setNetworkLoggingEnabled(android.content.ComponentName, boolean)}.
+     */
+    void setNetworkLogging(boolean enabled, @NonNull Consumer<Void> onSuccess, @NonNull Consumer<Exception> onError);
+
+    /**
+     * Same as {@link #setNetworkLogging(boolean, Consumer, Consumer)}, but ignoring callbacks.
+     */
+    void setNetworkLogging(boolean enabled);
 
     /**
      * Used on error callbacks to indicate a {@link android.app.admin.DevicePolicyManager} method
      * call failed.
      */
     @SuppressWarnings("serial")
-    public static final class InvalidResultException extends Exception {
+    public static class InvalidResultException extends Exception {
 
         private final String mMethod;
         private final String mResult;
@@ -99,6 +114,7 @@ public interface DevicePolicyManagerGateway {
         /**
          * Default constructor.
          *
+         * @param result result of the method call.
          * @param method method name template.
          * @param args method arguments.
          */
@@ -111,6 +127,24 @@ public interface DevicePolicyManagerGateway {
         @Override
         public String toString() {
             return "DPM." + mMethod + " returned " + mResult;
+        }
+    }
+
+    /**
+     * Used on error callbacks to indicate a {@link android.app.admin.DevicePolicyManager} method
+     * call that returned {@code false}.
+     */
+    @SuppressWarnings("serial")
+    public static final class FailedOperationException extends InvalidResultException {
+
+        /**
+         * Default constructor.
+         *
+         * @param method method name template.
+         * @param args method arguments.
+         */
+        public FailedOperationException(@NonNull String method, @NonNull Object...args) {
+            super("false", method, args);
         }
     }
 }

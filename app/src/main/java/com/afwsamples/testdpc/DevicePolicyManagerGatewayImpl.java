@@ -178,6 +178,43 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
     }
 
     @Override
+    public void requestBugreport(Consumer<Void> onSuccess, Consumer<Exception> onError) {
+        Log.d(TAG, "requestBugreport(");
+
+        try {
+            boolean success = mDevicePolicyManager.requestBugreport(mAdminComponentName);
+            if (success) {
+                onSuccess.accept(null);
+            } else {
+                onError.accept(new FailedOperationException("requestBugreport()"));
+            }
+        } catch (Exception e) {
+            onError.accept(e);
+        }
+    }
+
+    @Override
+    public void setNetworkLogging(boolean enabled, Consumer<Void> onSuccess,
+            Consumer<Exception> onError) {
+        Log.d(TAG, "setNetworkLogging(" + enabled + ")");
+
+        try {
+            mDevicePolicyManager.setNetworkLoggingEnabled(mAdminComponentName, enabled);
+            onSuccess.accept(null);
+        } catch (Exception e) {
+            onError.accept(e);
+        }
+    }
+
+    @Override
+    public void setNetworkLogging(boolean enabled) {
+        String message = String.format("setNetworkLogging(%b)", enabled);
+        setNetworkLogging(enabled,
+                (v) -> onSuccessLog(message),
+                (e) -> onErrorLog(message));
+    }
+
+    @Override
     public String toString() {
         return "DevicePolicyManagerGatewayImpl[" + mAdminComponentName + "]";
     }

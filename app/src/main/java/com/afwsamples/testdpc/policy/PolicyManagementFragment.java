@@ -100,6 +100,7 @@ import com.afwsamples.testdpc.DevicePolicyManagerGateway;
 import com.afwsamples.testdpc.DevicePolicyManagerGatewayImpl;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.SetupManagementActivity;
+import com.afwsamples.testdpc.DevicePolicyManagerGateway.FailedOperationException;
 import com.afwsamples.testdpc.common.AccountArrayAdapter;
 import com.afwsamples.testdpc.common.AppInfoArrayAdapter;
 import com.afwsamples.testdpc.common.BaseSearchablePolicyPreferenceFragment;
@@ -1468,8 +1469,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 reloadEnableSecurityLoggingUi();
                 return true;
             case ENABLE_NETWORK_LOGGING:
-                mDevicePolicyManager.setNetworkLoggingEnabled(mAdminComponentName,
-                        (Boolean) newValue);
+                mDevicePolicyManagerGateway.setNetworkLogging((Boolean) newValue);
                 reloadEnableNetworkLoggingUi();
                 return true;
             case DISABLE_SCREEN_CAPTURE_KEY:
@@ -1643,14 +1643,16 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     @TargetApi(VERSION_CODES.N)
     private void requestBugReport() {
-        try {
-            if (!mDevicePolicyManager.requestBugreport(mAdminComponentName)) {
-                showToast(R.string.bugreport_failure_throttled);
-            }
-        } catch (SecurityException e) {
-            Log.i(TAG, "Exception when calling requestBugreport()", e);
-            showToast(R.string.bugreport_failure_exception);
-        }
+        mDevicePolicyManagerGateway.requestBugreport(
+                (v) -> onSuccessLog("requestBugreport"),
+                (e) -> {
+                    if (e instanceof FailedOperationException) {
+                        showToast(R.string.bugreport_failure_throttled);
+                    } else {
+                        Log.e(TAG, "Exception when calling requestBugreport()", e);
+                        showToast(R.string.bugreport_failure_exception);
+                    }
+                });
     }
 
     @TargetApi(VERSION_CODES.M)

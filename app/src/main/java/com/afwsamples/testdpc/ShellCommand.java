@@ -45,6 +45,8 @@ final class ShellCommand {
     private static final String CMD_LOCK_NOW = "lock-now";
     private static final String ARG_FLAGS = "--flags";
     private static final String CMD_WIPE_DATA = "wipe-data";
+    private static final String CMD_REQUEST_BUGREPORT = "request-bugreport";
+    private static final String CMD_SET_NETWORK_LOGGING = "set-network-logging";
 
     private final PrintWriter mWriter;
     private final String[] mArgs;
@@ -87,6 +89,12 @@ final class ShellCommand {
             case CMD_WIPE_DATA:
                 execute(() -> wipeData());
                 break;
+            case CMD_REQUEST_BUGREPORT:
+                execute(() -> requestBugreport());
+                break;
+            case CMD_SET_NETWORK_LOGGING:
+                execute(() -> setNetworkLogging());
+                break;
             default:
                 mWriter.printf("Invalid command: %s\n\n", cmd);
                 showUsage();
@@ -100,9 +108,12 @@ final class ShellCommand {
                 CMD_CREATE_USER, ARG_FLAGS);
         mWriter.printf("\t%s <USER_SERIAL_NUMBER> - remove the given user\n", CMD_REMOVE_USER);
         mWriter.printf("\t%s - list the user restrictions\n", CMD_LIST_USER_RESTRICTIONS);
-        mWriter.printf("\t%s <RESTRICTION> <true|false>- sets the given user restriction\n",
+        mWriter.printf("\t%s <RESTRICTION> <true|false>- set the given user restriction\n",
                 CMD_SET_USER_RESTRICTION);
-        mWriter.printf("\t%s - locks the device (now! :-)\n", CMD_LOCK_NOW);
+        mWriter.printf("\t%s - lock the device (now! :-)\n", CMD_LOCK_NOW);
+        mWriter.printf("\t%s - request a bugreport\n", CMD_REQUEST_BUGREPORT);
+        mWriter.printf("\t%s <true|false> - enable / disable network logging\n",
+                CMD_SET_NETWORK_LOGGING);
     }
 
     private void createUser() {
@@ -179,6 +190,23 @@ final class ShellCommand {
         mDevicePolicyManagerGateway.wipeData(/* flags= */ 0,
                 (v) -> onSuccess("Data wiped"),
                 (e) -> onError(e, "Error wiping data"));
+    }
+
+    private void requestBugreport() {
+        Log.i(TAG, "requestBugreport()");
+        mDevicePolicyManagerGateway.requestBugreport(
+                (v) -> onSuccess("Bugreport requested"),
+                (e) -> onError(e, "Error requesting bugreport"));
+    }
+
+    private void setNetworkLogging() {
+        // TODO(b/171350084): check args
+        boolean enabled = Boolean.parseBoolean(mArgs[1]);
+        Log.i(TAG, "setNetworkLogging(" + enabled + ")");
+
+        mDevicePolicyManagerGateway.setNetworkLogging(enabled,
+                (v) -> onSuccess("Network logging set to %b", enabled),
+                (e) -> onError(e, "Error setting network logging to %b", enabled));
     }
 
     private void execute(@NonNull Runnable r) {
