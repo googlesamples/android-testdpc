@@ -25,11 +25,13 @@ import androidx.annotation.Nullable;
 import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * Provides a CLI (command-line interface) to TestDPC through {@code dumpsys}.
  *
- * <p>Usage: <@code adb shell dumpsys activity service com.afwsamples.testdpc}.
+ * <p>Usage: {@code adb shell dumpsys activity service --user USER_ID com.afwsamples.testdpc CMD}.
  *
  */
 final class ShellCommand {
@@ -41,6 +43,9 @@ final class ShellCommand {
     private static final String CMD_REMOVE_USER = "remove-user";
     private static final String CMD_LIST_USER_RESTRICTIONS = "list-user-restrictions";
     private static final String CMD_SET_USER_RESTRICTION = "set-user-restriction";
+    private static final String CMD_IS_USER_AFFILIATED = "is-user-affiliated";
+    private static final String CMD_SET_AFFILIATION_IDS = "set-affiliation-ids";
+    private static final String CMD_GET_AFFILIATION_IDS = "get-affiliation-ids";
     private static final String CMD_HELP = "help";
     private static final String CMD_LOCK_NOW = "lock-now";
     private static final String ARG_FLAGS = "--flags";
@@ -77,6 +82,15 @@ final class ShellCommand {
             case CMD_REMOVE_USER:
                 execute(() -> removeUser());
                 break;
+            case CMD_IS_USER_AFFILIATED:
+                execute(() -> isUserAffiliated());
+                break;
+            case CMD_SET_AFFILIATION_IDS:
+                execute(() -> setAffiliationIds());
+                break;
+            case CMD_GET_AFFILIATION_IDS:
+                execute(() -> getAffiliationIds());
+                break;
             case CMD_LIST_USER_RESTRICTIONS:
                 execute(() -> listUserRestrictions());
                 break;
@@ -107,6 +121,12 @@ final class ShellCommand {
         mWriter.printf("\t%s [%s FLAGS] [NAME] - create a user with the optional flags and name\n",
                 CMD_CREATE_USER, ARG_FLAGS);
         mWriter.printf("\t%s <USER_SERIAL_NUMBER> - remove the given user\n", CMD_REMOVE_USER);
+        mWriter.printf("\t%s - checks if the user is affiliated with the device\n",
+                CMD_IS_USER_AFFILIATED);
+        mWriter.printf("\t%s [ID1] [ID2] [IDN] - sets the user affiliation ids (or clear them if "
+                + "no ids is passed)\n", CMD_SET_AFFILIATION_IDS);
+        mWriter.printf("\t%s - gets the user affiliation ids\n",
+                CMD_GET_AFFILIATION_IDS);
         mWriter.printf("\t%s - list the user restrictions\n", CMD_LIST_USER_RESTRICTIONS);
         mWriter.printf("\t%s <RESTRICTION> <true|false>- set the given user restriction\n",
                 CMD_SET_USER_RESTRICTION);
@@ -157,6 +177,31 @@ final class ShellCommand {
                 (v) -> onSuccess("User %d removed", serialNumber),
                 (e) -> onError(e, "Error removing user %d", serialNumber));
     }
+
+    private void getAffiliationIds() {
+        Set<String> ids = mDevicePolicyManagerGateway.getAffiliationIds();
+        if (ids.isEmpty()) {
+            mWriter.println("no affiliation ids");
+            return;
+        }
+        mWriter.printf("%d affiliation ids: %s\n", ids.size(), ids);
+    }
+
+    private void setAffiliationIds() {
+        Set<String> ids = new LinkedHashSet<String>(mArgs.length - 1);
+        for (int i = 1; i < mArgs.length; i++) {
+            ids.add(mArgs[i]);
+        }
+        Log.i(TAG, "setAffiliationIds(): ids=" + ids);
+        mDevicePolicyManagerGateway.setAffiliationIds(ids);
+
+        getAffiliationIds();
+    }
+
+    private void isUserAffiliated() {
+        mWriter.println(mDevicePolicyManagerGateway.isAffiliatedUser());
+    }
+
 
     private void listUserRestrictions() {
         Log.i(TAG, "listUserRestrictions()");

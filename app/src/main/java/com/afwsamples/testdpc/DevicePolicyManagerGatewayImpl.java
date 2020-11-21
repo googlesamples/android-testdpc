@@ -113,6 +113,26 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
     }
 
     @Override
+    public boolean isAffiliatedUser() {
+        boolean isIt = mDevicePolicyManager.isAffiliatedUser();
+        Log.d(TAG, "isAffiliatedUser(): " + isIt);
+        return isIt;
+    }
+
+    @Override
+    public void setAffiliationIds(Set<String> ids) {
+        Log.d(TAG, "setAffiliationIds(" + ids + ")");
+        mDevicePolicyManager.setAffiliationIds(mAdminComponentName, ids);
+    }
+
+    @Override
+    public Set<String> getAffiliationIds() {
+        Set<String> ids = mDevicePolicyManager.getAffiliationIds(mAdminComponentName);
+        Log.d(TAG, "getAffiliationIds(): " + ids);
+        return ids;
+    }
+
+    @Override
     public Set<String> getUserRestrictions() {
         Log.d(TAG, "getUserRestrictions()");
         Bundle restrictions = mDevicePolicyManager.getUserRestrictions(mAdminComponentName);
