@@ -52,6 +52,22 @@ public interface DevicePolicyManagerGateway {
             @NonNull Consumer<Void> onSuccess, @NonNull Consumer<Exception> onError);
 
     /**
+     * See {@link android.app.admin.DevicePolicyManager#isAffiliatedUser()}.
+     */
+    boolean isAffiliatedUser();
+
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#setAffiliationIds(android.content.ComponentName, Set)}.
+     */
+    void setAffiliationIds(@NonNull Set<String> ids);
+
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#getAffiliationIds(android.content.ComponentName)}.
+     */
+    @NonNull
+    Set<String> getAffiliationIds();
+
+    /**
      * See {@link android.app.admin.DevicePolicyManager#getUserRestrictions(android.content.ComponentName)}.
      */
     @NonNull

@@ -282,15 +282,13 @@ public class SetupManagementFragment extends Fragment implements
 
     @TargetApi(VERSION_CODES.O)
     private void passAffiliationIds(Intent intent, PersistableBundle adminExtras) {
-        ComponentName admin = DeviceAdminReceiver.getComponentName(getActivity());
-        DevicePolicyManager dpm = (DevicePolicyManager)
-                getActivity().getSystemService(Context.DEVICE_POLICY_SERVICE);
-        Set<String> ids = dpm.getAffiliationIds(admin);
+        DevicePolicyManagerGateway dpmg = new DevicePolicyManagerGatewayImpl(getActivity());
+        Set<String> ids = dpmg.getAffiliationIds();
         String affiliationId = null;
         if (ids.size() == 0) {
             SecureRandom randomGenerator = new SecureRandom();
             affiliationId = Integer.toString(randomGenerator.nextInt(1000000));
-            dpm.setAffiliationIds(admin, Collections.singleton(affiliationId));
+            dpmg.setAffiliationIds(Collections.singleton(affiliationId));
         } else {
             affiliationId = ids.iterator().next();
         }
