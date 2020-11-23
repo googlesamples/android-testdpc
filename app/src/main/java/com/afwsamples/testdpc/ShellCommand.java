@@ -41,6 +41,9 @@ final class ShellCommand {
 
     private static final String CMD_CREATE_USER = "create-user";
     private static final String CMD_REMOVE_USER = "remove-user";
+    private static final String CMD_SWITCH_USER = "switch-user";
+    private static final String CMD_START_USER_BG = "start-user-in-background";
+    private static final String CMD_STOP_USER = "stop-user";
     private static final String CMD_LIST_USER_RESTRICTIONS = "list-user-restrictions";
     private static final String CMD_SET_USER_RESTRICTION = "set-user-restriction";
     private static final String CMD_IS_USER_AFFILIATED = "is-user-affiliated";
@@ -82,6 +85,15 @@ final class ShellCommand {
             case CMD_REMOVE_USER:
                 execute(() -> removeUser());
                 break;
+            case CMD_SWITCH_USER:
+                execute(() -> switchUser());
+                break;
+            case CMD_START_USER_BG:
+                execute(() -> startUserInBackground());
+                break;
+            case CMD_STOP_USER:
+                execute(() -> stopUser());
+                break;
             case CMD_IS_USER_AFFILIATED:
                 execute(() -> isUserAffiliated());
                 break;
@@ -121,6 +133,10 @@ final class ShellCommand {
         mWriter.printf("\t%s [%s FLAGS] [NAME] - create a user with the optional flags and name\n",
                 CMD_CREATE_USER, ARG_FLAGS);
         mWriter.printf("\t%s <USER_SERIAL_NUMBER> - remove the given user\n", CMD_REMOVE_USER);
+        mWriter.printf("\t%s <USER_SERIAL_NUMBER> - switch the given user to foreground\n",
+                CMD_SWITCH_USER);
+        mWriter.printf("\t%s <USER_SERIAL_NUMBER> - start the given user in the background\n",
+                CMD_START_USER_BG);
         mWriter.printf("\t%s - checks if the user is affiliated with the device\n",
                 CMD_IS_USER_AFFILIATED);
         mWriter.printf("\t%s [ID1] [ID2] [IDN] - sets the user affiliation ids (or clear them if "
@@ -169,13 +185,39 @@ final class ShellCommand {
     }
 
     private void removeUser() {
-        // TODO(b/171350084): check args
-        long serialNumber = Long.parseLong(mArgs[1]);
-        Log.i(TAG, "removeUser(): serialNumber=" + serialNumber);
+        UserHandle userHandle = getUserHandleArg(1);
+        if (userHandle == null) return;
 
-        mDevicePolicyManagerGateway.removeUser(serialNumber,
-                (v) -> onSuccess("User %d removed", serialNumber),
-                (e) -> onError(e, "Error removing user %d", serialNumber));
+        mDevicePolicyManagerGateway.removeUser(userHandle,
+                (v) -> onSuccess("User %s removed", userHandle),
+                (e) -> onError(e, "Error removing user %s", userHandle));
+    }
+
+    private void switchUser() {
+        UserHandle userHandle = getUserHandleArg(1);
+        if (userHandle == null) return;
+
+        mDevicePolicyManagerGateway.switchUser(userHandle,
+                (v) -> onSuccess("User %s switched", userHandle),
+                (e) -> onError(e, "Error switching user %s", userHandle));
+    }
+
+    private void startUserInBackground() {
+        UserHandle userHandle = getUserHandleArg(1);
+        if (userHandle == null) return;
+
+        mDevicePolicyManagerGateway.startUserInBackground(userHandle,
+                (v) -> onSuccess("User %s started in background", userHandle),
+                (e) -> onError(e, "Error starting user %s in background", userHandle));
+    }
+
+    private void stopUser() {
+        UserHandle userHandle = getUserHandleArg(1);
+        if (userHandle == null) return;
+
+        mDevicePolicyManagerGateway.stopUser(userHandle,
+                (v) -> onSuccess("User %s stopped", userHandle),
+                (e) -> onError(e, "Error stopping user %s", userHandle));
     }
 
     private void getAffiliationIds() {
@@ -285,5 +327,15 @@ final class ShellCommand {
         int size = collection.size();
         mWriter.printf("%d %s:\n", size, name);
         collection.forEach((s) -> mWriter.printf("  %s\n", s));
+    }
+
+    private UserHandle getUserHandleArg(int index) {
+        // TODO(b/171350084): check args
+        long serialNumber = Long.parseLong(mArgs[index]);
+        UserHandle userHandle = mDevicePolicyManagerGateway.getUserHandle(serialNumber);
+        if (userHandle == null) {
+            mWriter.printf("No user handle for serial number %d\n", serialNumber);
+        }
+        return userHandle;
     }
 }

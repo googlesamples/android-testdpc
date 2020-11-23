@@ -83,16 +83,8 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
     }
 
     @Override
-    public void removeUser(long serialNumber, Consumer<Void> onSuccess,
-            Consumer<Exception> onError) {
-        Log.d(TAG, "removeUser(" + serialNumber + ")");
-        UserHandle userHandle = mUserManager.getUserForSerialNumber(serialNumber);
-        if (userHandle == null) {
-            onError.accept(new InvalidResultException("null", "getUserForSerialNumber(%d)",
-                    serialNumber));
-            return;
-        }
-        removeUser(userHandle, onSuccess, onError);
+    public UserHandle getUserHandle(long serialNumber) {
+        return mUserManager.getUserForSerialNumber(serialNumber);
     }
 
     @Override
@@ -106,6 +98,58 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
                 onSuccess.accept(null);
             } else {
                 onError.accept(new InvalidResultException("false", "removeUser(%s)", userHandle));
+            }
+        } catch (Exception e) {
+            onError.accept(e);
+        }
+    }
+
+    @Override
+    public void switchUser(UserHandle userHandle, Consumer<Void> onSuccess,
+            Consumer<Exception> onError) {
+        Log.d(TAG, "switchUser(" + userHandle + ")");
+
+        try {
+            boolean success = mDevicePolicyManager.switchUser(mAdminComponentName, userHandle);
+            if (success) {
+                onSuccess.accept(null);
+            } else {
+                onError.accept(new FailedOperationException("switchUser(%s)", userHandle));
+            }
+        } catch (Exception e) {
+            onError.accept(e);
+        }
+    }
+
+    @Override
+    public void startUserInBackground(UserHandle userHandle, Consumer<Integer> onSuccess,
+            Consumer<Exception> onError) {
+        Log.d(TAG, "startUserInBackground(" + userHandle + ")");
+        try {
+            int status = mDevicePolicyManager.startUserInBackground(mAdminComponentName,
+                    userHandle);
+            if (status == UserManager.USER_OPERATION_SUCCESS) {
+                onSuccess.accept(status);
+            } else {
+                onError.accept(new FailedUserOperationException(status, "startUserInBackground(%s)",
+                        userHandle));
+            }
+        } catch (Exception e) {
+            onError.accept(e);
+        }
+    }
+
+    @Override
+    public void stopUser(UserHandle userHandle, Consumer<Integer> onSuccess,
+            Consumer<Exception> onError) {
+        Log.d(TAG, "stopUser(" + userHandle + ")");
+        try {
+            int status = mDevicePolicyManager.stopUser(mAdminComponentName, userHandle);
+            if (status == UserManager.USER_OPERATION_SUCCESS) {
+                onSuccess.accept(status);
+            } else {
+                onError.accept(new FailedUserOperationException(status, "stopUser(%s)",
+                        userHandle));
             }
         } catch (Exception e) {
             onError.accept(e);
