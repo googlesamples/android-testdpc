@@ -1629,14 +1629,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private void requestBugReport() {
         mDevicePolicyManagerGateway.requestBugreport(
                 (v) -> onSuccessLog("requestBugreport"),
-                (e) -> {
-                    if (e instanceof FailedOperationException) {
-                        showToast(R.string.bugreport_failure_throttled);
-                    } else {
-                        Log.e(TAG, "Exception when calling requestBugreport()", e);
-                        showToast(R.string.bugreport_failure_exception);
-                    }
-                });
+                (e) -> onErrorOrFailureShowToast("requestBugreport",
+                        R.string.bugreport_failure_throttled, R.string.bugreport_failure_exception,
+                        e));
     }
 
     @TargetApi(VERSION_CODES.M)
@@ -2163,15 +2158,19 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                         long serialNumber = -1;
                         try {
                             serialNumber = Long.parseLong(input.getText().toString());
-                            mDevicePolicyManagerGateway.removeUser(serialNumber,
-                                    (u) -> showToast(R.string.user_removed),
-                                    (e) -> showToast(R.string.failed_to_remove_user));
+                            removeUser(mDevicePolicyManagerGateway.getUserHandle(serialNumber));
                         } catch (NumberFormatException e) {
                             // Error message is printed in the next line.
                         }
                     }
                 })
                 .show();
+    }
+
+    private void removeUser(UserHandle userHandle)  {
+        mDevicePolicyManagerGateway.removeUser(userHandle,
+                (u) -> onSuccessShowToast("removeUser()", R.string.user_removed),
+                (e) -> onErrorShowToast("removeUser()", R.string.failed_to_remove_user, e));
     }
 
     /**
@@ -2182,11 +2181,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
      */
     private void showRemoveUserPrompt() {
         if (Util.SDK_INT >= VERSION_CODES.P) {
-            showChooseUserPrompt(R.string.remove_user, userHandle -> {
-                mDevicePolicyManagerGateway.removeUser(userHandle,
-                        (u) -> showToast(R.string.user_removed),
-                        (e) -> showToast(R.string.failed_to_remove_user));
-            });
+            showChooseUserPrompt(R.string.remove_user, (u) -> removeUser(u));
         } else {
             showRemoveUserPromptLegacy();
         }
@@ -2199,9 +2194,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     @TargetApi(VERSION_CODES.P)
     private void showSwitchUserPrompt() {
         showChooseUserPrompt(R.string.switch_user, userHandle -> {
-            boolean success =
-                    mDevicePolicyManager.switchUser(mAdminComponentName, userHandle);
-            showToast(success ? R.string.user_switched : R.string.failed_to_switch_user);
+            mDevicePolicyManagerGateway.switchUser(userHandle,
+                    (v) -> onSuccessShowToast("switchUser", R.string.user_switched),
+                    (e) -> onErrorShowToast("switchUser", R.string.failed_to_switch_user, e));
         });
     }
 
@@ -2212,10 +2207,11 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     @TargetApi(VERSION_CODES.P)
     private void showStartUserInBackgroundPrompt() {
         showChooseUserPrompt(R.string.start_user_in_background, userHandle -> {
-            int status = mDevicePolicyManager.startUserInBackground(mAdminComponentName, userHandle);
-            showToast(status == USER_OPERATION_SUCCESS
-                    ? R.string.user_started_in_background
-                    : R.string.failed_to_start_user_in_background);
+            mDevicePolicyManagerGateway.startUserInBackground(userHandle,
+                    (v) -> onSuccessShowToast("startUserInBackground",
+                            R.string.user_started_in_background),
+                    (e) -> onErrorShowToast("startUserInBackground",
+                            R.string.failed_to_start_user_in_background, e));
         });
     }
 
@@ -2226,9 +2222,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     @TargetApi(VERSION_CODES.P)
     private void showStopUserPrompt() {
         showChooseUserPrompt(R.string.stop_user, userHandle -> {
-            int status = mDevicePolicyManager.stopUser(mAdminComponentName, userHandle);
-            showToast(status == USER_OPERATION_SUCCESS ? R.string.user_stopped
-                    : R.string.failed_to_stop_user);
+            mDevicePolicyManagerGateway.startUserInBackground(userHandle,
+                    (v) -> onSuccessShowToast("stopUser", R.string.user_stopped),
+                    (e) -> onErrorShowToast("stopUser", R.string.failed_to_stop_user, e));
         });
     }
 
@@ -4057,6 +4053,27 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     }
 
     private void onErrorLog(String method, Exception e) {
-        Log.d(TAG, method + "() failed: ", e);
+        Log.e(TAG, method + "() failed: ", e);
+    }
+
+    private void onSuccessShowToast(String method, int msgId) {
+        Log.d(TAG, method + "() succeeded");
+        showToast(msgId);
+    }
+
+    private void onErrorShowToast(String method, int msgId, Exception e) {
+        Log.e(TAG, method + "() failed: ", e);
+        showToast(msgId);
+    }
+
+    private void onErrorOrFailureShowToast(String method, int failureMsgId, int errorMsgId,
+            Exception e) {
+        if (e instanceof FailedOperationException) {
+            Log.e(TAG, method + " returned false");
+            showToast(failureMsgId);
+        } else {
+            Log.e(TAG, "Exception when calling " + method, e);
+            showToast(errorMsgId);
+        }
     }
 }

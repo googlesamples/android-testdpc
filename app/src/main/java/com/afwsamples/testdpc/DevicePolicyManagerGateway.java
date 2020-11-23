@@ -16,7 +16,7 @@
 package com.afwsamples.testdpc;
 
 import android.os.UserHandle;
-
+import android.os.UserManager;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -37,19 +37,33 @@ public interface DevicePolicyManagerGateway {
     void createAndManageUser(@Nullable String name, int flags,
             @NonNull Consumer<UserHandle> onSuccess, @NonNull Consumer<Exception> onError);
 
+    /** @see {@link android.os.UserManager#getUserForSerialNumber(long)}.*/
+    @Nullable
+    UserHandle getUserHandle(long serialNumber);
+
     /**
      * See {@link android.app.admin.DevicePolicyManager#removeUser(android.content.ComponentName, UserHandle)}.
      */
-    void removeUser(@NonNull UserHandle userHandle,
-            @NonNull Consumer<Void> onSuccess, @NonNull Consumer<Exception> onError);
+    void removeUser(@NonNull UserHandle userHandle, @NonNull Consumer<Void> onSuccess,
+            @NonNull Consumer<Exception> onError);
 
     /**
-     * Same as {@link #removeUser(UserHandle, Consumer<Void>, Consumer<Exception>)}, but it uses
-     * {@link android.os.UserManager#getSerialNumberForUser(UserHandle)}
-     * to get the {@link UserHandle} associated with the {@code serialNumber}.
+     * See {@link android.app.admin.DevicePolicyManager#switchUser(android.content.ComponentName, UserHandle)}.
      */
-    void removeUser(@NonNull long serialNumber,
-            @NonNull Consumer<Void> onSuccess, @NonNull Consumer<Exception> onError);
+    void switchUser(@NonNull UserHandle userHandle, @NonNull Consumer<Void> onSuccess,
+            @NonNull Consumer<Exception> onError);
+
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#startUserInBackground(android.content.ComponentName, UserHandle)}.
+     */
+    void startUserInBackground(@NonNull UserHandle userHandle, @NonNull Consumer<Integer> onSuccess,
+            @NonNull Consumer<Exception> onError);
+
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#stopUser(android.content.ComponentName, UserHandle)}.
+     */
+    void stopUser(@NonNull UserHandle userHandle, @NonNull Consumer<Integer> onSuccess,
+            @NonNull Consumer<Exception> onError);
 
     /**
      * See {@link android.app.admin.DevicePolicyManager#isAffiliatedUser()}.
@@ -161,6 +175,47 @@ public interface DevicePolicyManagerGateway {
          */
         public FailedOperationException(@NonNull String method, @NonNull Object...args) {
             super("false", method, args);
+        }
+    }
+
+    /**
+     * Used on error callbacks to indicate a {@link android.app.admin.DevicePolicyManager} method
+     * call that returned a user-related error.
+     */
+    @SuppressWarnings("serial")
+    public static final class FailedUserOperationException extends InvalidResultException {
+
+        /**
+         * Default constructor.
+         *
+         * @param status user-related opeartion status.
+         * @param method method name template.
+         * @param args method arguments.
+         */
+        public FailedUserOperationException(int status, @NonNull String method,
+                @NonNull Object...args) {
+            super(userStatusToString(status), method, args);
+        }
+
+        private static String userStatusToString(int status) {
+            switch (status) {
+                case UserManager.USER_OPERATION_SUCCESS:
+                    return "SUCCESS";
+                case UserManager.USER_OPERATION_ERROR_CURRENT_USER:
+                    return "ERROR_CURRENT_USER";
+                case UserManager.USER_OPERATION_ERROR_LOW_STORAGE:
+                    return "ERROR_LOW_STORAGE";
+                case UserManager.USER_OPERATION_ERROR_MANAGED_PROFILE:
+                    return "ERROR_MAX_MANAGED_PROFILE";
+                case UserManager.USER_OPERATION_ERROR_MAX_RUNNING_USERS:
+                    return "ERROR_MAX_RUNNING_USERS";
+                case UserManager.USER_OPERATION_ERROR_MAX_USERS:
+                    return "ERROR_MAX_USERS";
+                case UserManager.USER_OPERATION_ERROR_UNKNOWN:
+                    return "ERROR_UNKNOWN";
+                default:
+                    return "INVALID_STATUS:" + status;
+            }
         }
     }
 }
