@@ -344,6 +344,11 @@
             android:key="set_input_methods"
             android:title="@string/set_input_methods"
             testdpc:minSdkVersion="L" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="set_input_methods_on_parent"
+            android:title="@string/set_input_methods_on_parent"
+            testdpc:minSdkVersion="S"
+            testdpc:admin="orgOwnedProfileOwner"/>
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/notification_listeners_title">

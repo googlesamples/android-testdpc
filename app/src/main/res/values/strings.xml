@@ -671,9 +671,15 @@
     <!-- Input method -->
     <string name="input_methods_title">Input methods</string>
     <string name="set_input_methods">Set input methods</string>
+    <string name="set_input_methods_on_parent">Set input methods on parent</string>
     <string name="set_input_methods_successful">The given list of input methods is enabled</string>
     <string name="set_input_methods_fail">Cannot disallow input methods enabled by the primary user</string>
     <string name="all_input_methods_enabled">All input methods are enabled.</string>
+    <string name="add_input_method_on_parent_fail">Failed to add input method on parent</string>
+    <string name="all_input_methods_on_parent">Allowed all input methods on parent</string>
+    <string name="system_input_methods_on_parent">Allowed only system input methods on parent</string>
+    <string name="input_methods_all">Allow all input methods</string>
+    <string name="input_methods_system">Allow only system input methods</string>
 
     <!-- Notification listeners -->
     <string name="notification_listeners_title">Notification Listener Services</string>

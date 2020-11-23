@@ -74,6 +74,7 @@ import android.view.inputmethod.InputMethodInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -359,6 +360,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String SET_DISABLE_ACCOUNT_MANAGEMENT_KEY
             = "set_disable_account_management";
     private static final String SET_INPUT_METHODS_KEY = "set_input_methods";
+    private static final String SET_INPUT_METHODS_ON_PARENT_KEY = "set_input_methods_on_parent";
     private static final String SET_NOTIFICATION_LISTENERS_KEY = "set_notification_listeners";
     private static final String SET_NOTIFICATION_LISTENERS_TEXT_KEY = "set_notification_listeners_text";
     private static final String SET_LONG_SUPPORT_MESSAGE_KEY = "set_long_support_message";
@@ -658,6 +660,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 : R.string.requires_network_logs);
         findPreference(SET_ACCESSIBILITY_SERVICES_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_INPUT_METHODS_KEY).setOnPreferenceClickListener(this);
+        findPreference(SET_INPUT_METHODS_ON_PARENT_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_NOTIFICATION_LISTENERS_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_NOTIFICATION_LISTENERS_TEXT_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_DISABLE_ACCOUNT_MANAGEMENT_KEY).setOnPreferenceClickListener(this);
@@ -1028,6 +1031,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 }
                 mGetInputMethodsTask = new GetInputMethodsTask();
                 mGetInputMethodsTask.execute();
+                return true;
+            case SET_INPUT_METHODS_ON_PARENT_KEY:
+                setPermittedInputMethodsOnParent();
                 return true;
             case SET_NOTIFICATION_LISTENERS_KEY:
                 // Avoid starting the same task twice.
@@ -3676,6 +3682,36 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                     : R.string.set_input_methods_successful;
             showToast(result ? successMsgId : R.string.set_input_methods_fail);
         }
+    }
+
+    @RequiresApi(api = VERSION_CODES.S)
+    private void setPermittedInputMethodsOnParent() {
+        if (getActivity() == null || getActivity().isFinishing()) {
+            return;
+        }
+        DevicePolicyManagerGateway parentDpmGateway =
+            DevicePolicyManagerGatewayImpl.forParentProfile(getActivity());
+        View view = getActivity().getLayoutInflater()
+            .inflate(R.layout.permitted_input_methods_on_parent, null);
+
+        Button allInputMethodsButton = view.findViewById(R.id.all_input_methods_button);
+        allInputMethodsButton.setOnClickListener(v -> {
+            boolean result = parentDpmGateway.setPermittedInputMethods(null);
+            showToast(result
+                ? R.string.all_input_methods_on_parent
+                : R.string.add_input_method_on_parent_fail);
+        });
+        Button systemInputMethodsButton = view.findViewById(R.id.system_input_methods_button);
+        systemInputMethodsButton.setOnClickListener(v -> {
+            boolean result = parentDpmGateway.setPermittedInputMethods(new ArrayList<>());
+            showToast(result
+                ? R.string.system_input_methods_on_parent
+                : R.string.add_input_method_on_parent_fail);
+        });
+
+        new AlertDialog.Builder(getActivity())
+            .setView(view)
+            .show();
     }
 
     @TargetApi(VERSION_CODES.O)

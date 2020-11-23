@@ -24,10 +24,7 @@ import android.os.Bundle;
 import android.os.UserHandle;
 import android.os.UserManager;
 import android.util.Log;
-
 import androidx.annotation.NonNull;
-
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -335,7 +332,7 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
 
     @Override
     public void setUserControlDisabledPackages(List<String> packages, Consumer<Void> onSuccess,
-            Consumer<Exception> onError) {
+        Consumer<Exception> onError) {
         Log.d(TAG, "setUserControlDisabledPackages(" + packages + ")");
 
         try {
@@ -349,6 +346,28 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
     @Override
     public List<String> getUserControlDisabledPackages() {
         return mDevicePolicyManager.getUserControlDisabledPackages(mAdminComponentName);
+    }
+
+    public boolean setPermittedInputMethods(List<String> packageNames) {
+        String inputMethods = packageNames != null ? String.join(",", packageNames) : "";
+        String message = "setPermittedInputMethods(" + inputMethods + ")";
+        return setPermittedInputMethods(packageNames,
+            (v) -> onSuccessLog(message),
+            (e) -> onErrorLog(message));
+    }
+
+    @Override
+    public boolean setPermittedInputMethods(List<String> packageNames, Consumer<Void> onSuccess,
+        Consumer<Exception> onError) {
+        boolean result = false;
+        try {
+            result = mDevicePolicyManager
+                .setPermittedInputMethods(mAdminComponentName, packageNames);
+            onSuccess.accept(null);
+        } catch (Exception e) {
+            onError.accept(e);
+        }
+        return result;
     }
 
     @Override

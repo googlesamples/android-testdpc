@@ -15,6 +15,7 @@
  */
 package com.afwsamples.testdpc;
 
+import android.content.ComponentName;
 import android.graphics.Bitmap;
 import android.os.UserHandle;
 import android.os.UserManager;
@@ -167,6 +168,19 @@ public interface DevicePolicyManagerGateway {
      * See {@link android.app.admin.DevicePolicyManager#getUserControlDisabledPackages(android.content.ComponentName)}.
      */
     @NonNull List<String> getUserControlDisabledPackages();
+
+    /*
+     * See {@link android.app.admin.DevicePolicyManager#setPermittedInputMethods(
+     * android.content.ComponentName, List)}.
+     */
+    boolean setPermittedInputMethods(List<String> packageNames, @NonNull Consumer<Void> onSuccess,
+        @NonNull Consumer<Exception> onError);
+
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#setPermittedInputMethods(
+     * android.content.ComponentName, List)}.
+     */
+    boolean setPermittedInputMethods(List<String> packageNames);
 
     /**
      * Used on error callbacks to indicate a {@link android.app.admin.DevicePolicyManager} method

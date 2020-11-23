@@ -27,6 +27,7 @@ import androidx.annotation.Nullable;
 
 import java.io.File;
 import java.io.PrintWriter;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -66,7 +67,8 @@ final class ShellCommand {
             "set-user-control-disabled-packages";
     private static final String CMD_GET_USER_CONTROL_DISABLED_PACKAGES =
             "get-user-control-disabled-packages";
-
+    private static final String CMD_SET_PERMITTED_INPUT_METHODS_PARENT =
+        "set-permitted-input-methods-parent";
     private static final String ARG_FLAGS = "--flags";
 
     private final Context mContext;
@@ -153,6 +155,9 @@ final class ShellCommand {
                 break;
             case CMD_GET_USER_CONTROL_DISABLED_PACKAGES:
                 execute(() -> getUserControlDisabledPackages());
+                break;
+            case CMD_SET_PERMITTED_INPUT_METHODS_PARENT:
+                execute(() -> setPermittedInputMethodsOnParent());
                 break;
             default:
                 mWriter.printf("Invalid command: %s\n\n", cmd);
@@ -422,6 +427,16 @@ final class ShellCommand {
     private void getUserControlDisabledPackages() {
         List<String> pkgs = mDevicePolicyManagerGateway.getUserControlDisabledPackages();
         pkgs.forEach((p) -> mWriter.println(p));
+    }
+
+    private void setPermittedInputMethodsOnParent() {
+        List<String> inputMethods = new ArrayList<String>(mArgs.length - 1);
+        for (int i = 1; i < mArgs.length; i++) {
+            inputMethods.add(mArgs[i]);
+        }
+        DevicePolicyManagerGateway parentDpmGateway =
+            DevicePolicyManagerGatewayImpl.forParentProfile(mContext);
+        parentDpmGateway.setPermittedInputMethods(inputMethods);
     }
 
     private void execute(@NonNull Runnable r) {
