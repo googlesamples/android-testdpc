@@ -283,6 +283,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String PASSWORD_COMPLIANT_KEY = "password_compliant";
     private static final String PASSWORD_COMPLEXITY_KEY = "password_complexity";
     private static final String REQUIRED_PASSWORD_COMPLEXITY_KEY = "required_password_complexity";
+    private static final String REQUIRED_PASSWORD_COMPLEXITY_ON_PARENT_KEY =
+            "required_password_complexity_on_parent";
     private static final String SEPARATE_CHALLENGE_KEY = "separate_challenge";
     private static final String DISABLE_CAMERA_KEY = "disable_camera";
     private static final String DISABLE_CAMERA_ON_PARENT_KEY = "disable_camera_on_parent";
@@ -393,6 +395,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         "set_new_password_with_complexity";
     private static final String SET_REQUIRED_PASSWORD_COMPLEXITY =
             "set_required_password_complexity";
+    private static final String SET_REQUIRED_PASSWORD_COMPLEXITY_ON_PARENT =
+            "set_required_password_complexity_on_parent";
     private static final String SET_PROFILE_PARENT_NEW_PASSWORD = "set_profile_parent_new_password";
     private static final String BIND_DEVICE_ADMIN_POLICIES = "bind_device_admin_policies";
     private static final String CROSS_PROFILE_APPS = "cross_profile_apps";
@@ -780,6 +784,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
         onCreateSetNewPasswordWithComplexityPreference();
         onCreateSetRequiredPasswordComplexityPreference();
+        onCreateSetRequiredPasswordComplexityOnParentPreference();
         constrainSpecialCasePreferences();
 
         maybeDisableLockTaskPreferences();
@@ -870,6 +875,13 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 (ListPreference) findPreference(SET_REQUIRED_PASSWORD_COMPLEXITY);
         addPasswordComplexityListToPreference(requiredComplexityPref);
         requiredComplexityPref.setOnPreferenceChangeListener(this);
+    }
+
+    private void onCreateSetRequiredPasswordComplexityOnParentPreference() {
+        ListPreference requiredParentComplexityPref =
+                (ListPreference) findPreference(SET_REQUIRED_PASSWORD_COMPLEXITY_ON_PARENT);
+        addPasswordComplexityListToPreference(requiredParentComplexityPref);
+        requiredParentComplexityPref.setOnPreferenceChangeListener(this);
     }
 
     private void constrainSpecialCasePreferences() {
@@ -1539,6 +1551,10 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             case SET_REQUIRED_PASSWORD_COMPLEXITY:
                 int requiredComplexity = Integer.parseInt((String) newValue);
                 setRequiredPasswordComplexity(requiredComplexity);
+                return true;
+            case SET_REQUIRED_PASSWORD_COMPLEXITY_ON_PARENT:
+                int requiredParentComplexity = Integer.parseInt((String) newValue);
+                setRequiredPasswordComplexityOnParent(requiredParentComplexity);
                 return true;
             case APP_FEEDBACK_NOTIFICATIONS:
                 SharedPreferences.Editor editor =
@@ -2453,8 +2469,25 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     // running older releases and obviates the need for a target sdk check here.
     @TargetApi(VERSION_CODES.S)
     private void setRequiredPasswordComplexity(int complexity) {
+        setRequiredPasswordComplexity(mDevicePolicyManager, complexity);
+    }
+
+    // NOTE: The setRequiredPasswordComplexity call is gated by a check in device_policy_header.xml,
+    // where the minSdkVersion for it is specified. That prevents it from being callable on devices
+    // running older releases and obviates the need for a target sdk check here.
+    @TargetApi(VERSION_CODES.S)
+    private void setRequiredPasswordComplexityOnParent(int complexity) {
+        setRequiredPasswordComplexity(
+                mDevicePolicyManager.getParentProfileInstance(mAdminComponentName), complexity);
+    }
+
+    // NOTE: The setRequiredPasswordComplexity call is gated by a check in device_policy_header.xml,
+    // where the minSdkVersion for it is specified. That prevents it from being callable on devices
+    // running older releases and obviates the need for a target sdk check here.
+    @TargetApi(VERSION_CODES.S)
+    private void setRequiredPasswordComplexity(DevicePolicyManager dpm, int complexity) {
         try {
-            ReflectionUtil.invoke(mDevicePolicyManager, "setRequiredPasswordComplexity",
+            ReflectionUtil.invoke(dpm, "setRequiredPasswordComplexity",
                     new Class[]{Integer.TYPE}, complexity);
         } catch (ReflectionIsTemporaryException e) {
             Log.e(TAG, "Error invoking setRequiredPasswordComplexity", e);
@@ -2463,6 +2496,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         loadPasswordComplexity();
         loadRequiredPasswordComplexity();
     }
+
 
     @TargetApi(VERSION_CODES.N)
     private void loadPasswordCompliant() {
