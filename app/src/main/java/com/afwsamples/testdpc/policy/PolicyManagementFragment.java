@@ -1429,10 +1429,11 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 .setPositiveButton(android.R.string.ok, (d, i) -> {
                     final int flags = evictKeyCheckBox.isChecked()
                             ? DevicePolicyManager.FLAG_EVICT_CREDENTIAL_ENCRYPTION_KEY : 0;
-                    final DevicePolicyManager dpm = lockParentCheckBox.isChecked()
-                            ? mDevicePolicyManager.getParentProfileInstance(mAdminComponentName)
-                            : mDevicePolicyManager;
-                    dpm.lockNow(flags);
+                    final DevicePolicyManagerGateway gateway = lockParentCheckBox.isChecked()
+                            ? DevicePolicyManagerGatewayImpl.forParentProfile(getActivity())
+                            : mDevicePolicyManagerGateway;
+                    gateway.lockNow(flags, (v) -> onSuccessLog("lockNow"),
+                            (e) -> onErrorLog("lockNow", e));
                 })
                 .setNegativeButton(android.R.string.cancel, null)
                 .show();

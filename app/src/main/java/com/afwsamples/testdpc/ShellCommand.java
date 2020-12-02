@@ -146,7 +146,8 @@ final class ShellCommand {
         mWriter.printf("\t%s - list the user restrictions\n", CMD_LIST_USER_RESTRICTIONS);
         mWriter.printf("\t%s <RESTRICTION> <true|false>- set the given user restriction\n",
                 CMD_SET_USER_RESTRICTION);
-        mWriter.printf("\t%s - lock the device (now! :-)\n", CMD_LOCK_NOW);
+        mWriter.printf("\t%s [FLAGS]- lock the device (now! :-)\n", CMD_LOCK_NOW);
+        mWriter.printf("\t%s [FLAGS]- factory reset the device\n", CMD_WIPE_DATA);
         mWriter.printf("\t%s - request a bugreport\n", CMD_REQUEST_BUGREPORT);
         mWriter.printf("\t%s <true|false> - enable / disable network logging\n",
                 CMD_SET_NETWORK_LOGGING);
@@ -264,17 +265,24 @@ final class ShellCommand {
     }
 
     private void lockNow() {
-        // TODO(b/171350084): add flags
-        Log.i(TAG, "lockNow()");
-        mDevicePolicyManagerGateway.lockNow(
-                (v) -> onSuccess("Device locked"),
-                (e) -> onError(e, "Error locking device"));
+        Integer flags = getIntArg(/* index= */ 1);
+        if (flags == null) {
+            Log.i(TAG, "lockNow()");
+            mDevicePolicyManagerGateway.lockNow(
+                    (v) -> onSuccess("Device locked"),
+                    (e) -> onError(e, "Error locking device"));
+        } else {
+            Log.i(TAG, "lockNow(" + flags + ")");
+            mDevicePolicyManagerGateway.lockNow(flags,
+                    (v) -> onSuccess("Device locked"),
+                    (e) -> onError(e, "Error locking device"));
+        }
     }
 
     private void wipeData() {
-        // TODO(b/171350084): add flags
+        Integer flags = getIntArg(/* index= */ 1);
         Log.i(TAG, "wipeData()");
-        mDevicePolicyManagerGateway.wipeData(/* flags= */ 0,
+        mDevicePolicyManagerGateway.wipeData(flags == null ? 0 : flags,
                 (v) -> onSuccess("Data wiped"),
                 (e) -> onError(e, "Error wiping data"));
     }
@@ -337,5 +345,11 @@ final class ShellCommand {
             mWriter.printf("No user handle for serial number %d\n", serialNumber);
         }
         return userHandle;
+    }
+
+    /** Gets an optional {@code int} argument at index {@code index}. */
+    @Nullable
+    private Integer getIntArg(int index) {
+        return mArgs.length <= index ? null : Integer.parseInt(mArgs[index]);
     }
 }
