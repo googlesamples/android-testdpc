@@ -409,6 +409,11 @@
             android:title="@string/set_required_password_complexity"
             testdpc:admin="deviceOwner|profileOwner"
             testdpc:minSdkVersion="S"/>
+        <com.afwsamples.testdpc.common.preference.DpcListPreference
+            android:key="set_required_password_complexity_on_parent"
+            android:title="@string/set_required_password_complexity_on_parent"
+            testdpc:admin="profileOwner"
+            testdpc:minSdkVersion="S"/>
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="set_profile_parent_new_password"
             android:title="@string/request_to_set_profile_parent_new_password"
