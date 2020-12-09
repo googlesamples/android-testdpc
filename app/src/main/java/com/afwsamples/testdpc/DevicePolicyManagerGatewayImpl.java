@@ -242,6 +242,18 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
     }
 
     @Override
+    public void reboot(Consumer<Void> onSuccess, Consumer<Exception> onError) {
+        Log.d(TAG, "reboot()");
+
+        try {
+            mDevicePolicyManager.reboot(mAdminComponentName);
+            onSuccess.accept(null);
+        } catch (Exception e) {
+            onError.accept(e);
+        }
+    }
+
+    @Override
     public void wipeData(int flags, Consumer<Void> onSuccess, Consumer<Exception> onError) {
         Log.d(TAG, "wipeData(" + flags + ")");
 

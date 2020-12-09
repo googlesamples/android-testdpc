@@ -51,10 +51,11 @@ final class ShellCommand {
     private static final String CMD_GET_AFFILIATION_IDS = "get-affiliation-ids";
     private static final String CMD_HELP = "help";
     private static final String CMD_LOCK_NOW = "lock-now";
-    private static final String ARG_FLAGS = "--flags";
+    private static final String CMD_REBOOT = "reboot";
     private static final String CMD_WIPE_DATA = "wipe-data";
     private static final String CMD_REQUEST_BUGREPORT = "request-bugreport";
     private static final String CMD_SET_NETWORK_LOGGING = "set-network-logging";
+    private static final String ARG_FLAGS = "--flags";
 
     private final PrintWriter mWriter;
     private final String[] mArgs;
@@ -112,6 +113,9 @@ final class ShellCommand {
             case CMD_LOCK_NOW:
                 execute(() -> lockNow());
                 break;
+            case CMD_REBOOT:
+                execute(() -> reboot());
+                break;
             case CMD_WIPE_DATA:
                 execute(() -> wipeData());
                 break;
@@ -147,6 +151,7 @@ final class ShellCommand {
         mWriter.printf("\t%s <RESTRICTION> <true|false>- set the given user restriction\n",
                 CMD_SET_USER_RESTRICTION);
         mWriter.printf("\t%s [FLAGS]- lock the device (now! :-)\n", CMD_LOCK_NOW);
+        mWriter.printf("\t%s - reboot the device\n", CMD_REBOOT);
         mWriter.printf("\t%s [FLAGS]- factory reset the device\n", CMD_WIPE_DATA);
         mWriter.printf("\t%s - request a bugreport\n", CMD_REQUEST_BUGREPORT);
         mWriter.printf("\t%s <true|false> - enable / disable network logging\n",
@@ -277,6 +282,13 @@ final class ShellCommand {
                     (v) -> onSuccess("Device locked"),
                     (e) -> onError(e, "Error locking device"));
         }
+    }
+
+    private void reboot() {
+        Log.i(TAG, "reboot()");
+        mDevicePolicyManagerGateway.reboot(
+                (v) -> onSuccess("Device rebooted"),
+                (e) -> onError(e, "Error rebooting device"));
     }
 
     private void wipeData() {
