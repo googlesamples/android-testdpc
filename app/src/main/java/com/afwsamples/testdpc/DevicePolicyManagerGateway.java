@@ -116,6 +116,11 @@ public interface DevicePolicyManagerGateway {
     void lockNow(int flags, @NonNull Consumer<Void> onSuccess, @NonNull Consumer<Exception> onError);
 
     /**
+     * See {@link android.app.admin.DevicePolicyManager#reboot()}.
+     */
+    void reboot(@NonNull Consumer<Void> onSuccess, @NonNull Consumer<Exception> onError);
+
+    /**
      * See {@link android.app.admin.DevicePolicyManager#wipeData(int)}.
      */
     void wipeData(int flags, @NonNull Consumer<Void> onSuccess,

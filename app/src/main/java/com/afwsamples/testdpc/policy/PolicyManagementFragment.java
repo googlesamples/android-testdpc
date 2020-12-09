@@ -3753,7 +3753,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             showToast(R.string.reboot_error_msg);
             return;
         }
-        mDevicePolicyManager.reboot(mAdminComponentName);
+        mDevicePolicyManagerGateway.reboot((v) -> onSuccessLog("reboot"),
+                (e) -> onErrorLog("reboot", e));
     }
 
     private void showSetupManagement() {
