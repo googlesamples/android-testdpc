@@ -303,6 +303,24 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
     }
 
     @Override
+    public void setOrganizationName(CharSequence title, Consumer<Void> onSuccess,
+            Consumer<Exception> onError) {
+        Log.d(TAG, "setOrganizationName(" + title + ")");
+
+        try {
+            mDevicePolicyManager.setOrganizationName(mAdminComponentName, title);
+            onSuccess.accept(null);
+        } catch (Exception e) {
+            onError.accept(e);
+        }
+    }
+
+    @Override
+    public CharSequence getOrganizationName() {
+        return mDevicePolicyManager.getOrganizationName(mAdminComponentName);
+    }
+
+    @Override
     public String toString() {
         return "DevicePolicyManagerGatewayImpl[" + mAdminComponentName + "]";
     }
