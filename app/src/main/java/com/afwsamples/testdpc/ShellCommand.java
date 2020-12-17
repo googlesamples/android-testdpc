@@ -55,6 +55,8 @@ final class ShellCommand {
     private static final String CMD_WIPE_DATA = "wipe-data";
     private static final String CMD_REQUEST_BUGREPORT = "request-bugreport";
     private static final String CMD_SET_NETWORK_LOGGING = "set-network-logging";
+    private static final String CMD_SET_ORGANIZATION_NAME = "set-organization-name";
+    private static final String CMD_GET_ORGANIZATION_NAME = "get-organization-name";
     private static final String ARG_FLAGS = "--flags";
 
     private final PrintWriter mWriter;
@@ -125,6 +127,12 @@ final class ShellCommand {
             case CMD_SET_NETWORK_LOGGING:
                 execute(() -> setNetworkLogging());
                 break;
+            case CMD_SET_ORGANIZATION_NAME:
+                execute(() -> setOrganizationName());
+                break;
+            case CMD_GET_ORGANIZATION_NAME:
+                execute(() -> getOrganizationName());
+                break;
             default:
                 mWriter.printf("Invalid command: %s\n\n", cmd);
                 showUsage();
@@ -156,6 +164,9 @@ final class ShellCommand {
         mWriter.printf("\t%s - request a bugreport\n", CMD_REQUEST_BUGREPORT);
         mWriter.printf("\t%s <true|false> - enable / disable network logging\n",
                 CMD_SET_NETWORK_LOGGING);
+        mWriter.printf("\t%s [NAME] - set the organization name; use it without a name to reset\n",
+                CMD_SET_ORGANIZATION_NAME);
+        mWriter.printf("\t%s - get the organization name\n", CMD_GET_ORGANIZATION_NAME);
     }
 
     private void createUser() {
@@ -314,6 +325,24 @@ final class ShellCommand {
         mDevicePolicyManagerGateway.setNetworkLogging(enabled,
                 (v) -> onSuccess("Network logging set to %b", enabled),
                 (e) -> onError(e, "Error setting network logging to %b", enabled));
+    }
+
+    private void setOrganizationName() {
+        String title = mArgs.length > 1 ? mArgs[1] : null;
+        Log.i(TAG, "setOrganizationName(" + title + ")");
+
+        mDevicePolicyManagerGateway.setOrganizationName(title,
+                (v) -> onSuccess("Organization name set to %s", title),
+                (e) -> onError(e, "Error setting Organization name to %s", title));
+    }
+
+    private void getOrganizationName() {
+        CharSequence title = mDevicePolicyManagerGateway.getOrganizationName();
+        if (title == null) {
+            mWriter.println("Not set");
+            return;
+        }
+        mWriter.println(title);
     }
 
     private void execute(@NonNull Runnable r) {

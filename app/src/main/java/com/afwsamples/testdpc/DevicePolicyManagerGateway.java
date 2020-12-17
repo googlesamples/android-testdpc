@@ -142,6 +142,16 @@ public interface DevicePolicyManagerGateway {
     void setNetworkLogging(boolean enabled);
 
     /**
+     * See {@link android.app.admin.DevicePolicyManager#setOrganizationName(android.content.ComponentName, name)}.
+     */
+    void setOrganizationName(@Nullable CharSequence title, @NonNull Consumer<Void> onSuccess, @NonNull Consumer<Exception> onError);
+
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#getOrganizationName(android.content.ComponentName)}.
+     */
+    @Nullable CharSequence getOrganizationName();
+
+    /**
      * Used on error callbacks to indicate a {@link android.app.admin.DevicePolicyManager} method
      * call failed.
      */

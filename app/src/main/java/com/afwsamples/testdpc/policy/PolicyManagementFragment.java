@@ -1530,7 +1530,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 reloadSetAutoTimeZoneUi();
                 return true;
             case SET_DEVICE_ORGANIZATION_NAME_KEY:
-                mDevicePolicyManager.setOrganizationName(mAdminComponentName, (String) newValue);
+                mDevicePolicyManagerGateway.setOrganizationName((String) newValue,
+                        (v) -> onSuccessLog("setOrganizationName"),
+                        (e) -> onErrorLog("setOrganizationName", e));
                 mSetDeviceOrganizationNamePreference.setSummary((String) newValue);
                 return true;
             case ENABLE_LOGOUT_KEY:
