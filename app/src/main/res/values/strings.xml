@@ -1173,4 +1173,8 @@
         This screen will be shown if the user sets device up with a managed account, and we believe that the user may want to set up a managed profile rather than a managed device.[CHAR LIMIT=100] -->
     <string name="selection_divider_text">or</string>
 
+    <string name="set_organization_id">Set Organization Identifier</string>
+    <string name="organization_id_empty">Organization Identifier must not be empty.</string>
+    <string name="enrollment_specific_id">Enrollment-specific ID</string>
+
 </resources>

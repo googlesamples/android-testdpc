@@ -148,7 +148,6 @@ import com.afwsamples.testdpc.util.MainThreadExecutor;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -419,6 +418,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String SUSPEND_PERSONAL_APPS_KEY = "suspend_personal_apps";
     private static final String PROFILE_MAX_TIME_OFF_KEY = "profile_max_time_off";
     private static final String COMMON_CRITERIA_MODE_KEY = "common_criteria_mode";
+    private static final String SET_ORGANIZATION_ID_KEY = "set_organization_id";
+    private static final String ENROLLMENT_SPECIFIC_ID_KEY = "enrollment_specific_id";
 
     private static final String BATTERY_PLUGGED_ANY = Integer.toString(
             BatteryManager.BATTERY_PLUGGED_AC |
@@ -746,6 +747,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(CROSS_PROFILE_CALENDAR_KEY).setOnPreferenceClickListener(this);
         findPreference(FACTORY_RESET_ORG_OWNED_DEVICE).setOnPreferenceClickListener(this);
         findPreference(SET_FACTORY_RESET_PROTECTION_POLICY_KEY).setOnPreferenceClickListener(this);
+        findPreference(SET_ORGANIZATION_ID_KEY).setOnPreferenceClickListener(this);
 
         DpcPreference bindDeviceAdminPreference =
                 (DpcPreference) findPreference(BIND_DEVICE_ADMIN_POLICIES);
@@ -791,6 +793,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         loadAppFeedbackNotifications();
         loadAppStatus();
         loadSecurityPatch();
+        loadEnrollmentSpecificId();
         loadIsEphemeralUserUi();
         reloadCameraDisableUi();
         reloadScreenCaptureDisableUi();
@@ -1322,6 +1325,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 return true;
             case SET_FACTORY_RESET_PROTECTION_POLICY_KEY:
                 showFragment(new FactoryResetProtectionPolicyFragment());
+                return true;
+            case SET_ORGANIZATION_ID_KEY:
+                showSetOrganizationIdDialog();
                 return true;
         }
         return false;
@@ -2397,6 +2403,21 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         }
         String display = DateFormat.getDateInstance(DateFormat.MEDIUM).format(date);
         securityPatchPreference.setSummary(display);
+    }
+
+    @TargetApi(VERSION_CODES.S)
+    private void loadEnrollmentSpecificId() {
+        Preference enrollmentSpecificIdPreference = findPreference(ENROLLMENT_SPECIFIC_ID_KEY);
+        String esid = "";
+        try {
+            //TODO: Call directly when the S SDK is available.
+            esid = (String) ReflectionUtil.invoke(mDevicePolicyManager, "getEnrollmentSpecificId");
+        } catch (ReflectionIsTemporaryException e) {
+            Log.e(TAG, "Error invoking getEnterpriseSpecificId", e);
+            esid = "Error";
+        }
+
+        enrollmentSpecificIdPreference.setSummary(esid);
     }
 
     @TargetApi(VERSION_CODES.P)
@@ -4054,6 +4075,48 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 })
                 .setNegativeButton(android.R.string.cancel, null)
                 .show();
+    }
+
+    /**
+     * Shows a dialog that asks the user to set an organization ID
+     */
+    @TargetApi(VERSION_CODES.S)
+    private void showSetOrganizationIdDialog() {
+        if (getActivity() == null || getActivity().isFinishing()) {
+            return;
+        }
+
+        final View dialogView = getActivity().getLayoutInflater().inflate(
+                R.layout.simple_edittext, null);
+        final EditText organizationIdTextEdit = (EditText) dialogView.findViewById(
+                R.id.input);
+        organizationIdTextEdit.setText("");
+
+        new AlertDialog.Builder(getActivity())
+                .setTitle(R.string.set_organization_id)
+                .setView(dialogView)
+                .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
+                    final String organizationId = organizationIdTextEdit.getText().toString();
+                    if (organizationId.isEmpty()) {
+                        showToast(R.string.organization_id_empty);
+                        return;
+                    }
+                    setOrganizationId(organizationId);
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    private void setOrganizationId(String organizationId) {
+        try {
+            //TODO: Call directly when the S SDK is available.
+            ReflectionUtil.invoke(mDevicePolicyManager, "setOrganizationId", organizationId);
+        } catch (ReflectionIsTemporaryException e) {
+            Log.e(TAG, "Error invoking setOrganizationId", e);
+            showToast("Error setting organization ID");
+        }
+
+        loadEnrollmentSpecificId();
     }
 
     private void chooseAccount() {

@@ -28,6 +28,12 @@
         android:title="@string/security_patch"
         testdpc:admin="any"
         testdpc:minSdkVersion="M" />
+    <com.afwsamples.testdpc.common.preference.DpcPreference
+        android:key="enrollment_specific_id"
+        android:selectable="false"
+        android:title="@string/enrollment_specific_id"
+        testdpc:admin="any"
+        testdpc:minSdkVersion="S" />
 
     <PreferenceCategory android:title="@string/accessibility_title">
         <com.afwsamples.testdpc.common.preference.DpcPreference
@@ -66,6 +72,10 @@
             android:key="set_profile_name"
             android:title="@string/set_profile_name"
             testdpc:minSdkVersion="L" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="set_organization_id"
+            android:title="@string/set_organization_id"
+            testdpc:minSdkVersion="S" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/override_apn_title">
