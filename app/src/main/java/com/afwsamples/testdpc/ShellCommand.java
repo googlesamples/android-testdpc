@@ -16,12 +16,16 @@
 package com.afwsamples.testdpc;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Environment;
 import android.os.UserHandle;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.io.File;
 import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.Collection;
@@ -40,6 +44,7 @@ final class ShellCommand {
     private static final String TAG = "TestDPCShellCommand";
 
     private static final String CMD_CREATE_USER = "create-user";
+    private static final String CMD_SET_USER_ICON = "set-user-icon";
     private static final String CMD_REMOVE_USER = "remove-user";
     private static final String CMD_SWITCH_USER = "switch-user";
     private static final String CMD_START_USER_BG = "start-user-in-background";
@@ -59,12 +64,14 @@ final class ShellCommand {
     private static final String CMD_GET_ORGANIZATION_NAME = "get-organization-name";
     private static final String ARG_FLAGS = "--flags";
 
+    private final Context mContext;
     private final PrintWriter mWriter;
     private final String[] mArgs;
     private final DevicePolicyManagerGateway mDevicePolicyManagerGateway;
 
     public ShellCommand(@NonNull Context context, @NonNull PrintWriter writer,
             @Nullable String[] args) {
+        mContext = context;
         mWriter = writer;
         mArgs = args;
         mDevicePolicyManagerGateway = new DevicePolicyManagerGatewayImpl(context);
@@ -84,6 +91,9 @@ final class ShellCommand {
                 break;
             case CMD_CREATE_USER:
                 execute(() -> createUser());
+                break;
+            case CMD_SET_USER_ICON:
+                execute(() -> setUserIcon());
                 break;
             case CMD_REMOVE_USER:
                 execute(() -> removeUser());
@@ -144,6 +154,17 @@ final class ShellCommand {
         mWriter.printf("\t%s - show this help\n", CMD_HELP);
         mWriter.printf("\t%s [%s FLAGS] [NAME] - create a user with the optional flags and name\n",
                 CMD_CREATE_USER, ARG_FLAGS);
+        File setIconRootDir = UserIconContentProvider.getStorageDirectory(mContext);
+        mWriter.printf("\t%s <FILE> - sets the user icon using the bitmap located at the given "
+                + "file,\n"
+                + "\t\twhich must be located in the user's `%s` directory.\n"
+                + "\t\tFor user 0, you can use `adb push` to push a local file to that directory\n"
+                + "\t\t(%s),\n"
+                + "\t\tbut for other users you need to switch to that user and use its content "
+                + "provider \n"
+                + "\t\t(for example, `adb shell content write --user 10 --uri \n"
+                + "\t\tcontent://%s/icon.png < /tmp/icon.png`)\n", CMD_SET_USER_ICON,
+                setIconRootDir.getName(), setIconRootDir, UserIconContentProvider.AUTHORITY);
         mWriter.printf("\t%s <USER_SERIAL_NUMBER> - remove the given user\n", CMD_REMOVE_USER);
         mWriter.printf("\t%s <USER_SERIAL_NUMBER> - switch the given user to foreground\n",
                 CMD_SWITCH_USER);
@@ -199,6 +220,31 @@ final class ShellCommand {
         mDevicePolicyManagerGateway.createAndManageUser(name, flags,
                 (u) -> onSuccess("User created: %s", u),
                 (e) -> onError(e, "Error creating user %s", name));
+    }
+
+    private void setUserIcon() {
+        if (!hasExactlyNumberOfArguments(2)) return;
+
+        String name = mArgs[1];
+        Log.i(TAG, "setUserIcon(): name=" + name);
+
+        File file = UserIconContentProvider.getFile(mContext, name);
+
+        if (!file.isFile()) {
+            mWriter.printf("Could not open file %s\n", name);
+            return;
+        }
+
+        String absolutePath = file.getAbsolutePath();
+        Log.i(TAG, "setUserIcon(): path=" + absolutePath);
+        Bitmap icon = BitmapFactory.decodeFile(absolutePath, /* bmOptions= */ null);
+        if (icon == null) {
+            mWriter.printf("Could not create bitmap from file %s\n", absolutePath);
+            return;
+        }
+        mDevicePolicyManagerGateway.setUserIcon(icon,
+                (v) -> onSuccess("User icon created from file %s", absolutePath),
+                (e) -> onError(e, "Error creating user icon from file %s", absolutePath));
     }
 
     private void removeUser() {
@@ -392,5 +438,13 @@ final class ShellCommand {
     @Nullable
     private Integer getIntArg(int index) {
         return mArgs.length <= index ? null : Integer.parseInt(mArgs[index]);
+    }
+
+    private boolean hasExactlyNumberOfArguments(int number) {
+        if (mArgs.length != number) {
+            mWriter.printf("Must have exactly %d arguments: %s\n", number, Arrays.toString(mArgs));
+            return false;
+        }
+        return true;
     }
 }

@@ -184,6 +184,13 @@
                     android:resource="@xml/filepaths" />
         </provider>
 
+        <provider
+                android:authorities="com.afwsamples.testdpc.usericoncontentprovider"
+                android:name="com.afwsamples.testdpc.UserIconContentProvider"
+                android:grantUriPermissions="true"
+                android:exported="true">
+        </provider>
+
         <service android:name=".profilepolicy.apprestrictions.AppRestrictionsProxy">
             <intent-filter>
                 <action android:name="com.android.vending.dpc.APPLICATION_RESTRICTIONS_PROXY" />

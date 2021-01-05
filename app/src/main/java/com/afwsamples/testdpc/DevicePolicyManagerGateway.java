@@ -15,6 +15,7 @@
  */
 package com.afwsamples.testdpc;
 
+import android.graphics.Bitmap;
 import android.os.UserHandle;
 import android.os.UserManager;
 import androidx.annotation.NonNull;
@@ -36,6 +37,11 @@ public interface DevicePolicyManagerGateway {
      */
     void createAndManageUser(@Nullable String name, int flags,
             @NonNull Consumer<UserHandle> onSuccess, @NonNull Consumer<Exception> onError);
+
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#setUserIcon(android.content.ComponentName, android.graphics.Bitmap)}.
+     */
+    void setUserIcon(@NonNull Bitmap icon, @NonNull Consumer<Void> onSuccess, @NonNull Consumer<Exception> onError);
 
     /** @see {@link android.os.UserManager#getUserForSerialNumber(long)}.*/
     @Nullable

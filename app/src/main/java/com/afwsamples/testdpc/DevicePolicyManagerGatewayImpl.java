@@ -19,6 +19,7 @@ package com.afwsamples.testdpc;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.UserHandle;
 import android.os.UserManager;
@@ -77,6 +78,17 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
                         new InvalidResultException("null",
                                 "createAndManageUser(%s, %d)", name, flags));
             }
+        } catch (Exception e) {
+            onError.accept(e);
+        }
+    }
+
+    @Override
+    public void setUserIcon(Bitmap icon, Consumer<Void> onSuccess, Consumer<Exception> onError) {
+        Log.d(TAG, "setUserIcon(" + icon + ")");
+        try {
+            mDevicePolicyManager.setUserIcon(mAdminComponentName, icon);
+            onSuccess.accept(null);
         } catch (Exception e) {
             onError.accept(e);
         }
