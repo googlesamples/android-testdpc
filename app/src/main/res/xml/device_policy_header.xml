@@ -419,6 +419,11 @@
             android:title="@string/request_to_set_profile_parent_new_password"
             testdpc:minSdkVersion="N"
             testdpc:user="managedProfile" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="set_profile_parent_new_password_device_requirement"
+            android:title="@string/request_to_set_profile_parent_new_password_device_requirement"
+            testdpc:minSdkVersion="S"
+            testdpc:user="managedProfile" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/lock_task_title">

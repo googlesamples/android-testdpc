@@ -963,7 +963,7 @@
     <string name="password_failed_no_limit_set">No limit set on failed password attempts.</string>
 
     <string name="password_compliant_title">Active password compliant</string>
-    <string name="password_compliant_profile_summary">Personal: %1$s, Work: %2$s</string>
+    <string name="password_compliant_profile_summary">Personal: %1$s (device req: %2$s), Work: %3$s</string>
     <string name="password_compliant_summary">Compliant %1$s</string>
 
     <!-- Strings for password complexity -->
@@ -1057,6 +1057,7 @@
     <string name="set_required_password_complexity">Set required password complexity</string>
     <string name="set_required_password_complexity_on_parent">Set required password complexity on parent</string>
     <string name="request_to_set_profile_parent_new_password">Request user to set profile parent new password</string>
+    <string name="request_to_set_profile_parent_new_password_device_requirement">Request user to set profile parent new password (device requirement only)</string>
 
     <!-- Device owner to profile owner communication (COMP and DO<->PO of secondary users) -->
     <string name="bind_device_admin_category_title">Bind to profile owner</string>
