@@ -27,9 +27,11 @@ import androidx.annotation.Nullable;
 
 import java.io.File;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -39,8 +41,6 @@ import java.util.Set;
  *
  */
 final class ShellCommand {
-    // TODO(b/171350084): add unit tests
-
     private static final String TAG = "TestDPCShellCommand";
 
     private static final String CMD_CREATE_USER = "create-user";
@@ -62,6 +62,11 @@ final class ShellCommand {
     private static final String CMD_SET_NETWORK_LOGGING = "set-network-logging";
     private static final String CMD_SET_ORGANIZATION_NAME = "set-organization-name";
     private static final String CMD_GET_ORGANIZATION_NAME = "get-organization-name";
+    private static final String CMD_SET_USER_CONTROL_DISABLED_PACKAGES =
+            "set-user-control-disabled-packages";
+    private static final String CMD_GET_USER_CONTROL_DISABLED_PACKAGES =
+            "get-user-control-disabled-packages";
+
     private static final String ARG_FLAGS = "--flags";
 
     private final Context mContext;
@@ -143,6 +148,12 @@ final class ShellCommand {
             case CMD_GET_ORGANIZATION_NAME:
                 execute(() -> getOrganizationName());
                 break;
+            case CMD_SET_USER_CONTROL_DISABLED_PACKAGES:
+                execute(() -> setUserControlDisabledPackages());
+                break;
+            case CMD_GET_USER_CONTROL_DISABLED_PACKAGES:
+                execute(() -> getUserControlDisabledPackages());
+                break;
             default:
                 mWriter.printf("Invalid command: %s\n\n", cmd);
                 showUsage();
@@ -188,6 +199,11 @@ final class ShellCommand {
         mWriter.printf("\t%s [NAME] - set the organization name; use it without a name to reset\n",
                 CMD_SET_ORGANIZATION_NAME);
         mWriter.printf("\t%s - get the organization name\n", CMD_GET_ORGANIZATION_NAME);
+        mWriter.printf("\t%s [PKG1] [PKG2] [PKGN] - sets the packages that the user cannot force "
+                + "stop or clear data. Use no args to reset it.\n",
+                CMD_SET_USER_CONTROL_DISABLED_PACKAGES);
+        mWriter.printf("\t%s - gets the packages that the user cannot force stop or "
+                + "clear data\n", CMD_GET_USER_CONTROL_DISABLED_PACKAGES);
     }
 
     private void createUser() {
@@ -293,7 +309,7 @@ final class ShellCommand {
     }
 
     private void setAffiliationIds() {
-        Set<String> ids = new LinkedHashSet<String>(mArgs.length - 1);
+        Set<String> ids = new LinkedHashSet<>(mArgs.length - 1);
         for (int i = 1; i < mArgs.length; i++) {
             ids.add(mArgs[i]);
         }
@@ -389,6 +405,23 @@ final class ShellCommand {
             return;
         }
         mWriter.println(title);
+    }
+
+    private void setUserControlDisabledPackages() {
+        List<String> pkgs = new ArrayList<>(mArgs.length - 1);
+        for (int i = 1; i < mArgs.length; i++) {
+            pkgs.add(mArgs[i]);
+        }
+        Log.i(TAG, "setUserControlDisabledPackages(" + pkgs + ")");
+
+        mDevicePolicyManagerGateway.setUserControlDisabledPackages(pkgs,
+                (v) -> onSuccess("User-control disabled packages set to %s", pkgs),
+                (e) -> onError(e, "Error setting User-control disabled packages to %s", pkgs));
+    }
+
+    private void getUserControlDisabledPackages() {
+        List<String> pkgs = mDevicePolicyManagerGateway.getUserControlDisabledPackages();
+        pkgs.forEach((p) -> mWriter.println(p));
     }
 
     private void execute(@NonNull Runnable r) {
