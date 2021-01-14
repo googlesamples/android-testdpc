@@ -239,6 +239,19 @@ public interface DevicePolicyManagerGateway {
             @NonNull Consumer<Void> onSuccess, @NonNull Consumer<Exception> onError);
 
     /**
+     * See android.app.admin.DevicePolicyManager#setUsbDataSignalingEnabled(
+     * android.content.ComponentName, boolean)
+     */
+    void setUsbDataSignalingEnabled(boolean enabled, @NonNull Consumer<Void> onSuccess,
+        @NonNull Consumer<Exception> onError);
+
+    /**
+     * Same as {@link #setUsbDataSignalingEnabled(boolean, Consumer, Consumer)}, but ignoring
+     * callbacks.
+     */
+    void setUsbDataSignalingEnabled(boolean enabled);
+
+    /**
      * Used on error callbacks to indicate a {@link android.app.admin.DevicePolicyManager} method
      * call failed.
      */

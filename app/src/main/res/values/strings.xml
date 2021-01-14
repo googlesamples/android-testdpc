@@ -635,6 +635,8 @@
 
     <string name="common_criteria_mode">Enable Common Criteria mode</string>
 
+    <string name="enable_usb_data_signaling">Enable USB data signaling</string>
+
     <!-- Suspension of personal apps -->
     <string name="suspend_personal_apps">Suspend personal apps</string>
 

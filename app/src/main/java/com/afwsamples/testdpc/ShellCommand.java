@@ -78,7 +78,8 @@ final class ShellCommand {
     // Commands for APIs added on Android S
     private static final String CMD_SET_PERMITTED_INPUT_METHODS_PARENT =
         "set-permitted-input-methods-parent";
-
+    private static final String CMD_SET_USB_DATA_SIGNALING_ENABLED =
+        "set-usb-data-signaling-enabled";
     private static final String ARG_FLAGS = "--flags";
 
     private final Context mContext;
@@ -186,6 +187,8 @@ final class ShellCommand {
                 break;
             case CMD_GET_PASSWORD_QUALITY:
                 execute(() -> getPasswordQuality());
+            case CMD_SET_USB_DATA_SIGNALING_ENABLED:
+                execute(() -> setUsbDataSignalingEnabled());
                 break;
             case CMD_TRANSFER_OWNERSHIP:
                 execute(() -> transferOwnership());
@@ -254,6 +257,8 @@ final class ShellCommand {
         mWriter.printf("\t%s - get password quality\n", CMD_GET_PASSWORD_QUALITY);
         mWriter.printf("\t%s [ADMIN]- transfer ownership to the given admin\n",
                 CMD_TRANSFER_OWNERSHIP);
+        mWriter.printf("\t%s <true|false> - enable / disable USB data signaling\n",
+            CMD_SET_USB_DATA_SIGNALING_ENABLED);
     }
 
     private void createUser() {
@@ -525,8 +530,17 @@ final class ShellCommand {
         Log.i(TAG, "transferOwnership(" + target + ")");
 
         mDevicePolicyManagerGateway.transferOwnership(target, /* bundle= */ null,
-                (v) -> onSuccess("Ownership transferred to %s", flatTarget),
-                (e) -> onError(e, "Error transferring ownership to %s", flatTarget));
+            (v) -> onSuccess("Ownership transferred to %s", flatTarget),
+            (e) -> onError(e, "Error transferring ownership to %s", flatTarget));
+    }
+
+    private void setUsbDataSignalingEnabled() {
+        boolean enabled = Boolean.parseBoolean(mArgs[1]);
+        Log.i(TAG, "setUsbDataSignalingEnabled(" + enabled + ")");
+
+        mDevicePolicyManagerGateway.setUsbDataSignalingEnabled(enabled,
+            (v) -> onSuccess("USB data signaling set to %b", enabled),
+            (e) -> onError(e, "Error setting USB data signaling to %b", enabled));
     }
 
     private void execute(@NonNull Runnable r) {
