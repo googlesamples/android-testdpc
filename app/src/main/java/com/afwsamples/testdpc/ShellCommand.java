@@ -15,6 +15,7 @@
  */
 package com.afwsamples.testdpc;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -67,8 +68,13 @@ final class ShellCommand {
             "set-user-control-disabled-packages";
     private static final String CMD_GET_USER_CONTROL_DISABLED_PACKAGES =
             "get-user-control-disabled-packages";
+    private static final String CMD_REMOVE_ACTIVE_ADMIN = "remove-active-admin";
+    private static final String CMD_CLEAR_DEVICE_OWNER = "clear-device-owner";
+
+    // Commands for APIs added on Android S
     private static final String CMD_SET_PERMITTED_INPUT_METHODS_PARENT =
         "set-permitted-input-methods-parent";
+
     private static final String ARG_FLAGS = "--flags";
 
     private final Context mContext;
@@ -156,6 +162,12 @@ final class ShellCommand {
             case CMD_GET_USER_CONTROL_DISABLED_PACKAGES:
                 execute(() -> getUserControlDisabledPackages());
                 break;
+            case CMD_REMOVE_ACTIVE_ADMIN:
+                execute(() -> removeActiveAdmin());
+                break;
+            case CMD_CLEAR_DEVICE_OWNER:
+                execute(() -> clearDeviceOwner());
+                break;
             case CMD_SET_PERMITTED_INPUT_METHODS_PARENT:
                 execute(() -> setPermittedInputMethodsOnParent());
                 break;
@@ -204,11 +216,13 @@ final class ShellCommand {
         mWriter.printf("\t%s [NAME] - set the organization name; use it without a name to reset\n",
                 CMD_SET_ORGANIZATION_NAME);
         mWriter.printf("\t%s - get the organization name\n", CMD_GET_ORGANIZATION_NAME);
-        mWriter.printf("\t%s [PKG1] [PKG2] [PKGN] - sets the packages that the user cannot force "
-                + "stop or clear data. Use no args to reset it.\n",
+        mWriter.printf("\t%s [PKG1] [PKG2] [PKGN] - sets the packages that the user cannot force\n"
+                + "\tstop or clear data. Use no args to reset it.\n",
                 CMD_SET_USER_CONTROL_DISABLED_PACKAGES);
         mWriter.printf("\t%s - gets the packages that the user cannot force stop or "
                 + "clear data\n", CMD_GET_USER_CONTROL_DISABLED_PACKAGES);
+        mWriter.printf("\t%s - remove itself as an admin\n", CMD_REMOVE_ACTIVE_ADMIN);
+        mWriter.printf("\t%s - clear itself as device owner \n", CMD_CLEAR_DEVICE_OWNER);
     }
 
     private void createUser() {
@@ -427,6 +441,24 @@ final class ShellCommand {
     private void getUserControlDisabledPackages() {
         List<String> pkgs = mDevicePolicyManagerGateway.getUserControlDisabledPackages();
         pkgs.forEach((p) -> mWriter.println(p));
+    }
+
+    private void removeActiveAdmin() {
+        Log.i(TAG, "removeActiveAdmin()");
+
+        ComponentName admin = mDevicePolicyManagerGateway.getAdmin();
+        mDevicePolicyManagerGateway.removeActiveAdmin(
+                (v) -> onSuccess("Removed %s as an active admin", admin),
+                (e) -> onError(e, "Error removing %s as admin", admin));
+    }
+
+    private void clearDeviceOwner() {
+        Log.i(TAG, "clearDeviceOwner()");
+
+        String pkg = mDevicePolicyManagerGateway.getAdmin().getPackageName();
+        mDevicePolicyManagerGateway.clearDeviceOwnerApp(
+                (v) -> onSuccess("Removed %s as device owner", pkg),
+                (e) -> onError(e, "Error removing %s as device owner", pkg));
     }
 
     private void setPermittedInputMethodsOnParent() {
