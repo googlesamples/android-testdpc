@@ -15,6 +15,7 @@
  */
 package com.afwsamples.testdpc;
 
+import android.content.ComponentName;
 import android.graphics.Bitmap;
 import android.os.UserHandle;
 import android.os.UserManager;
@@ -32,6 +33,12 @@ import java.util.function.Consumer;
  * one called when it throws an exception.
  */
 public interface DevicePolicyManagerGateway {
+
+    /**
+     * Gets the admin component associated with the {@link android.app.admin.DevicePolicyManager}.
+     */
+    @NonNull
+    ComponentName getAdmin();
 
     /**
      * See {@link android.app.admin.DevicePolicyManager#createAndManageUser(android.content.ComponentName, String, android.content.ComponentName, android.os.PersistableBundle, int)}.
@@ -167,6 +174,16 @@ public interface DevicePolicyManagerGateway {
      * See {@link android.app.admin.DevicePolicyManager#getUserControlDisabledPackages(android.content.ComponentName)}.
      */
     @NonNull List<String> getUserControlDisabledPackages();
+
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#removeActiveAdmin(android.content.ComponentName)}.
+     */
+    void removeActiveAdmin(@NonNull Consumer<Void> onSuccess, @NonNull Consumer<Exception> onError);
+
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#clearDeviceOwnerApp(android.content.ComponentName)}.
+     */
+    void clearDeviceOwnerApp(@NonNull Consumer<Void> onSuccess, @NonNull Consumer<Exception> onError);
 
     /**
      * Used on error callbacks to indicate a {@link android.app.admin.DevicePolicyManager} method
