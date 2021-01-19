@@ -28,6 +28,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -330,6 +331,24 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
     @Override
     public CharSequence getOrganizationName() {
         return mDevicePolicyManager.getOrganizationName(mAdminComponentName);
+    }
+
+    @Override
+    public void setUserControlDisabledPackages(List<String> packages, Consumer<Void> onSuccess,
+            Consumer<Exception> onError) {
+        Log.d(TAG, "setUserControlDisabledPackages(" + packages + ")");
+
+        try {
+            mDevicePolicyManager.setUserControlDisabledPackages(mAdminComponentName, packages);
+            onSuccess.accept(null);
+        } catch (Exception e) {
+            onError.accept(e);
+        }
+    }
+
+    @Override
+    public List<String> getUserControlDisabledPackages() {
+        return mDevicePolicyManager.getUserControlDisabledPackages(mAdminComponentName);
     }
 
     @Override

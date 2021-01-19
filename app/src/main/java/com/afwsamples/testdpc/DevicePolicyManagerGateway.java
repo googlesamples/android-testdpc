@@ -21,6 +21,7 @@ import android.os.UserManager;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -148,7 +149,7 @@ public interface DevicePolicyManagerGateway {
     void setNetworkLogging(boolean enabled);
 
     /**
-     * See {@link android.app.admin.DevicePolicyManager#setOrganizationName(android.content.ComponentName, name)}.
+     * See {@link android.app.admin.DevicePolicyManager#setOrganizationName(android.content.ComponentName, String)}.
      */
     void setOrganizationName(@Nullable CharSequence title, @NonNull Consumer<Void> onSuccess, @NonNull Consumer<Exception> onError);
 
@@ -156,6 +157,16 @@ public interface DevicePolicyManagerGateway {
      * See {@link android.app.admin.DevicePolicyManager#getOrganizationName(android.content.ComponentName)}.
      */
     @Nullable CharSequence getOrganizationName();
+
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#setUserControlDisabledPackages(android.content.ComponentName, List<String>)}.
+     */
+    void setUserControlDisabledPackages(@Nullable List<String> packages, @NonNull Consumer<Void> onSuccess, @NonNull Consumer<Exception> onError);
+
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#getUserControlDisabledPackages(android.content.ComponentName)}.
+     */
+    @NonNull List<String> getUserControlDisabledPackages();
 
     /**
      * Used on error callbacks to indicate a {@link android.app.admin.DevicePolicyManager} method
