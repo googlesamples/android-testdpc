@@ -399,6 +399,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String SET_REQUIRED_PASSWORD_COMPLEXITY_ON_PARENT =
             "set_required_password_complexity_on_parent";
     private static final String SET_PROFILE_PARENT_NEW_PASSWORD = "set_profile_parent_new_password";
+    private static final String SET_PROFILE_PARENT_NEW_PASSWORD_DEVICE_REQUIREMENT =
+        "set_profile_parent_new_password_device_requirement";
     private static final String BIND_DEVICE_ADMIN_POLICIES = "bind_device_admin_policies";
     private static final String CROSS_PROFILE_APPS = "cross_profile_apps";
     private static final String CROSS_PROFILE_APPS_WHITELIST = "cross_profile_apps_whitelist";
@@ -732,6 +734,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(SET_LONG_SUPPORT_MESSAGE_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_NEW_PASSWORD).setOnPreferenceClickListener(this);
         findPreference(SET_PROFILE_PARENT_NEW_PASSWORD).setOnPreferenceClickListener(this);
+        findPreference(SET_PROFILE_PARENT_NEW_PASSWORD_DEVICE_REQUIREMENT)
+            .setOnPreferenceClickListener(this);
         findPreference(CROSS_PROFILE_APPS).setOnPreferenceClickListener(this);
         findPreference(CROSS_PROFILE_APPS_WHITELIST).setOnPreferenceClickListener(this);
 
@@ -1291,6 +1295,10 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             case SET_PROFILE_PARENT_NEW_PASSWORD:
                 startActivity(
                         new Intent(DevicePolicyManager.ACTION_SET_NEW_PARENT_PROFILE_PASSWORD));
+                return true;
+            case SET_PROFILE_PARENT_NEW_PASSWORD_DEVICE_REQUIREMENT:
+                startActivity(new Intent(DevicePolicyManager.ACTION_SET_NEW_PARENT_PROFILE_PASSWORD)
+                    .putExtra("android.app.extra.DEVICE_PASSWORD_REQUIREMENT_ONLY", true));
                 return true;
             case BIND_DEVICE_ADMIN_POLICIES:
                 showFragment(new BindDeviceAdminFragment());
@@ -2552,8 +2560,14 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             DevicePolicyManager parentDpm
                     = mDevicePolicyManager.getParentProfileInstance(mAdminComponentName);
             boolean parentCompliant = parentDpm.isActivePasswordSufficient();
+            final String deviceCompliant;
+            if (Util.SDK_INT < VERSION_CODES.S) {
+                deviceCompliant = "N/A";
+            } else {
+                deviceCompliant = Boolean.toString(parentDpm.isActivePasswordSufficientForDeviceRequirement());
+            }
             summary = String.format(getString(R.string.password_compliant_profile_summary),
-                    Boolean.toString(parentCompliant), Boolean.toString(compliant));
+                    Boolean.toString(parentCompliant), deviceCompliant, Boolean.toString(compliant));
         } else {
             summary = String.format(getString(R.string.password_compliant_summary),
                     Boolean.toString(compliant));
