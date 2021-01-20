@@ -27,7 +27,6 @@ import androidx.annotation.Nullable;
 
 import java.io.File;
 import java.io.PrintWriter;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -314,10 +313,7 @@ final class ShellCommand {
     }
 
     private void setAffiliationIds() {
-        Set<String> ids = new LinkedHashSet<>(mArgs.length - 1);
-        for (int i = 1; i < mArgs.length; i++) {
-            ids.add(mArgs[i]);
-        }
+        Set<String> ids = getSetFromAllArgs();
         Log.i(TAG, "setAffiliationIds(): ids=" + ids);
         mDevicePolicyManagerGateway.setAffiliationIds(ids);
 
@@ -413,10 +409,7 @@ final class ShellCommand {
     }
 
     private void setUserControlDisabledPackages() {
-        List<String> pkgs = new ArrayList<>(mArgs.length - 1);
-        for (int i = 1; i < mArgs.length; i++) {
-            pkgs.add(mArgs[i]);
-        }
+        List<String> pkgs = getListFromAllArgs();
         Log.i(TAG, "setUserControlDisabledPackages(" + pkgs + ")");
 
         mDevicePolicyManagerGateway.setUserControlDisabledPackages(pkgs,
@@ -430,10 +423,9 @@ final class ShellCommand {
     }
 
     private void setPermittedInputMethodsOnParent() {
-        List<String> inputMethods = new ArrayList<String>(mArgs.length - 1);
-        for (int i = 1; i < mArgs.length; i++) {
-            inputMethods.add(mArgs[i]);
-        }
+        List<String> inputMethods = getListFromAllArgs();
+        Log.i(TAG, "setPermittedInputMethodsOnParent(" + inputMethods + ")");
+
         DevicePolicyManagerGateway parentDpmGateway =
             DevicePolicyManagerGatewayImpl.forParentProfile(mContext);
         parentDpmGateway.setPermittedInputMethods(inputMethods);
@@ -494,5 +486,17 @@ final class ShellCommand {
             return false;
         }
         return true;
+    }
+
+    private List<String> getListFromAllArgs() {
+        List<String> list = new ArrayList<>(mArgs.length - 1);
+        for (int i = 1; i < mArgs.length; i++) {
+            list.add(mArgs[i]);
+        }
+        return list;
+    }
+
+    private Set<String> getSetFromAllArgs() {
+        return new LinkedHashSet<String>(getListFromAllArgs());
     }
 }
