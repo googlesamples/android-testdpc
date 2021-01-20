@@ -270,7 +270,7 @@
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="request_manage_credentials"
             android:title="@string/request_manage_credentials"
-            testdpc:minSdkVersion="R"
+            testdpc:minSdkVersion="S"
             testdpc:admin="any" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="install_key_certificate"
