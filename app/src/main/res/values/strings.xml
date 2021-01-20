@@ -514,6 +514,7 @@
 
     <!-- Strings for certificate management  -->
     <string name="certificate_management_title">Certificate management</string>
+    <string name="request_manage_credentials">Request to manage credentials</string>
     <string name="install_key_certificate">Install a private/public key pair</string>
     <string name="remove_key_certificate">Remove a private/public key pair</string>
     <string name="remove_keypair_successfully">The key pair is removed.</string>
@@ -564,6 +565,7 @@
     <string name="strongbox_features_description">StrongBox-related options</string>
     <string name="use_strongbox_checkbox">Use StrongBox</string>
     <string name="use_individual_attestation_checkbox">Use Individual Attestation Certificate</string>
+    <string name="invalid_app_uri_policy">Invalid policy string: %1$s</string>
 
 
     <!-- Strings for app restrictions -->

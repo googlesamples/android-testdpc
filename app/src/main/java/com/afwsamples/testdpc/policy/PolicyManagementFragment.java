@@ -58,6 +58,7 @@ import android.os.UserManager;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.provider.Settings.Secure;
+import android.security.AppUriAuthenticationPolicy;
 import android.security.KeyChain;
 import android.security.KeyChainAliasCallback;
 import android.service.notification.NotificationListenerService;
@@ -82,7 +83,6 @@ import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
-
 import androidx.annotation.RequiresApi;
 import androidx.annotation.StringRes;
 import androidx.core.content.FileProvider;
@@ -91,17 +91,16 @@ import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceManager;
 import androidx.preference.SwitchPreference;
-
 import com.afwsamples.testdpc.AddAccountActivity;
 import com.afwsamples.testdpc.BuildConfig;
 import com.afwsamples.testdpc.CrossProfileAppsFragment;
 import com.afwsamples.testdpc.CrossProfileAppsWhitelistFragment;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.DevicePolicyManagerGateway;
+import com.afwsamples.testdpc.DevicePolicyManagerGateway.FailedOperationException;
 import com.afwsamples.testdpc.DevicePolicyManagerGatewayImpl;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.SetupManagementActivity;
-import com.afwsamples.testdpc.DevicePolicyManagerGateway.FailedOperationException;
 import com.afwsamples.testdpc.common.AccountArrayAdapter;
 import com.afwsamples.testdpc.common.AppInfoArrayAdapter;
 import com.afwsamples.testdpc.common.BaseSearchablePolicyPreferenceFragment;
@@ -146,7 +145,6 @@ import com.afwsamples.testdpc.profilepolicy.delegation.DelegationFragment;
 import com.afwsamples.testdpc.profilepolicy.permission.ManageAppPermissionsFragment;
 import com.afwsamples.testdpc.transferownership.PickTransferComponentFragment;
 import com.afwsamples.testdpc.util.MainThreadExecutor;
-
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -260,6 +258,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final int CAPTURE_IMAGE_REQUEST_CODE = 7691;
     private static final int CAPTURE_VIDEO_REQUEST_CODE = 7692;
     private static final int INSTALL_APK_PACKAGE_REQUEST_CODE = 7693;
+    private static final int REQUEST_MANAGE_CREDENTIALS_REQUEST_CODE = 7694;
 
     public static final String X509_CERT_TYPE = "X.509";
     public static final String TAG = "PolicyManagement";
@@ -313,6 +312,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String REMOVE_ACCOUNT_KEY = "remove_account";
     private static final String HIDE_APPS_KEY = "hide_apps";
     private static final String HIDE_APPS_PARENT_KEY = "hide_apps_parent";
+    private static final String REQUEST_MANAGE_CREDENTIALS_KEY = "request_manage_credentials";
     private static final String INSTALL_CA_CERTIFICATE_KEY = "install_ca_certificate";
     private static final String INSTALL_KEY_CERTIFICATE_KEY = "install_key_certificate";
     private static final String INSTALL_NONMARKET_APPS_KEY
@@ -524,7 +524,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        if (isDelegatedApp()) {
+        if (isDelegatedApp() || isCredentialManagerApp()) {
             mAdminComponentName = null;
         } else {
             mAdminComponentName = DeviceAdminReceiver.getComponentName(getActivity());
@@ -695,6 +695,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         findPreference(DISABLE_METERED_DATA_KEY).setOnPreferenceClickListener(this);
         findPreference(GENERIC_DELEGATION_KEY).setOnPreferenceClickListener(this);
         findPreference(APP_RESTRICTIONS_MANAGING_PACKAGE_KEY).setOnPreferenceClickListener(this);
+        findPreference(REQUEST_MANAGE_CREDENTIALS_KEY).setOnPreferenceClickListener(this);
         findPreference(INSTALL_KEY_CERTIFICATE_KEY).setOnPreferenceClickListener(this);
         findPreference(GENERATE_KEY_CERTIFICATE_KEY).setOnPreferenceClickListener(this);
         findPreference(REMOVE_KEY_CERTIFICATE_KEY).setOnPreferenceClickListener(this);
@@ -920,6 +921,17 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
         DevicePolicyManager dpm = getActivity().getSystemService(DevicePolicyManager.class);
         return !dpm.getDelegatedScopes(null, getActivity().getPackageName()).isEmpty();
+    }
+
+    private boolean isCredentialManagerApp() {
+        //TODO: replace with more precise API
+        if (Util.SDK_INT < VERSION_CODES.S) {
+            return false;
+        }
+        DevicePolicyManager dpm = getActivity().getSystemService(DevicePolicyManager.class);
+        final String packageName = getActivity().getPackageName();
+        return !dpm.isDeviceOwnerApp(packageName) &&
+            !dpm.isProfileOwnerApp(packageName);
     }
 
     @Override
@@ -1151,6 +1163,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 return true;
             case MANAGE_APP_PERMISSIONS_KEY:
                 showFragment(new ManageAppPermissionsFragment());
+                return true;
+            case REQUEST_MANAGE_CREDENTIALS_KEY:
+                showConfigurePolicyAndManageCredentialsPrompt();
                 return true;
             case INSTALL_KEY_CERTIFICATE_KEY:
                 Util.showFileViewer(this,
@@ -2760,6 +2775,63 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 })
                 .setNegativeButton(android.R.string.cancel, null)
                 .show();
+    }
+
+    private void showConfigurePolicyAndManageCredentialsPrompt() {
+        if (getActivity() == null || getActivity().isFinishing()) {
+            return;
+        }
+        final String appUriPolicyName = "appUriPolicy";
+        final String defaultPolicy =
+                "com.android.chrome#client.badssl.com:443#testAlias\n"
+                + "com.android.chrome#prod.idrix.eu/secure#testAlias\n"
+                + "de.blinkt.openvpn#192.168.0.1#vpnAlias";
+        LinearLayout inputContainer = (LinearLayout) getActivity().getLayoutInflater()
+            .inflate(R.layout.simple_edittext, null);
+        final EditText editText = (EditText) inputContainer.findViewById(R.id.input);
+        editText.setSingleLine(false);
+        editText.setHint(defaultPolicy);
+        editText.setText(PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(
+            appUriPolicyName, defaultPolicy));
+
+        new AlertDialog.Builder(getActivity())
+            .setTitle(getString(R.string.request_manage_credentials))
+            .setView(inputContainer)
+            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    String policy = editText.getText().toString();
+                    if (TextUtils.isEmpty(policy)) policy = defaultPolicy;
+                    try {
+                        requestToManageCredentials(policy);
+                        SharedPreferences.Editor editor =
+                            PreferenceManager.getDefaultSharedPreferences(getActivity()).edit();
+                        editor.putString(appUriPolicyName, policy);
+                        editor.commit();
+                    } finally {
+                        dialog.dismiss();
+                    }
+                }
+            })
+            .setNegativeButton(android.R.string.cancel, null)
+            .show();
+    }
+
+    private void requestToManageCredentials(String policyStr) {
+        AppUriAuthenticationPolicy.Builder builder = new AppUriAuthenticationPolicy.Builder();
+        String[] policies = policyStr.split("\n");
+        for (int i = 0; i < policies.length; i++) {
+            String[] segments = policies[i].split("#");
+            if (segments.length != 3) {
+                showToast(String.format(
+                    getString(R.string.invalid_app_uri_policy), policies[i]));
+                return;
+            }
+            builder.addAppAndUriMapping(segments[0],
+                new Uri.Builder().authority(segments[1]).build(), segments[2]);
+        }
+        startActivityForResult(KeyChain.createManageCredentialsIntent(builder.build()),
+            REQUEST_MANAGE_CREDENTIALS_REQUEST_CODE);
     }
 
     /**
