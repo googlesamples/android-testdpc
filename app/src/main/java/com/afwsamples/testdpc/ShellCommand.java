@@ -320,10 +320,7 @@ final class ShellCommand {
     }
 
     private void setAffiliationIds() {
-        Set<String> ids = new LinkedHashSet<>(mArgs.length - 1);
-        for (int i = 1; i < mArgs.length; i++) {
-            ids.add(mArgs[i]);
-        }
+        Set<String> ids = getSetFromAllArgs();
         Log.i(TAG, "setAffiliationIds(): ids=" + ids);
         mDevicePolicyManagerGateway.setAffiliationIds(ids);
 
@@ -419,10 +416,7 @@ final class ShellCommand {
     }
 
     private void setUserControlDisabledPackages() {
-        List<String> pkgs = new ArrayList<>(mArgs.length - 1);
-        for (int i = 1; i < mArgs.length; i++) {
-            pkgs.add(mArgs[i]);
-        }
+        List<String> pkgs = getListFromAllArgs();
         Log.i(TAG, "setUserControlDisabledPackages(" + pkgs + ")");
 
         mDevicePolicyManagerGateway.setUserControlDisabledPackages(pkgs,
@@ -508,5 +502,17 @@ final class ShellCommand {
             return false;
         }
         return true;
+    }
+
+    private List<String> getListFromAllArgs() {
+        List<String> list = new ArrayList<>(mArgs.length - 1);
+        for (int i = 1; i < mArgs.length; i++) {
+            list.add(mArgs[i]);
+        }
+        return list;
+    }
+
+    private Set<String> getSetFromAllArgs() {
+        return new LinkedHashSet<String>(getListFromAllArgs());
     }
 }
