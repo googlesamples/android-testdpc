@@ -1925,17 +1925,13 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         new AlertDialog.Builder(getActivity())
                 .setTitle(R.string.remove_device_owner_title)
                 .setMessage(R.string.remove_device_owner_confirmation)
-                .setPositiveButton(android.R.string.ok,
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                mDevicePolicyManager.clearDeviceOwnerApp(mPackageName);
-                                if (getActivity() != null && !getActivity().isFinishing()) {
-                                    showToast(R.string.device_owner_removed);
-                                    getActivity().finish();
-                                }
-                            }
-                        })
+                .setPositiveButton(android.R.string.ok, (d, i) ->
+                    mDevicePolicyManagerGateway.clearDeviceOwnerApp((v)-> {
+                        if (getActivity() != null && !getActivity().isFinishing()) {
+                            showToast(R.string.device_owner_removed);
+                            getActivity().finish();
+                        }}, (e) -> onErrorLog("clearDeviceOwnerApp", e))
+                )
                 .setNegativeButton(android.R.string.cancel, null)
                 .show();
     }

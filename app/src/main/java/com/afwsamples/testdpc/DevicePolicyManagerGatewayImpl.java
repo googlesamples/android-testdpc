@@ -62,6 +62,11 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
     }
 
     @Override
+    public ComponentName getAdmin() {
+        return mAdminComponentName;
+    }
+
+    @Override
     public void createAndManageUser(String name, int flags, Consumer<UserHandle> onSuccess,
             Consumer<Exception> onError) {
         Log.d(TAG, "createAndManageUser(" + name + ", " + flags + ")");
@@ -368,6 +373,30 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
             onError.accept(e);
         }
         return result;
+    }
+
+    @Override
+    public void removeActiveAdmin(Consumer<Void> onSuccess, Consumer<Exception> onError) {
+        Log.d(TAG, "removeActiveAdmin()");
+
+        try {
+            mDevicePolicyManager.removeActiveAdmin(mAdminComponentName);
+            onSuccess.accept(null);
+        } catch (Exception e) {
+            onError.accept(e);
+        }
+    }
+
+    @Override
+    public void clearDeviceOwnerApp(Consumer<Void> onSuccess, Consumer<Exception> onError) {
+        Log.d(TAG, "clearDeviceOwnerApp()");
+
+        try {
+            mDevicePolicyManager.clearDeviceOwnerApp(mAdminComponentName.getPackageName());
+            onSuccess.accept(null);
+        } catch (Exception e) {
+            onError.accept(e);
+        }
     }
 
     @Override

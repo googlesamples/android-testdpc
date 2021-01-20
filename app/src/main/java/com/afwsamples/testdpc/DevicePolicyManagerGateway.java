@@ -35,6 +35,12 @@ import java.util.function.Consumer;
 public interface DevicePolicyManagerGateway {
 
     /**
+     * Gets the admin component associated with the {@link android.app.admin.DevicePolicyManager}.
+     */
+    @NonNull
+    ComponentName getAdmin();
+
+    /**
      * See {@link android.app.admin.DevicePolicyManager#createAndManageUser(android.content.ComponentName, String, android.content.ComponentName, android.os.PersistableBundle, int)}.
      */
     void createAndManageUser(@Nullable String name, int flags,
@@ -181,6 +187,16 @@ public interface DevicePolicyManagerGateway {
      * android.content.ComponentName, List)}.
      */
     boolean setPermittedInputMethods(List<String> packageNames);
+
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#removeActiveAdmin(android.content.ComponentName)}.
+     */
+    void removeActiveAdmin(@NonNull Consumer<Void> onSuccess, @NonNull Consumer<Exception> onError);
+
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#clearDeviceOwnerApp(android.content.ComponentName)}.
+     */
+    void clearDeviceOwnerApp(@NonNull Consumer<Void> onSuccess, @NonNull Consumer<Exception> onError);
 
     /**
      * Used on error callbacks to indicate a {@link android.app.admin.DevicePolicyManager} method
