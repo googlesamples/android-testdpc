@@ -69,6 +69,7 @@ final class ShellCommand {
             "get-user-control-disabled-packages";
     private static final String CMD_REMOVE_ACTIVE_ADMIN = "remove-active-admin";
     private static final String CMD_CLEAR_DEVICE_OWNER = "clear-device-owner";
+    private static final String CMD_CLEAR_PROFILE_OWNER = "clear-profile-owner";
 
     // Commands for APIs added on Android S
     private static final String CMD_SET_PERMITTED_INPUT_METHODS_PARENT =
@@ -167,6 +168,9 @@ final class ShellCommand {
             case CMD_CLEAR_DEVICE_OWNER:
                 execute(() -> clearDeviceOwner());
                 break;
+            case CMD_CLEAR_PROFILE_OWNER:
+                execute(() -> clearProfileOwner());
+                break;
             case CMD_SET_PERMITTED_INPUT_METHODS_PARENT:
                 execute(() -> setPermittedInputMethodsOnParent());
                 break;
@@ -215,13 +219,14 @@ final class ShellCommand {
         mWriter.printf("\t%s [NAME] - set the organization name; use it without a name to reset\n",
                 CMD_SET_ORGANIZATION_NAME);
         mWriter.printf("\t%s - get the organization name\n", CMD_GET_ORGANIZATION_NAME);
-        mWriter.printf("\t%s [PKG1] [PKG2] [PKGN] - sets the packages that the user cannot force\n"
-                + "\tstop or clear data. Use no args to reset it.\n",
+        mWriter.printf("\t%s [PKG1] [PKG2] [PKGN] - sets the packages that the user cannot\n"
+                + "\t\tforce stop or clear data. Use no args to reset it.\n",
                 CMD_SET_USER_CONTROL_DISABLED_PACKAGES);
         mWriter.printf("\t%s - gets the packages that the user cannot force stop or "
                 + "clear data\n", CMD_GET_USER_CONTROL_DISABLED_PACKAGES);
         mWriter.printf("\t%s - remove itself as an admin\n", CMD_REMOVE_ACTIVE_ADMIN);
         mWriter.printf("\t%s - clear itself as device owner \n", CMD_CLEAR_DEVICE_OWNER);
+        mWriter.printf("\t%s - clear itself as profile owner \n", CMD_CLEAR_PROFILE_OWNER);
     }
 
     private void createUser() {
@@ -452,6 +457,15 @@ final class ShellCommand {
         mDevicePolicyManagerGateway.clearDeviceOwnerApp(
                 (v) -> onSuccess("Removed %s as device owner", pkg),
                 (e) -> onError(e, "Error removing %s as device owner", pkg));
+    }
+
+    private void clearProfileOwner() {
+        Log.i(TAG, "clearProfileOwner()");
+
+        String pkg = mDevicePolicyManagerGateway.getAdmin().getPackageName();
+        mDevicePolicyManagerGateway.clearProfileOwner(
+                (v) -> onSuccess("Removed %s as profile owner", pkg),
+                (e) -> onError(e, "Error removing %s as profile owner", pkg));
     }
 
     private void setPermittedInputMethodsOnParent() {
