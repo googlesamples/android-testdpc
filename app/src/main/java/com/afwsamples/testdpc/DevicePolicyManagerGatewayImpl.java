@@ -381,6 +381,18 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
     }
 
     @Override
+    public void clearProfileOwner(Consumer<Void> onSuccess, Consumer<Exception> onError) {
+        Log.d(TAG, "clearProfileOwner()");
+
+        try {
+            mDevicePolicyManager.clearProfileOwner(mAdminComponentName);
+            onSuccess.accept(null);
+        } catch (Exception e) {
+            onError.accept(e);
+        }
+    }
+
+    @Override
     public String toString() {
         return "DevicePolicyManagerGatewayImpl[" + mAdminComponentName + "]";
     }

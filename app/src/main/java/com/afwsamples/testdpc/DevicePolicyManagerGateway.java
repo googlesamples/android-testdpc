@@ -186,6 +186,11 @@ public interface DevicePolicyManagerGateway {
     void clearDeviceOwnerApp(@NonNull Consumer<Void> onSuccess, @NonNull Consumer<Exception> onError);
 
     /**
+     * See {@link android.app.admin.DevicePolicyManager#clearProfileOwner(android.content.ComponentName)}.
+     */
+    void clearProfileOwner(@NonNull Consumer<Void> onSuccess, @NonNull Consumer<Exception> onError);
+
+    /**
      * Used on error callbacks to indicate a {@link android.app.admin.DevicePolicyManager} method
      * call failed.
      */
