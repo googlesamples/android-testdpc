@@ -15,6 +15,7 @@
  */
 package com.afwsamples.testdpc;
 
+import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.graphics.Bitmap;
 import android.os.UserHandle;
@@ -39,6 +40,22 @@ public interface DevicePolicyManagerGateway {
      */
     @NonNull
     ComponentName getAdmin();
+
+    /**
+     * Gets the {@link android.app.admin.DevicePolicyManager}.
+     */
+    @NonNull
+    DevicePolicyManager getDevicePolicyManager();
+
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#isDeviceOwnerApp(String)}.
+     */
+    boolean isDeviceOwnerApp();
+
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#isProfileOwnerApp(String)}.
+     */
+    boolean isProfileOwnerApp();
 
     /**
      * See {@link android.app.admin.DevicePolicyManager#createAndManageUser(android.content.ComponentName, String, android.content.ComponentName, android.os.PersistableBundle, int)}.
@@ -189,6 +206,17 @@ public interface DevicePolicyManagerGateway {
      * See {@link android.app.admin.DevicePolicyManager#clearProfileOwner(android.content.ComponentName)}.
      */
     void clearProfileOwner(@NonNull Consumer<Void> onSuccess, @NonNull Consumer<Exception> onError);
+
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#setPasswordQuality(ComponentName, int)
+     */
+    void setPasswordQuality(int quality, @NonNull Consumer<Void> onSuccess,
+            @NonNull Consumer<Exception> onError);
+
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#getPasswordQuality(ComponentName)
+     */
+    int getPasswordQuality();
 
     /**
      * Used on error callbacks to indicate a {@link android.app.admin.DevicePolicyManager} method

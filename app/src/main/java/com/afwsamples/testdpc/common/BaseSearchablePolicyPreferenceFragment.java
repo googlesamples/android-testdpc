@@ -11,6 +11,7 @@ import androidx.preference.PreferenceViewHolder;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -32,10 +33,20 @@ public abstract class BaseSearchablePolicyPreferenceFragment extends PreferenceF
     protected LinearLayoutManager mLayoutManager;
     private HighlightablePreferenceGroupAdapter mAdapter;
     private String mPreferenceKey;
-    private boolean mPreferenceHighlighted = false;
+    private boolean mPreferenceHighlighted;
+    private final String mTag;
+
     public static final String EXTRA_PREFERENCE_KEY = "preference_key";
     private static final String SAVE_HIGHLIGHTED_KEY = "preference_highlighted";
     private static final int DELAY_HIGHLIGHT_DURATION_MILLIS = 500;
+
+    protected BaseSearchablePolicyPreferenceFragment() {
+        mTag = getClass().getSimpleName();
+    }
+
+    protected BaseSearchablePolicyPreferenceFragment(String tag) {
+        mTag = tag;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -206,4 +217,12 @@ public abstract class BaseSearchablePolicyPreferenceFragment extends PreferenceF
      * @return whether the preference fragment is available.
      */
     public abstract boolean isAvailable(Context context);
+
+    protected void onSuccessLog(String method) {
+        Log.d(mTag, method + "() succeeded");
+    }
+
+    protected void onErrorLog(String method, Exception e) {
+        Log.e(mTag, method + "() failed: ", e);
+    }
 }

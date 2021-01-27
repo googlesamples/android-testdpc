@@ -70,6 +70,21 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
     }
 
     @Override
+    public DevicePolicyManager getDevicePolicyManager() {
+        return mDevicePolicyManager;
+    }
+
+    @Override
+    public boolean isProfileOwnerApp() {
+        return mDevicePolicyManager.isProfileOwnerApp(mAdminComponentName.getPackageName());
+    }
+
+    @Override
+    public boolean isDeviceOwnerApp() {
+        return mDevicePolicyManager.isDeviceOwnerApp(mAdminComponentName.getPackageName());
+    }
+
+    @Override
     public void createAndManageUser(String name, int flags, Consumer<UserHandle> onSuccess,
             Consumer<Exception> onError) {
         Log.d(TAG, "createAndManageUser(" + name + ", " + flags + ")");
@@ -390,6 +405,26 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
         } catch (Exception e) {
             onError.accept(e);
         }
+    }
+
+    @Override
+    public void setPasswordQuality(int quality, Consumer<Void> onSuccess,
+            Consumer<Exception> onError) {
+        Log.d(TAG, "setPasswordQuality(" + quality + ")");
+
+        try {
+            mDevicePolicyManager.setPasswordQuality(mAdminComponentName, quality);
+            onSuccess.accept(null);
+        } catch (Exception e) {
+            onError.accept(e);
+        }
+    }
+
+    @Override
+    public int getPasswordQuality() {
+        int quality = mDevicePolicyManager.getPasswordQuality(mAdminComponentName);
+        Log.d(TAG, "getPasswordQuality(): " + quality);
+        return quality;
     }
 
     @Override
