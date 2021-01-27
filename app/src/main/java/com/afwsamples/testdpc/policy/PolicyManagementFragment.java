@@ -1290,6 +1290,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                         SetSupportMessageFragment.TYPE_LONG));
                 return true;
             case SET_NEW_PASSWORD:
+                Log.d(TAG, "starting " + DevicePolicyManager.ACTION_SET_NEW_PASSWORD);
                 startActivity(new Intent(DevicePolicyManager.ACTION_SET_NEW_PASSWORD));
                 return true;
             case SET_PROFILE_PARENT_NEW_PASSWORD:
@@ -4332,14 +4333,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     @RequiresApi(VERSION_CODES.R)
     private void setAutoTimeZoneEnabled(boolean enabled) {
         mDevicePolicyManager.setAutoTimeZoneEnabled(mAdminComponentName, enabled);
-    }
-
-    private void onSuccessLog(String method) {
-        Log.d(TAG, method + "() succeeded");
-    }
-
-    private void onErrorLog(String method, Exception e) {
-        Log.e(TAG, method + "() failed: ", e);
     }
 
     private void onSuccessShowToast(String method, int msgId) {

@@ -44,6 +44,7 @@ import java.util.Set;
 final class ShellCommand {
     private static final String TAG = "TestDPCShellCommand";
 
+    private static final String CMD_DUMP = "dump";
     private static final String CMD_CREATE_USER = "create-user";
     private static final String CMD_SET_USER_ICON = "set-user-icon";
     private static final String CMD_REMOVE_USER = "remove-user";
@@ -70,6 +71,8 @@ final class ShellCommand {
     private static final String CMD_REMOVE_ACTIVE_ADMIN = "remove-active-admin";
     private static final String CMD_CLEAR_DEVICE_OWNER = "clear-device-owner";
     private static final String CMD_CLEAR_PROFILE_OWNER = "clear-profile-owner";
+    private static final String CMD_SET_PASSWORD_QUALITY = "set-password-quality";
+    private static final String CMD_GET_PASSWORD_QUALITY = "get-password-quality";
 
     // Commands for APIs added on Android S
     private static final String CMD_SET_PERMITTED_INPUT_METHODS_PARENT =
@@ -99,6 +102,9 @@ final class ShellCommand {
         }
         String cmd = mArgs[0];
         switch (cmd) {
+            case CMD_DUMP:
+                dumpState();
+                break;
             case CMD_HELP:
                 showUsage();
                 break;
@@ -174,15 +180,27 @@ final class ShellCommand {
             case CMD_SET_PERMITTED_INPUT_METHODS_PARENT:
                 execute(() -> setPermittedInputMethodsOnParent());
                 break;
+            case CMD_SET_PASSWORD_QUALITY:
+                execute(() -> setPasswordQuality());
+                break;
+            case CMD_GET_PASSWORD_QUALITY:
+                execute(() -> getPasswordQuality());
+                break;
             default:
                 mWriter.printf("Invalid command: %s\n\n", cmd);
                 showUsage();
         }
     }
 
+    private void dumpState() {
+        mWriter.printf("isDeviceOwner: %b\n", mDevicePolicyManagerGateway.isDeviceOwnerApp());
+        mWriter.printf("isProfileOwner: %b\n", mDevicePolicyManagerGateway.isProfileOwnerApp());
+    }
+
     private void showUsage() {
         mWriter.printf("Usage:\n\n");
         mWriter.printf("\t%s - show this help\n", CMD_HELP);
+        mWriter.printf("\t%s - dump internal state\n", CMD_DUMP);
         mWriter.printf("\t%s [%s FLAGS] [NAME] - create a user with the optional flags and name\n",
                 CMD_CREATE_USER, ARG_FLAGS);
         File setIconRootDir = UserIconContentProvider.getStorageDirectory(mContext);
@@ -227,6 +245,9 @@ final class ShellCommand {
         mWriter.printf("\t%s - remove itself as an admin\n", CMD_REMOVE_ACTIVE_ADMIN);
         mWriter.printf("\t%s - clear itself as device owner \n", CMD_CLEAR_DEVICE_OWNER);
         mWriter.printf("\t%s - clear itself as profile owner \n", CMD_CLEAR_PROFILE_OWNER);
+        mWriter.printf("\t%s <QUALITY> - set password quality\n",
+                CMD_SET_PASSWORD_QUALITY);
+        mWriter.printf("\t%s - get password quality\n", CMD_GET_PASSWORD_QUALITY);
     }
 
     private void createUser() {
@@ -475,6 +496,19 @@ final class ShellCommand {
         DevicePolicyManagerGateway parentDpmGateway =
             DevicePolicyManagerGatewayImpl.forParentProfile(mContext);
         parentDpmGateway.setPermittedInputMethods(inputMethods);
+    }
+
+    private void setPasswordQuality() {
+        int quality = getIntArg(/* index= */ 1);
+        Log.i(TAG, "setPasswordQuality(" + quality + ")");
+
+        mDevicePolicyManagerGateway.setPasswordQuality(quality,
+                (v) -> onSuccess("Set password quality to %d", quality),
+                (e) -> onError(e, "Error setting password quality to %d", quality));
+    }
+
+    private void getPasswordQuality() {
+        mWriter.printf("password quality: %d\n", mDevicePolicyManagerGateway.getPasswordQuality());
     }
 
     private void execute(@NonNull Runnable r) {
