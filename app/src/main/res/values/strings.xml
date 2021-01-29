@@ -1186,4 +1186,12 @@
     <string name="organization_id_empty">Organization Identifier must not be empty.</string>
     <string name="enrollment_specific_id">Enrollment-specific ID</string>
 
+    <!-- Messsge used in a toast to inform that operations that could be unsafe to execute might be safe now (or vice versa) -->
+    <string name="safety_operations_change_message">Operations that affect <xliff:g id="reason">%1$s</xliff:g> are now <xliff:g id="state">%2$s</xliff:g></string>
+
+    <string name="unsafe_operation_reason_driving_distraction">Driving Distraction</string>
+    <string name="unsafe_operation_reason_driving_undefined">Undefined</string>
+    <string name="safe">safe</string>
+    <string name="unsafe">unsafe</string>
+
 </resources>
