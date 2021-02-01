@@ -31,6 +31,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
+import android.os.Build;
 import android.os.UserHandle;
 import android.os.UserManager;
 import androidx.preference.PreferenceFragment;
@@ -54,6 +55,7 @@ public class Util {
     private static final String TAG = "Util";
     private static final int DEFAULT_BUFFER_SIZE = 4096;
 
+    // TODO(b/179160578): change check once S SDK is launched
     private static final boolean IS_RUNNING_S =
         VERSION.CODENAME.length() == 1 && VERSION.CODENAME.charAt(0) == 'S';
 
@@ -243,5 +245,16 @@ public class Util {
 
     public static boolean isRunningOnAutomotiveDevice(Context context) {
         return context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_AUTOMOTIVE);
+    }
+
+    public static void requireAndroidS() {
+        if (!isAtLeastS()) {
+            throw new IllegalStateException(
+                    "requires API level S, device's on " + Build.VERSION.SDK_INT);
+        }
+    }
+
+    public static boolean isAtLeastS() {
+        return IS_RUNNING_S || SDK_INT >= VERSION_CODES.S;
     }
 }

@@ -19,12 +19,15 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.os.Environment;
 import android.os.UserHandle;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import com.afwsamples.testdpc.common.Util;
 
 import java.io.File;
 import java.io.PrintWriter;
@@ -80,6 +83,9 @@ final class ShellCommand {
         "set-permitted-input-methods-parent";
     private static final String CMD_SET_USB_DATA_SIGNALING_ENABLED =
         "set-usb-data-signaling-enabled";
+    private static final String CMD_LIST_FOREGROUND_USERS = "list-foreground-users";
+    private static final String CMD_IS_FOREGROUND_USER = "is-foreground-user";
+
     private static final String ARG_FLAGS = "--flags";
 
     private final Context mContext;
@@ -182,6 +188,12 @@ final class ShellCommand {
             case CMD_SET_PERMITTED_INPUT_METHODS_PARENT:
                 execute(() -> setPermittedInputMethodsOnParent());
                 break;
+            case CMD_LIST_FOREGROUND_USERS:
+                execute(() -> listForegroundUsers());
+                break;
+            case CMD_IS_FOREGROUND_USER:
+                execute(() -> isForegroundUser());
+                break;
             case CMD_SET_PASSWORD_QUALITY:
                 execute(() -> setPasswordQuality());
                 break;
@@ -202,6 +214,12 @@ final class ShellCommand {
     private void dumpState() {
         mWriter.printf("isDeviceOwner: %b\n", mDevicePolicyManagerGateway.isDeviceOwnerApp());
         mWriter.printf("isProfileOwner: %b\n", mDevicePolicyManagerGateway.isProfileOwnerApp());
+        if (Util.isAtLeastS()) {
+            mWriter.printf("isHeadlessSystemUserMode: %b\n",
+                    mDevicePolicyManagerGateway.isHeadlessSystemUserMode());
+            mWriter.printf("isUserForeground: %b\n",
+                    mDevicePolicyManagerGateway.isUserForeground());
+        }
     }
 
     private void showUsage() {
@@ -257,8 +275,17 @@ final class ShellCommand {
         mWriter.printf("\t%s - get password quality\n", CMD_GET_PASSWORD_QUALITY);
         mWriter.printf("\t%s [ADMIN]- transfer ownership to the given admin\n",
                 CMD_TRANSFER_OWNERSHIP);
-        mWriter.printf("\t%s <true|false> - enable / disable USB data signaling\n",
-            CMD_SET_USB_DATA_SIGNALING_ENABLED);
+        if (Util.isAtLeastS()) {
+            mWriter.printf("\t%s <true|false> - enable / disable USB data signaling\n",
+                    CMD_SET_USB_DATA_SIGNALING_ENABLED);
+            mWriter.printf("\t%s [MET1] <MET2> <METN>- set the permitted input methods in the "
+                    + "parent's device admin\n",
+                    CMD_SET_PERMITTED_INPUT_METHODS_PARENT);
+            mWriter.printf("\t%s - list the users running on foreground\n",
+                    CMD_LIST_FOREGROUND_USERS);
+            mWriter.printf("\t%s - checks if the calling user is running on foreground\n",
+                    CMD_IS_FOREGROUND_USER);
+        }
     }
 
     private void createUser() {
@@ -507,6 +534,21 @@ final class ShellCommand {
         DevicePolicyManagerGateway parentDpmGateway =
             DevicePolicyManagerGatewayImpl.forParentProfile(mContext);
         parentDpmGateway.setPermittedInputMethods(inputMethods);
+    }
+
+    private void listForegroundUsers() {
+        List<UserHandle> users = mDevicePolicyManagerGateway.listForegroundAffiliatedUsers();
+        if (users.isEmpty()) {
+            mWriter.println("none");
+            return;
+        }
+        int size = users.size();
+        mWriter.printf("%d user%s:\n", size, (size > 1 ? "s" : ""));
+        users.forEach(u -> mWriter.printf("\t%s\n", u));
+    }
+
+    private void isForegroundUser() {
+        mWriter.println(mDevicePolicyManagerGateway.isUserForeground());
     }
 
     private void setPasswordQuality() {

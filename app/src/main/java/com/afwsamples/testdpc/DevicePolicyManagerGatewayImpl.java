@@ -20,13 +20,19 @@ import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.os.UserHandle;
 import android.os.UserManager;
 import android.util.Log;
 import androidx.annotation.NonNull;
+
 import com.afwsamples.testdpc.common.ReflectionUtil;
+import com.afwsamples.testdpc.common.ReflectionUtil.ReflectionIsTemporaryException;
+import com.afwsamples.testdpc.common.Util;
+
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -81,6 +87,48 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
     @Override
     public boolean isDeviceOwnerApp() {
         return mDevicePolicyManager.isDeviceOwnerApp(mAdminComponentName.getPackageName());
+    }
+
+    @Override
+    public boolean isHeadlessSystemUserMode() {
+        Util.requireAndroidS();
+
+        // TODO(b/179160578): use proper method when available on SDK
+        String method = "isHeadlessSystemUserMode";
+        try {
+            return (Boolean) ReflectionUtil.invoke(mUserManager, method);
+        } catch (ReflectionIsTemporaryException e) {
+            Log.wtf(TAG, "Error calling mUserManager." + method + "()", e);
+            return false;
+        }
+    }
+
+    @Override
+    public boolean isUserForeground() {
+        Util.requireAndroidS();
+
+        // TODO(b/179160578): use proper method when available on SDK
+        String method = "isUserForeground";
+        try {
+            return (Boolean) ReflectionUtil.invoke(mUserManager, method);
+        } catch (ReflectionIsTemporaryException e) {
+            Log.wtf(TAG, "Error calling mUserManager." + method + "()", e);
+            return false;
+        }
+    }
+
+    @Override
+    public List<UserHandle> listForegroundAffiliatedUsers() {
+        Util.requireAndroidS();
+
+        // TODO(b/179160578): use proper method when available on SDK
+        String method = "listForegroundAffiliatedUsers";
+        try {
+            return (List<UserHandle>) ReflectionUtil.invoke(mDevicePolicyManager, method);
+        } catch (ReflectionIsTemporaryException e) {
+            Log.wtf(TAG, "Error calling mDevicePolicyManager." + method + "()", e);
+            return Collections.emptyList();
+        }
     }
 
     @Override
@@ -494,12 +542,11 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
         return "DevicePolicyManagerGatewayImpl[" + mAdminComponentName + "]";
     }
 
-    private void onSuccessLog(String template, Object... args) {
+    private static void onSuccessLog(String template, Object... args) {
         Log.d(TAG, String.format(template, args) + " succeeded");
     }
 
-    private void onErrorLog(String template, Object... args) {
+    private static void onErrorLog(String template, Object... args) {
         Log.d(TAG, String.format(template, args) + " failed");
     }
-
 }

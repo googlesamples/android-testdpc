@@ -59,6 +59,21 @@ public interface DevicePolicyManagerGateway {
     boolean isProfileOwnerApp();
 
     /**
+     * See {@link android.os.UserManager#isHeadlessSystemUserMode()}.
+     */
+    boolean isHeadlessSystemUserMode();
+
+    /**
+     * See {@link android.os.UserManager#isUserForeground()}.
+     */
+    boolean isUserForeground();
+
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#listForegroundAffiliatedUsers()}.
+     */
+    List<UserHandle> listForegroundAffiliatedUsers();
+
+    /**
      * See {@link android.app.admin.DevicePolicyManager#createAndManageUser(android.content.ComponentName, String, android.content.ComponentName, android.os.PersistableBundle, int)}.
      */
     void createAndManageUser(@Nullable String name, int flags,
