@@ -115,6 +115,10 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
 
     @Override
     public void onProfileProvisioningComplete(Context context, Intent intent) {
+        if (Util.SDK_INT >= VERSION_CODES.O) {
+            // See http://b/177617306.
+            return;
+        }
         PostProvisioningTask task = new PostProvisioningTask(context);
         if (!task.performPostProvisioningOperations(intent)) {
             return;
