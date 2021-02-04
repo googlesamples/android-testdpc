@@ -18,6 +18,7 @@ package com.afwsamples.testdpc;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.graphics.Bitmap;
+import android.os.PersistableBundle;
 import android.os.UserHandle;
 import android.os.UserManager;
 import androidx.annotation.NonNull;
@@ -230,6 +231,12 @@ public interface DevicePolicyManagerGateway {
      * See {@link android.app.admin.DevicePolicyManager#getPasswordQuality(ComponentName)
      */
     int getPasswordQuality();
+
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#transferOwnership(ComponentName, ComponentName, android.os.PersistableBundle)}.
+     */
+    void transferOwnership(@NonNull ComponentName target, @Nullable PersistableBundle bundle,
+            @NonNull Consumer<Void> onSuccess, @NonNull Consumer<Exception> onError);
 
     /**
      * Used on error callbacks to indicate a {@link android.app.admin.DevicePolicyManager} method

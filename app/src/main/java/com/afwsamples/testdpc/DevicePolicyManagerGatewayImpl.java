@@ -21,6 +21,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.os.UserHandle;
 import android.os.UserManager;
 import android.util.Log;
@@ -444,6 +445,19 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
         int quality = mDevicePolicyManager.getPasswordQuality(mAdminComponentName);
         Log.d(TAG, "getPasswordQuality(): " + quality);
         return quality;
+    }
+
+    @Override
+    public void transferOwnership(ComponentName target, PersistableBundle bundle,
+            Consumer<Void> onSuccess, Consumer<Exception> onError) {
+        Log.d(TAG, "transferOwnership(" + target + ", " + bundle + ")");
+
+        try {
+            mDevicePolicyManager.transferOwnership(mAdminComponentName, target, bundle);
+            onSuccess.accept(null);
+        } catch (Exception e) {
+            onError.accept(e);
+        }
     }
 
     @Override

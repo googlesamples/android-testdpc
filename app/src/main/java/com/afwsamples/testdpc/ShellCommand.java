@@ -73,6 +73,7 @@ final class ShellCommand {
     private static final String CMD_CLEAR_PROFILE_OWNER = "clear-profile-owner";
     private static final String CMD_SET_PASSWORD_QUALITY = "set-password-quality";
     private static final String CMD_GET_PASSWORD_QUALITY = "get-password-quality";
+    private static final String CMD_TRANSFER_OWNERSHIP = "transfer-ownership";
 
     // Commands for APIs added on Android S
     private static final String CMD_SET_PERMITTED_INPUT_METHODS_PARENT =
@@ -186,6 +187,9 @@ final class ShellCommand {
             case CMD_GET_PASSWORD_QUALITY:
                 execute(() -> getPasswordQuality());
                 break;
+            case CMD_TRANSFER_OWNERSHIP:
+                execute(() -> transferOwnership());
+                break;
             default:
                 mWriter.printf("Invalid command: %s\n\n", cmd);
                 showUsage();
@@ -248,6 +252,8 @@ final class ShellCommand {
         mWriter.printf("\t%s <QUALITY> - set password quality\n",
                 CMD_SET_PASSWORD_QUALITY);
         mWriter.printf("\t%s - get password quality\n", CMD_GET_PASSWORD_QUALITY);
+        mWriter.printf("\t%s [ADMIN]- transfer ownership to the given admin\n",
+                CMD_TRANSFER_OWNERSHIP);
     }
 
     private void createUser() {
@@ -509,6 +515,18 @@ final class ShellCommand {
 
     private void getPasswordQuality() {
         mWriter.printf("password quality: %d\n", mDevicePolicyManagerGateway.getPasswordQuality());
+    }
+
+    private void transferOwnership() {
+        // TODO(b/171350084): check args
+        String flatTarget = mArgs[1];
+        ComponentName target = ComponentName.unflattenFromString(flatTarget);
+
+        Log.i(TAG, "transferOwnership(" + target + ")");
+
+        mDevicePolicyManagerGateway.transferOwnership(target, /* bundle= */ null,
+                (v) -> onSuccess("Ownership transferred to %s", flatTarget),
+                (e) -> onError(e, "Error transferring ownership to %s", flatTarget));
     }
 
     private void execute(@NonNull Runnable r) {
