@@ -29,6 +29,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
+import com.afwsamples.testdpc.DevicePolicyManagerGateway;
+import com.afwsamples.testdpc.DevicePolicyManagerGatewayImpl;
 import com.afwsamples.testdpc.R;
 
 /**
@@ -98,21 +100,28 @@ public abstract class ProfileOrParentFragment extends BaseSearchablePolicyPrefer
         public abstract Class<? extends ProfileOrParentFragment> getContentClass();
     }
 
-    private DevicePolicyManager mDevicePolicyManager;
-    private ComponentName mAdminComponent;
+    private DevicePolicyManagerGateway mDevicePolicyGateway;
     private boolean mParentInstance;
     private boolean mProfileOwner;
     private boolean mDeviceOwner;
+
+    public ProfileOrParentFragment() {
+        super(LOG_TAG);
+    }
 
     /**
      * @return a {@link DevicePolicyManager} instance for the profile this tab should affect.
      */
     protected final DevicePolicyManager getDpm() {
-        return mDevicePolicyManager;
+        return mDevicePolicyGateway.getDevicePolicyManager();
+    }
+
+    protected final DevicePolicyManagerGateway getDpmGateway() {
+        return mDevicePolicyGateway;
     }
 
     protected final ComponentName getAdmin() {
-        return mAdminComponent;
+        return mDevicePolicyGateway.getAdmin();
     }
 
     /**
@@ -146,18 +155,15 @@ public abstract class ProfileOrParentFragment extends BaseSearchablePolicyPrefer
             mParentInstance = arguments.getBoolean(EXTRA_PARENT_PROFILE, false);
         }
 
-        mAdminComponent = DeviceAdminReceiver.getComponentName(getActivity());
-
-        // Get a device policy manager for the current user.
-        mDevicePolicyManager = (DevicePolicyManager)
-                getActivity().getSystemService(Context.DEVICE_POLICY_SERVICE);
+        Context context = getActivity();
+        mDevicePolicyGateway = new DevicePolicyManagerGatewayImpl(context);
 
         // Store whether we are the profile owner for faster lookup.
-        mProfileOwner = mDevicePolicyManager.isProfileOwnerApp(getActivity().getPackageName());
-        mDeviceOwner = mDevicePolicyManager.isDeviceOwnerApp(getActivity().getPackageName());
+        mProfileOwner = mDevicePolicyGateway.isProfileOwnerApp();
+        mDeviceOwner = mDevicePolicyGateway.isDeviceOwnerApp();
 
         if (mParentInstance) {
-            mDevicePolicyManager = mDevicePolicyManager.getParentProfileInstance(mAdminComponent);
+            mDevicePolicyGateway = DevicePolicyManagerGatewayImpl.forParentProfile(context);
         }
 
         // Put at last to make sure all initializations above are done before subclass's
