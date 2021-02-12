@@ -69,9 +69,16 @@ public interface DevicePolicyManagerGateway {
      */
     void setUserIcon(@NonNull Bitmap icon, @NonNull Consumer<Void> onSuccess, @NonNull Consumer<Exception> onError);
 
-    /** @see {@link android.os.UserManager#getUserForSerialNumber(long)}.*/
+    /**
+     * @see {@link android.os.UserManager#getUserForSerialNumber(long)}.
+     */
     @Nullable
     UserHandle getUserHandle(long serialNumber);
+
+    /**
+     * @see {@link android.os.UserManager#getSerialNumber(UserHandle)}.
+     */
+    long getSerialNumber(@NonNull UserHandle user);
 
     /**
      * See {@link android.app.admin.DevicePolicyManager#removeUser(android.content.ComponentName, UserHandle)}.

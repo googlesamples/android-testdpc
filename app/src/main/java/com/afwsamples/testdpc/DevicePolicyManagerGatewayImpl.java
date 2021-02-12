@@ -119,6 +119,11 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
     }
 
     @Override
+    public long getSerialNumber(UserHandle user) {
+        return mUserManager.getSerialNumberForUser(user);
+    }
+
+    @Override
     public void removeUser(UserHandle userHandle, Consumer<Void> onSuccess,
             Consumer<Exception> onError) {
         Log.d(TAG, "removeUser(" + userHandle + ")");
