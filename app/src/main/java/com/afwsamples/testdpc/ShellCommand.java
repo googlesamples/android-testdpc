@@ -284,7 +284,7 @@ final class ShellCommand {
         Log.i(TAG, "createUser(): name=" + name + ", flags=" + flags);
 
         mDevicePolicyManagerGateway.createAndManageUser(name, flags,
-                (u) -> onSuccess("User created: %s", u),
+                (u) -> onSuccess("User created: %s", toString(u)),
                 (e) -> onError(e, "Error creating user %s", name));
     }
 
@@ -560,6 +560,10 @@ final class ShellCommand {
         int size = collection.size();
         mWriter.printf("%d %s:\n", size, name);
         collection.forEach((s) -> mWriter.printf("  %s\n", s));
+    }
+
+    private String toString(UserHandle user) {
+        return user.toString() + " serial=" + mDevicePolicyManagerGateway.getSerialNumber(user);
     }
 
     private UserHandle getUserHandleArg(int index) {
