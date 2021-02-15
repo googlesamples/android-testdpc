@@ -18,6 +18,7 @@ package com.afwsamples.testdpc.profilepolicy.delegation;
 
 import android.annotation.TargetApi;
 import android.app.admin.DevicePolicyManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.os.Build.VERSION_CODES;
@@ -51,19 +52,22 @@ public class DelegationFragment extends ManageAppFragment {
     List<DelegationScope> mDelegations;
     private String mPackageName;
     private boolean mIsDeviceOrProfileOwner;
+    private ComponentName mAdminName;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mAdminName = DeviceAdminReceiver.getComponentName(getActivity());
         mDpm = (DevicePolicyManager) getActivity().getSystemService(Context.DEVICE_POLICY_SERVICE);
         mPackageName = getActivity().getPackageName();
         final boolean isDeviceOwner = mDpm.isDeviceOwnerApp(mPackageName);
         final boolean isProfileOwner = mDpm.isProfileOwnerApp(mPackageName);
+        final boolean isManagedProfile = mDpm.isManagedProfile(mAdminName);
         mIsDeviceOrProfileOwner = isDeviceOwner || isProfileOwner;
 
-        // Show DO-only delegations if we are DO or delegated app i.e. we are not PO, ignoring the
-        // case where we are neither PO or DO (in which case this fragment is not accessible at all)
-        mDelegations = DelegationScope.defaultDelegationScopes(!isProfileOwner);
+        // Show DO or managed PO only delegations if we are DO, delegated app or managed PO.
+        mDelegations = DelegationScope
+            .defaultDelegationScopes(isDeviceOwner || (isManagedProfile && isProfileOwner));
 
         getActivity().getActionBar().setTitle(R.string.generic_delegation);
     }

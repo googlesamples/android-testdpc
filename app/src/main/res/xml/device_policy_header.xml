@@ -745,14 +745,14 @@
         <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
             android:key="enable_network_logging"
             android:title="@string/enable_network_logging"
-            testdpc:admin="deviceOwner"
+            testdpc:admin="deviceOwner|profileOwner"
             testdpc:delegation="delegation-network-logging"
             testdpc:minSdkVersion="O" />
         <!-- custom constraint: networkLoggingEnabled -->
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="request_network_logs"
             android:title="@string/request_network_logs"
-            testdpc:admin="deviceOwner"
+            testdpc:admin="deviceOwner|profileOwner"
             testdpc:delegation="delegation-network-logging"
             testdpc:minSdkVersion="O" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
