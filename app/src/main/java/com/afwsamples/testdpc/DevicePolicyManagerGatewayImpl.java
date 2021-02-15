@@ -26,6 +26,7 @@ import android.os.UserHandle;
 import android.os.UserManager;
 import android.util.Log;
 import androidx.annotation.NonNull;
+import com.afwsamples.testdpc.common.ReflectionUtil;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -374,6 +375,7 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
         return mDevicePolicyManager.getUserControlDisabledPackages(mAdminComponentName);
     }
 
+    @Override
     public boolean setPermittedInputMethods(List<String> packageNames) {
         String inputMethods = packageNames != null ? String.join(",", packageNames) : "";
         String message = "setPermittedInputMethods(" + inputMethods + ")";
@@ -394,6 +396,28 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
             onError.accept(e);
         }
         return result;
+    }
+
+    @Override
+    public void setUsbDataSignalingEnabled(boolean enabled, @NonNull Consumer<Void> onSuccess,
+        @NonNull Consumer<Exception> onError) {
+        Log.d(TAG, "setUsbDataSignalingEnabled(" + enabled + ")");
+
+        try {
+            ReflectionUtil.invoke(mDevicePolicyManager, "setUsbDataSignalingEnabled",
+                new Class[]{Boolean.TYPE}, enabled);
+            onSuccess.accept(null);
+        } catch (Exception e) {
+            onError.accept(e);
+        }
+    }
+
+    @Override
+    public void setUsbDataSignalingEnabled(boolean enabled) {
+        String message = String.format("setUsbDataSignalingEnabled(%b)", enabled);
+        setUsbDataSignalingEnabled(enabled,
+            (v) -> onSuccessLog(message),
+            (e) -> onErrorLog(message));
     }
 
     @Override

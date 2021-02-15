@@ -770,6 +770,11 @@
             android:title="@string/common_criteria_mode"
             testdpc:admin="deviceOwner|orgOwnedProfileOwner"
             testdpc:minSdkVersion="R" />
+        <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
+            android:key="enable_usb_data_signaling"
+            android:title="@string/enable_usb_data_signaling"
+            testdpc:admin="deviceOwner|orgOwnedProfileOwner"
+            testdpc:minSdkVersion="S" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="wipe_data"
             android:title="@string/wipe_data"

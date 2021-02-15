@@ -424,6 +424,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String COMMON_CRITERIA_MODE_KEY = "common_criteria_mode";
     private static final String SET_ORGANIZATION_ID_KEY = "set_organization_id";
     private static final String ENROLLMENT_SPECIFIC_ID_KEY = "enrollment_specific_id";
+    private static final String ENABLE_USB_DATA_SIGNALING_KEY = "enable_usb_data_signaling";
 
     private static final String BATTERY_PLUGGED_ANY = Integer.toString(
             BatteryManager.BATTERY_PLUGGED_AC |
@@ -484,6 +485,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     private DpcSwitchPreference mEnableBackupServicePreference;
     private DpcSwitchPreference mCommonCriteriaModePreference;
+    private DpcSwitchPreference mEnableUsbDataSignalingPreference;
     private SwitchPreference mEnableSecurityLoggingPreference;
     private SwitchPreference mEnableNetworkLoggingPreference;
     private DpcSwitchPreference mSetAutoTimeRequiredPreference;
@@ -638,6 +640,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         mCommonCriteriaModePreference = (DpcSwitchPreference) findPreference(
             COMMON_CRITERIA_MODE_KEY);
         mCommonCriteriaModePreference.setOnPreferenceChangeListener(this);
+        mEnableUsbDataSignalingPreference = (DpcSwitchPreference) findPreference(
+            ENABLE_USB_DATA_SIGNALING_KEY);
+        mEnableUsbDataSignalingPreference.setOnPreferenceChangeListener(this);
         findPreference(REQUEST_BUGREPORT_KEY).setOnPreferenceClickListener(this);
         mEnableSecurityLoggingPreference =
             (SwitchPreference) findPreference(ENABLE_SECURITY_LOGGING);
@@ -808,6 +813,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         reloadMuteAudioUi();
         reloadEnableBackupServiceUi();
         reloadCommonCriteriaModeUi();
+        reloadEnableUsbDataSignalingUi();
         reloadEnableSecurityLoggingUi();
         reloadEnableNetworkLoggingUi();
         reloadSetAutoTimeRequiredUi();
@@ -1513,6 +1519,10 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 setCommonCriteriaModeEnabled((Boolean) newValue);
                 reloadCommonCriteriaModeUi();
                 return true;
+            case ENABLE_USB_DATA_SIGNALING_KEY:
+                setUsbDataSignalingEnabled((Boolean) newValue);
+                reloadEnableUsbDataSignalingUi();
+                return true;
             case ENABLE_SECURITY_LOGGING:
                 setSecurityLoggingEnabled((Boolean) newValue);
                 reloadEnableSecurityLoggingUi();
@@ -1660,6 +1670,11 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     @TargetApi(VERSION_CODES.R)
     private void setCommonCriteriaModeEnabled(boolean enabled) {
         mDevicePolicyManager.setCommonCriteriaModeEnabled(mAdminComponentName, enabled);
+    }
+
+    @TargetApi(VERSION_CODES.S)
+    private void setUsbDataSignalingEnabled(boolean enabled) {
+        mDevicePolicyManagerGateway.setUsbDataSignalingEnabled(enabled);
     }
 
     @TargetApi(VERSION_CODES.M)
@@ -2693,6 +2708,17 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         if (mCommonCriteriaModePreference.isEnabled()) {
             mCommonCriteriaModePreference.setChecked(
                 mDevicePolicyManager.isCommonCriteriaModeEnabled(mAdminComponentName));
+        }
+    }
+
+    @TargetApi(VERSION_CODES.S)
+    private void reloadEnableUsbDataSignalingUi() {
+        try {
+            boolean enabled = (boolean) ReflectionUtil
+                .invoke(mDevicePolicyManager, "isUsbDataSignalingEnabled");
+            mEnableUsbDataSignalingPreference.setChecked(enabled);
+        } catch (ReflectionIsTemporaryException e) {
+            Log.e(TAG, "Error invoking isUsbDataSignalingEnabled", e);
         }
     }
 
