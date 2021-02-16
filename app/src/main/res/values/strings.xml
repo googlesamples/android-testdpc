@@ -1116,9 +1116,9 @@
     <string name="cross_profile_apps_available">TestDPC is installed in another profile, tap the icon to launch it in that profile.</string>
     <string name="cross_profile_apps_not_available">TestDPC is not installed in another profile, try installing it and come back to here.</string>
 
-    <string name="cross_profile_apps_whitelist">Whitelisted cross profile apps</string>
+    <string name="cross_profile_apps_allowlist">Allow-listed cross profile apps</string>
     <string name="cross_profile_apps_enabled_title">Enabled cross profile apps</string>
-    <string name="cross_profile_apps_no_whitelisted_apps">No apps whitelisted</string>
+    <string name="cross_profile_apps_no_allowlisted_apps">No apps allow-listed</string>
     <string name="cross_profile_apps_example_text">example.package.name</string>
     <string name="cross_profile_apps_add_button_text">Add app</string>
     <string name="cross_profile_apps_remove_button_text">Remove app</string>
