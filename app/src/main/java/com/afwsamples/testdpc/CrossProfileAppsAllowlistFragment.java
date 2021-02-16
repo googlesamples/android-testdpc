@@ -31,7 +31,7 @@ import java.util.Collections;
 import java.util.Set;
 
 /**
- * This fragment provides the ability to whitelist cross profile packages
+ * This fragment provides the ability to allow-list cross profile packages
  *
  * <p>APIs exercised:
  * <ul>
@@ -40,7 +40,7 @@ import java.util.Set;
  * </ul>
  */
 @TargetApi(VERSION_CODES.R)
-public class CrossProfileAppsWhitelistFragment extends Fragment {
+public class CrossProfileAppsAllowlistFragment extends Fragment {
     private static final String DELIMITER = "\n";
 
     private View mInflatedView;
@@ -59,12 +59,12 @@ public class CrossProfileAppsWhitelistFragment extends Fragment {
         mDevicePolicyManager = getActivity().getSystemService(DevicePolicyManager.class);
         mAdminComponent = DeviceAdminReceiver.getComponentName(getActivity());
         mInflatedView = inflater.inflate(
-            R.layout.cross_profile_apps_whitelist, container, false);
+            R.layout.cross_profile_apps_allowlist, container, false);
 
-        mAppNameEditText = mInflatedView.findViewById(R.id.cross_profile_app_whitelist_input);
-        mResetButton = mInflatedView.findViewById(R.id.cross_profile_app_whitelist_reset_button);
-        mAddButton = mInflatedView.findViewById(R.id.cross_profile_app_whitelist_add_button);
-        mRemoveButton = mInflatedView.findViewById(R.id.cross_profile_app_whitelist_remove_button);
+        mAppNameEditText = mInflatedView.findViewById(R.id.cross_profile_app_allowlist_input);
+        mResetButton = mInflatedView.findViewById(R.id.cross_profile_app_allowlist_reset_button);
+        mAddButton = mInflatedView.findViewById(R.id.cross_profile_app_allowlist_add_button);
+        mRemoveButton = mInflatedView.findViewById(R.id.cross_profile_app_allowlist_remove_button);
         mAppsList = mInflatedView.findViewById(R.id.cross_profile_app_list);
 
         setOnClickListeners();
@@ -103,7 +103,7 @@ public class CrossProfileAppsWhitelistFragment extends Fragment {
     private void updateCrossProfileAppsList(){
         Set<String> currentApps = mDevicePolicyManager.getCrossProfilePackages(mAdminComponent);
         if (currentApps.isEmpty()) {
-            mAppsList.setText(R.string.cross_profile_apps_no_whitelisted_apps);
+            mAppsList.setText(R.string.cross_profile_apps_no_allowlisted_apps);
         } else {
             mAppsList.setText(String.join(DELIMITER, currentApps));
         }

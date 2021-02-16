@@ -31,10 +31,10 @@ public abstract class ManageAppFragment extends BaseManageComponentFragment<Appl
     /**
      * List of packages always shown in the app list.
      */
-    private static final Set<String> WHITELISTED_APPS = new HashSet<>();
+    private static final Set<String> ALLOWLISTED_APPS = new HashSet<>();
     static {
         // GmsCore
-        WHITELISTED_APPS.add("com.google.android.gms");
+        ALLOWLISTED_APPS.add("com.google.android.gms");
     }
 
     @Override
@@ -61,7 +61,7 @@ public abstract class ManageAppFragment extends BaseManageComponentFragment<Appl
         for (ApplicationInfo applicationInfo : installedApps) {
             if (mPackageManager.getLaunchIntentForPackage(applicationInfo.packageName) != null
                     || (applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0
-                    || WHITELISTED_APPS.contains(applicationInfo.packageName)) {
+                    || ALLOWLISTED_APPS.contains(applicationInfo.packageName)) {
                 if (filterApp(applicationInfo)) {
                     filteredAppList.add(applicationInfo);
                 }
