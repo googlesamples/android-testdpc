@@ -19,6 +19,7 @@ package com.afwsamples.testdpc;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.PersistableBundle;
@@ -444,6 +445,25 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
         } catch (Exception e) {
             onError.accept(e);
         }
+    }
+
+    @Override
+    public void setPackagesSuspended(String[] packageNames, boolean suspended,
+            Consumer<String[]> onSuccess, Consumer<Exception> onError) {
+        Log.d(TAG, "setPackagesSuspended(" + Arrays.toString(packageNames) + ": " + suspended+ ")");
+
+        try {
+            String[] result = mDevicePolicyManager.setPackagesSuspended(mAdminComponentName,
+                    packageNames, suspended);
+            onSuccess.accept(result);
+        } catch (Exception e) {
+            onError.accept(e);
+        }
+    }
+
+    @Override
+    public boolean isPackageSuspended(String packageName) throws NameNotFoundException {
+        return mDevicePolicyManager.isPackageSuspended(mAdminComponentName, packageName);
     }
 
     @Override
