@@ -1716,8 +1716,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         mDevicePolicyManagerGateway.requestBugreport(
                 (v) -> onSuccessLog("requestBugreport"),
                 (e) -> onErrorOrFailureShowToast("requestBugreport",
-                        R.string.bugreport_failure_throttled, R.string.bugreport_failure_exception,
-                        e));
+                        e, R.string.bugreport_failure_throttled,
+                        R.string.bugreport_failure_exception));
     }
 
     @TargetApi(VERSION_CODES.M)
@@ -2252,7 +2252,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private void removeUser(UserHandle userHandle)  {
         mDevicePolicyManagerGateway.removeUser(userHandle,
                 (u) -> onSuccessShowToast("removeUser()", R.string.user_removed),
-                (e) -> onErrorShowToast("removeUser()", R.string.failed_to_remove_user, e));
+                (e) -> onErrorShowToast("removeUser()", e, R.string.failed_to_remove_user));
     }
 
     /**
@@ -2278,7 +2278,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         showChooseUserPrompt(R.string.switch_user, userHandle -> {
             mDevicePolicyManagerGateway.switchUser(userHandle,
                     (v) -> onSuccessShowToast("switchUser", R.string.user_switched),
-                    (e) -> onErrorShowToast("switchUser", R.string.failed_to_switch_user, e));
+                    (e) -> onErrorShowToast("switchUser", e, R.string.failed_to_switch_user));
         });
     }
 
@@ -2293,7 +2293,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                     (v) -> onSuccessShowToast("startUserInBackground",
                             R.string.user_started_in_background),
                     (e) -> onErrorShowToast("startUserInBackground",
-                            R.string.failed_to_start_user_in_background, e));
+                            e, R.string.failed_to_start_user_in_background));
         });
     }
 
@@ -2306,7 +2306,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         showChooseUserPrompt(R.string.stop_user, userHandle -> {
             mDevicePolicyManagerGateway.startUserInBackground(userHandle,
                     (v) -> onSuccessShowToast("stopUser", R.string.user_stopped),
-                    (e) -> onErrorShowToast("stopUser", R.string.failed_to_stop_user, e));
+                    (e) -> onErrorShowToast("stopUser", e, R.string.failed_to_stop_user));
         });
     }
 
@@ -3562,12 +3562,19 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                         @Override
                         public void onClick(DialogInterface dialog, int position) {
                             String packageName = showApps.get(position);
-                            if (mDevicePolicyManager.setPackagesSuspended(mAdminComponentName,
-                                    new String[] {packageName}, !forUnsuspending).length == 0) {
-                                showToast(successResId, packageName);
-                            } else {
-                                showToast(getString(failureResId, packageName), Toast.LENGTH_LONG);
-                            }
+                            mDevicePolicyManagerGateway.setPackagesSuspended(
+                                    new String[] {packageName}, !forUnsuspending,
+                                    (failed) -> {
+                                        if (failed.length == 0) {
+                                            onSuccessShowToast("setPackagesSuspended",
+                                                    successResId, packageName);
+                                        } else {
+                                            onErrorShowToast("setPackagesSuspended", failureResId,
+                                                    packageName);
+                                        }
+                                    },
+                                    (e) -> onErrorShowToast("setPackagesSuspended", e, failureResId,
+                                            packageName));
                         }
                     })
                     .show();
@@ -3656,7 +3663,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     @TargetApi(VERSION_CODES.N)
     private boolean isPackageSuspended(String packageName) {
         try {
-            return mDevicePolicyManager.isPackageSuspended(mAdminComponentName, packageName);
+            return mDevicePolicyManagerGateway.isPackageSuspended(packageName);
         } catch (PackageManager.NameNotFoundException e) {
             Log.e(TAG, "Unable check if package is suspended", e);
             return false;
@@ -3690,8 +3697,10 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private void showToast(String msg, int duration) {
         Activity activity = getActivity();
         if (activity == null || activity.isFinishing()) {
+            Log.w(TAG, "Not toasting '" + msg + "' as activity is finishing or finished");
             return;
         }
+        Log.d(TAG, "Showing toast: " + msg);
         Toast.makeText(activity, msg, duration).show();
     }
 
@@ -4361,18 +4370,23 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         mDevicePolicyManager.setAutoTimeZoneEnabled(mAdminComponentName, enabled);
     }
 
-    private void onSuccessShowToast(String method, int msgId) {
+    private void onSuccessShowToast(String method, int msgId, Object...args) {
         Log.d(TAG, method + "() succeeded");
-        showToast(msgId);
+        showToast(msgId, args);
     }
 
-    private void onErrorShowToast(String method, int msgId, Exception e) {
+    private void onErrorShowToast(String method, int msgId, Object... args) {
+        Log.e(TAG, method + "() failed");
+        showToast(msgId, args);
+    }
+
+    private void onErrorShowToast(String method, Exception e, int msgId, Object... args) {
         Log.e(TAG, method + "() failed: ", e);
-        showToast(msgId);
+        showToast(msgId, args);
     }
 
-    private void onErrorOrFailureShowToast(String method, int failureMsgId, int errorMsgId,
-            Exception e) {
+    private void onErrorOrFailureShowToast(String method, Exception e, int failureMsgId,
+            int errorMsgId) {
         if (e instanceof FailedOperationException) {
             Log.e(TAG, method + " returned false");
             showToast(failureMsgId);

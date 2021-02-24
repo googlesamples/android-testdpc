@@ -17,6 +17,7 @@ package com.afwsamples.testdpc;
 
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Bitmap;
 import android.os.PersistableBundle;
 import android.os.UserHandle;
@@ -272,6 +273,17 @@ public interface DevicePolicyManagerGateway {
      * callbacks.
      */
     void setUsbDataSignalingEnabled(boolean enabled);
+
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#setPackagesSuspended(ComponentName, String[], boolean)}.
+     */
+    void setPackagesSuspended(String[] packageNames, boolean suspended, @NonNull Consumer<String[]> onSuccess,
+        @NonNull Consumer<Exception> onError);
+
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#isPackageSuspended(ComponentName, String)}.
+     */
+    boolean isPackageSuspended(String packageName) throws NameNotFoundException;
 
     /**
      * Used on error callbacks to indicate a {@link android.app.admin.DevicePolicyManager} method

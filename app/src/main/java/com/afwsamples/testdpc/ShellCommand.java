@@ -17,6 +17,7 @@ package com.afwsamples.testdpc;
 
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
@@ -77,6 +78,8 @@ final class ShellCommand {
     private static final String CMD_SET_PASSWORD_QUALITY = "set-password-quality";
     private static final String CMD_GET_PASSWORD_QUALITY = "get-password-quality";
     private static final String CMD_TRANSFER_OWNERSHIP = "transfer-ownership";
+    private static final String CMD_SET_SUSPENDED_PACKAGES = "set-suspended-packages";
+    private static final String CMD_IS_PACKAGE_SUSPENDED = "is-package-suspended";
 
     // Commands for APIs added on Android S
     private static final String CMD_SET_PERMITTED_INPUT_METHODS_PARENT =
@@ -199,11 +202,18 @@ final class ShellCommand {
                 break;
             case CMD_GET_PASSWORD_QUALITY:
                 execute(() -> getPasswordQuality());
+                break;
             case CMD_SET_USB_DATA_SIGNALING_ENABLED:
                 execute(() -> setUsbDataSignalingEnabled());
                 break;
             case CMD_TRANSFER_OWNERSHIP:
                 execute(() -> transferOwnership());
+                break;
+            case CMD_SET_SUSPENDED_PACKAGES:
+                execute(() -> setPackagesSuspended());
+                break;
+            case CMD_IS_PACKAGE_SUSPENDED:
+                execute(() -> isPackageSuspended());
                 break;
             default:
                 mWriter.printf("Invalid command: %s\n\n", cmd);
@@ -275,6 +285,10 @@ final class ShellCommand {
         mWriter.printf("\t%s - get password quality\n", CMD_GET_PASSWORD_QUALITY);
         mWriter.printf("\t%s [ADMIN]- transfer ownership to the given admin\n",
                 CMD_TRANSFER_OWNERSHIP);
+        mWriter.printf("\t%s <SUSPENDED> <PKG1> [PKG2] [PGKN] - suspend / unsuspend the given "
+                + "packages\n", CMD_SET_SUSPENDED_PACKAGES);
+        mWriter.printf("\t%s <PKG1> [PKG2] [PKGN] - checks if the given packages are suspended\n",
+                CMD_IS_PACKAGE_SUSPENDED);
         if (Util.isAtLeastS()) {
             mWriter.printf("\t%s <true|false> - enable / disable USB data signaling\n",
                     CMD_SET_USB_DATA_SIGNALING_ENABLED);
@@ -585,6 +599,36 @@ final class ShellCommand {
             (e) -> onError(e, "Error setting USB data signaling to %b", enabled));
     }
 
+    private static String suspendedToString(boolean suspended) {
+        return suspended ? "SUSPENDED" : "NOT SUSPENDED";
+    }
+
+    private void setPackagesSuspended() {
+        boolean suspended = Boolean.parseBoolean(mArgs[1]);
+        String[] packageNames = getArrayFromArgs(2);
+
+        String printableNames = Arrays.toString(packageNames);
+        String printableStatus = suspendedToString(suspended);
+
+        Log.i(TAG, "setSuspendedPackages(" + printableNames + "): " + printableStatus);
+
+        mDevicePolicyManagerGateway.setPackagesSuspended(packageNames, suspended,
+            (v) -> onSuccess("Set %s (but not %s) to %s", printableNames, Arrays.toString(v),
+                    printableStatus),
+            (e) -> onError(e, "Error settings %s to %s", printableNames, printableStatus));
+    }
+
+    private void isPackageSuspended() {
+        getListFromAllArgs().forEach((packageName) -> {
+            try {
+                boolean suspended = mDevicePolicyManagerGateway.isPackageSuspended(packageName);
+                mWriter.printf("%s: %s\n", packageName, suspendedToString(suspended));
+            } catch (NameNotFoundException e) {
+                mWriter.printf("Invalid package name: %s\n", packageName);
+            }
+        });
+    }
+
     private void execute(@NonNull Runnable r) {
         try {
             r.run();
@@ -656,5 +700,12 @@ final class ShellCommand {
 
     private Set<String> getSetFromAllArgs() {
         return new LinkedHashSet<String>(getListFromAllArgs());
+    }
+
+    private String[] getArrayFromArgs(int startingIndex) {
+        int size = mArgs.length - startingIndex;
+        String[] array = new String[size];
+        System.arraycopy(mArgs, startingIndex, array, 0, size);
+        return array;
     }
 }
