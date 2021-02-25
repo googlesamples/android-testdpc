@@ -16,7 +16,7 @@
 
 package com.afwsamples.testdpc.policy.keyguard;
 
-import static com.afwsamples.testdpc.common.preference.DpcPreferenceHelper.NO_CUSTOM_CONSTRIANT;
+import static com.afwsamples.testdpc.common.preference.DpcPreferenceHelper.NO_CUSTOM_CONSTRAINT;
 import static com.afwsamples.testdpc.policy.keyguard.SetTrustAgentConfigFragment.Type;
 
 import android.annotation.TargetApi;
@@ -282,7 +282,7 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
         dpcPref.setCustomConstraint(
                 () -> Keys.NOT_APPLICABLE_TO_PARENT.contains(key) && isParentProfileInstance()
                         ? R.string.not_for_parent_profile
-                        : NO_CUSTOM_CONSTRIANT
+                        : NO_CUSTOM_CONSTRAINT
         );
 
         // We do not allow user to add trust agent config in pre-N devices in managed profile.

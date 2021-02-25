@@ -62,7 +62,7 @@ public class DpcPreferenceHelper {
         ADMIN_NONE | ADMIN_DEVICE_OWNER | ADMIN_PROFILE_OWNER | ADMIN_ORG_OWNED_PROFILE_OWNER;
     public static final int ADMIN_NOT_NONE = ADMIN_ANY & ~ADMIN_NONE;
     public static final @AdminKind int ADMIN_DEFAULT = ADMIN_NOT_NONE;
-    public static final int NO_CUSTOM_CONSTRIANT = 0;
+    public static final int NO_CUSTOM_CONSTRAINT = 0;
 
     @Retention(RetentionPolicy.SOURCE)
     @IntDef(flag = true, value = {USER_PRIMARY_USER, USER_SECONDARY_USER, USER_MANAGED_PROFILE})
@@ -242,7 +242,7 @@ public class DpcPreferenceHelper {
 
         for (CustomConstraint customConstraint : mCustomConstraints) {
             @StringRes int strRes = customConstraint.validateConstraint();
-            if (strRes != NO_CUSTOM_CONSTRIANT) {
+            if (strRes != NO_CUSTOM_CONSTRAINT) {
                 return mContext.getString(strRes);
             }
         }
