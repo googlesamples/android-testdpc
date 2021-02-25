@@ -972,20 +972,10 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         switch (key) {
             case MANAGE_LOCK_TASK_LIST_KEY:
                 showManageLockTaskListPrompt(R.string.lock_task_title,
-                        new ManageLockTaskListCallback() {
-                            @Override
-                            public void onPositiveButtonClicked(String[] lockTaskArray) {
-                                try {
-                                    mDevicePolicyManager.setLockTaskPackages(
-                                            DeviceAdminReceiver.getComponentName(getActivity()),
-                                            lockTaskArray);
-                                } catch (SecurityException e) {
-                                    Log.d(TAG, "Exception when setting lock task packages", e);
-                                    showToast(R.string.lock_task_unavailable);
-                                }
-                            }
-                        }
-                );
+                        (packages) -> mDevicePolicyManagerGateway.setLockTaskPackages(packages,
+                                (v) -> onSuccessLog("setLockTaskPackages()"),
+                                (e) -> onErrorShowToast("setLockTaskPackages()", e,
+                                        R.string.lock_task_unavailable)));
                 return true;
             case CHECK_LOCK_TASK_PERMITTED_KEY:
                 showCheckLockTaskPermittedPrompt();
@@ -1857,7 +1847,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String packageName = input.getText().toString();
-                        boolean isLockTaskPermitted = mDevicePolicyManager
+                        boolean isLockTaskPermitted = mDevicePolicyManagerGateway
                                 .isLockTaskPermitted(packageName);
                         showToast(isLockTaskPermitted
                                 ? R.string.check_lock_task_permitted_result_permitted
@@ -3983,7 +3973,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         if (!activityManager.isInLockTaskMode()){
             intent.addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
         }
-
         final ActivityOptions options = ActivityOptions.makeBasic();
         options.setLockTaskEnabled(true);
 
@@ -4356,8 +4345,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         return NO_CUSTOM_CONSTRIANT;
     }
 
-    abstract static class ManageLockTaskListCallback {
-        public abstract void onPositiveButtonClicked(String[] lockTaskArray);
+    interface ManageLockTaskListCallback {
+        void onPositiveButtonClicked(String[] lockTaskArray);
     }
 
     @RequiresApi(VERSION_CODES.R)

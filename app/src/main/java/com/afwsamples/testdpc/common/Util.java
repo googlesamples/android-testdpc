@@ -45,6 +45,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.List;
 
@@ -256,5 +258,52 @@ public class Util {
 
     public static boolean isAtLeastS() {
         return IS_RUNNING_S || SDK_INT >= VERSION_CODES.S;
+    }
+
+    public static String lockTaskFeaturesToString(int flags) {
+        return flagsToString(DevicePolicyManager.class, "LOCK_TASK_FEATURE_", flags);
+    }
+
+    public static void onSuccessLog(String tag, String template, Object... args) {
+        Log.d(tag, String.format(template, args) + " succeeded");
+    }
+
+    public static void onErrorLog(String tag, Exception e, String template, Object... args) {
+        Log.d(tag, String.format(template, args) + " failed", e);
+    }
+
+    // Copied from DebugUtils
+    public static String flagsToString(Class<?> clazz, String prefix, int flags) {
+        final StringBuilder res = new StringBuilder();
+        boolean flagsWasZero = flags == 0;
+
+        for (Field field : clazz.getDeclaredFields()) {
+            final int modifiers = field.getModifiers();
+            if (Modifier.isStatic(modifiers) && Modifier.isFinal(modifiers)
+                    && field.getType().equals(int.class) && field.getName().startsWith(prefix)) {
+                try {
+                    final int value = field.getInt(null);
+                    if (value == 0 && flagsWasZero) {
+                        return constNameWithoutPrefix(prefix, field);
+                    }
+                    if (value != 0 && (flags & value) == value) {
+                        flags &= ~value;
+                        res.append(constNameWithoutPrefix(prefix, field)).append('|');
+                    }
+                } catch (IllegalAccessException ignored) {
+                }
+            }
+        }
+        if (flags != 0 || res.length() == 0) {
+            res.append(Integer.toHexString(flags));
+        } else {
+            res.deleteCharAt(res.length() - 1);
+        }
+        return res.toString();
+    }
+
+    // Copied from DebugUtils
+    private static String constNameWithoutPrefix(String prefix, Field field) {
+        return field.getName().substring(prefix.length());
     }
 }

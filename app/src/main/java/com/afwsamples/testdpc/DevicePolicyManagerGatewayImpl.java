@@ -293,7 +293,7 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
         String message = String.format("setUserRestriction(%s, %b)", userRestriction, enabled);
         setUserRestriction(userRestriction, enabled,
                 (v) -> onSuccessLog(message),
-                (e) -> onErrorLog(message));
+                (e) -> onErrorLog(e, message));
     }
 
     @Override
@@ -386,7 +386,7 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
         String message = String.format("setNetworkLogging(%b)", enabled);
         setNetworkLogging(enabled,
                 (v) -> onSuccessLog(message),
-                (e) -> onErrorLog(message));
+                (e) -> onErrorLog(e, message));
     }
 
     @Override
@@ -431,7 +431,7 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
         String message = "setPermittedInputMethods(" + inputMethods + ")";
         return setPermittedInputMethods(packageNames,
             (v) -> onSuccessLog(message),
-            (e) -> onErrorLog(message));
+            (e) -> onErrorLog(e, message));
     }
 
     @Override
@@ -467,7 +467,7 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
         String message = String.format("setUsbDataSignalingEnabled(%b)", enabled);
         setUsbDataSignalingEnabled(enabled,
             (v) -> onSuccessLog(message),
-            (e) -> onErrorLog(message));
+            (e) -> onErrorLog(e, message));
     }
 
     @Override
@@ -559,15 +559,58 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
     }
 
     @Override
+    public void setLockTaskPackages(String[] packages, Consumer<Void> onSuccess,
+            Consumer<Exception> onError) {
+        Log.d(TAG, "setLockTaskPackages(" + Arrays.toString(packages) + ")");
+        try {
+            mDevicePolicyManager.setLockTaskPackages(mAdminComponentName, packages);
+            onSuccess.accept(null);
+        } catch (Exception e) {
+            onError.accept(e);
+        }
+    }
+
+    @Override
+    public String[] getLockTaskPackages() {
+        return mDevicePolicyManager.getLockTaskPackages(mAdminComponentName);
+    }
+
+    @Override
+    public void setLockTaskFeatures(int flags, Consumer<Void> onSuccess,
+            Consumer<Exception> onError) {
+        String features = Util.lockTaskFeaturesToString(flags);
+        Log.d(TAG, "setLockTaskFeatures(" + features + ")");
+        try {
+            mDevicePolicyManager.setLockTaskFeatures(mAdminComponentName, flags);
+            onSuccess.accept(null);
+        } catch (Exception e) {
+            onError.accept(e);
+        }
+    }
+
+    @Override
+    public int getLockTaskFeatures() {
+        int flags = mDevicePolicyManager.getLockTaskFeatures(mAdminComponentName);
+        Log.d(TAG, "getLockTaskFeatures(): " + Util.lockTaskFeaturesToString(flags)
+            + " (" + flags + ")");
+        return flags;
+    }
+
+    @Override
+    public boolean isLockTaskPermitted(String packageName) {
+        return mDevicePolicyManager.isLockTaskPermitted(packageName);
+    }
+
+    @Override
     public String toString() {
         return "DevicePolicyManagerGatewayImpl[" + mAdminComponentName + "]";
     }
 
     private static void onSuccessLog(String template, Object... args) {
-        Log.d(TAG, String.format(template, args) + " succeeded");
+        Util.onSuccessLog(TAG, template, args);
     }
 
-    private static void onErrorLog(String template, Object... args) {
-        Log.d(TAG, String.format(template, args) + " failed");
+    private static void onErrorLog(Exception e, String template, Object... args) {
+        Util.onErrorLog(TAG, e, template, args);
     }
 }
