@@ -244,6 +244,34 @@ public interface DevicePolicyManagerGateway {
      */
     boolean isPackageSuspended(String packageName) throws NameNotFoundException;
 
+    // TODO(b/171350084): use in other places
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#setLockTaskPackages(ComponentName, String[])}.
+     */
+    void setLockTaskPackages(String[] packages, @NonNull Consumer<Void> onSuccess,
+            @NonNull Consumer<Exception> onError);
+
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#getLockTaskPackages(ComponentName)}.
+     */
+    String[] getLockTaskPackages();
+
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#setLockTaskFeatures(ComponentName, int)}.
+     */
+    void setLockTaskFeatures(int flags, @NonNull Consumer<Void> onSuccess,
+            @NonNull Consumer<Exception> onError);
+
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#getLockTaskFeatures(ComponentName)}.
+     */
+    int getLockTaskFeatures();
+
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#isLockTaskPermitted(ComponentName, String)}.
+     */
+    boolean isLockTaskPermitted(String packageName);
+
     /**
      * Used on error callbacks to indicate a {@link android.app.admin.DevicePolicyManager} method
      * call failed.

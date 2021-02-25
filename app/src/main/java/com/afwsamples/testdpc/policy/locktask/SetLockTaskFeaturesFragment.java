@@ -24,8 +24,6 @@ import static android.app.admin.DevicePolicyManager.LOCK_TASK_FEATURE_OVERVIEW;
 import static android.app.admin.DevicePolicyManager.LOCK_TASK_FEATURE_SYSTEM_INFO;
 
 import android.annotation.TargetApi;
-import android.app.admin.DevicePolicyManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
@@ -34,8 +32,11 @@ import android.util.ArrayMap;
 import android.util.Log;
 import android.widget.Toast;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
+import com.afwsamples.testdpc.DevicePolicyManagerGateway;
+import com.afwsamples.testdpc.DevicePolicyManagerGatewayImpl;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.BaseSearchablePolicyPreferenceFragment;
+import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.common.preference.DpcSwitchPreference;
 import java.util.Map;
 
@@ -72,13 +73,12 @@ public class SetLockTaskFeaturesFragment
         FEATURE_FLAGS.put(KEY_KEYGUARD, LOCK_TASK_FEATURE_KEYGUARD);
     }
 
-    private DevicePolicyManager mDpm;
-    private ComponentName mAdmin;
+    private DevicePolicyManagerGateway mDpmGateway;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        mDpm = (DevicePolicyManager) getActivity().getSystemService(Context.DEVICE_POLICY_SERVICE);
-        mAdmin = DeviceAdminReceiver.getComponentName(getActivity());
+        mDpmGateway = new DevicePolicyManagerGatewayImpl(getActivity());
+
         getActivity().getActionBar().setTitle(R.string.set_lock_task_features_title);
 
         // Need to call super.onCreate() at last. Otherwise this.onCreatePreferences() will be
@@ -158,11 +158,13 @@ public class SetLockTaskFeaturesFragment
 
     @TargetApi(VERSION_CODES.P)
     private int getLockTaskFeatures() {
-        return mDpm.getLockTaskFeatures(mAdmin);
+        return mDpmGateway.getLockTaskFeatures();
     }
 
     @TargetApi(VERSION_CODES.P)
     private void setLockTaskFeatures(int flags) {
-       mDpm.setLockTaskFeatures(mAdmin, flags);
+        mDpmGateway.setLockTaskFeatures(flags,
+                (v) -> Util.onSuccessLog(TAG, "setLockTaskFeatures()"),
+                (e) -> Util.onErrorLog(TAG, e, "setLockTaskFeatures()"));
     }
 }

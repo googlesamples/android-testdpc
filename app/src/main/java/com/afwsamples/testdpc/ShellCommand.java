@@ -27,6 +27,8 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.afwsamples.testdpc.common.Util;
+
 import java.io.File;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -77,6 +79,11 @@ final class ShellCommand {
     private static final String CMD_TRANSFER_OWNERSHIP = "transfer-ownership";
     private static final String CMD_SET_SUSPENDED_PACKAGES = "set-suspended-packages";
     private static final String CMD_IS_PACKAGE_SUSPENDED = "is-package-suspended";
+    private static final String CMD_SET_LOCK_TASK_PACKAGES = "set-lock-task-packages";
+    private static final String CMD_GET_LOCK_TASK_PACKAGES = "get-lock-task-packages";
+    private static final String CMD_IS_LOCK_TASK_PERMITTED = "is-lock-task-permitted";
+    private static final String CMD_SET_LOCK_TASK_FEATURES = "set-lock-task-features";
+    private static final String CMD_GET_LOCK_TASK_FEATURES = "get-lock-task-features";
 
     private static final String ARG_FLAGS = "--flags";
 
@@ -192,6 +199,21 @@ final class ShellCommand {
             case CMD_IS_PACKAGE_SUSPENDED:
                 execute(() -> isPackageSuspended());
                 break;
+            case CMD_SET_LOCK_TASK_PACKAGES:
+                execute(() -> setLockTaskPackages());
+                break;
+            case CMD_GET_LOCK_TASK_PACKAGES:
+                execute(() -> getLockTaskPackages());
+                break;
+            case CMD_IS_LOCK_TASK_PERMITTED:
+                execute(() -> isLockTaskPermitted());
+                break;
+            case CMD_SET_LOCK_TASK_FEATURES:
+                execute(() -> setLockTaskFeatures());
+                break;
+            case CMD_GET_LOCK_TASK_FEATURES:
+                execute(() -> getLockTaskFeatures());
+                break;
             default:
                 mWriter.printf("Invalid command: %s\n\n", cmd);
                 showUsage();
@@ -260,6 +282,14 @@ final class ShellCommand {
                 + "packages\n", CMD_SET_SUSPENDED_PACKAGES);
         mWriter.printf("\t%s <PKG1> [PKG2] [PKGN] - checks if the given packages are suspended\n",
                 CMD_IS_PACKAGE_SUSPENDED);
+        mWriter.printf("\t%s <PKG1> [PKG2] [PGKN] - set the packages allowed to have tasks locked"
+                + "\n", CMD_SET_LOCK_TASK_PACKAGES);
+        mWriter.printf("\t%s - get the packages allowed to have tasks locked\n",
+                CMD_GET_LOCK_TASK_PACKAGES);
+        mWriter.printf("\t%s <PKG1> [PKG2] [PKGN] - checks if the given packages are allowed to "
+                + "have tasks locked\n", CMD_IS_LOCK_TASK_PERMITTED);
+        mWriter.printf("\t%s <FLAGS> - set the lock task features\n", CMD_SET_LOCK_TASK_FEATURES);
+        mWriter.printf("\t%s - get the lock task features\n", CMD_GET_LOCK_TASK_FEATURES);
     }
 
     private void createUser() {
@@ -532,7 +562,7 @@ final class ShellCommand {
 
     private void setPackagesSuspended() {
         boolean suspended = Boolean.parseBoolean(mArgs[1]);
-        String[] packageNames = getArrayFromArgs(2);
+        String[] packageNames = getArrayFromArgs(/* index= */ 2);
 
         String printableNames = Arrays.toString(packageNames);
         String printableStatus = suspendedToString(suspended);
@@ -553,6 +583,56 @@ final class ShellCommand {
             } catch (NameNotFoundException e) {
                 mWriter.printf("Invalid package name: %s\n", packageName);
             }
+        });
+    }
+
+    private void setLockTaskPackages() {
+        String[] packages = getArrayFromArgs(/* index= */ 1);
+
+        String printableNames = Arrays.toString(packages);
+
+        Log.i(TAG, "setLockTaskPackages(): " + printableNames);
+
+        mDevicePolicyManagerGateway.setLockTaskPackages(packages,
+            (v) -> onSuccess("Set lock tasks packages to %s", printableNames),
+            (e) -> onError(e, "Error settings lock task packages to %s", printableNames));
+    }
+
+    private void getLockTaskPackages() {
+        String[] packages = mDevicePolicyManagerGateway.getLockTaskPackages();
+        if (packages.length == 0) {
+            mWriter.println("no lock task packages");
+            return;
+        }
+        mWriter.println(Arrays.toString(packages));
+    }
+
+    private void setLockTaskFeatures() {
+        int flags = getIntArg(/* index= */ 1);
+
+        String features = Util.lockTaskFeaturesToString(flags);
+        Log.i(TAG, "setLockTaskFeatures(" + flags + "): setting to " + features);
+
+        mDevicePolicyManagerGateway.setLockTaskFeatures(flags,
+                (v) -> onSuccess("Set lock tasks features to %s", features),
+                (e) -> onError(e, "Error settings lock task features to %s", features));
+    }
+
+    private void getLockTaskFeatures() {
+        int flags = mDevicePolicyManagerGateway.getLockTaskFeatures();
+        String features= Util.lockTaskFeaturesToString(flags);
+
+        mWriter.printf("%s (%d)\n", features, flags);
+    }
+
+    private static String permittedToString(boolean permitted) {
+        return permitted ? "PERMITTED" : "NOT PERMITTED";
+    }
+
+    private void isLockTaskPermitted() {
+        getListFromAllArgs().forEach((packageName) -> {
+            boolean permitted = mDevicePolicyManagerGateway.isLockTaskPermitted(packageName);
+            mWriter.printf("%s: %s\n", packageName, permittedToString(permitted));
         });
     }
 
