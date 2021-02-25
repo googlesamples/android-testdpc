@@ -17,7 +17,7 @@
 package com.afwsamples.testdpc.policy;
 
 import static android.os.UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES;
-import static com.afwsamples.testdpc.common.preference.DpcPreferenceHelper.NO_CUSTOM_CONSTRIANT;
+import static com.afwsamples.testdpc.common.preference.DpcPreferenceHelper.NO_CUSTOM_CONSTRAINT;
 
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.accounts.Account;
@@ -650,7 +650,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         mRequestSecurityLogsPreference = (DpcPreference) findPreference(REQUEST_SECURITY_LOGS);
         mRequestSecurityLogsPreference.setOnPreferenceClickListener(this);
         final CustomConstraint securityLoggingChecker = () -> isSecurityLoggingEnabled()
-                ? NO_CUSTOM_CONSTRIANT
+                ? NO_CUSTOM_CONSTRAINT
                 : R.string.requires_security_logs;
         mRequestSecurityLogsPreference.setCustomConstraint(securityLoggingChecker);
         mRequestPreRebootSecurityLogsPreference =
@@ -661,9 +661,10 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         mEnableNetworkLoggingPreference.setOnPreferenceChangeListener(this);
         mRequestNetworkLogsPreference = (DpcPreference) findPreference(REQUEST_NETWORK_LOGS);
         mRequestNetworkLogsPreference.setOnPreferenceClickListener(this);
+        mRequestNetworkLogsPreference.setThrowShit();
         mRequestNetworkLogsPreference.setCustomConstraint(
             () -> isNetworkLoggingEnabled()
-                ? NO_CUSTOM_CONSTRIANT
+                ? NO_CUSTOM_CONSTRAINT
                 : R.string.requires_network_logs);
         findPreference(SET_ACCESSIBILITY_SERVICES_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_INPUT_METHODS_KEY).setOnPreferenceClickListener(this);
@@ -728,7 +729,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                     mUserManager.hasUserRestriction(
                         UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES_GLOBALLY))
                         ? R.string.user_restricted
-                        : NO_CUSTOM_CONSTRIANT);
+                        : NO_CUSTOM_CONSTRAINT);
         mInstallNonMarketAppsPreference.setOnPreferenceChangeListener(this);
         findPreference(SET_USER_RESTRICTIONS_KEY).setOnPreferenceClickListener(this);
         mUserRestrictionsParentPreference = (DpcPreference) findPreference(SET_USER_RESTRICTIONS_PARENT_KEY);
@@ -766,7 +767,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 (DpcPreference) findPreference(BIND_DEVICE_ADMIN_POLICIES);
         bindDeviceAdminPreference.setCustomConstraint(
                 () -> (Util.getBindDeviceAdminTargetUsers(getActivity()).size() == 1)
-                        ? NO_CUSTOM_CONSTRIANT
+                        ? NO_CUSTOM_CONSTRAINT
                         : R.string.require_one_po_to_bind);
         bindDeviceAdminPreference.setOnPreferenceClickListener(this);
 
@@ -1691,9 +1692,13 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         parentDpm.setScreenCaptureDisabled(mAdminComponentName, disabled);
     }
 
+    private boolean isDeviceOwner() {
+        return mDevicePolicyManager.isDeviceOwnerApp(mPackageName);
+    }
+
     @TargetApi(VERSION_CODES.O)
     private boolean isNetworkLoggingEnabled() {
-        return mDevicePolicyManager.isNetworkLoggingEnabled(mAdminComponentName);
+        return isDeviceOwner() && mDevicePolicyManager.isNetworkLoggingEnabled(mAdminComponentName);
     }
 
     @TargetApi(VERSION_CODES.O)
@@ -2668,7 +2673,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     @TargetApi(VERSION_CODES.O)
     private void reloadEnableNetworkLoggingUi() {
         if (mEnableNetworkLoggingPreference.isEnabled()) {
-            boolean isNetworkLoggingEnabled = mDevicePolicyManager.isNetworkLoggingEnabled(mAdminComponentName);
+            boolean isNetworkLoggingEnabled = isNetworkLoggingEnabled();
             mEnableNetworkLoggingPreference.setChecked(isNetworkLoggingEnabled);
             mRequestNetworkLogsPreference.refreshEnabledState();
         }
@@ -4308,7 +4313,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 return R.string.require_affiliated_user;
             }
         }
-        return NO_CUSTOM_CONSTRIANT;
+        return NO_CUSTOM_CONSTRAINT;
     }
 
     @TargetApi(30)
@@ -4324,7 +4329,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 return R.string.requires_device_owner;
             }
         }
-        return NO_CUSTOM_CONSTRIANT;
+        return NO_CUSTOM_CONSTRAINT;
     }
 
     private int validateDeviceOwnerBeforeP() {
@@ -4333,7 +4338,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 return R.string.requires_device_owner;
             }
         }
-        return NO_CUSTOM_CONSTRIANT;
+        return NO_CUSTOM_CONSTRAINT;
     }
 
     private int validateDeviceOwnerBeforeQ() {
@@ -4342,7 +4347,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 return R.string.requires_device_owner;
             }
         }
-        return NO_CUSTOM_CONSTRIANT;
+        return NO_CUSTOM_CONSTRAINT;
     }
 
     interface ManageLockTaskListCallback {

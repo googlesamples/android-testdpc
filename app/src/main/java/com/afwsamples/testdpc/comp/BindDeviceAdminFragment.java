@@ -16,7 +16,7 @@
 
 package com.afwsamples.testdpc.comp;
 
-import static com.afwsamples.testdpc.common.preference.DpcPreferenceHelper.NO_CUSTOM_CONSTRIANT;
+import static com.afwsamples.testdpc.common.preference.DpcPreferenceHelper.NO_CUSTOM_CONSTRAINT;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -97,7 +97,7 @@ public class BindDeviceAdminFragment extends BaseSearchablePolicyPreferenceFragm
 
         // Installing certificates makes sense for managed profile and secondary users.
         mInstallCaCertificatePreference.setCustomConstraint(
-                getCustomConstraint(NO_CUSTOM_CONSTRIANT));
+                getCustomConstraint(NO_CUSTOM_CONSTRAINT));
     }
 
     @Override
@@ -116,7 +116,7 @@ public class BindDeviceAdminFragment extends BaseSearchablePolicyPreferenceFragm
             } else if (!isManagedProfileRunning() || !isManagedProfileUnlocked()) {
                 return R.string.managed_profile_not_running_or_unlocked;
             } else {
-                return NO_CUSTOM_CONSTRIANT;
+                return NO_CUSTOM_CONSTRAINT;
             }
         };
     }
