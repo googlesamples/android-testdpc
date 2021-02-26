@@ -487,7 +487,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private DpcSwitchPreference mCommonCriteriaModePreference;
     private DpcSwitchPreference mEnableUsbDataSignalingPreference;
     private SwitchPreference mEnableSecurityLoggingPreference;
-    private SwitchPreference mEnableNetworkLoggingPreference;
+    private DpcSwitchPreference mEnableNetworkLoggingPreference;
     private DpcSwitchPreference mSetAutoTimeRequiredPreference;
     private DpcSwitchPreference mSetAutoTimePreference;
     private DpcSwitchPreference mSetAutoTimeZonePreference;
@@ -657,14 +657,14 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 (DpcPreference) findPreference(REQUEST_PRE_REBOOT_SECURITY_LOGS);
         mRequestPreRebootSecurityLogsPreference.setOnPreferenceClickListener(this);
         mRequestPreRebootSecurityLogsPreference.setCustomConstraint(securityLoggingChecker);
-        mEnableNetworkLoggingPreference = (SwitchPreference) findPreference(ENABLE_NETWORK_LOGGING);
+        mEnableNetworkLoggingPreference =
+            (DpcSwitchPreference) findPreference(ENABLE_NETWORK_LOGGING);
         mEnableNetworkLoggingPreference.setOnPreferenceChangeListener(this);
+        mEnableNetworkLoggingPreference.addCustomConstraint(
+            this::validateDeviceOwnerOrDelegationNetworkLoggingBeforeS);
         mRequestNetworkLogsPreference = (DpcPreference) findPreference(REQUEST_NETWORK_LOGS);
         mRequestNetworkLogsPreference.setOnPreferenceClickListener(this);
-        mRequestNetworkLogsPreference.setCustomConstraint(
-            () -> isNetworkLoggingEnabled()
-                ? NO_CUSTOM_CONSTRAINT
-                : R.string.requires_network_logs);
+        mRequestNetworkLogsPreference.setCustomConstraint(this::getRequestNetworkLogsConstraint);
         findPreference(SET_ACCESSIBILITY_SERVICES_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_INPUT_METHODS_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_INPUT_METHODS_ON_PARENT_KEY).setOnPreferenceClickListener(this);
@@ -4347,6 +4347,25 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             }
         }
         return NO_CUSTOM_CONSTRAINT;
+    }
+
+    private int validateDeviceOwnerOrDelegationNetworkLoggingBeforeS() {
+        if (Util.SDK_INT < VERSION_CODES.S) {
+            if (!mDevicePolicyManager.isDeviceOwnerApp(mPackageName) && !Util
+                .hasDelegation(getActivity(), DevicePolicyManager.DELEGATION_NETWORK_LOGGING)) {
+                return R.string.requires_device_owner_or_delegation_network_logging;
+            }
+        }
+        return NO_CUSTOM_CONSTRAINT;
+    }
+
+    private int getRequestNetworkLogsConstraint() {
+        int constraint = validateDeviceOwnerOrDelegationNetworkLoggingBeforeS();
+        if (constraint == NO_CUSTOM_CONSTRAINT) {
+            constraint = isNetworkLoggingEnabled()
+                ? NO_CUSTOM_CONSTRAINT : R.string.requires_network_logs;
+        }
+        return constraint;
     }
 
     interface ManageLockTaskListCallback {

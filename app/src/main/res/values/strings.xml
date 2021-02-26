@@ -107,6 +107,7 @@
     <string name="managed_profile">managed profile</string>
     <string name="requires_device_owner">Requires device owner</string>
     <string name="requires_profile_owner_organization_owned_device">Requires profile owner of an organization owned device</string>
+    <string name="requires_device_owner_or_delegation_network_logging">Requires device owner or delegation-network-logging</string>
 
     <string name="not_for_parent_profile">Not applicable to parent profile</string>
     <string name="user_restricted">Disallowed by user restriction</string>
