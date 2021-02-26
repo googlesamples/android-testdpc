@@ -661,7 +661,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         mEnableNetworkLoggingPreference.setOnPreferenceChangeListener(this);
         mRequestNetworkLogsPreference = (DpcPreference) findPreference(REQUEST_NETWORK_LOGS);
         mRequestNetworkLogsPreference.setOnPreferenceClickListener(this);
-        mRequestNetworkLogsPreference.setThrowShit();
         mRequestNetworkLogsPreference.setCustomConstraint(
             () -> isNetworkLoggingEnabled()
                 ? NO_CUSTOM_CONSTRAINT
