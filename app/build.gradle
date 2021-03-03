@@ -126,15 +126,19 @@ private void stripTestOnlyForBuild(flavor, buildType) {
     def manifestPath =
             "${buildDir}/intermediates/manifests/full/${flavor}/${buildType}/AndroidManifest.xml"
     if (file(manifestPath).exists()) {
-        def xml = new XmlParser().parse(manifestPath)
-        def attributeNames = xml.application[0].attributes().collect { it.key }
-        attributeNames.each {
-            if (it.getLocalPart() == 'testOnly') {
-                xml.application[0].attributes().remove(it)
-                println "Removed testOnly attribute successfully!"
+        if (System.getenv('TESTDPC_ALLOW_TEST_ONLY') == 'true') {
+            println "NOT stripping testOnly from manifest because of TESTDPC_ALLOW_TEST_ONLY"
+        } else {
+            def xml = new XmlParser().parse(manifestPath)
+            def attributeNames = xml.application[0].attributes().collect { it.key }
+            attributeNames.each {
+                if (it.getLocalPart() == 'testOnly') {
+                    xml.application[0].attributes().remove(it)
+                    println "Removed testOnly attribute successfully!"
+                }
             }
+            new XmlNodePrinter(new PrintWriter(new FileWriter(manifestPath))).print(xml)
         }
-        new XmlNodePrinter(new PrintWriter(new FileWriter(manifestPath))).print(xml)
     }
 }
 
