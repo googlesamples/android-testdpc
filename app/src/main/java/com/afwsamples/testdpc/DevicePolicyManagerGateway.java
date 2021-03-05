@@ -59,6 +59,12 @@ public interface DevicePolicyManagerGateway {
      */
     boolean isProfileOwnerApp();
 
+    // TODO(b/171350084): use in other places
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#isOrganizationOwnedDeviceWithManagedProfile()}.
+     */
+    boolean isOrganizationOwnedDeviceWithManagedProfile();
+
     /**
      * See {@link android.os.UserManager#isHeadlessSystemUserMode()}.
      */
@@ -295,6 +301,16 @@ public interface DevicePolicyManagerGateway {
      * See {@link android.app.admin.DevicePolicyManager#isApplicationHidden(ComponentName, String)}.
      */
     boolean isApplicationHidden(String packageName) throws NameNotFoundException;
+
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#setPersonalAppsSuspended(ComponentName, boolean)}.
+     */
+    void setPersonalAppsSuspended(boolean suspended, @NonNull Consumer<Void> onSuccess,
+            @NonNull Consumer<Exception> onError);
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#getPersonalAppsSuspendedReasons(ComponentName)}.
+     */
+    int getPersonalAppsSuspendedReasons();
 
     // TODO(b/171350084): use in other places
     /**

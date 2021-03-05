@@ -92,6 +92,11 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
     }
 
     @Override
+    public boolean isOrganizationOwnedDeviceWithManagedProfile() {
+        return mDevicePolicyManager.isOrganizationOwnedDeviceWithManagedProfile();
+    }
+
+    @Override
     public boolean isHeadlessSystemUserMode() {
         Util.requireAndroidS();
 
@@ -556,6 +561,24 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
     @Override
     public boolean isPackageSuspended(String packageName) throws NameNotFoundException {
         return mDevicePolicyManager.isPackageSuspended(mAdminComponentName, packageName);
+    }
+
+    @Override
+    public void setPersonalAppsSuspended(boolean suspended, Consumer<Void> onSuccess,
+            Consumer<Exception> onError) {
+        Log.d(TAG, "setPersonalAppsSuspended(" + suspended+ ")");
+
+        try {
+            mDevicePolicyManager.setPersonalAppsSuspended(mAdminComponentName, suspended);
+            onSuccess.accept(null);
+        } catch (Exception e) {
+            onError.accept(e);
+        }
+    }
+
+    @Override
+    public int getPersonalAppsSuspendedReasons() {
+        return mDevicePolicyManager.getPersonalAppsSuspendedReasons(mAdminComponentName);
     }
 
     @Override
