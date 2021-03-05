@@ -285,6 +285,17 @@ public interface DevicePolicyManagerGateway {
      */
     boolean isPackageSuspended(String packageName) throws NameNotFoundException;
 
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#setApplicationHidden(ComponentName, String, boolean)}.
+     */
+    void setApplicationHidden(String packageName, boolean suspended, @NonNull Consumer<Void> onSuccess,
+        @NonNull Consumer<Exception> onError);
+
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#isApplicationHidden(ComponentName, String)}.
+     */
+    boolean isApplicationHidden(String packageName) throws NameNotFoundException;
+
     // TODO(b/171350084): use in other places
     /**
      * See {@link android.app.admin.DevicePolicyManager#setLockTaskPackages(ComponentName, String[])}.

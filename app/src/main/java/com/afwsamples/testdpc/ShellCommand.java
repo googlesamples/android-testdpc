@@ -79,7 +79,9 @@ final class ShellCommand {
     private static final String CMD_GET_PASSWORD_QUALITY = "get-password-quality";
     private static final String CMD_TRANSFER_OWNERSHIP = "transfer-ownership";
     private static final String CMD_SET_SUSPENDED_PACKAGES = "set-suspended-packages";
-    private static final String CMD_IS_PACKAGE_SUSPENDED = "is-package-suspended";
+    private static final String CMD_LIST_PACKAGE_SUSPENDED = "list-suspended-packages";
+    private static final String CMD_SET_HIDDEN_PACKAGE = "set-hidden-package";
+    private static final String CMD_IS_HIDDEN_PACKAGE = "is-hidden-package";
     private static final String CMD_SET_LOCK_TASK_PACKAGES = "set-lock-task-packages";
     private static final String CMD_GET_LOCK_TASK_PACKAGES = "get-lock-task-packages";
     private static final String CMD_IS_LOCK_TASK_PERMITTED = "is-lock-task-permitted";
@@ -215,10 +217,16 @@ final class ShellCommand {
                 execute(() -> transferOwnership());
                 break;
             case CMD_SET_SUSPENDED_PACKAGES:
-                execute(() -> setPackagesSuspended());
+                execute(() -> setSuspendedPackages());
                 break;
-            case CMD_IS_PACKAGE_SUSPENDED:
-                execute(() -> isPackageSuspended());
+            case CMD_LIST_PACKAGE_SUSPENDED:
+                execute(() -> listSuspendedPackages());
+                break;
+            case CMD_SET_HIDDEN_PACKAGE:
+                execute(() -> setHiddenPackage());
+                break;
+            case CMD_IS_HIDDEN_PACKAGE:
+                execute(() -> isHiddenPackage());
                 break;
             case CMD_SET_LOCK_TASK_PACKAGES:
                 execute(() -> setLockTaskPackages());
@@ -308,7 +316,11 @@ final class ShellCommand {
         mWriter.printf("\t%s <SUSPENDED> <PKG1> [PKG2] [PGKN] - suspend / unsuspend the given "
                 + "packages\n", CMD_SET_SUSPENDED_PACKAGES);
         mWriter.printf("\t%s <PKG1> [PKG2] [PKGN] - checks if the given packages are suspended\n",
-                CMD_IS_PACKAGE_SUSPENDED);
+                CMD_LIST_PACKAGE_SUSPENDED);
+        mWriter.printf("\t%s <PKG> <HIDDEN> - hide / unhide the given package\n",
+                CMD_SET_HIDDEN_PACKAGE);
+        mWriter.printf("\t%s <PKG> - checks if the given package is hidden\n",
+                CMD_IS_HIDDEN_PACKAGE);
         mWriter.printf("\t%s <PKG1> [PKG2] [PGKN] - set the packages allowed to have tasks locked"
                 + "\n", CMD_SET_LOCK_TASK_PACKAGES);
         mWriter.printf("\t%s - get the packages allowed to have tasks locked\n",
@@ -632,7 +644,7 @@ final class ShellCommand {
         return suspended ? "SUSPENDED" : "NOT SUSPENDED";
     }
 
-    private void setPackagesSuspended() {
+    private void setSuspendedPackages() {
         boolean suspended = Boolean.parseBoolean(mArgs[1]);
         String[] packageNames = getArrayFromArgs(/* index= */ 2);
 
@@ -647,7 +659,7 @@ final class ShellCommand {
             (e) -> onError(e, "Error settings %s to %s", printableNames, printableStatus));
     }
 
-    private void isPackageSuspended() {
+    private void listSuspendedPackages() {
         getListFromAllArgs().forEach((packageName) -> {
             try {
                 boolean suspended = mDevicePolicyManagerGateway.isPackageSuspended(packageName);
@@ -656,6 +668,33 @@ final class ShellCommand {
                 mWriter.printf("Invalid package name: %s\n", packageName);
             }
         });
+    }
+
+    private static String hiddenToString(boolean hidden) {
+        return hidden ? "HIDDEN" : "VISIBLE";
+    }
+
+    private void setHiddenPackage() {
+        // TODO(b/171350084): check args
+        String packageName = mArgs[1];
+        boolean hidden = Boolean.parseBoolean(mArgs[2]);
+        String printableStatus = hiddenToString(hidden);
+
+        Log.i(TAG, "setHiddenPackages(" + packageName + "): " + printableStatus);
+        mDevicePolicyManagerGateway.setApplicationHidden(packageName, hidden,
+            (v) -> onSuccess("Set %s as %s", packageName, printableStatus),
+            (e) -> onError(e, "Error settings %s as %s", packageName, printableStatus));
+    }
+
+    private void isHiddenPackage() {
+        // TODO(b/171350084): check args
+        String packageName = mArgs[1];
+        try {
+            boolean hidden = mDevicePolicyManagerGateway.isApplicationHidden(packageName);
+            mWriter.printf("%s: %s\n", packageName, hiddenToString(hidden));
+        } catch (NameNotFoundException e) {
+            mWriter.printf("Invalid package name: %s\n", packageName);
+        }
     }
 
     private void setLockTaskPackages() {

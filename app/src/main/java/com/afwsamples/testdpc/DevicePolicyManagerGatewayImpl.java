@@ -571,6 +571,24 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
     }
 
     @Override
+    public void setApplicationHidden(String packageName, boolean hidden,
+            Consumer<Void> onSuccess, Consumer<Exception> onError) {
+        Log.d(TAG, "setApplicationHidden(" + packageName + ", " + hidden + ")");
+
+        try {
+            mDevicePolicyManager.setApplicationHidden(mAdminComponentName, packageName, hidden);
+            onSuccess.accept(null);
+        } catch (Exception e) {
+            onError.accept(e);
+        }
+    }
+
+    @Override
+    public boolean isApplicationHidden(String packageName) throws NameNotFoundException {
+        return mDevicePolicyManager.isApplicationHidden(mAdminComponentName, packageName);
+    }
+
+    @Override
     public String[] getLockTaskPackages() {
         return mDevicePolicyManager.getLockTaskPackages(mAdminComponentName);
     }
