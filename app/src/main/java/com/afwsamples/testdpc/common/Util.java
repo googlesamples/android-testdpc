@@ -254,6 +254,10 @@ public class Util {
         return flagsToString(DevicePolicyManager.class, "LOCK_TASK_FEATURE_", flags);
     }
 
+    public static String personalAppsSuspensionReasonToString(int reasons) {
+        return flagsToString(DevicePolicyManager.class, "PERSONAL_APPS_", reasons);
+    }
+
     public static void onSuccessLog(String tag, String template, Object... args) {
         Log.d(tag, String.format(template, args) + " succeeded");
     }

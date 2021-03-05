@@ -2320,8 +2320,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     private void loadAppStatus() {
         final @StringRes int appStatusStringId;
-        boolean isOrgOwned = Util.SDK_INT >= VERSION_CODES.R &&
-                mDevicePolicyManager.isOrganizationOwnedDeviceWithManagedProfile();
+        boolean isOrgOwned = Util.SDK_INT >= VERSION_CODES.R
+                && mDevicePolicyManagerGateway.isOrganizationOwnedDeviceWithManagedProfile();
         if (mDevicePolicyManager.isProfileOwnerApp(mPackageName)) {
             if (isOrgOwned) {
                 appStatusStringId = R.string.this_is_an_org_owned_profile_owner;
@@ -2560,7 +2560,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             return;
         }
         boolean isOrgOwned =
-            mDevicePolicyManager.isOrganizationOwnedDeviceWithManagedProfile();
+                mDevicePolicyManagerGateway.isOrganizationOwnedDeviceWithManagedProfile();
 
         if (mDevicePolicyManager.isDeviceOwnerApp(mPackageName)
                 || (mDevicePolicyManager.isProfileOwnerApp(mPackageName)
@@ -2576,7 +2576,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             return;
         }
         boolean isOrgOwned =
-            mDevicePolicyManager.isOrganizationOwnedDeviceWithManagedProfile();
+                mDevicePolicyManagerGateway.isOrganizationOwnedDeviceWithManagedProfile();
 
         if (mDevicePolicyManager.isDeviceOwnerApp(mPackageName)
                 || (mDevicePolicyManager.isProfileOwnerApp(mPackageName)

@@ -89,6 +89,11 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
     }
 
     @Override
+    public boolean isOrganizationOwnedDeviceWithManagedProfile() {
+        return mDevicePolicyManager.isOrganizationOwnedDeviceWithManagedProfile();
+    }
+
+    @Override
     public void createAndManageUser(String name, int flags, Consumer<UserHandle> onSuccess,
             Consumer<Exception> onError) {
         Log.d(TAG, "createAndManageUser(" + name + ", " + flags + ")");
@@ -469,15 +474,21 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
     }
 
     @Override
-    public void setLockTaskPackages(String[] packages, Consumer<Void> onSuccess,
+    public void setPersonalAppsSuspended(boolean suspended, Consumer<Void> onSuccess,
             Consumer<Exception> onError) {
-        Log.d(TAG, "setLockTaskPackages(" + Arrays.toString(packages) + ")");
+        Log.d(TAG, "setPersonalAppsSuspended(" + suspended+ ")");
+
         try {
-            mDevicePolicyManager.setLockTaskPackages(mAdminComponentName, packages);
+            mDevicePolicyManager.setPersonalAppsSuspended(mAdminComponentName, suspended);
             onSuccess.accept(null);
         } catch (Exception e) {
             onError.accept(e);
         }
+    }
+
+    @Override
+    public int getPersonalAppsSuspendedReasons() {
+        return mDevicePolicyManager.getPersonalAppsSuspendedReasons(mAdminComponentName);
     }
 
     @Override
@@ -496,6 +507,18 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
     @Override
     public boolean isApplicationHidden(String packageName) throws NameNotFoundException {
         return mDevicePolicyManager.isApplicationHidden(mAdminComponentName, packageName);
+    }
+
+    @Override
+    public void setLockTaskPackages(String[] packages, Consumer<Void> onSuccess,
+            Consumer<Exception> onError) {
+        Log.d(TAG, "setLockTaskPackages(" + Arrays.toString(packages) + ")");
+        try {
+            mDevicePolicyManager.setLockTaskPackages(mAdminComponentName, packages);
+            onSuccess.accept(null);
+        } catch (Exception e) {
+            onError.accept(e);
+        }
     }
 
     @Override

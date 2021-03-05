@@ -78,7 +78,10 @@ final class ShellCommand {
     private static final String CMD_GET_PASSWORD_QUALITY = "get-password-quality";
     private static final String CMD_TRANSFER_OWNERSHIP = "transfer-ownership";
     private static final String CMD_SET_SUSPENDED_PACKAGES = "set-suspended-packages";
-    private static final String CMD_LIST_PACKAGE_SUSPENDED = "list-suspended-packages";
+    private static final String CMD_IS_SUSPENDED_PACKAGE = "is-suspended-packages";
+    private static final String CMD_SET_PERSONAL_APPS_SUSPENDED = "set-personal-apps-suspended";
+    private static final String CMD_GET_PERSONAL_APPS_SUSPENDED_REASONS
+            = "get-personal-apps-suspended-reasons";
     private static final String CMD_SET_HIDDEN_PACKAGE = "set-hidden-package";
     private static final String CMD_IS_HIDDEN_PACKAGE = "is-hidden-package";
     private static final String CMD_SET_LOCK_TASK_PACKAGES = "set-lock-task-packages";
@@ -198,8 +201,14 @@ final class ShellCommand {
             case CMD_SET_SUSPENDED_PACKAGES:
                 execute(() -> setSuspendedPackages());
                 break;
-            case CMD_LIST_PACKAGE_SUSPENDED:
-                execute(() -> listSuspendedPackages());
+            case CMD_IS_SUSPENDED_PACKAGE:
+                execute(() -> isSuspendedPackage());
+                break;
+            case CMD_SET_PERSONAL_APPS_SUSPENDED:
+                execute(() -> setPersonalAppsSuspended());
+                break;
+            case CMD_GET_PERSONAL_APPS_SUSPENDED_REASONS:
+                execute(() -> getPersonalAppsSuspendedReasons());
                 break;
             case CMD_SET_HIDDEN_PACKAGE:
                 execute(() -> setHiddenPackage());
@@ -231,6 +240,8 @@ final class ShellCommand {
     private void dumpState() {
         mWriter.printf("isDeviceOwner: %b\n", mDevicePolicyManagerGateway.isDeviceOwnerApp());
         mWriter.printf("isProfileOwner: %b\n", mDevicePolicyManagerGateway.isProfileOwnerApp());
+        mWriter.printf("isOrganizationOwnedDeviceWithManagedProfile: %b\n",
+                mDevicePolicyManagerGateway.isOrganizationOwnedDeviceWithManagedProfile());
     }
 
     private void showUsage() {
@@ -289,7 +300,11 @@ final class ShellCommand {
         mWriter.printf("\t%s <SUSPENDED> <PKG1> [PKG2] [PGKN] - suspend / unsuspend the given "
                 + "packages\n", CMD_SET_SUSPENDED_PACKAGES);
         mWriter.printf("\t%s <PKG1> [PKG2] [PKGN] - checks if the given packages are suspended\n",
-                CMD_LIST_PACKAGE_SUSPENDED);
+                CMD_IS_SUSPENDED_PACKAGE);
+        mWriter.printf("\t%s <SUSPENDED> - suspend / unsuspend personal apps\n",
+                CMD_SET_PERSONAL_APPS_SUSPENDED);
+        mWriter.printf("\t%s - gets the reasons for suspending personal apps\n",
+                CMD_GET_PERSONAL_APPS_SUSPENDED_REASONS);
         mWriter.printf("\t%s <PKG> <HIDDEN> - hide / unhide the given package\n",
                 CMD_SET_HIDDEN_PACKAGE);
         mWriter.printf("\t%s <PKG> - checks if the given package is hidden\n",
@@ -587,7 +602,7 @@ final class ShellCommand {
             (e) -> onError(e, "Error settings %s to %s", printableNames, printableStatus));
     }
 
-    private void listSuspendedPackages() {
+    private void isSuspendedPackage() {
         getListFromAllArgs().forEach((packageName) -> {
             try {
                 boolean suspended = mDevicePolicyManagerGateway.isPackageSuspended(packageName);
@@ -623,6 +638,24 @@ final class ShellCommand {
         } catch (NameNotFoundException e) {
             mWriter.printf("Invalid package name: %s\n", packageName);
         }
+    }
+
+    private void setPersonalAppsSuspended() {
+        boolean suspended = Boolean.parseBoolean(mArgs[1]);
+        String printableStatus = suspendedToString(suspended);
+
+        Log.i(TAG, "setPersonalAppsSuspended(): " + printableStatus);
+
+        mDevicePolicyManagerGateway.setPersonalAppsSuspended(suspended,
+            (v) -> onSuccess("Set personal apps to %s", printableStatus),
+            (e) -> onError(e, "Error setting personal apps to %s", printableStatus));
+    }
+
+    private void getPersonalAppsSuspendedReasons() {
+        int reasons = mDevicePolicyManagerGateway.getPersonalAppsSuspendedReasons();
+        String printableReasons = Util.personalAppsSuspensionReasonToString(reasons);
+
+        mWriter.printf("%s (%d)\n", printableReasons, reasons);
     }
 
     private void setLockTaskPackages() {
