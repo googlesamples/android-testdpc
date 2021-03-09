@@ -75,15 +75,13 @@ public class EnableSystemAppsByIntentFragment extends IntentOrIntentFilterFragme
                     Toast.makeText(getActivity(), R.string.enable_system_apps_failure_msg,
                             Toast.LENGTH_SHORT).show();
                 } else {
-                    try {
-                        mDevicePolicyManager.enableSystemApp(
-                                DeviceAdminReceiver.getComponentName(getActivity()), intent);
-                        Toast.makeText(getActivity(), R.string.enable_system_apps_attempt_msg,
-                                Toast.LENGTH_SHORT).show();
-                    } catch (IllegalArgumentException e) {
-                        Toast.makeText(getActivity(), e.getLocalizedMessage(), Toast.LENGTH_SHORT)
-                                .show();
-                    }
+                    mDevicePolicyManagerGateway.enableSystemApp(intent,
+                            // TODO: change string to show number of apps enabled (i)
+                            (i) -> Toast.makeText(getActivity(),
+                                    R.string.enable_system_apps_attempt_msg, Toast.LENGTH_SHORT)
+                                .show(),
+                            (e) -> Toast.makeText(getActivity(), e.getLocalizedMessage(), Toast.LENGTH_SHORT)
+                                .show());
                 }
                 isClickHandled = true;
                 break;

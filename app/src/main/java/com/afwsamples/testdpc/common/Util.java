@@ -272,8 +272,12 @@ public class Util {
         Log.d(tag, String.format(template, args) + " succeeded");
     }
 
+    public static void onErrorLog(String tag, String template, Object... args) {
+        Log.e(tag, String.format(template, args) + " failed");
+    }
+
     public static void onErrorLog(String tag, Exception e, String template, Object... args) {
-        Log.d(tag, String.format(template, args) + " failed", e);
+        Log.e(tag, String.format(template, args) + " failed", e);
     }
 
     // Copied from DebugUtils

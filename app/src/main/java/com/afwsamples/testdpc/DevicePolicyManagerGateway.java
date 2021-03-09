@@ -17,6 +17,8 @@ package com.afwsamples.testdpc;
 
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Bitmap;
 import android.os.PersistableBundle;
@@ -307,10 +309,31 @@ public interface DevicePolicyManagerGateway {
      */
     void setPersonalAppsSuspended(boolean suspended, @NonNull Consumer<Void> onSuccess,
             @NonNull Consumer<Exception> onError);
+
     /**
      * See {@link android.app.admin.DevicePolicyManager#getPersonalAppsSuspendedReasons(ComponentName)}.
      */
     int getPersonalAppsSuspendedReasons();
+
+
+    // TODO(b/171350084): use on CosuConfig
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#enableSystemApp(ComponentName, String)}.
+     */
+    void enableSystemApp(String packageName, @NonNull Consumer<Void> onSuccess,
+            @NonNull Consumer<Exception> onError);
+
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#enableSystemApp(ComponentName, Intent)}.
+     */
+    void enableSystemApp(Intent intent, @NonNull Consumer<Integer> onSuccess,
+            @NonNull Consumer<Exception> onError);
+
+    /**
+     * Queries {@link PackageManager} to get the list of apps that are disabled for the user.
+     */
+    @NonNull
+    List<String> getDisabledSystemApps();
 
     // TODO(b/171350084): use in other places
     /**

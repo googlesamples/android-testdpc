@@ -536,12 +536,12 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         mDevicePolicyManager = (DevicePolicyManager) getActivity().getSystemService(
                 Context.DEVICE_POLICY_SERVICE);
         mUserManager = (UserManager) getActivity().getSystemService(Context.USER_SERVICE);
+        mPackageManager = getActivity().getPackageManager();
         mDevicePolicyManagerGateway = new DevicePolicyManagerGatewayImpl(mDevicePolicyManager,
-                mUserManager, mAdminComponentName);
+                mUserManager, mPackageManager, mAdminComponentName);
         mTelephonyManager = (TelephonyManager) getActivity()
                 .getSystemService(Context.TELEPHONY_SERVICE);
         mAccountManager = AccountManager.get(getActivity());
-        mPackageManager = getActivity().getPackageManager();
         mPackageName = getActivity().getPackageName();
 
         mImageUri = getStorageUri("image.jpg");
@@ -2793,21 +2793,14 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         new AlertDialog.Builder(getActivity())
                 .setTitle(getString(R.string.enable_system_apps_title))
                 .setView(inputContainer)
-                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        final String packageName = editText.getText().toString();
-                        try {
-                            mDevicePolicyManager.enableSystemApp(mAdminComponentName, packageName);
-                            showToast(R.string.enable_system_apps_by_package_name_success_msg,
-                                    packageName);
-                        } catch (IllegalArgumentException e) {
-                            showToast(R.string.package_name_error);
-                        } finally {
-                            dialog.dismiss();
-                        }
-                    }
-                })
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                        String packageName = editText.getText().toString();
+                        mDevicePolicyManagerGateway.enableSystemApp(packageName,
+                                (v) -> onSuccessShowToast("enableSystemApp",
+                                        R.string.enable_system_apps_by_package_name_success_msg,
+                                        packageName),
+                                (e) -> onErrorShowToast("enableSystemApp", e,
+                                        R.string.package_name_error, packageName));})
                 .setNegativeButton(android.R.string.cancel, null)
                 .show();
     }
@@ -3289,26 +3282,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
      * dialog enables the app.
      */
     private void showEnableSystemAppsPrompt() {
-        // Disabled system apps list = {All system apps} - {Enabled system apps}
-        final List<String> disabledSystemApps = new ArrayList<String>();
-        // This list contains both enabled and disabled apps.
-        List<ApplicationInfo> allApps = mPackageManager.getInstalledApplications(
-                PackageManager.GET_UNINSTALLED_PACKAGES);
-        Collections.sort(allApps, new ApplicationInfo.DisplayNameComparator(mPackageManager));
-        // This list contains all enabled apps.
-        List<ApplicationInfo> enabledApps =
-                mPackageManager.getInstalledApplications(0 /* Default flags */);
-        Set<String> enabledAppsPkgNames = new HashSet<String>();
-        for (ApplicationInfo applicationInfo : enabledApps) {
-            enabledAppsPkgNames.add(applicationInfo.packageName);
-        }
-        for (ApplicationInfo applicationInfo : allApps) {
-            // Interested in disabled system apps only.
-            if (!enabledAppsPkgNames.contains(applicationInfo.packageName)
-                    && (applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0) {
-                disabledSystemApps.add(applicationInfo.packageName);
-            }
-        }
+        final List<String> disabledSystemApps = mDevicePolicyManagerGateway.getDisabledSystemApps();
 
         if (disabledSystemApps.isEmpty()) {
             showToast(R.string.no_disabled_system_apps);
@@ -3317,15 +3291,13 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                     R.id.pkg_name, disabledSystemApps, true);
             new AlertDialog.Builder(getActivity())
                     .setTitle(getString(R.string.enable_system_apps_title))
-                    .setAdapter(appInfoArrayAdapter, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int position) {
+                    .setAdapter(appInfoArrayAdapter, (dialog, position) -> {
                             String packageName = disabledSystemApps.get(position);
-                            mDevicePolicyManager.enableSystemApp(mAdminComponentName, packageName);
-                            showToast(R.string.enable_system_apps_by_package_name_success_msg,
-                                    packageName);
-                        }
-                    })
+                            mDevicePolicyManagerGateway.enableSystemApp(packageName,
+                                    (v) -> onSuccessShowToast("enableSystemApp", R
+                                            .string.enable_system_apps_by_package_name_success_msg,
+                                            packageName),
+                                    (e) -> Util.onErrorLog("enableSystemApp(%s)", packageName));})
                     .show();
         }
     }

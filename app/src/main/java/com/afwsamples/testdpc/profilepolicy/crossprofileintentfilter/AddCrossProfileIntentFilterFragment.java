@@ -88,10 +88,10 @@ public class AddCrossProfileIntentFilterFragment extends IntentOrIntentFilterFra
             case R.id.btn_add:
                 IntentFilter intentFilter = getIntentFilter();
                 if (intentFilter != null) {
-                    mDevicePolicyManager.addCrossProfileIntentFilter(
-                            DeviceAdminReceiver.getComponentName(getActivity()),
-                            getIntentFilter(),
-                            getAddCrossProfileIntentFilterFlag());
+                    mDevicePolicyManagerGateway.getDevicePolicyManager()
+                            .addCrossProfileIntentFilter(
+                                    DeviceAdminReceiver.getComponentName(getActivity()),
+                                    getIntentFilter(), getAddCrossProfileIntentFilterFlag());
                     Toast.makeText(getActivity(),
                             getString(R.string.add_cross_profile_intent_success_msg),
                             Toast.LENGTH_SHORT).show();

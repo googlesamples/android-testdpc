@@ -83,6 +83,8 @@ final class ShellCommand {
     private static final String CMD_SET_PERSONAL_APPS_SUSPENDED = "set-personal-apps-suspended";
     private static final String CMD_GET_PERSONAL_APPS_SUSPENDED_REASONS
             = "get-personal-apps-suspended-reasons";
+    private static final String CMD_ENABLE_SYSTEM_APP = "enable-system-app";
+    private static final String CMD_LIST_DISABLED_SYSTEM_APPS = "list-disabled-system-apps";
     private static final String CMD_SET_HIDDEN_PACKAGE = "set-hidden-package";
     private static final String CMD_IS_HIDDEN_PACKAGE = "is-hidden-package";
     private static final String CMD_SET_LOCK_TASK_PACKAGES = "set-lock-task-packages";
@@ -237,6 +239,12 @@ final class ShellCommand {
             case CMD_IS_HIDDEN_PACKAGE:
                 execute(() -> isHiddenPackage());
                 break;
+            case CMD_ENABLE_SYSTEM_APP:
+                execute(() -> enableSystemApp());
+                break;
+            case CMD_LIST_DISABLED_SYSTEM_APPS:
+                execute(() -> listDisabledSystemApps());
+                break;
             case CMD_SET_LOCK_TASK_PACKAGES:
                 execute(() -> setLockTaskPackages());
                 break;
@@ -330,6 +338,8 @@ final class ShellCommand {
                 CMD_IS_SUSPENDED_PACKAGE);
         mWriter.printf("\t%s <SUSPENDED> - suspend / unsuspend personal apps\n",
                 CMD_SET_PERSONAL_APPS_SUSPENDED);
+        mWriter.printf("\t%s - enable the given system app \n", CMD_ENABLE_SYSTEM_APP);
+        mWriter.printf("\t%s - list the disabled system apps \n", CMD_LIST_DISABLED_SYSTEM_APPS);
         mWriter.printf("\t%s - gets the reasons for suspending personal apps\n",
                 CMD_GET_PERSONAL_APPS_SUSPENDED_REASONS);
         mWriter.printf("\t%s <PKG> <HIDDEN> - hide / unhide the given package\n",
@@ -476,7 +486,7 @@ final class ShellCommand {
     private void listUserRestrictions() {
         Log.i(TAG, "listUserRestrictions()");
 
-        print("user restrictions", mDevicePolicyManagerGateway.getUserRestrictions());
+        printCollection("user restriction", mDevicePolicyManagerGateway.getUserRestrictions());
     }
 
     private void setUserRestriction() {
@@ -730,6 +740,25 @@ final class ShellCommand {
         mWriter.printf("%s (%d)\n", printableReasons, reasons);
     }
 
+    private void enableSystemApp() {
+        // TODO(b/171350084): check args
+        String packageName = mArgs[1];
+
+        Log.i(TAG, "enableSystemApp(): " + packageName);
+
+        mDevicePolicyManagerGateway.enableSystemApp(packageName,
+            (v) -> onSuccess("Enabled system apps %s", packageName),
+            (e) -> onError(e, "Error enabling systen app%s", packageName));
+    }
+
+    private void listDisabledSystemApps() {
+        List<String> disabledSystemApps = mDevicePolicyManagerGateway.getDisabledSystemApps();
+
+        Log.i(TAG, "listDisabledSystemApps(): " + disabledSystemApps);
+
+        printCollection("disabled system app", disabledSystemApps);
+    }
+
     private void setLockTaskPackages() {
         String[] packages = getArrayFromArgs(/* index= */ 1);
 
@@ -802,14 +831,14 @@ final class ShellCommand {
         mWriter.printf("%s: %s\n", msg, e);
     }
 
-    private void print(String name, Collection<String> collection) {
+    private void printCollection(String nameOnSingular, Collection<String> collection) {
         if (collection.isEmpty()) {
-            mWriter.printf("No %s\n", name);
+            mWriter.printf("No %ss\n", nameOnSingular);
             return;
 
         }
         int size = collection.size();
-        mWriter.printf("%d %s:\n", size, name);
+        mWriter.printf("%d %s%s:\n", size, nameOnSingular, size == 1 ? "" : "s");
         collection.forEach((s) -> mWriter.printf("  %s\n", s));
     }
 

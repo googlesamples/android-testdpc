@@ -19,6 +19,9 @@ package com.afwsamples.testdpc;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Bitmap;
 import android.os.Build;
@@ -33,8 +36,10 @@ import com.afwsamples.testdpc.common.ReflectionUtil;
 import com.afwsamples.testdpc.common.ReflectionUtil.ReflectionIsTemporaryException;
 import com.afwsamples.testdpc.common.Util;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -47,17 +52,20 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
     private final DevicePolicyManager mDevicePolicyManager;
     private final UserManager mUserManager;
     private final ComponentName mAdminComponentName;
+    private final PackageManager mPackageManager;
 
     public DevicePolicyManagerGatewayImpl(@NonNull Context context) {
         this(context.getSystemService(DevicePolicyManager.class),
                 context.getSystemService(UserManager.class),
+                context.getPackageManager(),
                 DeviceAdminReceiver.getComponentName(context));
     }
 
     public DevicePolicyManagerGatewayImpl(@NonNull DevicePolicyManager dpm, @NonNull UserManager um,
-            @NonNull ComponentName admin) {
+            @NonNull PackageManager pm, @NonNull ComponentName admin) {
         mDevicePolicyManager = dpm;
         mUserManager = um;
+        mPackageManager = pm;
         mAdminComponentName = admin;
 
         Log.d(TAG, "constructor: admin=" + mAdminComponentName + ", dpm=" + dpm);
@@ -68,7 +76,8 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
         DevicePolicyManager dpm = context.getSystemService(DevicePolicyManager.class)
                 .getParentProfileInstance(admin);
         UserManager um = context.getSystemService(UserManager.class);
-        return new DevicePolicyManagerGatewayImpl(dpm, um, admin);
+        PackageManager pm = context.getPackageManager();
+        return new DevicePolicyManagerGatewayImpl(dpm, um, pm, admin);
     }
 
     @Override
@@ -579,6 +588,59 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
     @Override
     public int getPersonalAppsSuspendedReasons() {
         return mDevicePolicyManager.getPersonalAppsSuspendedReasons(mAdminComponentName);
+    }
+
+    @Override
+    public void enableSystemApp(String packageName, Consumer<Void> onSuccess,
+            Consumer<Exception> onError) {
+        Log.d(TAG, "enableSystemApp(" + packageName+ ")");
+
+        try {
+            mDevicePolicyManager.enableSystemApp(mAdminComponentName, packageName);
+            onSuccess.accept(null);
+        } catch (Exception e) {
+            onError.accept(e);
+        }
+    }
+
+    @Override
+    public void enableSystemApp(Intent intent, Consumer<Integer> onSuccess,
+            Consumer<Exception> onError) {
+        Log.d(TAG, "enableSystemApp(" + intent + ")");
+
+        try {
+            int result = mDevicePolicyManager.enableSystemApp(mAdminComponentName, intent);
+            Log.d(TAG, "returning " + result + " activities");
+            onSuccess.accept(result);
+        } catch (Exception e) {
+            onError.accept(e);
+        }
+    }
+
+    @Override
+    public List<String> getDisabledSystemApps() {
+        // Disabled system apps list = {All system apps} - {Enabled system apps}
+        List<String> disabledSystemApps = new ArrayList<String>();
+        // This list contains both enabled and disabled apps.
+        List<ApplicationInfo> allApps = mPackageManager.getInstalledApplications(
+                PackageManager.GET_UNINSTALLED_PACKAGES);
+        Collections.sort(allApps, new ApplicationInfo.DisplayNameComparator(mPackageManager));
+        // This list contains all enabled apps.
+        List<ApplicationInfo> enabledApps =
+                mPackageManager.getInstalledApplications(0 /* Default flags */);
+        Set<String> enabledAppsPkgNames = new HashSet<String>();
+        for (ApplicationInfo applicationInfo : enabledApps) {
+            enabledAppsPkgNames.add(applicationInfo.packageName);
+        }
+        for (ApplicationInfo applicationInfo : allApps) {
+            // Interested in disabled system apps only.
+            if (!enabledAppsPkgNames.contains(applicationInfo.packageName)
+                    && (applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0) {
+                disabledSystemApps.add(applicationInfo.packageName);
+            }
+        }
+        Log.d(TAG, "getDisabledSystemApps(): returning " + disabledSystemApps.size() + " apps");
+        return disabledSystemApps;
     }
 
     @Override
