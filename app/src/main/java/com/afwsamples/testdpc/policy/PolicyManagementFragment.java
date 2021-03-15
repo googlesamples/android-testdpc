@@ -93,8 +93,8 @@ import androidx.preference.PreferenceManager;
 import androidx.preference.SwitchPreference;
 import com.afwsamples.testdpc.AddAccountActivity;
 import com.afwsamples.testdpc.BuildConfig;
-import com.afwsamples.testdpc.CrossProfileAppsFragment;
 import com.afwsamples.testdpc.CrossProfileAppsAllowlistFragment;
+import com.afwsamples.testdpc.CrossProfileAppsFragment;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.DevicePolicyManagerGateway;
 import com.afwsamples.testdpc.DevicePolicyManagerGateway.FailedOperationException;
@@ -664,7 +664,10 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             this::validateDeviceOwnerOrDelegationNetworkLoggingBeforeS);
         mRequestNetworkLogsPreference = (DpcPreference) findPreference(REQUEST_NETWORK_LOGS);
         mRequestNetworkLogsPreference.setOnPreferenceClickListener(this);
-        mRequestNetworkLogsPreference.setCustomConstraint(this::getRequestNetworkLogsConstraint);
+        final CustomConstraint networkLoggingChecker = () -> isNetworkLoggingEnabled()
+            ? NO_CUSTOM_CONSTRAINT
+            : R.string.requires_network_logs;
+        mRequestNetworkLogsPreference.setCustomConstraint(networkLoggingChecker);
         findPreference(SET_ACCESSIBILITY_SERVICES_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_INPUT_METHODS_KEY).setOnPreferenceClickListener(this);
         findPreference(SET_INPUT_METHODS_ON_PARENT_KEY).setOnPreferenceClickListener(this);
@@ -1697,7 +1700,20 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     @TargetApi(VERSION_CODES.O)
     private boolean isNetworkLoggingEnabled() {
-        return isDeviceOwner() && mDevicePolicyManager.isNetworkLoggingEnabled(mAdminComponentName);
+        if (Util.SDK_INT < VERSION_CODES.S) {
+            if (!(isDeviceOwner() || hasNetworkLoggingDelegation())) {
+                return false;
+            }
+        } else {
+            if (!(isDeviceOwner() || isManagedProfileOwner() || hasNetworkLoggingDelegation())) {
+                return false;
+            }
+        }
+        return mDevicePolicyManager.isNetworkLoggingEnabled(mAdminComponentName);
+    }
+
+    private boolean hasNetworkLoggingDelegation() {
+        return Util.hasDelegation(getActivity(), DevicePolicyManager.DELEGATION_NETWORK_LOGGING);
     }
 
     @TargetApi(VERSION_CODES.O)
@@ -4322,22 +4338,10 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     }
 
     private int validateDeviceOwnerOrDelegationNetworkLoggingBeforeS() {
-        if (Util.SDK_INT < VERSION_CODES.S) {
-            if (!mDevicePolicyManager.isDeviceOwnerApp(mPackageName) && !Util
-                .hasDelegation(getActivity(), DevicePolicyManager.DELEGATION_NETWORK_LOGGING)) {
-                return R.string.requires_device_owner_or_delegation_network_logging;
-            }
+        if (Util.SDK_INT < VERSION_CODES.S && (isDeviceOwner() || hasNetworkLoggingDelegation())) {
+            return R.string.requires_device_owner_or_delegation_network_logging;
         }
         return NO_CUSTOM_CONSTRAINT;
-    }
-
-    private int getRequestNetworkLogsConstraint() {
-        int constraint = validateDeviceOwnerOrDelegationNetworkLoggingBeforeS();
-        if (constraint == NO_CUSTOM_CONSTRAINT) {
-            constraint = isNetworkLoggingEnabled()
-                ? NO_CUSTOM_CONSTRAINT : R.string.requires_network_logs;
-        }
-        return constraint;
     }
 
     interface ManageLockTaskListCallback {
