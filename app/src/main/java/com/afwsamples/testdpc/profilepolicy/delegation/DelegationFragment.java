@@ -33,6 +33,8 @@ import android.widget.Toast;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.ManageAppFragment;
+import com.afwsamples.testdpc.common.ReflectionUtil;
+import com.afwsamples.testdpc.common.ReflectionUtil.ReflectionIsTemporaryException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -214,6 +216,14 @@ public class DelegationFragment extends ManageAppFragment {
                     new DelegationScope(DevicePolicyManager.DELEGATION_ENABLE_SYSTEM_APP));
             defaultDelegations.add(
                     new DelegationScope(DevicePolicyManager.DELEGATION_CERT_SELECTION));
+            try {
+                defaultDelegations.add(
+                        new DelegationScope(
+                                ReflectionUtil.stringConstant(DevicePolicyManager.class,
+                                        "DELEGATION_SECURITY_LOGGING")));
+            } catch (ReflectionIsTemporaryException e) {
+                Log.w(TAG, "Failed to read DevicePolicyManager.DELEGATION_SECURITY_LOGGING", e);
+            }
             if (showDoOnlyDelegations) {
                 defaultDelegations.add(
                         new DelegationScope(DevicePolicyManager.DELEGATION_NETWORK_LOGGING));

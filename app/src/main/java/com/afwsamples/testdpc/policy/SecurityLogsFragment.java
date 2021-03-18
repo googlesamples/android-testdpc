@@ -32,6 +32,8 @@ import android.widget.ListView;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.Util;
+import com.afwsamples.testdpc.common.ReflectionUtil;
+import com.afwsamples.testdpc.common.ReflectionUtil.ReflectionIsTemporaryException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -83,10 +85,32 @@ public class SecurityLogsFragment extends ListFragment {
         }
     }
 
+    private boolean hasSecurityLoggingDelegation() {
+        if (Util.SDK_INT < VERSION_CODES.S) {
+            return false;
+        }
+
+        final String packageName = getActivity().getPackageName();
+        List<String> delegations = mDevicePolicyManager.getDelegatedScopes(null, packageName);
+
+        String securityLoggingDelegation = null;
+        try {
+            securityLoggingDelegation = ReflectionUtil.stringConstant(DevicePolicyManager.class,
+                "DELEGATION_SECURITY_LOGGING");
+        } catch (ReflectionIsTemporaryException e) {
+            Log.w(TAG, "Failed to read DevicePolicyManager.DELEGATION_SECURITY_LOGGING", e);
+        }
+
+        return securityLoggingDelegation != null && delegations.contains(securityLoggingDelegation);
+    }
+
     private List<SecurityEvent> getLogs() {
+        // If the app has the security logging delegation then the component name is
+        // not passed in.
+        ComponentName name = hasSecurityLoggingDelegation() ? null : mAdminName;
         return mPreReboot
-                ? mDevicePolicyManager.retrievePreRebootSecurityLogs(mAdminName)
-                : mDevicePolicyManager.retrieveSecurityLogs(mAdminName);
+                ? mDevicePolicyManager.retrievePreRebootSecurityLogs(name)
+                : mDevicePolicyManager.retrieveSecurityLogs(name);
     }
 
     private void processEvents(List<SecurityEvent> logs) {

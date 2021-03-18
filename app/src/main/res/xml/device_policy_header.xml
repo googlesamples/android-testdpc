@@ -729,18 +729,21 @@
             android:key="enable_security_logging"
             android:title="@string/enable_security_logging"
             testdpc:admin="deviceOwner|orgOwnedProfileOwner"
+            testdpc:delegation="delegation-security-logging"
             testdpc:minSdkVersion="N" />
         <!-- custom constraint: securityLoggingChecker -->
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="request_security_logs"
             android:title="@string/request_security_logs"
             testdpc:admin="deviceOwner|orgOwnedProfileOwner"
+            testdpc:delegation="delegation-security-logging"
             testdpc:minSdkVersion="N" />
         <!-- custom constraint: securityLoggingChecker -->
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="request_pre_reboot_security_logs"
             android:title="@string/request_pre_reboot_security_logs"
             testdpc:admin="deviceOwner|orgOwnedProfileOwner"
+            testdpc:delegation="delegation-security-logging"
             testdpc:minSdkVersion="N" />
         <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
             android:key="enable_network_logging"
