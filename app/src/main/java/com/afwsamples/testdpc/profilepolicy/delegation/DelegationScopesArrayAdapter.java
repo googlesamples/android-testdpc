@@ -20,6 +20,10 @@ import java.util.List;
 class DelegationScopesArrayAdapter
         extends ArrayAdapter<DelegationFragment.DelegationScope> {
 
+    // Replace this with DevicePolicyManager.DELEGATION_SECURITY_LOGGING when it is a
+    // part of the SDK.
+    private static final String DELEGATION_SECURITY_LOGGING = "delegation-security-logging";
+
     public DelegationScopesArrayAdapter(Context context, int res,
                                         List<DelegationFragment.DelegationScope> objects) {
         super(context, res, objects);
@@ -61,6 +65,9 @@ class DelegationScopesArrayAdapter
                 break;
             case DevicePolicyManager.DELEGATION_NETWORK_LOGGING:
                 viewHolder.setText(R.string.delegation_scope_network_logging);
+                break;
+            case DELEGATION_SECURITY_LOGGING:
+                viewHolder.setText(R.string.delegation_scope_security_logging);
                 break;
             case DevicePolicyManager.DELEGATION_CERT_SELECTION:
                 viewHolder.setText(R.string.delegation_scope_cert_selection);
