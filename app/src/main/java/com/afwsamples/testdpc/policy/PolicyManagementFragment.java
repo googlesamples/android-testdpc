@@ -350,6 +350,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private static final String LOCK_NOW_KEY = "lock_now";
     private static final String SET_ACCESSIBILITY_SERVICES_KEY = "set_accessibility_services";
     private static final String SET_ALWAYS_ON_VPN_KEY = "set_always_on_vpn";
+    private static final String SET_GET_NETWORK_PREFERENCE_STATUS =
+            "set_get_network_preference_status";
     private static final String SET_GLOBAL_HTTP_PROXY_KEY = "set_global_http_proxy";
     private static final String SET_LOCK_TASK_FEATURES_KEY = "set_lock_task_features";
     private static final String CLEAR_GLOBAL_HTTP_PROXY_KEY = "clear_global_http_proxy";
@@ -474,6 +476,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private SwitchPreference mDisableScreenCaptureSwitchPreference;
     private DpcSwitchPreference mDisableScreenCaptureOnParentSwitchPreference;
     private SwitchPreference mMuteAudioSwitchPreference;
+    private SwitchPreference mEnterpriseNetworkPreferenceSwitchPreference;
 
     private DpcPreference mDisableStatusBarPreference;
     private DpcPreference mReenableStatusBarPreference;
@@ -599,6 +602,13 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         mMuteAudioSwitchPreference = (SwitchPreference) findPreference(
                 MUTE_AUDIO_KEY);
         mMuteAudioSwitchPreference.setOnPreferenceChangeListener(this);
+
+        mEnterpriseNetworkPreferenceSwitchPreference = (SwitchPreference) findPreference(
+                SET_GET_NETWORK_PREFERENCE_STATUS);
+        mEnterpriseNetworkPreferenceSwitchPreference.setOnPreferenceChangeListener(this);
+        mEnterpriseNetworkPreferenceSwitchPreference.setChecked(
+                mDevicePolicyManager.isEnterpriseNetworkPreferenceEnabled());
+
         findPreference(LOCK_SCREEN_POLICY_KEY).setOnPreferenceClickListener(this);
         findPreference(PASSWORD_CONSTRAINTS_KEY).setOnPreferenceClickListener(this);
         findPreference(RESET_PASSWORD_KEY).setOnPreferenceClickListener(this);
@@ -1537,6 +1547,11 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 mDevicePolicyManager.setMasterVolumeMuted(mAdminComponentName,
                         (Boolean) newValue);
                 reloadMuteAudioUi();
+                return true;
+            case SET_GET_NETWORK_PREFERENCE_STATUS:
+                mDevicePolicyManager.setEnterpriseNetworkPreferenceEnabled((Boolean) newValue);
+                showToast(Boolean.toString(
+                        mDevicePolicyManager.isEnterpriseNetworkPreferenceEnabled()));
                 return true;
             case STAY_ON_WHILE_PLUGGED_IN:
                 mDevicePolicyManager.setGlobalSetting(mAdminComponentName,

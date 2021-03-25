@@ -502,6 +502,12 @@
             android:key="set_always_on_vpn"
             android:title="@string/set_always_on_vpn"
             testdpc:minSdkVersion="N" />
+        <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
+            android:key="set_get_network_preference_status"
+            android:title="@string/set_get_network_preference_status"
+            testdpc:admin="profileOwner"
+            testdpc:minSdkVersion="S"
+            testdpc:user="managedProfile" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="set_global_http_proxy"
             android:title="@string/set_global_http_proxy"
