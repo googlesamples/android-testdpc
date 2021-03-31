@@ -103,7 +103,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
-                android:inputType="number"
+                android:inputType="numberSigned"
                 android:paddingTop="8dp"
                 android:visibility="gone"/>
 
