@@ -528,6 +528,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     private Uri mImageUri;
     private Uri mVideoUri;
+    private boolean mIsProfileOwner;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -542,6 +543,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         mPackageManager = getActivity().getPackageManager();
         mDevicePolicyManagerGateway = new DevicePolicyManagerGatewayImpl(mDevicePolicyManager,
                 mUserManager, mPackageManager, mAdminComponentName);
+        mIsProfileOwner = mDevicePolicyManagerGateway.isProfileOwnerApp();
         mTelephonyManager = (TelephonyManager) getActivity()
                 .getSystemService(Context.TELEPHONY_SERVICE);
         mAccountManager = AccountManager.get(getActivity());
@@ -606,9 +608,10 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         mEnterpriseNetworkPreferenceSwitchPreference = (SwitchPreference) findPreference(
                 SET_GET_NETWORK_PREFERENCE_STATUS);
         mEnterpriseNetworkPreferenceSwitchPreference.setOnPreferenceChangeListener(this);
-        mEnterpriseNetworkPreferenceSwitchPreference.setChecked(
-                mDevicePolicyManager.isEnterpriseNetworkPreferenceEnabled());
-
+        if (mIsProfileOwner) {
+            mEnterpriseNetworkPreferenceSwitchPreference.setChecked(
+                    mDevicePolicyManager.isEnterpriseNetworkPreferenceEnabled());
+        }
         findPreference(LOCK_SCREEN_POLICY_KEY).setOnPreferenceClickListener(this);
         findPreference(PASSWORD_CONSTRAINTS_KEY).setOnPreferenceClickListener(this);
         findPreference(RESET_PASSWORD_KEY).setOnPreferenceClickListener(this);
