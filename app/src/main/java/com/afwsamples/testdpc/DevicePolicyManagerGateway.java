@@ -19,6 +19,7 @@ import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Bitmap;
+import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.os.UserHandle;
 import android.os.UserManager;
@@ -298,6 +299,22 @@ public interface DevicePolicyManagerGateway {
      * See {@link android.app.admin.DevicePolicyManager#isLockTaskPermitted(ComponentName, String)}.
      */
     boolean isLockTaskPermitted(String packageName);
+
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#setApplicationRestrictions(ComponentName, String, Bundle)}.
+     */
+    void setApplicationRestrictions(String packageName, Bundle settings,
+            @NonNull Consumer<Void> onSuccess, @NonNull Consumer<Exception> onError);
+
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#getApplicationRestrictions(ComponentName, String)}.
+     */
+    Bundle getApplicationRestrictions(String packageName);
+
+    /**
+     * Gets this app's own restrictions using {@link UserManager#getApplicationRestrictions(String)}.
+     */
+    Bundle getSelfRestrictions();
 
     /**
      * Used on error callbacks to indicate a {@link android.app.admin.DevicePolicyManager} method

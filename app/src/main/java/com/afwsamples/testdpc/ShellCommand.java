@@ -20,6 +20,8 @@ import android.content.Context;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Build;
+import android.os.Bundle;
 import android.os.Environment;
 import android.os.UserHandle;
 import android.util.Log;
@@ -89,6 +91,8 @@ final class ShellCommand {
     private static final String CMD_IS_LOCK_TASK_PERMITTED = "is-lock-task-permitted";
     private static final String CMD_SET_LOCK_TASK_FEATURES = "set-lock-task-features";
     private static final String CMD_GET_LOCK_TASK_FEATURES = "get-lock-task-features";
+    private static final String CMD_SET_APP_RESTRICTIONS = "set-app-restrictions";
+    private static final String CMD_GET_APP_RESTRICTIONS = "get-app-restrictions";
 
     private static final String ARG_FLAGS = "--flags";
 
@@ -231,6 +235,12 @@ final class ShellCommand {
             case CMD_GET_LOCK_TASK_FEATURES:
                 execute(() -> getLockTaskFeatures());
                 break;
+            case CMD_SET_APP_RESTRICTIONS:
+                execute(() -> setAppRestrictions());
+                break;
+            case CMD_GET_APP_RESTRICTIONS:
+                execute(() -> getAppRestrictions());
+                break;
             default:
                 mWriter.printf("Invalid command: %s\n\n", cmd);
                 showUsage();
@@ -317,6 +327,12 @@ final class ShellCommand {
                 + "have tasks locked\n", CMD_IS_LOCK_TASK_PERMITTED);
         mWriter.printf("\t%s <FLAGS> - set the lock task features\n", CMD_SET_LOCK_TASK_FEATURES);
         mWriter.printf("\t%s - get the lock task features\n", CMD_GET_LOCK_TASK_FEATURES);
+        mWriter.printf("\t%s <PKG> [K1 V1] [Kn Vn] - sets the key/value (as String) application "
+                + "restrictions for the given app (or resets when no key/value is passed)\n",
+                CMD_SET_APP_RESTRICTIONS);
+        mWriter.printf("\t%s [PKG1] [PKGNn] - get the application restrictions for the given apps, "
+                + "or for TestDPC itself (using UserManager) when PKG is not passed\n",
+                CMD_GET_APP_RESTRICTIONS);
     }
 
     private void createUser() {
@@ -692,9 +708,49 @@ final class ShellCommand {
 
     private void getLockTaskFeatures() {
         int flags = mDevicePolicyManagerGateway.getLockTaskFeatures();
-        String features= Util.lockTaskFeaturesToString(flags);
+        String features = Util.lockTaskFeaturesToString(flags);
 
         mWriter.printf("%s (%d)\n", features, flags);
+    }
+
+    private void setAppRestrictions() {
+        // TODO(b/171350084): check args size
+        String packageName = mArgs[1];
+        Bundle settings = new Bundle();
+        for (int i = 2; i < mArgs.length; i++) {
+            String key = mArgs[i];
+            String value = mArgs[++i];
+            settings.putString(key, value);
+        }
+        mDevicePolicyManagerGateway.setApplicationRestrictions(packageName, settings,
+                (v) -> onSuccess("Set %d app restrictions for %s", settings.size(), packageName),
+                (e) -> onError(e, "Error setting app restrictions for %s", packageName));
+    }
+
+    private void getAppRestrictions() {
+        if (mArgs.length == 1) {
+            printAppRestrictions(mContext.getPackageName(),
+                    mDevicePolicyManagerGateway.getSelfRestrictions());
+            return;
+        }
+
+        for (int i = 1; i < mArgs.length; i++) {
+            String packageName = mArgs[i];
+            Bundle settings = mDevicePolicyManagerGateway.getApplicationRestrictions(packageName);
+            printAppRestrictions(packageName, settings);
+        }
+    }
+
+    private void printAppRestrictions(String packageName, Bundle settings) {
+        if (settings == null || settings.isEmpty()) {
+            mWriter.printf("No app restrictions for %s\n", packageName);
+            return;
+        }
+        mWriter.printf("%d app restrictions for %s\n", settings.size(), packageName);
+        for (String key : settings.keySet()) {
+            Object value = settings.get(key);
+            mWriter.printf("  %s = %s\n", key, value);
+        }
     }
 
     private static String permittedToString(boolean permitted) {
