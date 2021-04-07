@@ -28,7 +28,7 @@ import android.app.Fragment;
 public abstract class DumpableActivity extends Activity {
 
     @Override
-    public final void dump(String prefix, FileDescriptor fd, PrintWriter pw, String[] args) {
+    public void dump(String prefix, FileDescriptor fd, PrintWriter pw, String[] args) {
         boolean quietMode = Dumpable.isQuietMode(args);
         if (quietMode) {
             List<Fragment> fragments = getFragmentManager().getFragments();
