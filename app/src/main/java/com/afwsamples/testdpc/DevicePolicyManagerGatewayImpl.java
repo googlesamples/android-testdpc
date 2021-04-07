@@ -705,6 +705,29 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
     }
 
     @Override
+    public Bundle getApplicationRestrictions(String packageName) {
+        return mDevicePolicyManager.getApplicationRestrictions(mAdminComponentName, packageName);
+    }
+
+    @Override
+    public Bundle getSelfRestrictions() {
+        return mUserManager.getApplicationRestrictions(mAdminComponentName.getPackageName());
+    }
+
+    @Override
+    public void setApplicationRestrictions(String packageName, Bundle settings,
+            Consumer<Void> onSuccess, Consumer<Exception> onError) {
+        Log.d(TAG, "setApplicationRestrictions(" + packageName + ")");
+        try {
+            mDevicePolicyManager.setApplicationRestrictions(mAdminComponentName, packageName,
+                    settings);
+            onSuccess.accept(null);
+        } catch (Exception e) {
+            onError.accept(e);
+        }
+    }
+
+    @Override
     public String toString() {
         return "DevicePolicyManagerGatewayImpl[" + mAdminComponentName + "]";
     }
