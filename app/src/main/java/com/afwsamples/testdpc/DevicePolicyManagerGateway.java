@@ -381,6 +381,17 @@ public interface DevicePolicyManagerGateway {
     Bundle getSelfRestrictions();
 
     /**
+     * See {@link android.app.admin.DevicePolicyManager#setPermissionGrantState(ComponentName, String, String, int)}.
+     */
+    void setPermissionGrantState(String packageName, String permission, int grantState,
+            @NonNull Consumer<Boolean> onSuccess, @NonNull Consumer<Exception> onError);
+
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#getPermissionGrantState(ComponentName, String, String)}.
+     */
+    int getPermissionGrantState(String packageName, String permission);
+
+    /**
      * Used on error callbacks to indicate a {@link android.app.admin.DevicePolicyManager} method
      * call failed.
      */
