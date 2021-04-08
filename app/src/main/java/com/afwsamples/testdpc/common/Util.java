@@ -258,6 +258,10 @@ public class Util {
         return flagsToString(DevicePolicyManager.class, "PERSONAL_APPS_", reasons);
     }
 
+    public static String grantStateToString(int grantState) {
+        return constantToString(DevicePolicyManager.class, "PERMISSION_GRANT_STATE_", grantState);
+    }
+
     public static void onSuccessLog(String tag, String template, Object... args) {
         Log.d(tag, String.format(template, args) + " succeeded");
     }
@@ -294,6 +298,22 @@ public class Util {
             res.deleteCharAt(res.length() - 1);
         }
         return res.toString();
+    }
+
+    // Copied from DebugUtils
+    public static String constantToString(Class<?> clazz, String prefix, int value) {
+        for (Field field : clazz.getDeclaredFields()) {
+            final int modifiers = field.getModifiers();
+            try {
+                if (Modifier.isStatic(modifiers) && Modifier.isFinal(modifiers)
+                        && field.getType().equals(int.class) && field.getName().startsWith(prefix)
+                        && field.getInt(null) == value) {
+                    return constNameWithoutPrefix(prefix, field);
+                }
+            } catch (IllegalAccessException ignored) {
+            }
+        }
+        return prefix + Integer.toString(value);
     }
 
     // Copied from DebugUtils

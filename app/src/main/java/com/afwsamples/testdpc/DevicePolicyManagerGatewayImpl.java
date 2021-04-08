@@ -576,6 +576,29 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
     }
 
     @Override
+    public void setPermissionGrantState(String packageName, String permission, int grantState,
+            Consumer<Boolean> onSuccess, Consumer<Exception> onError) {
+        Log.d(TAG, "setPermissionGrantState(" + packageName + ", " + permission + "): "
+                + Util.grantStateToString(grantState));
+        try {
+            boolean result = mDevicePolicyManager.setPermissionGrantState(mAdminComponentName,
+                    packageName, permission, grantState);
+            onSuccess.accept(result);
+        } catch (Exception e) {
+            onError.accept(e);
+        }
+    }
+
+    @Override
+    public int getPermissionGrantState(String packageName, String permission) {
+        int grantState = mDevicePolicyManager.getPermissionGrantState(mAdminComponentName,
+                packageName, permission);
+        Log.d(TAG, "getPermissionGrantState(" + packageName + ", " + permission + "): "
+                + Util.grantStateToString(grantState));
+        return grantState;
+    }
+
+    @Override
     public String toString() {
         return "DevicePolicyManagerGatewayImpl[" + mAdminComponentName + "]";
     }
