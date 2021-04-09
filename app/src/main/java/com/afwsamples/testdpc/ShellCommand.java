@@ -95,6 +95,8 @@ final class ShellCommand {
     private static final String CMD_GET_LOCK_TASK_FEATURES = "get-lock-task-features";
     private static final String CMD_SET_APP_RESTRICTIONS = "set-app-restrictions";
     private static final String CMD_GET_APP_RESTRICTIONS = "get-app-restrictions";
+    private static final String CMD_SET_PERMISSION_GRANT_STATE = "set-permission-grant-state";
+    private static final String CMD_GET_PERMISSION_GRANT_STATE = "get-permission-grant-state";
 
     // Commands for APIs added on Android S
     private static final String CMD_SET_PERMITTED_INPUT_METHODS_PARENT =
@@ -269,6 +271,12 @@ final class ShellCommand {
             case CMD_GET_APP_RESTRICTIONS:
                 execute(() -> getAppRestrictions());
                 break;
+            case CMD_SET_PERMISSION_GRANT_STATE:
+                execute(() -> setPermissionGrantState());
+                break;
+            case CMD_GET_PERMISSION_GRANT_STATE:
+                execute(() -> getPermissionGrantState());
+                break;
             default:
                 mWriter.printf("Invalid command: %s\n\n", cmd);
                 showUsage();
@@ -369,6 +377,13 @@ final class ShellCommand {
         mWriter.printf("\t%s [PKG1] [PKGNn] - get the application restrictions for the given apps, "
                 + "or for TestDPC itself (using UserManager) when PKG is not passed\n",
                 CMD_GET_APP_RESTRICTIONS);
+        mWriter.printf("\t%s <PKG> <PERMISSION> <STATE> - set the grant state for the given "
+                + "package / permission\n",
+                CMD_SET_PERMISSION_GRANT_STATE);
+        mWriter.printf("\t%s <PKG> <PERMISSION> - get the grant state for the given permission / "
+                + "package\n", CMD_GET_PERMISSION_GRANT_STATE);
+
+        // Separator for S / pre-S commands - do NOT remove line to avoid cherry-pick conflicts
 
         if (Util.isAtLeastS()) {
             mWriter.printf("\t%s <true|false> - enable / disable USB data signaling\n",
@@ -851,6 +866,29 @@ final class ShellCommand {
             Object value = settings.get(key);
             mWriter.printf("  %s = %s\n", key, value);
         }
+    }
+
+    private void setPermissionGrantState() {
+        // TODO(b/171350084): check args
+        String packageName = mArgs[1];
+        String permission = mArgs[2];
+        int grantState = getIntArg(3);
+        String grantName = Util.grantStateToString(grantState);
+
+        mDevicePolicyManagerGateway.setPermissionGrantState(packageName, permission, grantState,
+                (v) -> onSuccess("Set %s state on %s to %s", permission, packageName, grantName),
+                (e) -> onError(e, "Error setting %s state on %s to %s", packageName, permission,
+                        grantName));
+    }
+
+    private void getPermissionGrantState() {
+        // TODO(b/171350084): check args
+        String packageName = mArgs[1];
+        String permission = mArgs[2];
+        int grantState = mDevicePolicyManagerGateway.getPermissionGrantState(packageName,
+                permission);
+        mWriter.printf("%s state for %s: %s\n", permission, packageName,
+                Util.grantStateToString(grantState));
     }
 
     private static String permittedToString(boolean permitted) {
