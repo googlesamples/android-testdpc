@@ -31,6 +31,7 @@ import android.os.UserHandle;
 import android.os.UserManager;
 import android.util.Log;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.afwsamples.testdpc.common.ReflectionUtil;
 import com.afwsamples.testdpc.common.ReflectionUtil.ReflectionIsTemporaryException;
@@ -92,11 +93,18 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
 
     @Override
     public boolean isProfileOwnerApp() {
+        if (mAdminComponentName == null) {
+            return false;
+        }
         return mDevicePolicyManager.isProfileOwnerApp(mAdminComponentName.getPackageName());
     }
 
     @Override
     public boolean isDeviceOwnerApp() {
+        if (mAdminComponentName == null) {
+            return false;
+        }
+
         return mDevicePolicyManager.isDeviceOwnerApp(mAdminComponentName.getPackageName());
     }
 
