@@ -503,8 +503,8 @@
             android:title="@string/set_always_on_vpn"
             testdpc:minSdkVersion="N" />
         <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
-            android:key="set_get_network_preference_status"
-            android:title="@string/set_get_network_preference_status"
+            android:key="set_get_preferential_network_service_status"
+            android:title="@string/set_get_preferential_network_service_status"
             testdpc:admin="profileOwner"
             testdpc:minSdkVersion="S"
             testdpc:user="managedProfile" />
