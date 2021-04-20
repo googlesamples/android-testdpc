@@ -48,6 +48,7 @@ import android.content.pm.ResolveInfo;
 import android.location.LocationManager;
 import android.net.ProxyInfo;
 import android.net.Uri;
+import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.BatteryManager;
 import android.os.Build;
@@ -390,6 +391,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             = "create_eap_tls_wifi_configuration";
     private static final String WIFI_CONFIG_LOCKDOWN_ENABLE_KEY = "enable_wifi_config_lockdown";
     private static final String MODIFY_WIFI_CONFIGURATION_KEY = "modify_wifi_configuration";
+    private static final String MODIFY_OWNED_WIFI_CONFIGURATION_KEY = "modify_owned_wifi_configuration";
+    private static final String REMOVE_NOT_OWNED_WIFI_CONFIGURATION_KEY = "remove_not_owned_wifi_configurations";
     private static final String TRANSFER_OWNERSHIP_KEY = "transfer_ownership_to_component";
     private static final String TAG_WIFI_CONFIG_CREATION = "wifi_config_creation";
     private static final String SECURITY_PATCH_FORMAT = "yyyy-MM-dd";
@@ -735,6 +738,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 findPreference(WIFI_CONFIG_LOCKDOWN_ENABLE_KEY);
         mLockdownAdminConfiguredNetworksPreference.setOnPreferenceChangeListener(this);
         findPreference(MODIFY_WIFI_CONFIGURATION_KEY).setOnPreferenceClickListener(this);
+        findPreference(MODIFY_OWNED_WIFI_CONFIGURATION_KEY).setOnPreferenceClickListener(this);
+        findPreference(REMOVE_NOT_OWNED_WIFI_CONFIGURATION_KEY).setOnPreferenceClickListener(this);
         findPreference(TRANSFER_OWNERSHIP_KEY).setOnPreferenceClickListener(this);
         findPreference(SHOW_WIFI_MAC_ADDRESS_KEY).setOnPreferenceClickListener(this);
         mInstallNonMarketAppsPreference = (DpcSwitchPreference) findPreference(
@@ -1279,7 +1284,19 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 showEapTlsWifiConfigCreationDialog();
                 return true;
             case MODIFY_WIFI_CONFIGURATION_KEY:
-                showFragment(new WifiModificationFragment());
+                showFragment(WifiModificationFragment.createFragment(false));
+                return true;
+            case MODIFY_OWNED_WIFI_CONFIGURATION_KEY:
+                showFragment(WifiModificationFragment.createFragment(true));
+                return true;
+            case REMOVE_NOT_OWNED_WIFI_CONFIGURATION_KEY:
+                boolean removed = getContext().getSystemService(WifiManager.class)
+                    .removeNonCallerConfiguredNetworks();
+                if (removed) {
+                    showToast("One or more networks are removed");
+                } else {
+                    showToast("No network is removed");
+                }
                 return true;
             case SHOW_WIFI_MAC_ADDRESS_KEY:
                 showWifiMacAddress();

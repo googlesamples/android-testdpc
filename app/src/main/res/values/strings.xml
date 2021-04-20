@@ -328,12 +328,15 @@
     <string name="wifi_config_fail">Failed to save the WI-FI configuration.</string>
     <string name="enable_wifi_config_lockdown">DO created WI-FI configs are modifiable only by DO</string>
     <string name="modify_wifi_configuration">Modify WI-FI configuration</string>
+    <string name="modify_owned_wifi_configuration">Modify Owned WI-FI configuration</string>
+    <string name="remove_not_owned_wifi_configurations">Remove all networks not owned by DO</string>
     <string name="show_wifi_mac_address">Show Wi-Fi MAC address</string>
     <string name="show_wifi_mac_address_title">Wi-Fi MAC address</string>
     <string name="show_wifi_mac_address_not_available_msg">Wi-Fi MAC is not available</string>
     <string name="wifi_configs_header">Saved WI-FI configurations</string>
     <string name="wifi_update_config_button">Update selected</string>
     <string name="wifi_remove_config_button">Remove selected</string>
+    <string name="wifi_remove_all_config_button">Remove All</string>
     <string name="wifi_modification_error_title">Error modifying config</string>
     <string name="wifi_remove_config_error">Unable to remove SSID \'<xliff:g id="wifi_ssid">%1$s</xliff:g>\': netId = <xliff:g id="wifi_network_id">%2$d</xliff:g></string>
     <string name="create_eap_tls_wifi_configuration">Create EAP-TLS WI-FI configuration</string>
