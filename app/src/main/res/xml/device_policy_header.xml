@@ -338,6 +338,16 @@
             testdpc:admin="any"
             testdpc:minSdkVersion="L" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="modify_owned_wifi_configuration"
+            android:title="@string/modify_owned_wifi_configuration"
+            testdpc:admin="any"
+            testdpc:minSdkVersion="S" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="remove_not_owned_wifi_configurations"
+            android:title="@string/remove_not_owned_wifi_configurations"
+            testdpc:admin="deviceOwner"
+            testdpc:minSdkVersion="S" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="show_wifi_mac_address"
             android:title="@string/show_wifi_mac_address"
             testdpc:minSdkVersion="N"
@@ -633,7 +643,7 @@
             android:key="logout_user"
             android:title="@string/logout_user"
             testdpc:minSdkVersion="P"
-            testdpc:user="secondaryUser" /> 
+            testdpc:user="secondaryUser" />
         <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
             android:key="enable_logout"
             android:title="@string/enable_logout"

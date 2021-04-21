@@ -56,17 +56,26 @@ import static android.net.wifi.WifiEnterpriseConfig.Eap;
 public class WifiModificationFragment extends Fragment
         implements WifiConfigCreationDialog.Listener {
 
+    // Fragment argument: if set, ony list networks added by TestDPC itself. This causes
+    // the fragment to switch to different WifiManager APIs that don't rely on location permission.
+    private static final String ARG_OWNED_NETWORKS_ONLY = "owned_networks_only";
     private static final String TAG_WIFI_CONFIG_MODIFICATION = "wifi_config_modification";
     private ListView mConfigsList;
     private ConfigsAdapter mConfigsAdapter;
     private List<WifiConfiguration> mConfiguredNetworks = new ArrayList<>();
     private WifiManager mWifiManager;
+    private boolean mShowOwnedNetworksOnly;
 
     private void updateConfigsList() {
         mConfiguredNetworks.clear();
         // WifiManager deprecated APIs including #getConfiguredNetworks are restricted to system apps and DPCs
         // https://developer.android.com/preview/privacy/camera-connectivity#wifi-network-config-restrictions
-        List<WifiConfiguration> configuredNetworks = mWifiManager.getConfiguredNetworks();
+        List<WifiConfiguration> configuredNetworks;
+        if (mShowOwnedNetworksOnly) {
+            configuredNetworks = mWifiManager.getCallerConfiguredNetworks();
+        } else {
+            configuredNetworks = mWifiManager.getConfiguredNetworks();
+        }
         if (configuredNetworks != null) {
             mConfiguredNetworks.addAll(configuredNetworks);
         }
@@ -138,6 +147,7 @@ public class WifiModificationFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
             Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
+        mShowOwnedNetworksOnly = getArguments().getBoolean(ARG_OWNED_NETWORKS_ONLY);
         mWifiManager = (WifiManager)getActivity().getSystemService(Context.WIFI_SERVICE);
         View view = inflater.inflate(R.layout.wifi_config_modification, container, false);
 
@@ -204,7 +214,6 @@ public class WifiModificationFragment extends Fragment
                 }
             });
         }
-
         return view;
     }
 
@@ -217,11 +226,13 @@ public class WifiModificationFragment extends Fragment
     public void onCancel() {
     }
 
-    public static boolean shouldRequestLocationPermission(Context context) {
+    public boolean shouldRequestLocationPermission(Context context) {
         if (Util.SDK_INT < VERSION_CODES.M) {
             return false;
         }
-
+        if (mShowOwnedNetworksOnly) {
+            return false;
+        }
         return ContextCompat.checkSelfPermission(context, permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED;
     }
@@ -238,5 +249,13 @@ public class WifiModificationFragment extends Fragment
             return;
         }
         Toast.makeText(activity, msg, Toast.LENGTH_SHORT).show();
+    }
+
+    public static WifiModificationFragment createFragment(boolean showOwnedNetworksOnly) {
+        WifiModificationFragment fragment = new WifiModificationFragment();
+        Bundle args = new Bundle();
+        args.putBoolean(ARG_OWNED_NETWORKS_ONLY, showOwnedNetworksOnly);
+        fragment.setArguments(args);
+        return fragment;
     }
 }
