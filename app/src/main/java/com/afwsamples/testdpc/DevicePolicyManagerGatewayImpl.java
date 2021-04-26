@@ -120,7 +120,7 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
         // TODO(b/179160578): use proper method when available on SDK
         String method = "isHeadlessSystemUserMode";
         try {
-            return (Boolean) ReflectionUtil.invoke(mUserManager, method);
+            return ReflectionUtil.invoke(mUserManager, method);
         } catch (ReflectionIsTemporaryException e) {
             Log.wtf(TAG, "Error calling mUserManager." + method + "()", e);
             return false;
@@ -134,7 +134,7 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
         // TODO(b/179160578): use proper method when available on SDK
         String method = "isUserForeground";
         try {
-            return (Boolean) ReflectionUtil.invoke(mUserManager, method);
+            return ReflectionUtil.invoke(mUserManager, method);
         } catch (ReflectionIsTemporaryException e) {
             Log.wtf(TAG, "Error calling mUserManager." + method + "()", e);
             return false;
@@ -148,7 +148,7 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
         // TODO(b/179160578): use proper method when available on SDK
         String method = "listForegroundAffiliatedUsers";
         try {
-            return (List<UserHandle>) ReflectionUtil.invoke(mDevicePolicyManager, method);
+            return ReflectionUtil.invoke(mDevicePolicyManager, method);
         } catch (ReflectionIsTemporaryException e) {
             Log.wtf(TAG, "Error calling mDevicePolicyManager." + method + "()", e);
             return Collections.emptyList();

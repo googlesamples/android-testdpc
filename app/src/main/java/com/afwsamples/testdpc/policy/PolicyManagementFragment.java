@@ -2517,7 +2517,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         String esid = "";
         try {
             //TODO: Call directly when the S SDK is available.
-            esid = (String) ReflectionUtil.invoke(mDevicePolicyManager, "getEnrollmentSpecificId");
+            esid = ReflectionUtil.invoke(mDevicePolicyManager, "getEnrollmentSpecificId");
         } catch (ReflectionIsTemporaryException e) {
             Log.e(TAG, "Error invoking getEnterpriseSpecificId", e);
             esid = "Error";
@@ -2562,9 +2562,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     @TargetApi(VERSION_CODES.S)
     private int getRequiredComplexity(DevicePolicyManager dpm) {
         try {
-            Integer complexity =
-                    (Integer) ReflectionUtil.invoke(dpm, "getRequiredPasswordComplexity");
-            return complexity;
+            return ReflectionUtil.invoke(dpm, "getRequiredPasswordComplexity");
         } catch (ReflectionIsTemporaryException e) {
             Log.e(TAG, "Error invoking getRequiredPasswordComplexity", e);
         }
@@ -2779,8 +2777,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     @TargetApi(VERSION_CODES.S)
     private void reloadEnableUsbDataSignalingUi() {
         try {
-            boolean enabled = (boolean) ReflectionUtil
-                .invoke(mDevicePolicyManager, "isUsbDataSignalingEnabled");
+            boolean enabled = ReflectionUtil.invoke(mDevicePolicyManager,
+                    "isUsbDataSignalingEnabled");
             mEnableUsbDataSignalingPreference.setChecked(enabled);
         } catch (ReflectionIsTemporaryException e) {
             Log.e(TAG, "Error invoking isUsbDataSignalingEnabled", e);
@@ -4299,7 +4297,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     private void setOrganizationId(String organizationId) {
         try {
-            //TODO: Call directly when the S SDK is available.
+            //TODO(b/179160578): Call directly when the S SDK is available.
             ReflectionUtil.invoke(mDevicePolicyManager, "setOrganizationId", organizationId);
         } catch (ReflectionIsTemporaryException e) {
             Log.e(TAG, "Error invoking setOrganizationId", e);

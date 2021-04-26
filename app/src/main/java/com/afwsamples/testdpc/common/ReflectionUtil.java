@@ -6,7 +6,7 @@ import java.lang.reflect.InvocationTargetException;
  * Common utility functions for reflection. These are intended to be used to test APIs before they
  * are added to the SDK. There should be not uses of this class checked in to the repository.
  */
-public class ReflectionUtil {
+public final class ReflectionUtil {
     /**
      * Calls a method on an object with the given arguments. This can be used when the method is not
      * in the SDK. If any arguments are {@code null} or primitive types you must use
@@ -22,7 +22,7 @@ public class ReflectionUtil {
      *                   {@link #invoke(Object, String, Class[], Object[])}.
      * @return           The result of the invocation. {@code null} if {@code void}.
      */
-    public static Object invoke(Object obj, String methodName, Object... args)
+    public static <T> T invoke(Object obj, String methodName, Object... args)
             throws ReflectionIsTemporaryException {
         return invoke(obj.getClass(), obj, methodName, args);
     }
@@ -30,7 +30,7 @@ public class ReflectionUtil {
     /**
      * Same as {@link #invoke(Object, String, Object...)} but for static methods.
      */
-    public static Object invoke(Class<?> clazz, String methodName, Object... args)
+    public static <T> T invoke(Class<?> clazz, String methodName, Object... args)
             throws ReflectionIsTemporaryException {
         return invoke(clazz, null, methodName, args);
     }
@@ -49,7 +49,7 @@ public class ReflectionUtil {
      * @param args           The arguments to pass to the method.
      * @return               The result of the invocation. {@code null} if {@code void}.
      */
-    public static Object invoke(Object obj, String methodName, Class<?>[] parameterTypes,
+    public static <T> T invoke(Object obj, String methodName, Class<?>[] parameterTypes,
                                 Object... args) throws ReflectionIsTemporaryException {
         return invoke(obj.getClass(), obj, methodName, parameterTypes, args);
     }
@@ -57,13 +57,13 @@ public class ReflectionUtil {
     /**
      * Same as {@link #invoke(Object, String, Class[], Object...)} but for static methods.
      */
-    public static Object invoke(Class<?> clazz, String methodName, Class<?>[] parameterTypes,
+    public static <T> T invoke(Class<?> clazz, String methodName, Class<?>[] parameterTypes,
                                 Object... args) throws ReflectionIsTemporaryException {
         return invoke(clazz, null, methodName, parameterTypes, args);
     }
 
     /** Resolve the parameter types and invoke the method. */
-    private static Object invoke(Class<?> clazz, Object obj, String methodName, Object... args)
+    private static <T> T invoke(Class<?> clazz, Object obj, String methodName, Object... args)
             throws ReflectionIsTemporaryException {
         Class<?> parameterTypes[] = new Class<?>[args.length];
         for (int i = 0; i < args.length; ++i) {
@@ -73,11 +73,13 @@ public class ReflectionUtil {
     }
 
     /** Resolve the method and invoke it. */
-    private static Object invoke(Class<?> clazz, Object obj, String methodName,
+    private static <T> T invoke(Class<?> clazz, Object obj, String methodName,
                                  Class<?>[] parameterTypes, Object... args)
             throws ReflectionIsTemporaryException {
         try {
-            return clazz.getMethod(methodName, parameterTypes).invoke(obj, args);
+            @SuppressWarnings("unchecked")
+            T result = (T) clazz.getMethod(methodName, parameterTypes).invoke(obj, args);
+            return result;
         } catch (SecurityException | NoSuchMethodException | IllegalArgumentException
                 | IllegalAccessException | InvocationTargetException e) {
             throw new ReflectionIsTemporaryException("Failed to invoke method", e);
@@ -135,5 +137,9 @@ public class ReflectionUtil {
         public ReflectionIsTemporaryException(String message, Throwable cause) {
             super(message, cause);
         }
+    }
+
+    private ReflectionUtil() {
+        throw new UnsupportedOperationException("provides only static methods");
     }
 }
