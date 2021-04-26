@@ -472,14 +472,17 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
 
     @Override
     public void setUsbDataSignalingEnabled(boolean enabled, @NonNull Consumer<Void> onSuccess,
-        @NonNull Consumer<Exception> onError) {
+            @NonNull Consumer<Exception> onError) {
         Log.d(TAG, "setUsbDataSignalingEnabled(" + enabled + ")");
+        Util.requireAndroidS();
 
+        String method = "setUsbDataSignalingEnabled";
         try {
-            ReflectionUtil.invoke(mDevicePolicyManager, "setUsbDataSignalingEnabled",
-                new Class[]{Boolean.TYPE}, enabled);
+            // TODO(b/179160578): use proper method when available on SDK
+            ReflectionUtil.invoke(mDevicePolicyManager, method, new Class[]{Boolean.TYPE}, enabled);
             onSuccess.accept(null);
         } catch (Exception e) {
+            Log.wtf(TAG, "Error calling " + method + "()", e);
             onError.accept(e);
         }
     }
@@ -490,6 +493,37 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
         setUsbDataSignalingEnabled(enabled,
             (v) -> onSuccessLog(message),
             (e) -> onErrorLog(e, message));
+    }
+
+    @Override
+    public void setPreferentialNetworkServiceEnabled(boolean enabled, Consumer<Void> onSuccess,
+            Consumer<Exception> onError) {
+        Log.d(TAG, "setPreferentialNetworkServiceEnabled(" + enabled + ")");
+        Util.requireAndroidS();
+
+        String method = "setPreferentialNetworkServiceEnabled";
+        try {
+            // TODO(b/179160578): use proper method when available on SDK
+            ReflectionUtil.invoke(mDevicePolicyManager, method, new Class[]{Boolean.TYPE}, enabled);
+            onSuccess.accept(null);
+        } catch (Exception e) {
+            Log.wtf(TAG, "Error calling " + method + "()", e);
+            onError.accept(e);
+        }
+    }
+
+    @Override
+    public boolean isPreferentialNetworkServiceEnabled() {
+        Util.requireAndroidS();
+
+        String method = "isPreferentialNetworkServiceEnabled";
+        try {
+            // TODO(b/179160578): use proper method when available on SDK
+            return (Boolean) ReflectionUtil.invoke(mUserManager, method);
+        } catch (ReflectionIsTemporaryException e) {
+            Log.wtf(TAG, "Error calling " + method + "()", e);
+            return false;
+        }
     }
 
     @Override

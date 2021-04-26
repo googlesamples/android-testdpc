@@ -613,7 +613,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         mPreferentialNetworkServiceSwitchPreference.setOnPreferenceChangeListener(this);
         if (mIsProfileOwner) {
             mPreferentialNetworkServiceSwitchPreference.setChecked(
-                isPreferentialNetworkServiceEnabled());
+                    mDevicePolicyManagerGateway.isPreferentialNetworkServiceEnabled());
         }
         findPreference(LOCK_SCREEN_POLICY_KEY).setOnPreferenceClickListener(this);
         findPreference(PASSWORD_CONSTRAINTS_KEY).setOnPreferenceClickListener(this);
@@ -843,27 +843,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         reloadEnableLogoutUi();
         reloadAutoBrightnessUi();
         reloadPersonalAppsSuspendedUi();
-    }
-
-    private boolean isPreferentialNetworkServiceEnabled() {
-        try {
-            //TODO: Call directly when the S SDK is available.
-            return (Boolean) ReflectionUtil.invoke(mDevicePolicyManager,
-                "isPreferentialNetworkServiceEnabled");
-        } catch (ReflectionIsTemporaryException e) {
-            Log.e(TAG, "Error invoking isPreferentialNetworkServiceEnabled", e);
-        }
-        return false;
-    }
-
-    private void setPreferentialNetworkServiceEnabled(Boolean isEnabled) {
-        try {
-            //TODO: Call directly when the S SDK is available.
-            ReflectionUtil.invoke(mDevicePolicyManager, "setPreferentialNetworkServiceEnabled",
-                new Class[]{Boolean.TYPE}, isEnabled);
-        } catch (ReflectionIsTemporaryException e) {
-            Log.e(TAG, "Error invoking setPreferentialNetworkServiceEnabled", e);
-        }
     }
 
     @Override
@@ -1590,8 +1569,11 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 reloadMuteAudioUi();
                 return true;
             case SET_GET_PREFERENTIAL_NETWORK_SERVICE_STATUS:
-                setPreferentialNetworkServiceEnabled((Boolean) newValue);
-                showToast(Boolean.toString(isPreferentialNetworkServiceEnabled()));
+                mDevicePolicyManagerGateway.setPreferentialNetworkServiceEnabled((Boolean) newValue,
+                        (v) -> onSuccessShowToastWithHardcodedMessage(
+                                "setPreferentialNetworkServiceEnabled(%b)",
+                                mDevicePolicyManagerGateway.isPreferentialNetworkServiceEnabled()),
+                        (e) -> onErrorLog("setPreferentialNetworkServiceEnabled", e));
                 return true;
             case STAY_ON_WHILE_PLUGGED_IN:
                 mDevicePolicyManager.setGlobalSetting(mAdminComponentName,
@@ -4414,6 +4396,13 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private void onSuccessShowToast(String method, int msgId, Object...args) {
         Log.d(TAG, method + "() succeeded");
         showToast(msgId, args);
+    }
+
+    /**
+     * Used for messages not backed by resources.
+     */
+    private void onSuccessShowToastWithHardcodedMessage(String format, Object...args) {
+        showToast(String.format(format, args));
     }
 
     private void onErrorShowToast(String method, int msgId, Object... args) {

@@ -284,6 +284,17 @@ public interface DevicePolicyManagerGateway {
     void setUsbDataSignalingEnabled(boolean enabled);
 
     /**
+     * See {@link android.app.admin.DevicePolicyManager#setPreferentialNetworkServiceEnabled(ComponentName, boolean)}.
+     */
+    void setPreferentialNetworkServiceEnabled(boolean enabled,
+            @NonNull Consumer<Void> onSuccess, @NonNull Consumer<Exception> onError);
+
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#isPreferentialNetworkServiceEnabled(ComponentName)}.
+     */
+    boolean isPreferentialNetworkServiceEnabled();
+
+    /**
      * See {@link android.app.admin.DevicePolicyManager#setPackagesSuspended(ComponentName, String[], boolean)}.
      */
     void setPackagesSuspended(String[] packageNames, boolean suspended, @NonNull Consumer<String[]> onSuccess,
