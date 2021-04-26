@@ -1,12 +1,18 @@
 package com.afwsamples.testdpc.common;
 
+import android.util.Log;
+
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 
 /**
  * Common utility functions for reflection. These are intended to be used to test APIs before they
  * are added to the SDK. There should be not uses of this class checked in to the repository.
  */
 public final class ReflectionUtil {
+
+    private static final String TAG = ReflectionUtil.class.getSimpleName();
+
     /**
      * Calls a method on an object with the given arguments. This can be used when the method is not
      * in the SDK. If any arguments are {@code null} or primitive types you must use
@@ -82,7 +88,8 @@ public final class ReflectionUtil {
             return result;
         } catch (SecurityException | NoSuchMethodException | IllegalArgumentException
                 | IllegalAccessException | InvocationTargetException e) {
-            throw new ReflectionIsTemporaryException("Failed to invoke method", e);
+            ReflectionIsTemporaryException.rethrow(e, clazz, methodName, args);
+            return null;
         }
     }
 
@@ -133,9 +140,26 @@ public final class ReflectionUtil {
      *
      * To handle this, gracefully fail the operation in progress.
      */
-    public static class ReflectionIsTemporaryException extends Exception {
-        public ReflectionIsTemporaryException(String message, Throwable cause) {
+    public static final class ReflectionIsTemporaryException extends Exception {
+
+        private static final long serialVersionUID = 1L;
+
+        private ReflectionIsTemporaryException(String message, Throwable cause) {
             super(message, cause);
+        }
+
+        public static void rethrow(Exception e, Class<?> clazz, String methodName, Object... args)
+                throws ReflectionIsTemporaryException {
+            String method = clazz.getSimpleName() + "." + methodName + "("
+                + (args == null || args.length == 0 ? "" : Arrays.toString(args)) + ")";
+            Log.w(TAG, "Exception calling method " + method + ":", e);
+            if (e instanceof InvocationTargetException) {
+                Throwable cause = e.getCause();
+                if (cause instanceof RuntimeException) {
+                    throw (RuntimeException) cause;
+                }
+            }
+            throw new ReflectionIsTemporaryException("Failed to invoke " + method, e);
         }
     }
 
