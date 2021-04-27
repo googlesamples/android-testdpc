@@ -97,6 +97,8 @@ final class ShellCommand {
     private static final String CMD_GET_APP_RESTRICTIONS = "get-app-restrictions";
     private static final String CMD_SET_PERMISSION_GRANT_STATE = "set-permission-grant-state";
     private static final String CMD_GET_PERMISSION_GRANT_STATE = "get-permission-grant-state";
+    private static final String CMD_SET_LOCATION_ENABLED = "set-location-enabled";
+    private static final String CMD_IS_LOCATION_ENABLED = "is-location-enabled";
 
     // Commands for APIs added on Android S
     private static final String CMD_SET_PERMITTED_INPUT_METHODS_PARENT =
@@ -277,6 +279,12 @@ final class ShellCommand {
             case CMD_GET_PERMISSION_GRANT_STATE:
                 execute(() -> getPermissionGrantState());
                 break;
+            case CMD_SET_LOCATION_ENABLED:
+                execute(() -> setLocationEnabled());
+                break;
+            case CMD_IS_LOCATION_ENABLED:
+                execute(() -> isLocationEnabled());
+                break;
             default:
                 mWriter.printf("Invalid command: %s\n\n", cmd);
                 showUsage();
@@ -382,6 +390,10 @@ final class ShellCommand {
                 CMD_SET_PERMISSION_GRANT_STATE);
         mWriter.printf("\t%s <PKG> <PERMISSION> - get the grant state for the given permission / "
                 + "package\n", CMD_GET_PERMISSION_GRANT_STATE);
+        mWriter.printf("\t%s <true|false> - set location enabled for the user\n",
+                CMD_SET_LOCATION_ENABLED);
+        mWriter.printf("\t%s - get whether location is enabled for the user\n",
+                CMD_IS_LOCATION_ENABLED);
 
         // Separator for S / pre-S commands - do NOT remove line to avoid cherry-pick conflicts
 
@@ -889,6 +901,20 @@ final class ShellCommand {
                 permission);
         mWriter.printf("%s state for %s: %s\n", permission, packageName,
                 Util.grantStateToString(grantState));
+    }
+
+    private void setLocationEnabled() {
+        // TODO(b/171350084): check args
+        boolean enabled = Boolean.parseBoolean(mArgs[1]);
+
+        mDevicePolicyManagerGateway.setLocationEnabled(enabled,
+                (v) -> onSuccess("Set location enabled to %b", enabled),
+                (e) -> onError(e, "Error setting location enabled to %b", enabled));
+    }
+
+    private void isLocationEnabled() {
+        boolean enabled = mDevicePolicyManagerGateway.isLocationEnabled();
+        mWriter.printf("Location enabled: %b\n", enabled);
     }
 
     private static String permittedToString(boolean permitted) {
