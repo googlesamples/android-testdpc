@@ -451,6 +451,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     private UserManager mUserManager;
     private TelephonyManager mTelephonyManager;
     private AccountManager mAccountManager;
+    private LocationManager mLocationManager;
 
     private DpcPreference mInstallExistingPackagePreference;
 
@@ -520,8 +521,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         mDevicePolicyManager = (DevicePolicyManager) getActivity().getSystemService(
                 Context.DEVICE_POLICY_SERVICE);
         mUserManager = (UserManager) getActivity().getSystemService(Context.USER_SERVICE);
+        mLocationManager = getActivity().getSystemService(LocationManager.class);
         mDevicePolicyManagerGateway = new DevicePolicyManagerGatewayImpl(mDevicePolicyManager,
-                mUserManager, mAdminComponentName);
+                mUserManager, mLocationManager, mAdminComponentName);
         mTelephonyManager = (TelephonyManager) getActivity()
                 .getSystemService(Context.TELEPHONY_SERVICE);
         mAccountManager = AccountManager.get(getActivity());
@@ -2440,8 +2442,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     @TargetApi(Util.R_VERSION_CODE)
     private void reloadLocationEnabledUi() {
-        LocationManager locationManager = getActivity().getSystemService(LocationManager.class);
-        mSetLocationEnabledPreference.setChecked(locationManager.isLocationEnabled());
+        mSetLocationEnabledPreference.setChecked(mLocationManager.isLocationEnabled());
     }
 
     @TargetApi(Util.R_VERSION_CODE)

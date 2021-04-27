@@ -21,6 +21,8 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Bitmap;
+import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.os.UserHandle;
@@ -44,17 +46,20 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
     private final DevicePolicyManager mDevicePolicyManager;
     private final UserManager mUserManager;
     private final ComponentName mAdminComponentName;
+    private final LocationManager mLocationManager;
 
     public DevicePolicyManagerGatewayImpl(@NonNull Context context) {
         this(context.getSystemService(DevicePolicyManager.class),
                 context.getSystemService(UserManager.class),
+                context.getSystemService(LocationManager.class),
                 DeviceAdminReceiver.getComponentName(context));
     }
 
     public DevicePolicyManagerGatewayImpl(@NonNull DevicePolicyManager dpm, @NonNull UserManager um,
-            @NonNull ComponentName admin) {
+            @NonNull LocationManager lm, @NonNull ComponentName admin) {
         mDevicePolicyManager = dpm;
         mUserManager = um;
+        mLocationManager = lm;
         mAdminComponentName = admin;
 
         Log.d(TAG, "constructor: admin=" + mAdminComponentName + ", dpm=" + dpm);
@@ -65,7 +70,8 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
         DevicePolicyManager dpm = context.getSystemService(DevicePolicyManager.class)
                 .getParentProfileInstance(admin);
         UserManager um = context.getSystemService(UserManager.class);
-        return new DevicePolicyManagerGatewayImpl(dpm, um, admin);
+        LocationManager lm = context.getSystemService(LocationManager.class);
+        return new DevicePolicyManagerGatewayImpl(dpm, um, lm, admin);
     }
 
     @Override
@@ -596,6 +602,23 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
         Log.d(TAG, "getPermissionGrantState(" + packageName + ", " + permission + "): "
                 + Util.grantStateToString(grantState));
         return grantState;
+    }
+
+    @Override
+    public void setLocationEnabled(boolean enabled, Consumer<Void> onSuccess,
+            Consumer<Exception> onError) {
+        Log.d(TAG, "setLocationEnabled(" + enabled + ")");
+        try {
+            mDevicePolicyManager.setLocationEnabled(mAdminComponentName, enabled);
+            onSuccess.accept(null);
+        } catch (Exception e) {
+            onError.accept(e);
+        }
+    }
+
+    @Override
+    public boolean isLocationEnabled() {
+        return mLocationManager.isLocationEnabled();
     }
 
     @Override

@@ -328,6 +328,17 @@ public interface DevicePolicyManagerGateway {
     int getPermissionGrantState(String packageName, String permission);
 
     /**
+     * See {@link android.app.admin.DevicePolicyManager#setLocationEnabled(ComponentName, boolean)}.
+     */
+    void setLocationEnabled(boolean enabled, @NonNull Consumer<Void> onSuccess,
+            @NonNull Consumer<Exception> onError);
+
+    /**
+     * See {@link android.location.LocationManager#isLocationEnabled()}.
+     */
+    boolean isLocationEnabled();
+
+    /**
      * Used on error callbacks to indicate a {@link android.app.admin.DevicePolicyManager} method
      * call failed.
      */
