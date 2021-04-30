@@ -2758,12 +2758,14 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     @TargetApi(VERSION_CODES.S)
     private void reloadEnableUsbDataSignalingUi() {
-        try {
-            boolean enabled = ReflectionUtil.invoke(mDevicePolicyManager,
+        if (isOrganizationOwnedDevice()) {
+            try {
+                boolean enabled = ReflectionUtil.invoke(mDevicePolicyManager,
                     "isUsbDataSignalingEnabled");
-            mEnableUsbDataSignalingPreference.setChecked(enabled);
-        } catch (ReflectionIsTemporaryException e) {
-            Log.e(TAG, "Error invoking isUsbDataSignalingEnabled", e);
+                mEnableUsbDataSignalingPreference.setChecked(enabled);
+            } catch (ReflectionIsTemporaryException e) {
+                Log.e(TAG, "Error invoking isUsbDataSignalingEnabled", e);
+            }
         }
     }
 
@@ -2793,12 +2795,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         if (Util.SDK_INT < VERSION_CODES.R) {
             return;
         }
-        boolean isOrgOwned =
-                mDevicePolicyManagerGateway.isOrganizationOwnedDeviceWithManagedProfile();
-
-        if (mDevicePolicyManager.isDeviceOwnerApp(mPackageName)
-                || (mDevicePolicyManager.isProfileOwnerApp(mPackageName)
-                && isOrgOwned)) {
+        if (isOrganizationOwnedDevice()) {
             boolean isAutoTime = mDevicePolicyManager.getAutoTimeEnabled(mAdminComponentName);
             mSetAutoTimePreference.setChecked(isAutoTime);
         }
@@ -2809,12 +2806,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         if (Util.SDK_INT < VERSION_CODES.R) {
             return;
         }
-        boolean isOrgOwned =
-                mDevicePolicyManagerGateway.isOrganizationOwnedDeviceWithManagedProfile();
-
-        if (mDevicePolicyManager.isDeviceOwnerApp(mPackageName)
-                || (mDevicePolicyManager.isProfileOwnerApp(mPackageName)
-                && isOrgOwned)) {
+        if (isOrganizationOwnedDevice()) {
             boolean isAutoTimeZone = mDevicePolicyManager
                     .getAutoTimeZoneEnabled(mAdminComponentName);
             mSetAutoTimeZonePreference.setChecked(isAutoTimeZone);
@@ -4343,6 +4335,12 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         DevicePolicyManagerGatewayImpl.forParentProfile(getActivity()).wipeData(/* flags= */ 0,
                 (v) -> onSuccessLog("wipeData"),
                 (e) -> onErrorLog("wipeData", e));
+    }
+
+    private boolean isOrganizationOwnedDevice() {
+        return mDevicePolicyManager.isDeviceOwnerApp(mPackageName)
+            || (mDevicePolicyManager.isProfileOwnerApp(mPackageName)
+            && mDevicePolicyManagerGateway.isOrganizationOwnedDeviceWithManagedProfile());
     }
 
     private int validateDeviceOwnerBeforeO() {
