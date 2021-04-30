@@ -519,7 +519,7 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
         String method = "isPreferentialNetworkServiceEnabled";
         try {
             // TODO(b/179160578): use proper method when available on SDK
-            return (Boolean) ReflectionUtil.invoke(mUserManager, method);
+            return (Boolean) ReflectionUtil.invoke(mDevicePolicyManager, method);
         } catch (ReflectionIsTemporaryException e) {
             Log.wtf(TAG, "Error calling " + method + "()", e);
             return false;
