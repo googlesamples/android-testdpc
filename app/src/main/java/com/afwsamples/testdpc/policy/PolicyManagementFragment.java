@@ -535,22 +535,22 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        Context context = getActivity();
         if (isDelegatedApp() || isCredentialManagerApp()) {
             mAdminComponentName = null;
         } else {
-            mAdminComponentName = DeviceAdminReceiver.getComponentName(getActivity());
+            mAdminComponentName = DeviceAdminReceiver.getComponentName(context);
         }
-        mDevicePolicyManager = (DevicePolicyManager) getActivity().getSystemService(
-                Context.DEVICE_POLICY_SERVICE);
-        mUserManager = (UserManager) getActivity().getSystemService(Context.USER_SERVICE);
-        mPackageManager = getActivity().getPackageManager();
+        mDevicePolicyManager = context.getSystemService(DevicePolicyManager.class);
+        mUserManager = context.getSystemService(UserManager.class);
+        mPackageManager = context.getPackageManager();
         mDevicePolicyManagerGateway = new DevicePolicyManagerGatewayImpl(mDevicePolicyManager,
-                mUserManager, mPackageManager, mAdminComponentName);
+                mUserManager, mPackageManager, context.getSystemService(LocationManager.class),
+                mAdminComponentName);
         mIsProfileOwner = mDevicePolicyManagerGateway.isProfileOwnerApp();
-        mTelephonyManager = (TelephonyManager) getActivity()
-                .getSystemService(Context.TELEPHONY_SERVICE);
-        mAccountManager = AccountManager.get(getActivity());
-        mPackageName = getActivity().getPackageName();
+        mTelephonyManager = context.getSystemService(TelephonyManager.class);
+        mAccountManager = AccountManager.get(context);
+        mPackageName = context.getPackageName();
 
         mImageUri = getStorageUri("image.jpg");
         mVideoUri = getStorageUri("video.mp4");
