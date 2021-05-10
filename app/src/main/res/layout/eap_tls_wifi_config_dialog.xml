@@ -76,6 +76,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/import_user_certificate"/>
+            <Button android:id="@+id/select_user_cert"
+                    style="@style/networking_item_content"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/select_user_certificate"/>
             <TextView
                     android:id="@+id/selected_user_cert"
                     style="@style/networking_item_label"
