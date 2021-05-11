@@ -32,7 +32,8 @@
         android:key="enrollment_specific_id"
         android:selectable="false"
         android:title="@string/enrollment_specific_id"
-        testdpc:admin="any"
+        testdpc:admin="deviceOwner|profileOwner"
+        testdpc:delegation="delegation-cert-install"
         testdpc:minSdkVersion="S" />
 
     <PreferenceCategory android:title="@string/accessibility_title">

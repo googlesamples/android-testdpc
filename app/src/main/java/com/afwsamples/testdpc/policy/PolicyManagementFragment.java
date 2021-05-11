@@ -2496,6 +2496,10 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     @TargetApi(VERSION_CODES.S)
     private void loadEnrollmentSpecificId() {
         Preference enrollmentSpecificIdPreference = findPreference(ENROLLMENT_SPECIFIC_ID_KEY);
+        if (!enrollmentSpecificIdPreference.isEnabled()) {
+            return;
+        }
+
         String esid = "";
         try {
             //TODO: Call directly when the S SDK is available.
