@@ -344,11 +344,14 @@
     <string name="wifi_client_cert_password">Client certificate password (if any)</string>
     <string name="import_ca_certificate">Import CA certificate</string>
     <string name="import_user_certificate">Import user certificate</string>
+    <string name="select_user_certificate">Select user certificate</string>
     <string name="selected_certificate">Selected certificate: <xliff:g example="server certificate" id="certificate_alias">%1$s</xliff:g></string>
-    <string name="selected_certificate_none">None</string>
+    <string name="selected_keychain_certificate">Selected KeyChain alias: <xliff:g example="somealias" id="certificate_alias">%1$s</xliff:g></string>
+    <string name="selected_certificate_none">No certificate selected</string>
     <string name="error_missing_ssid">Missing SSID</string>
     <string name="error_missing_ca_cert">Missing CA cert</string>
     <string name="error_missing_client_cert">Missing client cert or invalid cert password</string>
+    <string name="error_cannot_grant_to_wifi">Failed to allow Wi-Fi auth with client key pair</string>
     <string name="wifi_eap_tls_dialog_message">EAP_TLS with X.509 CA certificate and PKCS12 client certificate</string>
     <string name="wifi_unknown_cert">Unknown cert</string>
 
