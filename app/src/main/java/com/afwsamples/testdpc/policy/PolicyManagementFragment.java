@@ -1709,6 +1709,11 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     @TargetApi(VERSION_CODES.M)
     private void setKeyGuardDisabled(boolean disabled) {
+        mDevicePolicyManagerGateway.setKeyguardDisabled(disabled,
+                (v) -> onSuccessLog("setKeyGuardDisabled(%b)", disabled),
+                (e) -> showToast(disabled ? R.string.unable_disable_keyguard
+                        : R.string.unable_enable_keyguard));
+
         if (!mDevicePolicyManager.setKeyguardDisabled(mAdminComponentName, disabled)) {
             // this should not happen
             if (disabled) {

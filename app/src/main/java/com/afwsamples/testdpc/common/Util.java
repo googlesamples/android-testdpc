@@ -272,6 +272,10 @@ public class Util {
         return constantToString(DevicePolicyManager.class, "PERMISSION_GRANT_STATE_", grantState);
     }
 
+    public static String keyguardDisabledFeaturesToString(int which) {
+        return flagsToString(DevicePolicyManager.class, "KEYGUARD_DISABLE_", which);
+    }
+
     public static void onSuccessLog(String tag, String template, Object... args) {
         Log.d(tag, String.format(template, args) + " succeeded");
     }

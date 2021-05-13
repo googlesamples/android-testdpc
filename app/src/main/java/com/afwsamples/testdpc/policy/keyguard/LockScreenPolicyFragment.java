@@ -122,7 +122,7 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
         addPreferencesFromResource(R.xml.lock_screen_preferences);
         setupAll();
         disableIncompatibleManagementOptionsInCurrentProfile();
-        final int disabledFeatures = getDpm().getKeyguardDisabledFeatures(getAdmin());
+        final int disabledFeatures = getDpmGateway().getKeyguardDisabledFeatures();
         for (Map.Entry<String, Integer> flag : KEYGUARD_FEATURES.entrySet()) {
             setup(flag.getKey(), (disabledFeatures & flag.getValue()) != 0 ? true : false);
         }
@@ -229,16 +229,18 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
     }
 
     private boolean updateKeyguardFeatures(int flag, boolean newValue) {
-        int disabledFeatures = getDpm().getKeyguardDisabledFeatures(getAdmin());
+        int disabledFeatures = getDpmGateway().getKeyguardDisabledFeatures();
         if (newValue) {
             disabledFeatures |= flag;
         } else {
             disabledFeatures &= ~flag;
         }
-        getDpm().setKeyguardDisabledFeatures(getAdmin(), disabledFeatures);
+        getDpmGateway().setKeyguardDisabledFeatures(disabledFeatures,
+                (v) -> onSuccessLog("setKeyguardDisabledFeatures"),
+                (e) -> onErrorLog("setKeyguardDisabledFeatures", e));
 
         // Verify that the new setting stuck.
-        int newDisabledFeatures = getDpm().getKeyguardDisabledFeatures(getAdmin());
+        int newDisabledFeatures = getDpmGateway().getKeyguardDisabledFeatures();
         return disabledFeatures == newDisabledFeatures;
     }
 

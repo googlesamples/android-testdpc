@@ -224,8 +224,8 @@ public final class PasswordConstraintsFragment extends ProfileOrParentFragment i
                 list.setValue((String) newValue);
                 summary = list.getEntry();
                 getDpmGateway().setPasswordQuality(value,
-                        (v) -> onSuccessLog("set password quality"),
-                        (e) -> onErrorLog("set password quality", e));
+                        (v) -> onSuccessLog("setPasswordQuality"),
+                        (e) -> onErrorLog("setPasswordQuality", e));
                 refreshPreferences();
                 break;
             }

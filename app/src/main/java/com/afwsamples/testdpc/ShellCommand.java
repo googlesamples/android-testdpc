@@ -103,6 +103,11 @@ final class ShellCommand {
             = "set-device-owner-lockscreen-info";
     private static final String CMD_GET_DEVICE_OWNER_LOCKSCREEN_INFO
             = "get-device-owner-lockscreen-info";
+    private static final String CMD_SET_KEYGUARD_DISABLED = "set-keyguard-disabled";
+    private static final String CMD_SET_KEYGUARD_DISABLED_FEATURES =
+            "set-keyguard-disabled-features";
+    private static final String CMD_GET_KEYGUARD_DISABLED_FEATURES =
+            "get-keyguard-disabled-features";
 
     // Commands for APIs added on Android S
     private static final String CMD_SET_PERMITTED_INPUT_METHODS_PARENT =
@@ -295,6 +300,15 @@ final class ShellCommand {
             case CMD_GET_DEVICE_OWNER_LOCKSCREEN_INFO:
                 execute(() -> getDeviceOwnerLockScreenInfo());
                 break;
+            case CMD_SET_KEYGUARD_DISABLED:
+                execute(() -> setKeyguardDisabled());
+                break;
+            case CMD_SET_KEYGUARD_DISABLED_FEATURES:
+                execute(() -> setKeyguardDisabledFeatures());
+                break;
+            case CMD_GET_KEYGUARD_DISABLED_FEATURES:
+                execute(() -> getKeyguardDisabledFeatures());
+                break;
             default:
                 mWriter.printf("Invalid command: %s\n\n", cmd);
                 showUsage();
@@ -405,10 +419,14 @@ final class ShellCommand {
         mWriter.printf("\t%s - get whether location is enabled for the user\n",
                 CMD_IS_LOCATION_ENABLED);
         mWriter.printf("\t%s [INFO] - set the device owner lock screen info (or reset when no INFO "
-                + "is passed)\n",
-                CMD_SET_DEVICE_OWNER_LOCKSCREEN_INFO);
-        mWriter.printf("\t%s - get the device owner lock screen info",
+                + "is passed)\n", CMD_SET_DEVICE_OWNER_LOCKSCREEN_INFO);
+        mWriter.printf("\t%s - get the device owner lock screen info\n",
                 CMD_GET_DEVICE_OWNER_LOCKSCREEN_INFO);
+        mWriter.printf("\t%s <true|false> - set keyguard disabled\n", CMD_SET_KEYGUARD_DISABLED);
+        mWriter.printf("\t%s <FLAGS> - set the keyguard disabled features\n",
+                CMD_SET_KEYGUARD_DISABLED_FEATURES);
+        mWriter.printf("\t%s - get the keyguard disabled features\n",
+                CMD_GET_KEYGUARD_DISABLED_FEATURES);
 
         // Separator for S / pre-S commands - do NOT remove line to avoid cherry-pick conflicts
 
@@ -942,6 +960,33 @@ final class ShellCommand {
     private void getDeviceOwnerLockScreenInfo() {
         CharSequence info = mDevicePolicyManagerGateway.getDeviceOwnerLockScreenInfo();
         mWriter.printf("Lock screen info: %s\n", info);
+    }
+    
+    private void setKeyguardDisabled() {
+        // TODO(b/171350084): check args
+        boolean disabled = Boolean.parseBoolean(mArgs[1]);
+
+        mDevicePolicyManagerGateway.setKeyguardDisabled(disabled,
+                (v) -> onSuccess("Set keyguard disabled to %b", disabled),
+                (e) -> onError(e, "Error setting keyguard disabled to %b", disabled));
+    }
+
+    private void setKeyguardDisabledFeatures() {
+        int which = getIntArg(/* index= */ 1);
+
+        String features = Util.keyguardDisabledFeaturesToString(which);
+        Log.i(TAG, "setKeyguardDisabledFeatures(" + which + "): setting to " + features);
+
+        mDevicePolicyManagerGateway.setKeyguardDisabledFeatures(which,
+                (v) -> onSuccess("Set keyguard features to %s", features),
+                (e) -> onError(e, "Error settings keyguard features to %s", features));
+    }
+
+    private void getKeyguardDisabledFeatures() {
+        int flags = mDevicePolicyManagerGateway.getKeyguardDisabledFeatures();
+        String features = Util.keyguardDisabledFeaturesToString(flags);
+
+        mWriter.printf("%s (%d)\n", features, flags);
     }
 
     private static String permittedToString(boolean permitted) {

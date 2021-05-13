@@ -742,7 +742,7 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
     public int getLockTaskFeatures() {
         int flags = mDevicePolicyManager.getLockTaskFeatures(mAdminComponentName);
         Log.d(TAG, "getLockTaskFeatures(): " + Util.lockTaskFeaturesToString(flags)
-            + " (" + flags + ")");
+                + " (" + flags + ")");
         return flags;
     }
 
@@ -826,9 +826,44 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
         }
     }
 
+    public void setKeyguardDisabled(boolean disabled, Consumer<Void> onSuccess,
+            Consumer<Exception> onError) {
+        Log.d(TAG, "KeyguardDisabled(" + disabled + ")");
+        try {
+            if (mDevicePolicyManager.setKeyguardDisabled(mAdminComponentName, disabled)) {
+                onSuccess.accept(null);
+            } else {
+                onError.accept(new InvalidResultException("false", "setKeyguardDisabled(%b)",
+                        disabled));
+            }
+        } catch (Exception e) {
+            onError.accept(e);
+        }
+    }
+
+    @Override
+    public void setKeyguardDisabledFeatures(int which, Consumer<Void> onSuccess,
+            Consumer<Exception> onError) {
+        String features = Util.keyguardDisabledFeaturesToString(which);
+        Log.d(TAG, "setKeyguardDisabledFeatures(" + features + ")");
+        try {
+            mDevicePolicyManager.setKeyguardDisabledFeatures(mAdminComponentName, which);
+            onSuccess.accept(null);
+        } catch (Exception e) {
+            onError.accept(e);
+        }
+    }
+
     @Override
     public CharSequence getDeviceOwnerLockScreenInfo() {
         return mDevicePolicyManager.getDeviceOwnerLockScreenInfo();
+    }
+
+    public int getKeyguardDisabledFeatures() {
+        int which = mDevicePolicyManager.getKeyguardDisabledFeatures(mAdminComponentName);
+        Log.d(TAG, "getKeyguardDisabledFeatures(): " + Util.keyguardDisabledFeaturesToString(which)
+                + " (" + which + ")");
+        return which;
     }
 
     @Override
