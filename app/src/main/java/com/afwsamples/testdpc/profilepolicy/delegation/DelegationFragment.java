@@ -54,22 +54,26 @@ public class DelegationFragment extends ManageAppFragment {
     List<DelegationScope> mDelegations;
     private String mPackageName;
     private boolean mIsDeviceOrProfileOwner;
-    private ComponentName mAdminName;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mAdminName = DeviceAdminReceiver.getComponentName(getActivity());
         mDpm = (DevicePolicyManager) getActivity().getSystemService(Context.DEVICE_POLICY_SERVICE);
         mPackageName = getActivity().getPackageName();
-        final boolean isDeviceOwner = mDpm.isDeviceOwnerApp(mPackageName);
-        final boolean isProfileOwner = mDpm.isProfileOwnerApp(mPackageName);
-        final boolean isManagedProfile = mDpm.isManagedProfile(mAdminName);
-        mIsDeviceOrProfileOwner = isDeviceOwner || isProfileOwner;
+        if (isDelegatedApp(mPackageName)) {
+            // Show all delegations if we are delegated app.
+            mDelegations = DelegationScope.defaultDelegationScopes(true);
+        } else {
+            ComponentName mAdminName = DeviceAdminReceiver.getComponentName(getActivity());
+            final boolean isDeviceOwner = mDpm.isDeviceOwnerApp(mPackageName);
+            final boolean isProfileOwner = mDpm.isProfileOwnerApp(mPackageName);
+            final boolean isManagedProfile = mDpm.isManagedProfile(mAdminName);
+            mIsDeviceOrProfileOwner = isDeviceOwner || isProfileOwner;
 
-        // Show DO or managed PO only delegations if we are DO, delegated app or managed PO.
-        mDelegations = DelegationScope
-            .defaultDelegationScopes(isDeviceOwner || (isManagedProfile && isProfileOwner));
+            // Show DO or managed PO only delegations if we are DO or managed PO.
+            mDelegations = DelegationScope
+                .defaultDelegationScopes(isDeviceOwner || (isManagedProfile && isProfileOwner));
+        }
 
         getActivity().getActionBar().setTitle(R.string.generic_delegation);
     }
@@ -230,5 +234,10 @@ public class DelegationFragment extends ManageAppFragment {
             }
             return defaultDelegations;
         }
+    }
+
+    @TargetApi(VERSION_CODES.O)
+    private boolean isDelegatedApp(String packageName) {
+        return !mDpm.getDelegatedScopes(null, packageName).isEmpty();
     }
 }
