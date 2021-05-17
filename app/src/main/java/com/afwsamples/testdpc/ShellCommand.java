@@ -97,6 +97,10 @@ final class ShellCommand {
     private static final String CMD_GET_PERMISSION_GRANT_STATE = "get-permission-grant-state";
     private static final String CMD_SET_LOCATION_ENABLED = "set-location-enabled";
     private static final String CMD_IS_LOCATION_ENABLED = "is-location-enabled";
+    private static final String CMD_SET_DEVICE_OWNER_LOCKSCREEN_INFO
+            = "set-device-owner-lockscreen-info";
+    private static final String CMD_GET_DEVICE_OWNER_LOCKSCREEN_INFO
+            = "get-device-owner-lockscreen-info";
 
     private static final String ARG_FLAGS = "--flags";
 
@@ -257,6 +261,12 @@ final class ShellCommand {
             case CMD_IS_LOCATION_ENABLED:
                 execute(() -> isLocationEnabled());
                 break;
+            case CMD_SET_DEVICE_OWNER_LOCKSCREEN_INFO:
+                execute(() -> setDeviceOwnerLockScreenInfo());
+                break;
+            case CMD_GET_DEVICE_OWNER_LOCKSCREEN_INFO:
+                execute(() -> getDeviceOwnerLockScreenInfo());
+                break;
             default:
                 mWriter.printf("Invalid command: %s\n\n", cmd);
                 showUsage();
@@ -358,6 +368,11 @@ final class ShellCommand {
                 CMD_SET_LOCATION_ENABLED);
         mWriter.printf("\t%s - get whether location is enabled for the user\n",
                 CMD_IS_LOCATION_ENABLED);
+        mWriter.printf("\t%s [INFO] - set the device owner lock screen info (or reset when no INFO "
+                + "is passed)\n",
+                CMD_SET_DEVICE_OWNER_LOCKSCREEN_INFO);
+        mWriter.printf("\t%s - get the device owner lock screen info",
+                CMD_GET_DEVICE_OWNER_LOCKSCREEN_INFO);
 
         // Separator for S / pre-S commands - do NOT remove line to avoid cherry-pick conflicts
     }
@@ -815,6 +830,18 @@ final class ShellCommand {
     private void isLocationEnabled() {
         boolean enabled = mDevicePolicyManagerGateway.isLocationEnabled();
         mWriter.printf("Location enabled: %b\n", enabled);
+    }
+
+    private void setDeviceOwnerLockScreenInfo() {
+        final CharSequence info = mArgs.length > 0 ? mArgs[1] : "";
+        mDevicePolicyManagerGateway.setDeviceOwnerLockScreenInfo(info,
+                (v) -> onSuccess("Set lock screen info to '%s'", info),
+                (e) -> onError(e, "Error setting lock screen info to '%s'", info));
+    }
+
+    private void getDeviceOwnerLockScreenInfo() {
+        CharSequence info = mDevicePolicyManagerGateway.getDeviceOwnerLockScreenInfo();
+        mWriter.printf("Lock screen info: %s\n", info);
     }
 
     private static String permittedToString(boolean permitted) {
