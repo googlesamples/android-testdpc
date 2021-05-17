@@ -414,6 +414,17 @@ public interface DevicePolicyManagerGateway {
     boolean isLocationEnabled();
 
     /**
+     * See {@link android.app.admin.DevicePolicyManager#setDeviceOwnerLockScreenInfo(ComponentName, CharSequence)}.
+     */
+    void setDeviceOwnerLockScreenInfo(CharSequence info, @NonNull Consumer<Void> onSuccess,
+            @NonNull Consumer<Exception> onError);
+
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#getDeviceOwnerLockScreenInfo()}.
+     */
+    CharSequence getDeviceOwnerLockScreenInfo();
+
+    /**
      * Used on error callbacks to indicate a {@link android.app.admin.DevicePolicyManager} method
      * call failed.
      */
