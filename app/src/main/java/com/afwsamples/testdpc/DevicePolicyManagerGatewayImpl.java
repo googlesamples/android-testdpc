@@ -815,6 +815,23 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
     }
 
     @Override
+    public void setDeviceOwnerLockScreenInfo(CharSequence info, Consumer<Void> onSuccess,
+            Consumer<Exception> onError) {
+        Log.d(TAG, "setDeviceOwnerLockScreenInfo(" + info + ")");
+        try {
+            mDevicePolicyManager.setDeviceOwnerLockScreenInfo(mAdminComponentName, info);
+            onSuccess.accept(null);
+        } catch (Exception e) {
+            onError.accept(e);
+        }
+    }
+
+    @Override
+    public CharSequence getDeviceOwnerLockScreenInfo() {
+        return mDevicePolicyManager.getDeviceOwnerLockScreenInfo();
+    }
+
+    @Override
     public String toString() {
         return "DevicePolicyManagerGatewayImpl[" + mAdminComponentName + "]";
     }
