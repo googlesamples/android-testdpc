@@ -425,6 +425,23 @@ public interface DevicePolicyManagerGateway {
     CharSequence getDeviceOwnerLockScreenInfo();
 
     /**
+     * See {@link android.app.admin.DevicePolicyManager#setKeyguardDisabled(ComponentName, boolean)}.
+     */
+    void setKeyguardDisabled(boolean disabled, @NonNull Consumer<Void> onSuccess,
+            @NonNull Consumer<Exception> onError);
+
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#setKeyguardDisabledFeatures(ComponentName, int)}.
+     */
+    void setKeyguardDisabledFeatures(int which, @NonNull Consumer<Void> onSuccess,
+            @NonNull Consumer<Exception> onError);
+
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#getKeyguardDisabledFeatures(ComponentName)}.
+     */
+    int getKeyguardDisabledFeatures();
+
+    /**
      * Used on error callbacks to indicate a {@link android.app.admin.DevicePolicyManager} method
      * call failed.
      */
