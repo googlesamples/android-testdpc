@@ -107,6 +107,7 @@ public class PickTransferComponentFragment extends Fragment {
         try {
             PersistableBundle persistableBundle = new PersistableBundle();
             persistableBundle.putString("random_key", "random_value");
+            // TODO: use DevicePolicyManagerGateway instead
             mDevicePolicyManager.transferOwnership(source, target, persistableBundle);
             return "Success!";
         } catch (Exception e) {

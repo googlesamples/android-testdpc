@@ -32,6 +32,8 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.afwsamples.testdpc.DevicePolicyManagerGateway;
+import com.afwsamples.testdpc.DevicePolicyManagerGatewayImpl;
 import com.afwsamples.testdpc.R;
 
 import java.util.ArrayList;
@@ -49,13 +51,14 @@ public abstract class ToggleComponentsArrayAdapter extends ArrayAdapter<ResolveI
 
     protected PackageManager mPackageManager;
     protected DevicePolicyManager mDevicePolicyManager;
+    protected DevicePolicyManagerGateway mDevicePolicyManagerGateway;
     protected List<Boolean> mIsComponentCheckedList;
 
     public ToggleComponentsArrayAdapter(Context context, int resource, List<ResolveInfo> objects) {
         super(context, resource, objects);
         mPackageManager = context.getPackageManager();
-        mDevicePolicyManager = (DevicePolicyManager) context.getSystemService(
-                Context.DEVICE_POLICY_SERVICE);
+        mDevicePolicyManagerGateway = new DevicePolicyManagerGatewayImpl(context);
+        mDevicePolicyManager = mDevicePolicyManagerGateway.getDevicePolicyManager();
         // Init mIsComponentCheckedList
         mIsComponentCheckedList = new ArrayList<>(Arrays.asList(new Boolean[objects.size()]));
         Collections.fill(mIsComponentCheckedList, Boolean.FALSE);

@@ -25,6 +25,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -43,6 +44,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.List;
 
@@ -243,5 +246,80 @@ public class Util {
     public static boolean isRunningOnTvDevice(Context context) {
         UiModeManager uiModeManager = (UiModeManager) context.getSystemService(Context.UI_MODE_SERVICE);
         return uiModeManager.getCurrentModeType() == Configuration.UI_MODE_TYPE_TELEVISION;
+    }
+
+    public static boolean isRunningOnAutomotiveDevice(Context context) {
+        return context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_AUTOMOTIVE);
+    }
+
+    public static String lockTaskFeaturesToString(int flags) {
+        return flagsToString(DevicePolicyManager.class, "LOCK_TASK_FEATURE_", flags);
+    }
+
+    public static String personalAppsSuspensionReasonToString(int reasons) {
+        return flagsToString(DevicePolicyManager.class, "PERSONAL_APPS_", reasons);
+    }
+
+    public static String grantStateToString(int grantState) {
+        return constantToString(DevicePolicyManager.class, "PERMISSION_GRANT_STATE_", grantState);
+    }
+
+    public static void onSuccessLog(String tag, String template, Object... args) {
+        Log.d(tag, String.format(template, args) + " succeeded");
+    }
+
+    public static void onErrorLog(String tag, Exception e, String template, Object... args) {
+        Log.d(tag, String.format(template, args) + " failed", e);
+    }
+
+    // Copied from DebugUtils
+    public static String flagsToString(Class<?> clazz, String prefix, int flags) {
+        final StringBuilder res = new StringBuilder();
+        boolean flagsWasZero = flags == 0;
+
+        for (Field field : clazz.getDeclaredFields()) {
+            final int modifiers = field.getModifiers();
+            if (Modifier.isStatic(modifiers) && Modifier.isFinal(modifiers)
+                    && field.getType().equals(int.class) && field.getName().startsWith(prefix)) {
+                try {
+                    final int value = field.getInt(null);
+                    if (value == 0 && flagsWasZero) {
+                        return constNameWithoutPrefix(prefix, field);
+                    }
+                    if (value != 0 && (flags & value) == value) {
+                        flags &= ~value;
+                        res.append(constNameWithoutPrefix(prefix, field)).append('|');
+                    }
+                } catch (IllegalAccessException ignored) {
+                }
+            }
+        }
+        if (flags != 0 || res.length() == 0) {
+            res.append(Integer.toHexString(flags));
+        } else {
+            res.deleteCharAt(res.length() - 1);
+        }
+        return res.toString();
+    }
+
+    // Copied from DebugUtils
+    public static String constantToString(Class<?> clazz, String prefix, int value) {
+        for (Field field : clazz.getDeclaredFields()) {
+            final int modifiers = field.getModifiers();
+            try {
+                if (Modifier.isStatic(modifiers) && Modifier.isFinal(modifiers)
+                        && field.getType().equals(int.class) && field.getName().startsWith(prefix)
+                        && field.getInt(null) == value) {
+                    return constNameWithoutPrefix(prefix, field);
+                }
+            } catch (IllegalAccessException ignored) {
+            }
+        }
+        return prefix + Integer.toString(value);
+    }
+
+    // Copied from DebugUtils
+    private static String constNameWithoutPrefix(String prefix, Field field) {
+        return field.getName().substring(prefix.length());
     }
 }

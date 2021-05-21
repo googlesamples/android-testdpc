@@ -11,10 +11,16 @@ import androidx.preference.PreferenceViewHolder;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+
+import com.afwsamples.testdpc.common.Dumpable;
+
+import java.io.FileDescriptor;
+import java.io.PrintWriter;
 
 import com.afwsamples.testdpc.R;
 
@@ -22,14 +28,25 @@ import com.afwsamples.testdpc.R;
  * Base class of searchable policy preference fragment. With specified preference key,
  * it will scroll to the corresponding preference and highlight it.
  */
-public abstract class BaseSearchablePolicyPreferenceFragment extends PreferenceFragment {
+public abstract class BaseSearchablePolicyPreferenceFragment extends PreferenceFragment
+        implements Dumpable {
     protected LinearLayoutManager mLayoutManager;
     private HighlightablePreferenceGroupAdapter mAdapter;
     private String mPreferenceKey;
-    private boolean mPreferenceHighlighted = false;
+    private boolean mPreferenceHighlighted;
+    private final String mTag;
+
     public static final String EXTRA_PREFERENCE_KEY = "preference_key";
     private static final String SAVE_HIGHLIGHTED_KEY = "preference_highlighted";
     private static final int DELAY_HIGHLIGHT_DURATION_MILLIS = 500;
+
+    protected BaseSearchablePolicyPreferenceFragment() {
+        mTag = getClass().getSimpleName();
+    }
+
+    protected BaseSearchablePolicyPreferenceFragment(String tag) {
+        mTag = tag;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -77,6 +94,40 @@ public abstract class BaseSearchablePolicyPreferenceFragment extends PreferenceF
     protected RecyclerView.Adapter onCreateAdapter(PreferenceScreen preferenceScreen) {
         mAdapter = new HighlightablePreferenceGroupAdapter(preferenceScreen);
         return mAdapter;
+    }
+
+    @Override // from Fragment
+    public final void dump(String prefix, FileDescriptor fd, PrintWriter pw, String[] args) {
+        dump(prefix, pw, fd, Dumpable.isQuietMode(args), args);
+    }
+
+    @Override // from Dumpable
+    public final void dump(String prefix, PrintWriter pw, FileDescriptor fd, boolean quietModeOnly,
+            String[] args) {
+        // Dump its own state
+        if (mAdapter == null) {
+            pw.printf("%sno adapter\n", prefix);
+        } else {
+            pw.printf("%smHighlightPosition: %d\n", prefix, mAdapter.mHighlightPosition);
+        }
+        pw.printf("%smPreferenceKey: %s\n", prefix, mPreferenceKey);
+        pw.printf("%smPreferenceHighlighted: %b\n", prefix, mPreferenceHighlighted);
+
+        // Dump subclass state
+        dump(prefix, pw, args);
+
+        if (quietModeOnly) return;
+
+        // Dump superclass state
+        super.dump(prefix, fd, pw, args);
+
+    }
+
+    /**
+     * Dumps just the subclass state.
+     */
+    protected void dump(String prefix, PrintWriter writer, String[] args) {
+
     }
 
     private void highlightPreferenceIfNeeded() {
@@ -166,4 +217,12 @@ public abstract class BaseSearchablePolicyPreferenceFragment extends PreferenceF
      * @return whether the preference fragment is available.
      */
     public abstract boolean isAvailable(Context context);
+
+    protected void onSuccessLog(String method) {
+        Log.d(mTag, method + "() succeeded");
+    }
+
+    protected void onErrorLog(String method, Exception e) {
+        Log.e(mTag, method + "() failed: ", e);
+    }
 }

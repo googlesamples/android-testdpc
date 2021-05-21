@@ -20,8 +20,6 @@ import static android.os.UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES;
 import static com.afwsamples.testdpc.common.Util.Q_VERSION_CODE;
 
 import android.app.AlertDialog;
-import android.app.admin.DevicePolicyManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
@@ -31,6 +29,8 @@ import androidx.preference.PreferenceScreen;
 import android.util.Log;
 import android.widget.Toast;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
+import com.afwsamples.testdpc.DevicePolicyManagerGateway;
+import com.afwsamples.testdpc.DevicePolicyManagerGatewayImpl;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.BaseSearchablePolicyPreferenceFragment;
 import com.afwsamples.testdpc.common.preference.DpcPreferenceBase;
@@ -41,9 +41,7 @@ public class UserRestrictionsDisplayFragment extends BaseSearchablePolicyPrefere
         implements Preference.OnPreferenceChangeListener {
     private static final String TAG = "UserRestrictions";
 
-    private DevicePolicyManager mDevicePolicyManager;
-    private UserManager mUserManager;
-    private ComponentName mAdminComponentName;
+    private DevicePolicyManagerGateway mDevicePolicyManagerGateway;
 
     public static UserRestrictionsDisplayFragment newInstance() {
         UserRestrictionsDisplayFragment fragment = new UserRestrictionsDisplayFragment();
@@ -52,10 +50,7 @@ public class UserRestrictionsDisplayFragment extends BaseSearchablePolicyPrefere
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        mDevicePolicyManager = (DevicePolicyManager) getActivity().getSystemService(
-                Context.DEVICE_POLICY_SERVICE);
-        mUserManager = (UserManager) getActivity().getSystemService(Context.USER_SERVICE);
-        mAdminComponentName = DeviceAdminReceiver.getComponentName(getActivity());
+        mDevicePolicyManagerGateway = new DevicePolicyManagerGatewayImpl(getActivity());
         super.onCreate(savedInstanceState);
         getActivity().getActionBar().setTitle(R.string.user_restrictions_management_title);
     }
@@ -93,11 +88,10 @@ public class UserRestrictionsDisplayFragment extends BaseSearchablePolicyPrefere
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         String restriction = preference.getKey();
+        boolean enabled = newValue.equals(true);
         try {
-            if (newValue.equals(true)) {
-                mDevicePolicyManager.addUserRestriction(mAdminComponentName, restriction);
-            } else {
-                mDevicePolicyManager.clearUserRestriction(mAdminComponentName, restriction);
+            mDevicePolicyManagerGateway.setUserRestriction(restriction, enabled);
+            if (!enabled) {
                 if (DISALLOW_INSTALL_UNKNOWN_SOURCES.equals(restriction) ||
                         UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES_GLOBALLY.equals(
                                 restriction)) {
@@ -128,7 +122,7 @@ public class UserRestrictionsDisplayFragment extends BaseSearchablePolicyPrefere
 
     private void updateUserRestriction(String userRestriction) {
         DpcSwitchPreference preference = (DpcSwitchPreference) findPreference(userRestriction);
-        boolean disallowed = mUserManager.hasUserRestriction(userRestriction);
+        boolean disallowed = mDevicePolicyManagerGateway.hasUserRestriction(userRestriction);
         preference.setChecked(disallowed);
     }
 

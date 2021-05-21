@@ -43,7 +43,8 @@ public class LockTaskAppInfoArrayAdapter extends ToggleComponentsArrayAdapter {
     public boolean isComponentEnabled(ResolveInfo resolveInfo) {
         if (resolveInfo != null && resolveInfo.activityInfo != null &&!TextUtils.isEmpty(
                 resolveInfo.activityInfo.packageName)) {
-            return mDevicePolicyManager.isLockTaskPermitted(resolveInfo.activityInfo.packageName);
+            return mDevicePolicyManagerGateway
+                    .isLockTaskPermitted(resolveInfo.activityInfo.packageName);
         }
         return false;
     }

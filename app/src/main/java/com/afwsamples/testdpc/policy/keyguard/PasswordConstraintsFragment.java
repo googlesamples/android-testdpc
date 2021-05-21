@@ -24,7 +24,7 @@ import static android.app.admin.DevicePolicyManager.PASSWORD_QUALITY_NUMERIC_COM
 import static android.app.admin.DevicePolicyManager.PASSWORD_QUALITY_SOMETHING;
 import static android.app.admin.DevicePolicyManager.PASSWORD_QUALITY_UNSPECIFIED;
 
-import static com.afwsamples.testdpc.common.preference.DpcPreferenceHelper.NO_CUSTOM_CONSTRIANT;
+import static com.afwsamples.testdpc.common.preference.DpcPreferenceHelper.NO_CUSTOM_CONSTRAINT;
 
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
@@ -170,7 +170,7 @@ public final class PasswordConstraintsFragment extends ProfileOrParentFragment i
         setup(Keys.HISTORY_LENGTH, getDpm().getPasswordHistoryLength(getAdmin()));
 
         // Minimum quality requirement.
-        setup(Keys.QUALITY, PASSWORD_QUALITIES.floorKey(getDpm().getPasswordQuality(getAdmin())));
+        setup(Keys.QUALITY, PASSWORD_QUALITIES.floorKey(getDpmGateway().getPasswordQuality()));
 
         // Minimum length requirements.
         setup(Keys.MIN_LENGTH, getDpm().getPasswordMinimumLength(getAdmin()));
@@ -223,7 +223,9 @@ public final class PasswordConstraintsFragment extends ProfileOrParentFragment i
                 // Store newValue now so getEntry() can return the new setting
                 list.setValue((String) newValue);
                 summary = list.getEntry();
-                getDpm().setPasswordQuality(getAdmin(), value);
+                getDpmGateway().setPasswordQuality(value,
+                        (v) -> onSuccessLog("set password quality"),
+                        (e) -> onErrorLog("set password quality", e));
                 refreshPreferences();
                 break;
             }
@@ -263,14 +265,14 @@ public final class PasswordConstraintsFragment extends ProfileOrParentFragment i
     private void setPreferencesConstraint() {
         // Minimum length can be set for most qualities
         mMinLength.setCustomConstraint(
-                () -> getDpm().getPasswordQuality(getAdmin()) >= PASSWORD_QUALITY_NUMERIC
-                        ? NO_CUSTOM_CONSTRIANT
+                () -> getDpmGateway().getPasswordQuality() >= PASSWORD_QUALITY_NUMERIC
+                        ? NO_CUSTOM_CONSTRAINT
                         : R.string.not_for_password_quality);
 
         // Other minimums are only active for the highest quality
         CustomConstraint constraint =
-                () -> getDpm().getPasswordQuality(getAdmin()) == PASSWORD_QUALITY_COMPLEX
-                        ? NO_CUSTOM_CONSTRIANT
+                () -> getDpmGateway().getPasswordQuality() == PASSWORD_QUALITY_COMPLEX
+                        ? NO_CUSTOM_CONSTRAINT
                         : R.string.not_for_password_quality;
         mMinLetters.setCustomConstraint(constraint);
         mMinNumeric.setCustomConstraint(constraint);

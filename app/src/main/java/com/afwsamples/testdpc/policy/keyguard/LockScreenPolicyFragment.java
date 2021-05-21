@@ -16,7 +16,7 @@
 
 package com.afwsamples.testdpc.policy.keyguard;
 
-import static com.afwsamples.testdpc.common.preference.DpcPreferenceHelper.NO_CUSTOM_CONSTRIANT;
+import static com.afwsamples.testdpc.common.preference.DpcPreferenceHelper.NO_CUSTOM_CONSTRAINT;
 import static com.afwsamples.testdpc.policy.keyguard.SetTrustAgentConfigFragment.Type;
 
 import android.annotation.TargetApi;
@@ -223,8 +223,9 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
 
     @TargetApi(VERSION_CODES.N)
     private void setLockScreenMessage(Preference preference, String newValue) {
-        getDpm().setDeviceOwnerLockScreenInfo(getAdmin(), newValue);
-        preference.setSummary(newValue);
+        getDpmGateway().setDeviceOwnerLockScreenInfo(newValue,
+                (v) -> preference.setSummary(newValue),
+                (e) -> onErrorLog("setDeviceOwnerLockScreenInfo", e));
     }
 
     private boolean updateKeyguardFeatures(int flag, boolean newValue) {
@@ -259,7 +260,7 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
     private void setupAll() {
         setup(Keys.LOCK_SCREEN_MESSAGE,
             Util.SDK_INT >= VERSION_CODES.N && isDeviceOwner()
-                        ? getDpm().getDeviceOwnerLockScreenInfo() : null);
+                        ? getDpmGateway().getDeviceOwnerLockScreenInfo() : null);
         setup(Keys.MAX_FAILS_BEFORE_WIPE, getDpm().getMaximumFailedPasswordsForWipe(getAdmin()));
         setup(Keys.MAX_TIME_SCREEN_LOCK,
                 TimeUnit.MILLISECONDS.toSeconds(getDpm().getMaximumTimeToLock(getAdmin())));
@@ -282,7 +283,7 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment impl
         dpcPref.setCustomConstraint(
                 () -> Keys.NOT_APPLICABLE_TO_PARENT.contains(key) && isParentProfileInstance()
                         ? R.string.not_for_parent_profile
-                        : NO_CUSTOM_CONSTRIANT
+                        : NO_CUSTOM_CONSTRAINT
         );
 
         // We do not allow user to add trust agent config in pre-N devices in managed profile.
