@@ -493,6 +493,8 @@
     <string name="disallow_uninstall_apps">Disallow uninstall apps</string>
     <string name="disallow_unmute_microphone">Disallow unmute microphone</string>
     <string name="disallow_usb_file_transfer">Disallow usb file transfer</string>
+    <string name="disallow_microphone_toggle">Disallow microphone toggle</string>
+    <string name="disallow_camera_toggle">Disallow camera toggle</string>
     <string name="ensure_verify_apps">Ensure verify apps</string>
     <string name="disallow_autofill">Disallow autofill</string>
     <string name="disallow_unified_password">Require separate challenge</string>

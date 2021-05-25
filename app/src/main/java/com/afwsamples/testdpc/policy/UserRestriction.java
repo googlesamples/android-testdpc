@@ -10,6 +10,7 @@ import static android.os.UserManager.DISALLOW_APPS_CONTROL;
 import static android.os.UserManager.DISALLOW_AUTOFILL;
 import static android.os.UserManager.DISALLOW_BLUETOOTH;
 import static android.os.UserManager.DISALLOW_BLUETOOTH_SHARING;
+import static android.os.UserManager.DISALLOW_CAMERA_TOGGLE;
 import static android.os.UserManager.DISALLOW_CONFIG_BLUETOOTH;
 import static android.os.UserManager.DISALLOW_CONFIG_BRIGHTNESS;
 import static android.os.UserManager.DISALLOW_CONFIG_CELL_BROADCASTS;
@@ -34,6 +35,7 @@ import static android.os.UserManager.DISALLOW_FUN;
 import static android.os.UserManager.DISALLOW_INSTALL_APPS;
 import static android.os.UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES;
 import static android.os.UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES_GLOBALLY;
+import static android.os.UserManager.DISALLOW_MICROPHONE_TOGGLE;
 import static android.os.UserManager.DISALLOW_MODIFY_ACCOUNTS;
 import static android.os.UserManager.DISALLOW_MOUNT_PHYSICAL_MEDIA;
 import static android.os.UserManager.DISALLOW_NETWORK_RESET;
@@ -56,6 +58,7 @@ import static android.os.UserManager.DISALLOW_USB_FILE_TRANSFER;
 import static android.os.UserManager.DISALLOW_USER_SWITCH;
 import static android.os.UserManager.ENSURE_VERIFY_APPS;
 
+import android.os.UserManager;
 import com.afwsamples.testdpc.R;
 
 public class UserRestriction {
@@ -206,6 +209,10 @@ public class UserRestriction {
             new UserRestriction(
                     DISALLOW_CONFIG_PRIVATE_DNS,
                     R.string.disallow_config_private_dns),
+            new UserRestriction(DISALLOW_MICROPHONE_TOGGLE,
+                    R.string.disallow_microphone_toggle),
+            new UserRestriction(DISALLOW_CAMERA_TOGGLE,
+                    R.string.disallow_camera_toggle),
     };
 
     /**
@@ -256,7 +263,7 @@ public class UserRestriction {
             new UserRestriction(DISALLOW_OUTGOING_CALLS,
                     R.string.disallow_outgoing_calls),
             new UserRestriction(DISALLOW_UNMUTE_MICROPHONE,
-                    R.string.disallow_unmute_microphone),
+                    R.string.disallow_unmute_microphone)
     };
 
     /**
@@ -293,7 +300,9 @@ public class UserRestriction {
      * User restrictions that cannot be set by profile owners. Applied to all users.
      */
     public static final String[] DEVICE_OWNER_ONLY_RESTRICTIONS = {
-            DISALLOW_USER_SWITCH
+            DISALLOW_USER_SWITCH,
+            DISALLOW_MICROPHONE_TOGGLE,
+            DISALLOW_CAMERA_TOGGLE,
     };
 
     /**
