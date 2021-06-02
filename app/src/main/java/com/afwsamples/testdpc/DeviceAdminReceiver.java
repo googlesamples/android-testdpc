@@ -165,6 +165,7 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
             final String bugreportFileHash) {
         Log.i(TAG, "Bugreport shared, hash: " + bugreportFileHash);
         final Uri bugreportUri = intent.getData();
+        Log.i(TAG, "Bugreport URI: " + bugreportUri);
 
         final PendingResult result = goAsync();
         new AsyncTask<Void, Void, String>() {
@@ -180,16 +181,20 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
                     in = new FileInputStream(mInputPfd.getFileDescriptor());
                     outputBugreportFile = new File(context.getExternalFilesDir(null),
                             bugreportUri.getLastPathSegment());
+                    Log.i(TAG, "Writing bugreport to " + outputBugreportFile);
                     out = new FileOutputStream(outputBugreportFile);
                     byte[] buffer = new byte[1024];
                     int read;
+                    long totalRead = 0;
                     while ((read = in.read(buffer)) != -1) {
+                        totalRead += read;
                         out.write(buffer, 0, read);
                     }
                     in.close();
                     out.close();
                     message = context.getString(R.string.received_bugreport,
-                            outputBugreportFile.getPath(), bugreportFileHash);
+                            outputBugreportFile.getPath(), bugreportFileHash, totalRead);
+                    Log.i(TAG, message);
                 } catch (IOException e) {
                     Log.e(TAG, e.getMessage());
                     message = context.getString(R.string.received_bugreport_failed_retrieval);

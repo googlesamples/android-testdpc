@@ -632,7 +632,7 @@
     <!-- Remote bugreport -->
     <string name="bugreport_title">Bugreport</string>
     <string name="request_bugreport">Request bugreport</string>
-    <string name="received_bugreport">Received bugreport %1$s hash: %2$s</string>
+    <string name="received_bugreport">Received bugreport %1$s hash: %2$s bytes: %3$s</string>
     <string name="received_bugreport_failed_retrieval">Received bugreport file, but failed to retrieve it</string>
     <string name="bugreport_sharing_declined">User declined sharing bugreport</string>
     <string name="bugreport_failure_message">Bugreport request failed: %s</string>
