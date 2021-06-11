@@ -379,4 +379,9 @@ public class UserRestriction {
             DISALLOW_INSTALL_UNKNOWN_SOURCES_GLOBALLY,
             DISALLOW_CONFIG_PRIVATE_DNS,
     };
+
+    public static String[] SC_PLUS_RESTRICTIONS = {
+            DISALLOW_MICROPHONE_TOGGLE,
+            DISALLOW_CAMERA_TOGGLE,
+    };
 }
