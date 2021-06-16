@@ -19,6 +19,9 @@ package com.afwsamples.testdpc;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Bitmap;
 import android.location.LocationManager;
@@ -28,12 +31,17 @@ import android.os.PersistableBundle;
 import android.os.UserHandle;
 import android.os.UserManager;
 import android.util.Log;
-
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
+import com.afwsamples.testdpc.common.ReflectionUtil;
+import com.afwsamples.testdpc.common.ReflectionUtil.ReflectionIsTemporaryException;
 import com.afwsamples.testdpc.common.Util;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -46,19 +54,22 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
     private final DevicePolicyManager mDevicePolicyManager;
     private final UserManager mUserManager;
     private final ComponentName mAdminComponentName;
+    private final PackageManager mPackageManager;
     private final LocationManager mLocationManager;
 
     public DevicePolicyManagerGatewayImpl(@NonNull Context context) {
         this(context.getSystemService(DevicePolicyManager.class),
                 context.getSystemService(UserManager.class),
+                context.getPackageManager(),
                 context.getSystemService(LocationManager.class),
                 DeviceAdminReceiver.getComponentName(context));
     }
 
     public DevicePolicyManagerGatewayImpl(@NonNull DevicePolicyManager dpm, @NonNull UserManager um,
-            @NonNull LocationManager lm, @NonNull ComponentName admin) {
+            @NonNull PackageManager pm, @NonNull LocationManager lm, @NonNull ComponentName admin) {
         mDevicePolicyManager = dpm;
         mUserManager = um;
+        mPackageManager = pm;
         mLocationManager = lm;
         mAdminComponentName = admin;
 
@@ -70,8 +81,9 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
         DevicePolicyManager dpm = context.getSystemService(DevicePolicyManager.class)
                 .getParentProfileInstance(admin);
         UserManager um = context.getSystemService(UserManager.class);
+        PackageManager pm = context.getPackageManager();
         LocationManager lm = context.getSystemService(LocationManager.class);
-        return new DevicePolicyManagerGatewayImpl(dpm, um, lm, admin);
+        return new DevicePolicyManagerGatewayImpl(dpm, um, pm, lm, admin);
     }
 
     @Override
@@ -86,17 +98,45 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
 
     @Override
     public boolean isProfileOwnerApp() {
+        if (mAdminComponentName == null) {
+            return false;
+        }
         return mDevicePolicyManager.isProfileOwnerApp(mAdminComponentName.getPackageName());
     }
 
     @Override
     public boolean isDeviceOwnerApp() {
+        if (mAdminComponentName == null) {
+            return false;
+        }
+
         return mDevicePolicyManager.isDeviceOwnerApp(mAdminComponentName.getPackageName());
     }
 
     @Override
     public boolean isOrganizationOwnedDeviceWithManagedProfile() {
         return mDevicePolicyManager.isOrganizationOwnedDeviceWithManagedProfile();
+    }
+
+    @Override
+    public boolean isHeadlessSystemUserMode() {
+        Util.requireAndroidS();
+
+        return mUserManager.isHeadlessSystemUserMode();
+    }
+
+    @Override
+    public boolean isUserForeground() {
+        Util.requireAndroidS();
+
+        return mUserManager.isUserForeground();
+    }
+
+    @Override
+    public List<UserHandle> listForegroundAffiliatedUsers() {
+        Util.requireAndroidS();
+
+        return mDevicePolicyManager.listForegroundAffiliatedUsers();
     }
 
     @Override
@@ -375,7 +415,7 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
 
     @Override
     public void setUserControlDisabledPackages(List<String> packages, Consumer<Void> onSuccess,
-            Consumer<Exception> onError) {
+        Consumer<Exception> onError) {
         Log.d(TAG, "setUserControlDisabledPackages(" + packages + ")");
 
         try {
@@ -389,6 +429,74 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
     @Override
     public List<String> getUserControlDisabledPackages() {
         return mDevicePolicyManager.getUserControlDisabledPackages(mAdminComponentName);
+    }
+
+    @Override
+    public boolean setPermittedInputMethods(List<String> packageNames) {
+        String inputMethods = packageNames != null ? String.join(",", packageNames) : "";
+        String message = "setPermittedInputMethods(" + inputMethods + ")";
+        return setPermittedInputMethods(packageNames,
+            (v) -> onSuccessLog(message),
+            (e) -> onErrorLog(e, message));
+    }
+
+    @Override
+    public boolean setPermittedInputMethods(List<String> packageNames, Consumer<Void> onSuccess,
+        Consumer<Exception> onError) {
+        boolean result = false;
+        try {
+            result = mDevicePolicyManager
+                .setPermittedInputMethods(mAdminComponentName, packageNames);
+            onSuccess.accept(null);
+        } catch (Exception e) {
+            onError.accept(e);
+        }
+        return result;
+    }
+
+    @Override
+    public void setUsbDataSignalingEnabled(boolean enabled, @NonNull Consumer<Void> onSuccess,
+            @NonNull Consumer<Exception> onError) {
+        Log.d(TAG, "setUsbDataSignalingEnabled(" + enabled + ")");
+        Util.requireAndroidS();
+
+        try {
+            mDevicePolicyManager.setUsbDataSignalingEnabled(enabled);
+            onSuccess.accept(null);
+        } catch (Exception e) {
+            Log.wtf(TAG, "Error calling setUsbDataSignalingEnabled()", e);
+            onError.accept(e);
+        }
+    }
+
+    @Override
+    public void setUsbDataSignalingEnabled(boolean enabled) {
+        String message = String.format("setUsbDataSignalingEnabled(%b)", enabled);
+        setUsbDataSignalingEnabled(enabled,
+            (v) -> onSuccessLog(message),
+            (e) -> onErrorLog(e, message));
+    }
+
+    @Override
+    public void setPreferentialNetworkServiceEnabled(boolean enabled, Consumer<Void> onSuccess,
+            Consumer<Exception> onError) {
+        Log.d(TAG, "setPreferentialNetworkServiceEnabled(" + enabled + ")");
+        Util.requireAndroidS();
+
+        try {
+            mDevicePolicyManager.setPreferentialNetworkServiceEnabled(enabled);
+            onSuccess.accept(null);
+        } catch (Exception e) {
+            Log.wtf(TAG, "Error calling setPreferentialNetworkServiceEnabled()", e);
+            onError.accept(e);
+        }
+    }
+
+    @Override
+    public boolean isPreferentialNetworkServiceEnabled() {
+        Util.requireAndroidS();
+
+        return mDevicePolicyManager.isPreferentialNetworkServiceEnabled();
     }
 
     @Override
@@ -498,6 +606,71 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
     }
 
     @Override
+    public void enableSystemApp(String packageName, Consumer<Void> onSuccess,
+            Consumer<Exception> onError) {
+        Log.d(TAG, "enableSystemApp(" + packageName+ ")");
+
+        try {
+            mDevicePolicyManager.enableSystemApp(mAdminComponentName, packageName);
+            onSuccess.accept(null);
+        } catch (Exception e) {
+            onError.accept(e);
+        }
+    }
+
+    @Override
+    public void enableSystemApp(Intent intent, Consumer<Integer> onSuccess,
+            Consumer<Exception> onError) {
+        Log.d(TAG, "enableSystemApp(" + intent + ")");
+
+        try {
+            int result = mDevicePolicyManager.enableSystemApp(mAdminComponentName, intent);
+            Log.d(TAG, "returning " + result + " activities");
+            onSuccess.accept(result);
+        } catch (Exception e) {
+            onError.accept(e);
+        }
+    }
+
+    @Override
+    public List<String> getDisabledSystemApps() {
+        // Disabled system apps list = {All system apps} - {Enabled system apps}
+        List<String> disabledSystemApps = new ArrayList<String>();
+        // This list contains both enabled and disabled apps.
+        List<ApplicationInfo> allApps = mPackageManager.getInstalledApplications(
+                PackageManager.GET_UNINSTALLED_PACKAGES);
+        Collections.sort(allApps, new ApplicationInfo.DisplayNameComparator(mPackageManager));
+        // This list contains all enabled apps.
+        List<ApplicationInfo> enabledApps =
+                mPackageManager.getInstalledApplications(0 /* Default flags */);
+        Set<String> enabledAppsPkgNames = new HashSet<String>();
+        for (ApplicationInfo applicationInfo : enabledApps) {
+            enabledAppsPkgNames.add(applicationInfo.packageName);
+        }
+        for (ApplicationInfo applicationInfo : allApps) {
+            // Interested in disabled system apps only.
+            if (!enabledAppsPkgNames.contains(applicationInfo.packageName)
+                    && (applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0) {
+                disabledSystemApps.add(applicationInfo.packageName);
+            }
+        }
+        Log.d(TAG, "getDisabledSystemApps(): returning " + disabledSystemApps.size() + " apps");
+        return disabledSystemApps;
+    }
+
+    @Override
+    public void setLockTaskPackages(String[] packages, Consumer<Void> onSuccess,
+            Consumer<Exception> onError) {
+        Log.d(TAG, "setLockTaskPackages(" + Arrays.toString(packages) + ")");
+        try {
+            mDevicePolicyManager.setLockTaskPackages(mAdminComponentName, packages);
+            onSuccess.accept(null);
+        } catch (Exception e) {
+            onError.accept(e);
+        }
+    }
+
+    @Override
     public void setApplicationHidden(String packageName, boolean hidden,
             Consumer<Void> onSuccess, Consumer<Exception> onError) {
         Log.d(TAG, "setApplicationHidden(" + packageName + ", " + hidden + ")");
@@ -513,18 +686,6 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
     @Override
     public boolean isApplicationHidden(String packageName) throws NameNotFoundException {
         return mDevicePolicyManager.isApplicationHidden(mAdminComponentName, packageName);
-    }
-
-    @Override
-    public void setLockTaskPackages(String[] packages, Consumer<Void> onSuccess,
-            Consumer<Exception> onError) {
-        Log.d(TAG, "setLockTaskPackages(" + Arrays.toString(packages) + ")");
-        try {
-            mDevicePolicyManager.setLockTaskPackages(mAdminComponentName, packages);
-            onSuccess.accept(null);
-        } catch (Exception e) {
-            onError.accept(e);
-        }
     }
 
     @Override
@@ -549,7 +710,7 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
     public int getLockTaskFeatures() {
         int flags = mDevicePolicyManager.getLockTaskFeatures(mAdminComponentName);
         Log.d(TAG, "getLockTaskFeatures(): " + Util.lockTaskFeaturesToString(flags)
-            + " (" + flags + ")");
+                + " (" + flags + ")");
         return flags;
     }
 
@@ -583,13 +744,19 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
 
     @Override
     public void setPermissionGrantState(String packageName, String permission, int grantState,
-            Consumer<Boolean> onSuccess, Consumer<Exception> onError) {
+            Consumer<Void> onSuccess, Consumer<Exception> onError) {
+        String stateName = Util.grantStateToString(grantState);
         Log.d(TAG, "setPermissionGrantState(" + packageName + ", " + permission + "): "
-                + Util.grantStateToString(grantState));
+                + stateName);
         try {
-            boolean result = mDevicePolicyManager.setPermissionGrantState(mAdminComponentName,
+            boolean success = mDevicePolicyManager.setPermissionGrantState(mAdminComponentName,
                     packageName, permission, grantState);
-            onSuccess.accept(result);
+            if (success) {
+                onSuccess.accept(null);
+            } else {
+                onError.accept(new FailedOperationException("setPermissionGrantState(%s, %s, %s)",
+                        packageName, permission, stateName));
+            }
         } catch (Exception e) {
             onError.accept(e);
         }
@@ -633,9 +800,44 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
         }
     }
 
+    public void setKeyguardDisabled(boolean disabled, Consumer<Void> onSuccess,
+            Consumer<Exception> onError) {
+        Log.d(TAG, "KeyguardDisabled(" + disabled + ")");
+        try {
+            if (mDevicePolicyManager.setKeyguardDisabled(mAdminComponentName, disabled)) {
+                onSuccess.accept(null);
+            } else {
+                onError.accept(new InvalidResultException("false", "setKeyguardDisabled(%b)",
+                        disabled));
+            }
+        } catch (Exception e) {
+            onError.accept(e);
+        }
+    }
+
+    @Override
+    public void setKeyguardDisabledFeatures(int which, Consumer<Void> onSuccess,
+            Consumer<Exception> onError) {
+        String features = Util.keyguardDisabledFeaturesToString(which);
+        Log.d(TAG, "setKeyguardDisabledFeatures(" + features + ")");
+        try {
+            mDevicePolicyManager.setKeyguardDisabledFeatures(mAdminComponentName, which);
+            onSuccess.accept(null);
+        } catch (Exception e) {
+            onError.accept(e);
+        }
+    }
+
     @Override
     public CharSequence getDeviceOwnerLockScreenInfo() {
         return mDevicePolicyManager.getDeviceOwnerLockScreenInfo();
+    }
+
+    public int getKeyguardDisabledFeatures() {
+        int which = mDevicePolicyManager.getKeyguardDisabledFeatures(mAdminComponentName);
+        Log.d(TAG, "getKeyguardDisabledFeatures(): " + Util.keyguardDisabledFeaturesToString(which)
+                + " (" + which + ")");
+        return which;
     }
 
     @Override

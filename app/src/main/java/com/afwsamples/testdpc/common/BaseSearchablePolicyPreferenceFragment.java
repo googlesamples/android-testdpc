@@ -222,6 +222,10 @@ public abstract class BaseSearchablePolicyPreferenceFragment extends PreferenceF
         Log.d(mTag, method + "() succeeded");
     }
 
+    protected void onSuccessLog(String format, Object...args) {
+        Log.d(mTag, String.format(format, args) + "() succeeded");
+    }
+
     protected void onErrorLog(String method, Exception e) {
         Log.e(mTag, method + "() failed: ", e);
     }

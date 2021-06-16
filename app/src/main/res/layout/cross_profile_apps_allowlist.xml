@@ -41,7 +41,7 @@
               android:paddingBottom="@dimen/content_padding_bottom"/>
 
             <EditText
-                android:id="@+id/cross_profile_app_whitelist_input"
+                android:id="@+id/cross_profile_app_allowlist_input"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:hint="@string/cross_profile_apps_example_text"
@@ -55,14 +55,14 @@
                 android:paddingBottom="@dimen/content_padding_between_text">
 
               <Button
-                  android:id="@+id/cross_profile_app_whitelist_add_button"
+                  android:id="@+id/cross_profile_app_allowlist_add_button"
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
                   android:layout_marginTop="10dp"
                   android:text="@string/cross_profile_apps_add_button_text" />
 
               <Button
-                  android:id="@+id/cross_profile_app_whitelist_remove_button"
+                  android:id="@+id/cross_profile_app_allowlist_remove_button"
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
                   android:layout_marginTop="10dp"
@@ -70,7 +70,7 @@
             </LinearLayout>
 
           <Button
-              android:id="@+id/cross_profile_app_whitelist_reset_button"
+              android:id="@+id/cross_profile_app_allowlist_reset_button"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:text="@string/cross_profile_apps_reset_button_text" />

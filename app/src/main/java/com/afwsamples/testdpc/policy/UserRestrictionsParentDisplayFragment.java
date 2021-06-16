@@ -1,6 +1,7 @@
 package com.afwsamples.testdpc.policy;
 
 import android.content.Context;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
@@ -26,7 +27,7 @@ public class UserRestrictionsParentDisplayFragment extends BaseSearchablePolicyP
 
     private DevicePolicyManagerGateway mDevicePolicyManagerGateway;
 
-    @RequiresApi(api = Util.R_VERSION_CODE)
+    @RequiresApi(api = VERSION_CODES.R)
     @Override
     public void onCreate(Bundle savedInstanceState) {
         mDevicePolicyManagerGateway = DevicePolicyManagerGatewayImpl
@@ -35,7 +36,7 @@ public class UserRestrictionsParentDisplayFragment extends BaseSearchablePolicyP
         getActivity().getActionBar().setTitle(R.string.user_restrictions_management_title);
     }
 
-    @RequiresApi(api = Util.R_VERSION_CODE)
+    @RequiresApi(api = VERSION_CODES.R)
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         PreferenceScreen preferenceScreen = getPreferenceManager().createPreferenceScreen(
@@ -55,7 +56,7 @@ public class UserRestrictionsParentDisplayFragment extends BaseSearchablePolicyP
         constrainPreferences();
     }
 
-    @RequiresApi(api = Util.R_VERSION_CODE)
+    @RequiresApi(api = VERSION_CODES.R)
     @Override
     public void onResume() {
         super.onResume();
@@ -67,7 +68,7 @@ public class UserRestrictionsParentDisplayFragment extends BaseSearchablePolicyP
         return true;
     }
 
-    @RequiresApi(api = Util.R_VERSION_CODE)
+    @RequiresApi(api = VERSION_CODES.R)
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         String restriction = preference.getKey();
@@ -85,14 +86,14 @@ public class UserRestrictionsParentDisplayFragment extends BaseSearchablePolicyP
         }
     }
 
-    @RequiresApi(api = Util.R_VERSION_CODE)
+    @RequiresApi(api = VERSION_CODES.R)
     private void updateAllUserRestrictions() {
         for (UserRestriction restriction : UserRestriction.PROFILE_OWNER_ORG_DEVICE_RESTRICTIONS) {
             updateUserRestriction(restriction.key);
         }
     }
 
-    @RequiresApi(api = Util.R_VERSION_CODE)
+    @RequiresApi(api = VERSION_CODES.R)
     private void updateUserRestriction(String userRestriction) {
         DpcSwitchPreference preference = (DpcSwitchPreference) findPreference(userRestriction);
         Set<String> restrictions = mDevicePolicyManagerGateway.getUserRestrictions();
@@ -102,7 +103,7 @@ public class UserRestrictionsParentDisplayFragment extends BaseSearchablePolicyP
     private void constrainPreferences() {
         for (String restriction : UserRestriction.PROFILE_OWNER_ORG_OWNED_RESTRICTIONS) {
             DpcPreferenceBase pref = (DpcPreferenceBase) findPreference(restriction);
-            pref.setMinSdkVersion(Util.R_VERSION_CODE);
+            pref.setMinSdkVersion(VERSION_CODES.R);
         }
     }
 }

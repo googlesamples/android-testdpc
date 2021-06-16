@@ -31,6 +31,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
+import android.os.Build;
 import android.os.UserHandle;
 import android.os.UserManager;
 import androidx.preference.PreferenceFragment;
@@ -56,11 +57,9 @@ public class Util {
     private static final String TAG = "Util";
     private static final int DEFAULT_BUFFER_SIZE = 4096;
 
-    // TODO: Update to S when VERSION_CODES.R becomes available.
-    public static final int R_VERSION_CODE = 30;
-
-    private static final boolean IS_RUNNING_R =
-        VERSION.CODENAME.length() == 1 && VERSION.CODENAME.charAt(0) == 'R';
+    // TODO(b/179160578): change check once S SDK is launched
+    private static final boolean IS_RUNNING_S =
+        VERSION.CODENAME.length() == 1 && VERSION.CODENAME.charAt(0) == 'S';
 
     public static final int Q_VERSION_CODE = 29;
 
@@ -71,7 +70,7 @@ public class Util {
      * int is not yet assigned.
      **/
     public static final int SDK_INT =
-        IS_RUNNING_R ? VERSION_CODES.CUR_DEVELOPMENT : VERSION.SDK_INT;
+        IS_RUNNING_S ? VERSION_CODES.CUR_DEVELOPMENT : VERSION.SDK_INT;
 
     /**
      * Format a friendly datetime for the current locale according to device policy documentation.
@@ -252,6 +251,17 @@ public class Util {
         return context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_AUTOMOTIVE);
     }
 
+    public static void requireAndroidS() {
+        if (!isAtLeastS()) {
+            throw new IllegalStateException(
+                    "requires API level S, device's on " + Build.VERSION.SDK_INT);
+        }
+    }
+
+    public static boolean isAtLeastS() {
+        return IS_RUNNING_S || SDK_INT >= VERSION_CODES.S;
+    }
+
     public static String lockTaskFeaturesToString(int flags) {
         return flagsToString(DevicePolicyManager.class, "LOCK_TASK_FEATURE_", flags);
     }
@@ -264,12 +274,20 @@ public class Util {
         return constantToString(DevicePolicyManager.class, "PERMISSION_GRANT_STATE_", grantState);
     }
 
+    public static String keyguardDisabledFeaturesToString(int which) {
+        return flagsToString(DevicePolicyManager.class, "KEYGUARD_DISABLE_", which);
+    }
+
     public static void onSuccessLog(String tag, String template, Object... args) {
         Log.d(tag, String.format(template, args) + " succeeded");
     }
 
+    public static void onErrorLog(String tag, String template, Object... args) {
+        Log.e(tag, String.format(template, args) + " failed");
+    }
+
     public static void onErrorLog(String tag, Exception e, String template, Object... args) {
-        Log.d(tag, String.format(template, args) + " failed", e);
+        Log.e(tag, String.format(template, args) + " failed", e);
     }
 
     // Copied from DebugUtils

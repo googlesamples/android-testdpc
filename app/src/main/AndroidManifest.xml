@@ -111,7 +111,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".provision.DpcLoginActivity"
+        <activity android:name=".provision.GetProvisioningModeActivity"
                 android:exported="true"
                 android:permission="android.permission.BIND_DEVICE_ADMIN"
                 android:theme="@style/DpcLoginTheme">

@@ -107,6 +107,8 @@
     <string name="managed_profile">managed profile</string>
     <string name="requires_device_owner">Requires device owner</string>
     <string name="requires_profile_owner_organization_owned_device">Requires profile owner of an organization owned device</string>
+    <string name="requires_device_owner_or_delegation_network_logging">Requires device owner or delegation-network-logging</string>
+    <string name="requires_device_owner_or_delegation_security_logging">Requires device owner or delegation-security-logging</string>
 
     <string name="not_for_parent_profile">Not applicable to parent profile</string>
     <string name="user_restricted">Disallowed by user restriction</string>
@@ -329,12 +331,15 @@
     <string name="wifi_config_fail">Failed to save the WI-FI configuration.</string>
     <string name="enable_wifi_config_lockdown">DO created WI-FI configs are modifiable only by DO</string>
     <string name="modify_wifi_configuration">Modify WI-FI configuration</string>
+    <string name="modify_owned_wifi_configuration">Modify Owned WI-FI configuration</string>
+    <string name="remove_not_owned_wifi_configurations">Remove all networks not owned by DO</string>
     <string name="show_wifi_mac_address">Show Wi-Fi MAC address</string>
     <string name="show_wifi_mac_address_title">Wi-Fi MAC address</string>
     <string name="show_wifi_mac_address_not_available_msg">Wi-Fi MAC is not available</string>
     <string name="wifi_configs_header">Saved WI-FI configurations</string>
     <string name="wifi_update_config_button">Update selected</string>
     <string name="wifi_remove_config_button">Remove selected</string>
+    <string name="wifi_remove_all_config_button">Remove All</string>
     <string name="wifi_modification_error_title">Error modifying config</string>
     <string name="wifi_remove_config_error">Unable to remove SSID \'<xliff:g id="wifi_ssid">%1$s</xliff:g>\': netId = <xliff:g id="wifi_network_id">%2$d</xliff:g></string>
     <string name="create_eap_tls_wifi_configuration">Create EAP-TLS WI-FI configuration</string>
@@ -342,11 +347,14 @@
     <string name="wifi_client_cert_password">Client certificate password (if any)</string>
     <string name="import_ca_certificate">Import CA certificate</string>
     <string name="import_user_certificate">Import user certificate</string>
+    <string name="select_user_certificate">Select user certificate</string>
     <string name="selected_certificate">Selected certificate: <xliff:g example="server certificate" id="certificate_alias">%1$s</xliff:g></string>
-    <string name="selected_certificate_none">None</string>
+    <string name="selected_keychain_certificate">Selected KeyChain alias: <xliff:g example="somealias" id="certificate_alias">%1$s</xliff:g></string>
+    <string name="selected_certificate_none">No certificate selected</string>
     <string name="error_missing_ssid">Missing SSID</string>
     <string name="error_missing_ca_cert">Missing CA cert</string>
     <string name="error_missing_client_cert">Missing client cert or invalid cert password</string>
+    <string name="error_cannot_grant_to_wifi">Failed to allow Wi-Fi auth with client key pair</string>
     <string name="wifi_eap_tls_dialog_message">EAP_TLS with X.509 CA certificate and PKCS12 client certificate</string>
     <string name="wifi_unknown_cert">Unknown cert</string>
 
@@ -488,6 +496,8 @@
     <string name="disallow_uninstall_apps">Disallow uninstall apps</string>
     <string name="disallow_unmute_microphone">Disallow unmute microphone</string>
     <string name="disallow_usb_file_transfer">Disallow usb file transfer</string>
+    <string name="disallow_microphone_toggle">Disallow microphone toggle</string>
+    <string name="disallow_camera_toggle">Disallow camera toggle</string>
     <string name="ensure_verify_apps">Ensure verify apps</string>
     <string name="disallow_autofill">Disallow autofill</string>
     <string name="disallow_unified_password">Require separate challenge</string>
@@ -517,6 +527,7 @@
 
     <!-- Strings for certificate management  -->
     <string name="certificate_management_title">Certificate management</string>
+    <string name="request_manage_credentials">Request to manage credentials</string>
     <string name="install_key_certificate">Install a private/public key pair</string>
     <string name="remove_key_certificate">Remove a private/public key pair</string>
     <string name="remove_keypair_successfully">The key pair is removed.</string>
@@ -567,6 +578,7 @@
     <string name="strongbox_features_description">StrongBox-related options</string>
     <string name="use_strongbox_checkbox">Use StrongBox</string>
     <string name="use_individual_attestation_checkbox">Use Individual Attestation Certificate</string>
+    <string name="invalid_app_uri_policy">Invalid policy string: %1$s</string>
 
 
     <!-- Strings for app restrictions -->
@@ -603,6 +615,7 @@
     <string name="delegation_scope_enable_system_app">System app enabling</string>
     <string name="delegation_scope_keep_uninstalled_packages">Keep uninstalled packages</string>
     <string name="delegation_scope_network_logging">Access network logging</string>
+    <string name="delegation_scope_security_logging">Access security logging</string>
     <string name="delegation_scope_cert_selection">Choose private key</string>
     <string name="manage_cert_installer">Delegated cert installer</string>
 
@@ -622,7 +635,7 @@
     <!-- Remote bugreport -->
     <string name="bugreport_title">Bugreport</string>
     <string name="request_bugreport">Request bugreport</string>
-    <string name="received_bugreport">Received bugreport %1$s hash: %2$s</string>
+    <string name="received_bugreport">Received bugreport %1$s hash: %2$s bytes: %3$s</string>
     <string name="received_bugreport_failed_retrieval">Received bugreport file, but failed to retrieve it</string>
     <string name="bugreport_sharing_declined">User declined sharing bugreport</string>
     <string name="bugreport_failure_message">Bugreport request failed: %s</string>
@@ -635,6 +648,8 @@
     <string name="enable_backup_service">Enable backup service</string>
 
     <string name="common_criteria_mode">Enable Common Criteria mode</string>
+
+    <string name="enable_usb_data_signaling">Enable USB data signaling</string>
 
     <!-- Suspension of personal apps -->
     <string name="suspend_personal_apps">Suspend personal apps</string>
@@ -674,9 +689,15 @@
     <!-- Input method -->
     <string name="input_methods_title">Input methods</string>
     <string name="set_input_methods">Set input methods</string>
+    <string name="set_input_methods_on_parent">Set input methods on parent</string>
     <string name="set_input_methods_successful">The given list of input methods is enabled</string>
     <string name="set_input_methods_fail">Cannot disallow input methods enabled by the primary user</string>
     <string name="all_input_methods_enabled">All input methods are enabled.</string>
+    <string name="add_input_method_on_parent_fail">Failed to add input method on parent</string>
+    <string name="all_input_methods_on_parent">Allowed all input methods on parent</string>
+    <string name="system_input_methods_on_parent">Allowed only system input methods on parent</string>
+    <string name="input_methods_all">Allow all input methods</string>
+    <string name="input_methods_system">Allow only system input methods</string>
 
     <!-- Notification listeners -->
     <string name="notification_listeners_title">Notification Listener Services</string>
@@ -799,6 +820,7 @@
     <!-- Strings for networking -->
     <string name="networking_management_title">Networking</string>
     <string name="set_always_on_vpn">Set always-on VPN</string>
+    <string name="set_get_preferential_network_service_status">Preferential Network Service Status</string>
     <string name="set_global_http_proxy">Set global HTTP proxy</string>
     <string name="clear_global_http_proxy">Clear global HTTP proxy</string>
     <string name="networking_proxy_host">Host</string>
@@ -966,7 +988,7 @@
     <string name="password_failed_no_limit_set">No limit set on failed password attempts.</string>
 
     <string name="password_compliant_title">Active password compliant</string>
-    <string name="password_compliant_profile_summary">Personal: %1$s, Work: %2$s</string>
+    <string name="password_compliant_profile_summary">Personal: %1$s (device req: %2$s), Work: %3$s</string>
     <string name="password_compliant_summary">Compliant %1$s</string>
 
     <!-- Strings for password complexity -->
@@ -976,6 +998,7 @@
     <string name="password_complexity_medium">Medium</string>
     <string name="password_complexity_high">High</string>
     <string name="password_complexity_profile_summary">Personal: %1$s, Work: %2$s</string>
+    <string name="required_password_complexity_title">Required password complexity</string>
 
     <string name="separate_challenge_title">Separate challenge</string>
     <string name="separate_challenge_summary">Separate challenge enabled: %s</string>
@@ -1056,7 +1079,10 @@
 
     <string name="request_to_set_new_password">Request user to set new password</string>
     <string name="request_to_set_new_password_with_complexity">Set new password and specify minimum complexity</string>
+    <string name="set_required_password_complexity">Set required password complexity</string>
+    <string name="set_required_password_complexity_on_parent">Set required password complexity on parent</string>
     <string name="request_to_set_profile_parent_new_password">Request user to set profile parent new password</string>
+    <string name="request_to_set_profile_parent_new_password_device_requirement">Request user to set profile parent new password (device requirement only)</string>
 
     <!-- Device owner to profile owner communication (COMP and DO<->PO of secondary users) -->
     <string name="bind_device_admin_category_title">Bind to profile owner</string>
@@ -1105,9 +1131,9 @@
     <string name="cross_profile_apps_available">TestDPC is installed in another profile, tap the icon to launch it in that profile.</string>
     <string name="cross_profile_apps_not_available">TestDPC is not installed in another profile, try installing it and come back to here.</string>
 
-    <string name="cross_profile_apps_whitelist">Whitelisted cross profile apps</string>
+    <string name="cross_profile_apps_allowlist">Allow-listed cross profile apps</string>
     <string name="cross_profile_apps_enabled_title">Enabled cross profile apps</string>
-    <string name="cross_profile_apps_no_whitelisted_apps">No apps whitelisted</string>
+    <string name="cross_profile_apps_no_allowlisted_apps">No apps allow-listed</string>
     <string name="cross_profile_apps_example_text">example.package.name</string>
     <string name="cross_profile_apps_add_button_text">Add app</string>
     <string name="cross_profile_apps_remove_button_text">Remove app</string>
@@ -1172,5 +1198,17 @@
 
         This screen will be shown if the user sets device up with a managed account, and we believe that the user may want to set up a managed profile rather than a managed device.[CHAR LIMIT=100] -->
     <string name="selection_divider_text">or</string>
+
+    <string name="set_organization_id">Set Organization Identifier</string>
+    <string name="organization_id_empty">Organization Identifier must not be empty.</string>
+    <string name="enrollment_specific_id">Enrollment-specific ID</string>
+
+    <!-- Messsge used in a toast to inform that operations that could be unsafe to execute might be safe now (or vice versa) -->
+    <string name="safety_operations_change_message">Operations that affect <xliff:g id="reason">%1$s</xliff:g> are now <xliff:g id="state">%2$s</xliff:g></string>
+
+    <string name="unsafe_operation_reason_driving_distraction">Driving Distraction</string>
+    <string name="unsafe_operation_reason_driving_undefined">Undefined</string>
+    <string name="safe">safe</string>
+    <string name="unsafe">unsafe</string>
 
 </resources>

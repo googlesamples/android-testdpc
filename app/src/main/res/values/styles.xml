@@ -93,7 +93,7 @@
 
     <style name="SelectionDesc">
         <item name="android:textSize">@dimen/selection_detailed_text_size</item>
-        <item name="android:textColor">@color/light_gray</item>
+        <item name="android:textColor">@color/gray</item>
         <item name="android:paddingTop">@dimen/selection_detailed_text_padding_top</item>
         <item name="android:paddingBottom">@dimen/selection_detailed_text_padding_bottom</item>
     </style>

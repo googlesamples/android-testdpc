@@ -1,9 +1,12 @@
 package com.afwsamples.testdpc.policy.wifimanagement;
 
+import static com.afwsamples.testdpc.common.Util.SDK_INT;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.app.admin.DevicePolicyManager;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,12 +14,16 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiEnterpriseConfig;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.security.KeyChain;
+import android.security.KeyChainAliasCallback;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,7 +35,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
@@ -45,9 +51,12 @@ public class WifiEapTlsCreateDialogFragment extends DialogFragment {
     private final static String ARG_CONFIG = "config";
     private static final String TAG = "wifi_eap_tls";
 
+    private DevicePolicyManager mDpm;
+
     private WifiConfiguration mWifiConfiguration;
     private Uri mCaCertUri;
     private Uri mUserCertUri;
+    private String mUserCertAlias;
 
     private EditText mSsidEditText;
     private TextView mCaCertTextView;
@@ -66,6 +75,7 @@ public class WifiEapTlsCreateDialogFragment extends DialogFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mDpm = getActivity().getSystemService(DevicePolicyManager.class);
         mWifiConfiguration = getArguments().getParcelable(ARG_CONFIG);
         if (mWifiConfiguration == null) {
             mWifiConfiguration = new WifiConfiguration();
@@ -76,10 +86,19 @@ public class WifiEapTlsCreateDialogFragment extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         LayoutInflater inflater = LayoutInflater.from(getActivity());
         View rootView = inflater.inflate(R.layout.eap_tls_wifi_config_dialog, null);
+
         rootView.findViewById(R.id.import_ca_cert).setOnClickListener(
                 new ImportButtonOnClickListener(REQUEST_CA_CERT, "application/x-x509-ca-cert"));
         rootView.findViewById(R.id.import_user_cert).setOnClickListener(
                 new ImportButtonOnClickListener(REQUEST_USER_CERT, "application/x-pkcs12"));
+
+        final Button selectUserCertButton = rootView.findViewById(R.id.select_user_cert);
+        if (SDK_INT >= VERSION_CODES.S) {
+            selectUserCertButton.setOnClickListener(this::onSelectClientCertClicked);
+        } else {
+            // KeyChain keys aren't supported.
+            selectUserCertButton.setVisibility(View.GONE);
+        }
         mCaCertTextView = (TextView) rootView.findViewById(R.id.selected_ca_cert);
         mUserCertTextView = (TextView) rootView.findViewById(R.id.selected_user_cert);
         mSsidEditText = (EditText) rootView.findViewById(R.id.ssid);
@@ -110,6 +129,20 @@ public class WifiEapTlsCreateDialogFragment extends DialogFragment {
         return dialog;
     }
 
+    private void onSelectClientCertClicked(View view) {
+        KeyChain.choosePrivateKeyAlias(getActivity(), alias -> {
+            if (alias == null) {
+                // No value was chosen.
+                return;
+            }
+            mUserCertAlias = alias;
+            mUserCertUri = null;
+
+            getActivity().runOnUiThread(() ->
+                    updateSelectedCert(mUserCertTextView, /* uri= */ null, alias));
+        }, /* keyTypes[] */ null, /* issuers[] */ null, /* uri */ null, /* alias */ null);
+    }
+
     private void populateUi() {
         if (mWifiConfiguration == null) {
             return;
@@ -119,8 +152,8 @@ public class WifiEapTlsCreateDialogFragment extends DialogFragment {
         }
         mIdentityEditText.setText(mWifiConfiguration.enterpriseConfig.getIdentity());
         // Both ca cert and client are not populated in the WifiConfiguration object.
-        updateSelectedCert(mCaCertTextView, null);
-        updateSelectedCert(mUserCertTextView, null);
+        updateSelectedCert(mCaCertTextView, null, null);
+        updateSelectedCert(mUserCertTextView, null, null);
     }
 
     private boolean extractInputDataAndSave() {
@@ -131,31 +164,18 @@ public class WifiEapTlsCreateDialogFragment extends DialogFragment {
         } else {
             mSsidEditText.setError(null);
         }
-        if (mCaCertUri == null) {
-            showToast(R.string.error_missing_ca_cert);
+
+        mWifiConfiguration.SSID = ssid;
+        mWifiConfiguration.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_EAP);
+        mWifiConfiguration.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.IEEE8021X);
+
+        mWifiConfiguration.enterpriseConfig = extractEnterpriseConfig();
+
+        if (mWifiConfiguration.enterpriseConfig == null) {
             return false;
         }
-        if (mUserCertUri == null) {
-            showToast(R.string.error_missing_client_cert);
-            return false;
-        }
-        X509Certificate caCert = parseX509Certificate(mCaCertUri);
-        String certPassword = mCertPasswordEditText.getText().toString();
-        CertificateUtil.PKCS12ParseInfo parseInfo = null;
-        try {
-            parseInfo = CertificateUtil.parsePKCS12Certificate(
-                    getActivity().getContentResolver(), mUserCertUri, certPassword);
-        } catch (KeyStoreException | NoSuchAlgorithmException | IOException |
-                CertificateException | UnrecoverableKeyException e) {
-            Log.e(TAG, "Fail to parse the input certificate: ", e);
-        }
-        if (parseInfo == null) {
-            showToast(R.string.error_missing_client_cert);
-            return false;
-        }
-        String identity = mIdentityEditText.getText().toString();
-        boolean success = saveWifiConfiguration(ssid, caCert, parseInfo.privateKey,
-                parseInfo.certificate, identity);
+
+        boolean success = WifiConfigUtil.saveWifiConfiguration(getActivity(), mWifiConfiguration);
         if (success) {
             showToast(R.string.wifi_configs_header);
             return true;
@@ -165,20 +185,48 @@ public class WifiEapTlsCreateDialogFragment extends DialogFragment {
         return false;
     }
 
-    private boolean saveWifiConfiguration(String ssid, X509Certificate caCert,
-            PrivateKey privateKey, X509Certificate userCert, String identity) {
-        mWifiConfiguration.SSID = ssid;
-        mWifiConfiguration.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_EAP);
-        mWifiConfiguration.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.IEEE8021X);
-        WifiEnterpriseConfig enterpriseConfig = new WifiEnterpriseConfig();
-        enterpriseConfig.setEapMethod(WifiEnterpriseConfig.Eap.TLS);
-        enterpriseConfig.setCaCertificate(caCert);
-        enterpriseConfig.setClientKeyEntry(privateKey, userCert);
+    private WifiEnterpriseConfig extractEnterpriseConfig() {
+        WifiEnterpriseConfig config = new WifiEnterpriseConfig();
+        config.setEapMethod(WifiEnterpriseConfig.Eap.TLS);
+        String identity = mIdentityEditText.getText().toString();
+
         if (!TextUtils.isEmpty(identity)) {
-            enterpriseConfig.setIdentity(identity);
+            config.setIdentity(identity);
         }
-        mWifiConfiguration.enterpriseConfig = enterpriseConfig;
-        return WifiConfigUtil.saveWifiConfiguration(getActivity(), mWifiConfiguration);
+
+        if (mCaCertUri == null) {
+            showToast(R.string.error_missing_ca_cert);
+            return null;
+        }
+        config.setCaCertificate(parseX509Certificate(mCaCertUri));
+
+        if (mUserCertUri != null) {
+            final String certPassword = mCertPasswordEditText.getText().toString();
+            CertificateUtil.PKCS12ParseInfo parseInfo = null;
+            try {
+                parseInfo = CertificateUtil.parsePKCS12Certificate(
+                        getActivity().getContentResolver(), mUserCertUri, certPassword);
+            } catch (KeyStoreException | NoSuchAlgorithmException | IOException |
+                    CertificateException | UnrecoverableKeyException e) {
+                Log.e(TAG, "Fail to parse the input certificate: ", e);
+            }
+            if (parseInfo == null) {
+                showToast(R.string.error_missing_client_cert);
+                return null;
+            }
+            config.setClientKeyEntry(parseInfo.privateKey, parseInfo.certificate);
+        } else if (mUserCertAlias != null) {
+            if (!mDpm.grantKeyPairToWifiAuth(mUserCertAlias)) {
+                showToast(R.string.error_cannot_grant_to_wifi);
+                return null;
+            }
+            config.setClientKeyPairAlias(mUserCertAlias);
+        } else {
+            showToast(R.string.error_missing_client_cert);
+            return null;
+        }
+
+        return config;
     }
 
     /**
@@ -217,28 +265,26 @@ public class WifiEapTlsCreateDialogFragment extends DialogFragment {
         }
     }
 
-    private void updateSelectedCert(TextView textView, Uri uri) {
-        String displayName = null;
-        if (uri == null) {
-            displayName = getString(R.string.selected_certificate_none);
-        } else {
+    private void updateSelectedCert(TextView textView, Uri uri, String alias) {
+        final String selectedText;
+        if (uri != null) {
+            String displayName = null;
             final String[] projection = {MediaStore.MediaColumns.DISPLAY_NAME};
-            Cursor cursor = getActivity().getContentResolver().query(uri, projection,
-                    null, null, null);
-            if (cursor != null) {
-                try {
-                    if (cursor.moveToFirst()) {
-                        displayName = cursor.getString(0);
-                    }
-                } finally {
-                    cursor.close();
+            try (Cursor cursor = getActivity().getContentResolver().query(
+                    uri, projection, null, null, null)) {
+                if (cursor != null && cursor.moveToFirst()) {
+                    displayName = cursor.getString(0);
                 }
             }
-            if (TextUtils.isEmpty(getString(R.string.wifi_unknown_cert))) {
+            if (TextUtils.isEmpty(displayName)) {
                 displayName = getString(R.string.wifi_unknown_cert);
             }
+            selectedText = getString(R.string.selected_certificate, displayName);
+        } else if (alias != null) {
+            selectedText = getString(R.string.selected_keychain_certificate, alias);
+        } else {
+            selectedText = getString(R.string.selected_certificate_none);
         }
-        String selectedText = getString(R.string.selected_certificate, displayName);
         textView.setText(selectedText);
     }
 
@@ -252,11 +298,12 @@ public class WifiEapTlsCreateDialogFragment extends DialogFragment {
             switch (requestCode) {
                 case REQUEST_CA_CERT:
                     mCaCertUri = intent.getData();
-                    updateSelectedCert(mCaCertTextView, mCaCertUri);
+                    updateSelectedCert(mCaCertTextView, mCaCertUri, /* alias= */ null);
                     break;
                 case REQUEST_USER_CERT:
                     mUserCertUri = intent.getData();
-                    updateSelectedCert(mUserCertTextView, mUserCertUri);
+                    mUserCertAlias = null;
+                    updateSelectedCert(mUserCertTextView, mUserCertUri, /* alias= */ null);
                     break;
             }
         }

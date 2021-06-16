@@ -35,6 +35,8 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.afwsamples.testdpc.DevicePolicyManagerGateway;
+import com.afwsamples.testdpc.DevicePolicyManagerGatewayImpl;
 import com.afwsamples.testdpc.R;
 
 import java.util.Arrays;
@@ -128,7 +130,7 @@ public abstract class IntentOrIntentFilterFragment extends Fragment implements
             CUSTOM
     };
 
-    protected DevicePolicyManager mDevicePolicyManager;
+    protected DevicePolicyManagerGateway mDevicePolicyManagerGateway;
 
     protected Spinner mActionsSpinner;
 
@@ -163,8 +165,7 @@ public abstract class IntentOrIntentFilterFragment extends Fragment implements
             Bundle savedInstanceState) {
         Activity activity = getActivity();
 
-        mDevicePolicyManager = (DevicePolicyManager) activity
-                .getSystemService(Context.DEVICE_POLICY_SERVICE);
+        mDevicePolicyManagerGateway = new DevicePolicyManagerGatewayImpl(activity);
 
         View intentOrIntentFilterView = layoutInflater.inflate(
                 R.layout.add_intent_or_intent_filter, null);

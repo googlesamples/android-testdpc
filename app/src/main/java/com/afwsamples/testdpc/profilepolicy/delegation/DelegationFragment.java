@@ -18,6 +18,7 @@ package com.afwsamples.testdpc.profilepolicy.delegation;
 
 import android.annotation.TargetApi;
 import android.app.admin.DevicePolicyManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.os.Build.VERSION_CODES;
@@ -32,6 +33,8 @@ import android.widget.Toast;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.ManageAppFragment;
+import com.afwsamples.testdpc.common.ReflectionUtil;
+import com.afwsamples.testdpc.common.ReflectionUtil.ReflectionIsTemporaryException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -57,13 +60,20 @@ public class DelegationFragment extends ManageAppFragment {
         super.onCreate(savedInstanceState);
         mDpm = (DevicePolicyManager) getActivity().getSystemService(Context.DEVICE_POLICY_SERVICE);
         mPackageName = getActivity().getPackageName();
-        final boolean isDeviceOwner = mDpm.isDeviceOwnerApp(mPackageName);
-        final boolean isProfileOwner = mDpm.isProfileOwnerApp(mPackageName);
-        mIsDeviceOrProfileOwner = isDeviceOwner || isProfileOwner;
+        if (isDelegatedApp(mPackageName)) {
+            // Show all delegations if we are delegated app.
+            mDelegations = DelegationScope.defaultDelegationScopes(true);
+        } else {
+            ComponentName mAdminName = DeviceAdminReceiver.getComponentName(getActivity());
+            final boolean isDeviceOwner = mDpm.isDeviceOwnerApp(mPackageName);
+            final boolean isProfileOwner = mDpm.isProfileOwnerApp(mPackageName);
+            final boolean isManagedProfile = mDpm.isManagedProfile(mAdminName);
+            mIsDeviceOrProfileOwner = isDeviceOwner || isProfileOwner;
 
-        // Show DO-only delegations if we are DO or delegated app i.e. we are not PO, ignoring the
-        // case where we are neither PO or DO (in which case this fragment is not accessible at all)
-        mDelegations = DelegationScope.defaultDelegationScopes(!isProfileOwner);
+            // Show DO or managed PO only delegations if we are DO or managed PO.
+            mDelegations = DelegationScope
+                .defaultDelegationScopes(isDeviceOwner || (isManagedProfile && isProfileOwner));
+        }
 
         getActivity().getActionBar().setTitle(R.string.generic_delegation);
     }
@@ -210,11 +220,24 @@ public class DelegationFragment extends ManageAppFragment {
                     new DelegationScope(DevicePolicyManager.DELEGATION_ENABLE_SYSTEM_APP));
             defaultDelegations.add(
                     new DelegationScope(DevicePolicyManager.DELEGATION_CERT_SELECTION));
+            try {
+                defaultDelegations.add(
+                        new DelegationScope(
+                                ReflectionUtil.stringConstant(DevicePolicyManager.class,
+                                        "DELEGATION_SECURITY_LOGGING")));
+            } catch (ReflectionIsTemporaryException e) {
+                Log.w(TAG, "Failed to read DevicePolicyManager.DELEGATION_SECURITY_LOGGING", e);
+            }
             if (showDoOnlyDelegations) {
                 defaultDelegations.add(
                         new DelegationScope(DevicePolicyManager.DELEGATION_NETWORK_LOGGING));
             }
             return defaultDelegations;
         }
+    }
+
+    @TargetApi(VERSION_CODES.O)
+    private boolean isDelegatedApp(String packageName) {
+        return !mDpm.getDelegatedScopes(null, packageName).isEmpty();
     }
 }

@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ Copyright 2019 The Android Open Source Project
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:custom="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent">
+  <LinearLayout
+      android:id="@+id/dpc_login"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/selection_title"
+        style="@style/SelectionTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/selection_title_top_margin"
+        android:gravity="center_horizontal"
+        android:text="@string/selector_title"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textSize="@dimen/selection_title_text_size"/>
+
+    <LinearLayout
+        android:id="@+id/do_option"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/selection_content_padding"
+        android:layout_marginBottom="@dimen/selection_content_padding"
+        android:layout_marginLeft="@dimen/constraint_layout_margin"
+        android:layout_marginRight="@dimen/constraint_layout_margin"
+        android:paddingStart="@dimen/selection_guideline_padding"
+        android:paddingEnd="@dimen/selection_guideline_padding">
+      <ImageView
+          android:id="@+id/do_selection_image"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:scaleType="fitCenter"
+          android:src="@drawable/managed_device_setup"
+          android:layout_weight="0.368"
+          tools:ignore="ContentDescription"/>
+
+      <LinearLayout
+          android:orientation="vertical"
+          android:layout_weight="0.632"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content">
+
+
+        <TextView
+            android:id="@+id/do_selection_detailed_title"
+            style="@style/SelectionTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/do_selection_subtitle"/>
+
+
+        <TextView
+            android:id="@+id/do_selection_detailed_text"
+            style="@style/SelectionDesc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/do_selection_detailed_text"/>
+
+        <Button
+            android:id="@+id/do_selection_button"
+            style="@style/SelectionButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/do_selection_button_text"/>
+      </LinearLayout>
+    </LinearLayout>
+    <RelativeLayout
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/selection_middle_padding"
+        android:paddingBottom="@dimen/selection_middle_padding"
+        custom:layout_constraintBottom_toTopOf="parent"
+        custom:layout_constraintEnd_toEndOf="parent"
+        custom:layout_constraintStart_toStartOf="parent"
+        custom:layout_constraintTop_toBottomOf="parent">
+
+      <TextView
+          android:id="@+id/breakText"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginLeft="@dimen/selection_divider_margin_horizontal"
+          android:layout_marginRight="@dimen/selection_divider_margin_horizontal"
+          android:layout_centerInParent="true"
+          android:text="@string/selection_divider_text"/>
+
+      <View
+          android:layout_width="match_parent"
+          android:layout_height="@dimen/text_divider_height"
+          android:layout_centerVertical="true"
+          android:layout_toStartOf="@id/breakText"
+          android:background="?android:attr/listDivider"/>
+
+      <View
+          android:layout_width="match_parent"
+          android:layout_height="@dimen/text_divider_height"
+          android:layout_centerVertical="true"
+          android:layout_toEndOf="@id/breakText"
+          android:background="?android:attr/listDivider"/>
+
+    </RelativeLayout>
+    <LinearLayout
+        android:id="@+id/po_option"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/selection_content_padding"
+        android:layout_marginBottom="@dimen/selection_content_padding"
+        android:layout_marginLeft="@dimen/constraint_layout_margin"
+        android:layout_marginRight="@dimen/constraint_layout_margin"
+        android:paddingStart="@dimen/selection_guideline_padding"
+        android:paddingEnd="@dimen/selection_guideline_padding">
+      <ImageView
+          android:id="@+id/po_selection_image"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:scaleType="fitCenter"
+          android:src="@drawable/managed_profile_setup"
+          android:layout_weight="0.368"
+          tools:ignore="ContentDescription"/>
+
+      <LinearLayout
+          android:orientation="vertical"
+          android:layout_weight="0.632"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content">
+
+
+        <TextView
+            android:id="@+id/po_selection_detailed_title"
+            style="@style/SelectionTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/po_selection_subtitle"/>
+
+
+        <TextView
+            android:id="@+id/po_selection_detailed_text"
+            style="@style/SelectionDesc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/po_selection_detailed_text"/>
+
+        <Button
+            android:id="@+id/po_selection_button"
+            style="@style/SelectionButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/po_selection_button_text"/>
+      </LinearLayout>
+    </LinearLayout>
+  </LinearLayout>
+</ScrollView>

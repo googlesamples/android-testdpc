@@ -90,16 +90,32 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
         }
     }
 
+    // TODO(b/179160578): uncomment when available in the SDK
+    // @Override
+    @TargetApi(VERSION_CODES.S)
+    public void onOperationSafetyStateChanged(Context context, int reasonType, boolean safe) {
+        Log.d(TAG, "onOperationSafetyStateChanged(): " + reasonType + " = " + safe);
+        String status = safe ? context.getString(R.string.safe)
+                : context.getString(R.string.unsafe);
+        String reason;
+        switch (reasonType) {
+            case 1:  // TODO: use DPM constant once SDK is available
+                reason = context.getString(R.string.unsafe_operation_reason_driving_distraction);
+                break;
+            default:
+                reason = context.getString(R.string.unsafe_operation_reason_driving_undefined);
+        }
+        String message = context.getString(R.string.safety_operations_change_message, reason,
+                status);
+        showToast(context, message);
+    }
+
     @TargetApi(VERSION_CODES.N)
     @Override
     public void onSecurityLogsAvailable(Context context, Intent intent) {
         Log.i(TAG, "onSecurityLogsAvailable() called");
-        Toast.makeText(context,
-                context.getString(R.string.on_security_logs_available),
-                Toast.LENGTH_LONG)
-                .show();
+        showToast(context, R.string.on_security_logs_available);
     }
-
 
     /*
      * TODO: reconsider how to store and present the logs in the future, e.g. save the file into
@@ -115,6 +131,10 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
 
     @Override
     public void onProfileProvisioningComplete(Context context, Intent intent) {
+        if (Util.SDK_INT >= VERSION_CODES.O) {
+            // See http://b/177617306.
+            return;
+        }
         PostProvisioningTask task = new PostProvisioningTask(context);
         if (!task.performPostProvisioningOperations(intent)) {
             return;
@@ -126,8 +146,7 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
         } else {
             Log.e(TAG, "DeviceAdminReceiver.onProvisioningComplete() invoked, but ownership "
                 + "not assigned");
-            Toast.makeText(context, R.string.device_admin_receiver_failure, Toast.LENGTH_LONG)
-                .show();
+            showToast(context, R.string.device_admin_receiver_failure);
         }
     }
 
@@ -146,6 +165,7 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
             final String bugreportFileHash) {
         Log.i(TAG, "Bugreport shared, hash: " + bugreportFileHash);
         final Uri bugreportUri = intent.getData();
+        Log.i(TAG, "Bugreport URI: " + bugreportUri);
 
         final PendingResult result = goAsync();
         new AsyncTask<Void, Void, String>() {
@@ -161,16 +181,20 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
                     in = new FileInputStream(mInputPfd.getFileDescriptor());
                     outputBugreportFile = new File(context.getExternalFilesDir(null),
                             bugreportUri.getLastPathSegment());
+                    Log.i(TAG, "Writing bugreport to " + outputBugreportFile);
                     out = new FileOutputStream(outputBugreportFile);
                     byte[] buffer = new byte[1024];
                     int read;
+                    long totalRead = 0;
                     while ((read = in.read(buffer)) != -1) {
+                        totalRead += read;
                         out.write(buffer, 0, read);
                     }
                     in.close();
                     out.close();
                     message = context.getString(R.string.received_bugreport,
-                            outputBugreportFile.getPath(), bugreportFileHash);
+                            outputBugreportFile.getPath(), bugreportFileHash, totalRead);
+                    Log.i(TAG, message);
                 } catch (IOException e) {
                     Log.e(TAG, e.getMessage());
                     message = context.getString(R.string.received_bugreport_failed_retrieval);
@@ -251,8 +275,7 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
         if (receivedTime != -1) {
             DateFormat sdf = new SimpleDateFormat("hh:mm:ss dd/MM/yyyy");
             String timeString = sdf.format(new Date(receivedTime));
-            Toast.makeText(context, "System update received at: " + timeString,
-                    Toast.LENGTH_LONG).show();
+            showToast(context, "System update received at: " + timeString);
         } else {
             // No system update is currently available on this device.
         }
@@ -570,5 +593,14 @@ public class DeviceAdminReceiver extends android.app.admin.DeviceAdminReceiver {
                 userManager.getSerialNumberForUser(userHandle));
         Log.i(TAG, message);
         NotificationUtil.showNotification(context, titleResId, message, notificationId);
+    }
+
+    private void showToast(Context context, int resId) {
+        showToast(context, context.getString(resId));
+    }
+
+    private void showToast(Context context, String message) {
+        Log.v(TAG, "showToast():" + message);
+        Toast.makeText(context, message, Toast.LENGTH_LONG).show();
     }
 }

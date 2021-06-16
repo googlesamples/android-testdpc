@@ -84,6 +84,8 @@ final class ShellCommand {
     private static final String CMD_SET_PERSONAL_APPS_SUSPENDED = "set-personal-apps-suspended";
     private static final String CMD_GET_PERSONAL_APPS_SUSPENDED_REASONS
             = "get-personal-apps-suspended-reasons";
+    private static final String CMD_ENABLE_SYSTEM_APP = "enable-system-app";
+    private static final String CMD_LIST_DISABLED_SYSTEM_APPS = "list-disabled-system-apps";
     private static final String CMD_SET_HIDDEN_PACKAGE = "set-hidden-package";
     private static final String CMD_IS_HIDDEN_PACKAGE = "is-hidden-package";
     private static final String CMD_SET_LOCK_TASK_PACKAGES = "set-lock-task-packages";
@@ -101,6 +103,19 @@ final class ShellCommand {
             = "set-device-owner-lockscreen-info";
     private static final String CMD_GET_DEVICE_OWNER_LOCKSCREEN_INFO
             = "get-device-owner-lockscreen-info";
+    private static final String CMD_SET_KEYGUARD_DISABLED = "set-keyguard-disabled";
+    private static final String CMD_SET_KEYGUARD_DISABLED_FEATURES =
+            "set-keyguard-disabled-features";
+    private static final String CMD_GET_KEYGUARD_DISABLED_FEATURES =
+            "get-keyguard-disabled-features";
+
+    // Commands for APIs added on Android S
+    private static final String CMD_SET_PERMITTED_INPUT_METHODS_PARENT =
+        "set-permitted-input-methods-parent";
+    private static final String CMD_SET_USB_DATA_SIGNALING_ENABLED =
+        "set-usb-data-signaling-enabled";
+    private static final String CMD_LIST_FOREGROUND_USERS = "list-foreground-users";
+    private static final String CMD_IS_FOREGROUND_USER = "is-foreground-user";
 
     private static final String ARG_FLAGS = "--flags";
 
@@ -201,11 +216,23 @@ final class ShellCommand {
             case CMD_CLEAR_PROFILE_OWNER:
                 execute(() -> clearProfileOwner());
                 break;
+            case CMD_SET_PERMITTED_INPUT_METHODS_PARENT:
+                execute(() -> setPermittedInputMethodsOnParent());
+                break;
+            case CMD_LIST_FOREGROUND_USERS:
+                execute(() -> listForegroundUsers());
+                break;
+            case CMD_IS_FOREGROUND_USER:
+                execute(() -> isForegroundUser());
+                break;
             case CMD_SET_PASSWORD_QUALITY:
                 execute(() -> setPasswordQuality());
                 break;
             case CMD_GET_PASSWORD_QUALITY:
                 execute(() -> getPasswordQuality());
+                break;
+            case CMD_SET_USB_DATA_SIGNALING_ENABLED:
+                execute(() -> setUsbDataSignalingEnabled());
                 break;
             case CMD_TRANSFER_OWNERSHIP:
                 execute(() -> transferOwnership());
@@ -227,6 +254,12 @@ final class ShellCommand {
                 break;
             case CMD_IS_HIDDEN_PACKAGE:
                 execute(() -> isHiddenPackage());
+                break;
+            case CMD_ENABLE_SYSTEM_APP:
+                execute(() -> enableSystemApp());
+                break;
+            case CMD_LIST_DISABLED_SYSTEM_APPS:
+                execute(() -> listDisabledSystemApps());
                 break;
             case CMD_SET_LOCK_TASK_PACKAGES:
                 execute(() -> setLockTaskPackages());
@@ -267,6 +300,15 @@ final class ShellCommand {
             case CMD_GET_DEVICE_OWNER_LOCKSCREEN_INFO:
                 execute(() -> getDeviceOwnerLockScreenInfo());
                 break;
+            case CMD_SET_KEYGUARD_DISABLED:
+                execute(() -> setKeyguardDisabled());
+                break;
+            case CMD_SET_KEYGUARD_DISABLED_FEATURES:
+                execute(() -> setKeyguardDisabledFeatures());
+                break;
+            case CMD_GET_KEYGUARD_DISABLED_FEATURES:
+                execute(() -> getKeyguardDisabledFeatures());
+                break;
             default:
                 mWriter.printf("Invalid command: %s\n\n", cmd);
                 showUsage();
@@ -278,6 +320,12 @@ final class ShellCommand {
         mWriter.printf("isProfileOwner: %b\n", mDevicePolicyManagerGateway.isProfileOwnerApp());
         mWriter.printf("isOrganizationOwnedDeviceWithManagedProfile: %b\n",
                 mDevicePolicyManagerGateway.isOrganizationOwnedDeviceWithManagedProfile());
+        if (Util.isAtLeastS()) {
+            mWriter.printf("isHeadlessSystemUserMode: %b\n",
+                    mDevicePolicyManagerGateway.isHeadlessSystemUserMode());
+            mWriter.printf("isUserForeground: %b\n",
+                    mDevicePolicyManagerGateway.isUserForeground());
+        }
     }
 
     private void showUsage() {
@@ -339,6 +387,8 @@ final class ShellCommand {
                 CMD_IS_SUSPENDED_PACKAGE);
         mWriter.printf("\t%s <SUSPENDED> - suspend / unsuspend personal apps\n",
                 CMD_SET_PERSONAL_APPS_SUSPENDED);
+        mWriter.printf("\t%s - enable the given system app \n", CMD_ENABLE_SYSTEM_APP);
+        mWriter.printf("\t%s - list the disabled system apps \n", CMD_LIST_DISABLED_SYSTEM_APPS);
         mWriter.printf("\t%s - gets the reasons for suspending personal apps\n",
                 CMD_GET_PERSONAL_APPS_SUSPENDED_REASONS);
         mWriter.printf("\t%s <PKG> <HIDDEN> - hide / unhide the given package\n",
@@ -369,12 +419,28 @@ final class ShellCommand {
         mWriter.printf("\t%s - get whether location is enabled for the user\n",
                 CMD_IS_LOCATION_ENABLED);
         mWriter.printf("\t%s [INFO] - set the device owner lock screen info (or reset when no INFO "
-                + "is passed)\n",
-                CMD_SET_DEVICE_OWNER_LOCKSCREEN_INFO);
-        mWriter.printf("\t%s - get the device owner lock screen info",
+                + "is passed)\n", CMD_SET_DEVICE_OWNER_LOCKSCREEN_INFO);
+        mWriter.printf("\t%s - get the device owner lock screen info\n",
                 CMD_GET_DEVICE_OWNER_LOCKSCREEN_INFO);
+        mWriter.printf("\t%s <true|false> - set keyguard disabled\n", CMD_SET_KEYGUARD_DISABLED);
+        mWriter.printf("\t%s <FLAGS> - set the keyguard disabled features\n",
+                CMD_SET_KEYGUARD_DISABLED_FEATURES);
+        mWriter.printf("\t%s - get the keyguard disabled features\n",
+                CMD_GET_KEYGUARD_DISABLED_FEATURES);
 
         // Separator for S / pre-S commands - do NOT remove line to avoid cherry-pick conflicts
+
+        if (Util.isAtLeastS()) {
+            mWriter.printf("\t%s <true|false> - enable / disable USB data signaling\n",
+                    CMD_SET_USB_DATA_SIGNALING_ENABLED);
+            mWriter.printf("\t%s [MET1] <MET2> <METN>- set the permitted input methods in the "
+                    + "parent's device admin\n",
+                    CMD_SET_PERMITTED_INPUT_METHODS_PARENT);
+            mWriter.printf("\t%s - list the users running on foreground\n",
+                    CMD_LIST_FOREGROUND_USERS);
+            mWriter.printf("\t%s - checks if the calling user is running on foreground\n",
+                    CMD_IS_FOREGROUND_USER);
+        }
     }
 
     private void createUser() {
@@ -495,7 +561,7 @@ final class ShellCommand {
     private void listUserRestrictions() {
         Log.i(TAG, "listUserRestrictions()");
 
-        print("user restrictions", mDevicePolicyManagerGateway.getUserRestrictions());
+        printCollection("user restriction", mDevicePolicyManagerGateway.getUserRestrictions());
     }
 
     private void setUserRestriction() {
@@ -616,6 +682,30 @@ final class ShellCommand {
                 (e) -> onError(e, "Error removing %s as profile owner", pkg));
     }
 
+    private void setPermittedInputMethodsOnParent() {
+        List<String> inputMethods = getListFromAllArgs();
+        Log.i(TAG, "setPermittedInputMethodsOnParent(" + inputMethods + ")");
+
+        DevicePolicyManagerGateway parentDpmGateway =
+            DevicePolicyManagerGatewayImpl.forParentProfile(mContext);
+        parentDpmGateway.setPermittedInputMethods(inputMethods);
+    }
+
+    private void listForegroundUsers() {
+        List<UserHandle> users = mDevicePolicyManagerGateway.listForegroundAffiliatedUsers();
+        if (users.isEmpty()) {
+            mWriter.println("none");
+            return;
+        }
+        int size = users.size();
+        mWriter.printf("%d user%s:\n", size, (size > 1 ? "s" : ""));
+        users.forEach(u -> mWriter.printf("\t%s\n", u));
+    }
+
+    private void isForegroundUser() {
+        mWriter.println(mDevicePolicyManagerGateway.isUserForeground());
+    }
+
     private void setPasswordQuality() {
         int quality = getIntArg(/* index= */ 1);
         Log.i(TAG, "setPasswordQuality(" + quality + ")");
@@ -637,8 +727,17 @@ final class ShellCommand {
         Log.i(TAG, "transferOwnership(" + target + ")");
 
         mDevicePolicyManagerGateway.transferOwnership(target, /* bundle= */ null,
-                (v) -> onSuccess("Ownership transferred to %s", flatTarget),
-                (e) -> onError(e, "Error transferring ownership to %s", flatTarget));
+            (v) -> onSuccess("Ownership transferred to %s", flatTarget),
+            (e) -> onError(e, "Error transferring ownership to %s", flatTarget));
+    }
+
+    private void setUsbDataSignalingEnabled() {
+        boolean enabled = Boolean.parseBoolean(mArgs[1]);
+        Log.i(TAG, "setUsbDataSignalingEnabled(" + enabled + ")");
+
+        mDevicePolicyManagerGateway.setUsbDataSignalingEnabled(enabled,
+            (v) -> onSuccess("USB data signaling set to %b", enabled),
+            (e) -> onError(e, "Error setting USB data signaling to %b", enabled));
     }
 
     private static String suspendedToString(boolean suspended) {
@@ -714,6 +813,25 @@ final class ShellCommand {
         String printableReasons = Util.personalAppsSuspensionReasonToString(reasons);
 
         mWriter.printf("%s (%d)\n", printableReasons, reasons);
+    }
+
+    private void enableSystemApp() {
+        // TODO(b/171350084): check args
+        String packageName = mArgs[1];
+
+        Log.i(TAG, "enableSystemApp(): " + packageName);
+
+        mDevicePolicyManagerGateway.enableSystemApp(packageName,
+            (v) -> onSuccess("Enabled system apps %s", packageName),
+            (e) -> onError(e, "Error enabling systen app%s", packageName));
+    }
+
+    private void listDisabledSystemApps() {
+        List<String> disabledSystemApps = mDevicePolicyManagerGateway.getDisabledSystemApps();
+
+        Log.i(TAG, "listDisabledSystemApps(): " + disabledSystemApps);
+
+        printCollection("disabled system app", disabledSystemApps);
     }
 
     private void setLockTaskPackages() {
@@ -843,6 +961,33 @@ final class ShellCommand {
         CharSequence info = mDevicePolicyManagerGateway.getDeviceOwnerLockScreenInfo();
         mWriter.printf("Lock screen info: %s\n", info);
     }
+    
+    private void setKeyguardDisabled() {
+        // TODO(b/171350084): check args
+        boolean disabled = Boolean.parseBoolean(mArgs[1]);
+
+        mDevicePolicyManagerGateway.setKeyguardDisabled(disabled,
+                (v) -> onSuccess("Set keyguard disabled to %b", disabled),
+                (e) -> onError(e, "Error setting keyguard disabled to %b", disabled));
+    }
+
+    private void setKeyguardDisabledFeatures() {
+        int which = getIntArg(/* index= */ 1);
+
+        String features = Util.keyguardDisabledFeaturesToString(which);
+        Log.i(TAG, "setKeyguardDisabledFeatures(" + which + "): setting to " + features);
+
+        mDevicePolicyManagerGateway.setKeyguardDisabledFeatures(which,
+                (v) -> onSuccess("Set keyguard features to %s", features),
+                (e) -> onError(e, "Error settings keyguard features to %s", features));
+    }
+
+    private void getKeyguardDisabledFeatures() {
+        int flags = mDevicePolicyManagerGateway.getKeyguardDisabledFeatures();
+        String features = Util.keyguardDisabledFeaturesToString(flags);
+
+        mWriter.printf("%s (%d)\n", features, flags);
+    }
 
     private static String permittedToString(boolean permitted) {
         return permitted ? "PERMITTED" : "NOT PERMITTED";
@@ -877,14 +1022,14 @@ final class ShellCommand {
         mWriter.printf("%s: %s\n", msg, e);
     }
 
-    private void print(String name, Collection<String> collection) {
+    private void printCollection(String nameOnSingular, Collection<String> collection) {
         if (collection.isEmpty()) {
-            mWriter.printf("No %s\n", name);
+            mWriter.printf("No %ss\n", nameOnSingular);
             return;
 
         }
         int size = collection.size();
-        mWriter.printf("%d %s:\n", size, name);
+        mWriter.printf("%d %s%s:\n", size, nameOnSingular, size == 1 ? "" : "s");
         collection.forEach((s) -> mWriter.printf("  %s\n", s));
     }
 

@@ -30,6 +30,7 @@
             <enum name="P" value="28" />
             <enum name="Q" value="29" />
             <enum name="R" value="30" />
+            <enum name="S" value="31" />
         </attr>
 
         <!-- Constrain a preference to DO or PO admins. -->

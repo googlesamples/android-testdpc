@@ -22,6 +22,7 @@ import android.app.admin.DevicePolicyManager;
 import android.app.admin.FactoryResetProtectionPolicy;
 import android.content.ComponentName;
 import android.content.Context;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -61,7 +62,7 @@ public class FactoryResetProtectionPolicyFragment extends Fragment
     private FrpAccountsAdapter mAccountsAdapter;
     private Spinner mFrpEnabledSpinner;
 
-    @RequiresApi(api = Util.R_VERSION_CODE)
+    @RequiresApi(api = VERSION_CODES.R)
     @Override
     public void onCreate(Bundle savedInstanceState) {
         mDevicePolicyManager = (DevicePolicyManager)
@@ -71,7 +72,7 @@ public class FactoryResetProtectionPolicyFragment extends Fragment
         getActivity().getActionBar().setTitle(R.string.factory_reset_protection_policy);
     }
 
-    @RequiresApi(api = Util.R_VERSION_CODE)
+    @RequiresApi(api = VERSION_CODES.R)
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {

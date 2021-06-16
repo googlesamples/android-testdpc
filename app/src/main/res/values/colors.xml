@@ -23,6 +23,7 @@
     <color name="dark_teal">#00796B</color>
     <color name="pink">#FF4081</color>
     <color name="light_gray">#D3D3D3</color>
+    <color name="gray">#8e8e8e</color>
     <color name="dark_red">#D32F2F</color>
     <color name="dark_green">#388E3C</color>
     <color name="primary_dark">#ff254FAE</color>

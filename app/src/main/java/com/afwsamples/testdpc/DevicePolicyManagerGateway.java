@@ -17,6 +17,8 @@ package com.afwsamples.testdpc;
 
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -65,6 +67,21 @@ public interface DevicePolicyManagerGateway {
      * See {@link android.app.admin.DevicePolicyManager#isOrganizationOwnedDeviceWithManagedProfile()}.
      */
     boolean isOrganizationOwnedDeviceWithManagedProfile();
+
+    /**
+     * See {@link android.os.UserManager#isHeadlessSystemUserMode()}.
+     */
+    boolean isHeadlessSystemUserMode();
+
+    /**
+     * See {@link android.os.UserManager#isUserForeground()}.
+     */
+    boolean isUserForeground();
+
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#listForegroundAffiliatedUsers()}.
+     */
+    List<UserHandle> listForegroundAffiliatedUsers();
 
     /**
      * See {@link android.app.admin.DevicePolicyManager#createAndManageUser(android.content.ComponentName, String, android.content.ComponentName, android.os.PersistableBundle, int)}.
@@ -209,6 +226,19 @@ public interface DevicePolicyManagerGateway {
     @NonNull List<String> getUserControlDisabledPackages();
 
     /**
+     * See {@link android.app.admin.DevicePolicyManager#setPermittedInputMethods(
+     * android.content.ComponentName, List)}.
+     */
+    boolean setPermittedInputMethods(List<String> packageNames, @NonNull Consumer<Void> onSuccess,
+        @NonNull Consumer<Exception> onError);
+
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#setPermittedInputMethods(
+     * android.content.ComponentName, List)}.
+     */
+    boolean setPermittedInputMethods(List<String> packageNames);
+
+    /**
      * See {@link android.app.admin.DevicePolicyManager#removeActiveAdmin(android.content.ComponentName)}.
      */
     void removeActiveAdmin(@NonNull Consumer<Void> onSuccess, @NonNull Consumer<Exception> onError);
@@ -241,6 +271,30 @@ public interface DevicePolicyManagerGateway {
             @NonNull Consumer<Void> onSuccess, @NonNull Consumer<Exception> onError);
 
     /**
+     * See android.app.admin.DevicePolicyManager#setUsbDataSignalingEnabled(
+     * android.content.ComponentName, boolean)
+     */
+    void setUsbDataSignalingEnabled(boolean enabled, @NonNull Consumer<Void> onSuccess,
+        @NonNull Consumer<Exception> onError);
+
+    /**
+     * Same as {@link #setUsbDataSignalingEnabled(boolean, Consumer, Consumer)}, but ignoring
+     * callbacks.
+     */
+    void setUsbDataSignalingEnabled(boolean enabled);
+
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#setPreferentialNetworkServiceEnabled(ComponentName, boolean)}.
+     */
+    void setPreferentialNetworkServiceEnabled(boolean enabled,
+            @NonNull Consumer<Void> onSuccess, @NonNull Consumer<Exception> onError);
+
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#isPreferentialNetworkServiceEnabled(ComponentName)}.
+     */
+    boolean isPreferentialNetworkServiceEnabled();
+
+    /**
      * See {@link android.app.admin.DevicePolicyManager#setPackagesSuspended(ComponentName, String[], boolean)}.
      */
     void setPackagesSuspended(String[] packageNames, boolean suspended, @NonNull Consumer<String[]> onSuccess,
@@ -267,10 +321,30 @@ public interface DevicePolicyManagerGateway {
      */
     void setPersonalAppsSuspended(boolean suspended, @NonNull Consumer<Void> onSuccess,
             @NonNull Consumer<Exception> onError);
+
     /**
      * See {@link android.app.admin.DevicePolicyManager#getPersonalAppsSuspendedReasons(ComponentName)}.
      */
     int getPersonalAppsSuspendedReasons();
+
+    // TODO(b/171350084): use on CosuConfig
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#enableSystemApp(ComponentName, String)}.
+     */
+    void enableSystemApp(String packageName, @NonNull Consumer<Void> onSuccess,
+            @NonNull Consumer<Exception> onError);
+
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#enableSystemApp(ComponentName, Intent)}.
+     */
+    void enableSystemApp(Intent intent, @NonNull Consumer<Integer> onSuccess,
+            @NonNull Consumer<Exception> onError);
+
+    /**
+     * Queries {@link PackageManager} to get the list of apps that are disabled for the user.
+     */
+    @NonNull
+    List<String> getDisabledSystemApps();
 
     // TODO(b/171350084): use in other places
     /**
@@ -320,7 +394,7 @@ public interface DevicePolicyManagerGateway {
      * See {@link android.app.admin.DevicePolicyManager#setPermissionGrantState(ComponentName, String, String, int)}.
      */
     void setPermissionGrantState(String packageName, String permission, int grantState,
-            @NonNull Consumer<Boolean> onSuccess, @NonNull Consumer<Exception> onError);
+            @NonNull Consumer<Void> onSuccess, @NonNull Consumer<Exception> onError);
 
     /**
      * See {@link android.app.admin.DevicePolicyManager#getPermissionGrantState(ComponentName, String, String)}.
@@ -348,6 +422,23 @@ public interface DevicePolicyManagerGateway {
      * See {@link android.app.admin.DevicePolicyManager#getDeviceOwnerLockScreenInfo()}.
      */
     CharSequence getDeviceOwnerLockScreenInfo();
+
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#setKeyguardDisabled(ComponentName, boolean)}.
+     */
+    void setKeyguardDisabled(boolean disabled, @NonNull Consumer<Void> onSuccess,
+            @NonNull Consumer<Exception> onError);
+
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#setKeyguardDisabledFeatures(ComponentName, int)}.
+     */
+    void setKeyguardDisabledFeatures(int which, @NonNull Consumer<Void> onSuccess,
+            @NonNull Consumer<Exception> onError);
+
+    /**
+     * See {@link android.app.admin.DevicePolicyManager#getKeyguardDisabledFeatures(ComponentName)}.
+     */
+    int getKeyguardDisabledFeatures();
 
     /**
      * Used on error callbacks to indicate a {@link android.app.admin.DevicePolicyManager} method
