@@ -2505,14 +2505,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             return;
         }
 
-        String esid = "";
-        try {
-            //TODO: Call directly when the S SDK is available.
-            esid = ReflectionUtil.invoke(mDevicePolicyManager, "getEnrollmentSpecificId");
-        } catch (ReflectionIsTemporaryException e) {
-            Log.e(TAG, "Error invoking getEnterpriseSpecificId", e);
-            esid = "Error";
-        }
+        String esid = mDevicePolicyManager.getEnrollmentSpecificId();
 
         enrollmentSpecificIdPreference.setSummary(esid);
     }
@@ -2552,13 +2545,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     @TargetApi(VERSION_CODES.S)
     private int getRequiredComplexity(DevicePolicyManager dpm) {
-        try {
-            return ReflectionUtil.invoke(dpm, "getRequiredPasswordComplexity");
-        } catch (ReflectionIsTemporaryException e) {
-            Log.e(TAG, "Error invoking getRequiredPasswordComplexity", e);
-        }
-
-        return DevicePolicyManager.PASSWORD_COMPLEXITY_NONE;
+        return dpm.getRequiredPasswordComplexity();
     }
 
     private void loadRequiredPasswordComplexity() {
@@ -2605,12 +2592,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     // running older releases and obviates the need for a target sdk check here.
     @TargetApi(VERSION_CODES.S)
     private void setRequiredPasswordComplexity(DevicePolicyManager dpm, int complexity) {
-        try {
-            ReflectionUtil.invoke(dpm, "setRequiredPasswordComplexity",
-                    new Class[]{Integer.TYPE}, complexity);
-        } catch (ReflectionIsTemporaryException e) {
-            Log.e(TAG, "Error invoking setRequiredPasswordComplexity", e);
-        }
+        dpm.setRequiredPasswordComplexity(complexity);
         loadPasswordCompliant();
         loadPasswordComplexity();
         loadRequiredPasswordComplexity();
@@ -2768,13 +2750,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     @TargetApi(VERSION_CODES.S)
     private void reloadEnableUsbDataSignalingUi() {
         if (isOrganizationOwnedDevice()) {
-            try {
-                boolean enabled = ReflectionUtil.invoke(mDevicePolicyManager,
-                    "isUsbDataSignalingEnabled");
-                mEnableUsbDataSignalingPreference.setChecked(enabled);
-            } catch (ReflectionIsTemporaryException e) {
-                Log.e(TAG, "Error invoking isUsbDataSignalingEnabled", e);
-            }
+            boolean enabled = mDevicePolicyManager.isUsbDataSignalingEnabled();
+            mEnableUsbDataSignalingPreference.setChecked(enabled);
         }
     }
 

@@ -122,42 +122,21 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
     public boolean isHeadlessSystemUserMode() {
         Util.requireAndroidS();
 
-        // TODO(b/179160578): use proper method when available on SDK
-        String method = "isHeadlessSystemUserMode";
-        try {
-            return ReflectionUtil.invoke(mUserManager, method);
-        } catch (ReflectionIsTemporaryException e) {
-            Log.wtf(TAG, "Error calling mUserManager." + method + "()", e);
-            return false;
-        }
+        return mUserManager.isHeadlessSystemUserMode();
     }
 
     @Override
     public boolean isUserForeground() {
         Util.requireAndroidS();
 
-        // TODO(b/179160578): use proper method when available on SDK
-        String method = "isUserForeground";
-        try {
-            return ReflectionUtil.invoke(mUserManager, method);
-        } catch (ReflectionIsTemporaryException e) {
-            Log.wtf(TAG, "Error calling mUserManager." + method + "()", e);
-            return false;
-        }
+        return mUserManager.isUserForeground();
     }
 
     @Override
     public List<UserHandle> listForegroundAffiliatedUsers() {
         Util.requireAndroidS();
 
-        // TODO(b/179160578): use proper method when available on SDK
-        String method = "listForegroundAffiliatedUsers";
-        try {
-            return ReflectionUtil.invoke(mDevicePolicyManager, method);
-        } catch (ReflectionIsTemporaryException e) {
-            Log.wtf(TAG, "Error calling mDevicePolicyManager." + method + "()", e);
-            return Collections.emptyList();
-        }
+        return mDevicePolicyManager.listForegroundAffiliatedUsers();
     }
 
     @Override
@@ -481,13 +460,11 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
         Log.d(TAG, "setUsbDataSignalingEnabled(" + enabled + ")");
         Util.requireAndroidS();
 
-        String method = "setUsbDataSignalingEnabled";
         try {
-            // TODO(b/179160578): use proper method when available on SDK
-            ReflectionUtil.invoke(mDevicePolicyManager, method, new Class[]{Boolean.TYPE}, enabled);
+            mDevicePolicyManager.setUsbDataSignalingEnabled(enabled);
             onSuccess.accept(null);
         } catch (Exception e) {
-            Log.wtf(TAG, "Error calling " + method + "()", e);
+            Log.wtf(TAG, "Error calling setUsbDataSignalingEnabled()", e);
             onError.accept(e);
         }
     }
@@ -506,13 +483,11 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
         Log.d(TAG, "setPreferentialNetworkServiceEnabled(" + enabled + ")");
         Util.requireAndroidS();
 
-        String method = "setPreferentialNetworkServiceEnabled";
         try {
-            // TODO(b/179160578): use proper method when available on SDK
-            ReflectionUtil.invoke(mDevicePolicyManager, method, new Class[]{Boolean.TYPE}, enabled);
+            mDevicePolicyManager.setPreferentialNetworkServiceEnabled(enabled);
             onSuccess.accept(null);
         } catch (Exception e) {
-            Log.wtf(TAG, "Error calling " + method + "()", e);
+            Log.wtf(TAG, "Error calling setPreferentialNetworkServiceEnabled()", e);
             onError.accept(e);
         }
     }
@@ -521,14 +496,7 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
     public boolean isPreferentialNetworkServiceEnabled() {
         Util.requireAndroidS();
 
-        String method = "isPreferentialNetworkServiceEnabled";
-        try {
-            // TODO(b/179160578): use proper method when available on SDK
-            return (Boolean) ReflectionUtil.invoke(mDevicePolicyManager, method);
-        } catch (ReflectionIsTemporaryException e) {
-            Log.wtf(TAG, "Error calling " + method + "()", e);
-            return false;
-        }
+        return mDevicePolicyManager.isPreferentialNetworkServiceEnabled();
     }
 
     @Override
