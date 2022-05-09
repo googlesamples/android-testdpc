@@ -8,7 +8,7 @@ See the [documentation](https://developer.android.com/work/index.html) to learn 
 Getting Started
 ---------------
 
-This sample uses the Gradle build system. To build this project, use the "gradlew assemble" command or use "Import Project" in Android Studio.
+This sample uses the Bazel build system. To build this project, use the "bazel build --noincremental_dexing" command.
 
 This app can also be found [on the Play store](https://play.google.com/store/apps/details?id=com.afwsamples.testdpc).
 
@@ -23,28 +23,11 @@ You can find various kinds of provisioning methods [here](https://developers.goo
 3. Modify (if needed) and scan [this QR code] (http://down-box.appspot.com/qr/nQB0tw7b).
 4. Follow onscreen instructions
 
-#### NFC provisioning (Device Owner) ####
-The [NFC Provisioning app](https://github.com/googlesamples/android-NfcProvisioning) is used for *device owner* provisioning.
-1. Push the nfcprovisioning.txt file to your device:
-`adb push nfcprovisioning.txt /sdcard/`
-2. Open the NFC Provisioning app and ensure that com.afwsamples.testdpc is auto-populated.
-3. Bump the devices and touch to beam.
-4. Follow onscreen instructions on the target device.
-
 #### adb command (Device Owner) ####
 adb shell dpm set-device-owner com.afwsamples.testdpc/.DeviceAdminReceiver
 
 #### Work profile ####
-The easiest way is to launch the Test DPC app in launcher and follow the onscreen instructions.
-
-Screenshots
-------------
-
-<img src="doc/setup.png" height="400" alt="Setup" title="Setup screen"/>
-<img src="doc/policy_management.png" height="400" alt="Policy Management" title="Home screen once the profile is setup" />
-<img src="doc/manage_app_restrictions.png" height="400" alt="Manage App Restrictions" title="Manage restrictions for apps in the work profile" />
-<img src="doc/work_profile_management.png" height="400" alt="Work Profile Management" title="Manage policies specific to the work profile" />
-<img src="doc/network_data_usage_stats.png" height="400" alt="Network Data Usage Stats" title="Analyze data usage for specific work apps or the entire profile" />
+The easiest way is to launch the "Set Up TestDPC" app in launcher and follow the onscreen instructions.
 
 Support
 -------

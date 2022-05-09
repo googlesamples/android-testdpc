@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+ Copyright (C) 2018 The Android Open Source Project
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:testdpc="http://schemas.android.com/apk/res-auto"
+    android:title="@string/enterprise_slice">
+    <PreferenceCategory android:title="@string/enterprise_slice_1">
+        <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
+            android:key="enterprise_slice_1_enable"
+            android:title="@string/slice_enable"
+            testdpc:admin="profileOwner"
+            testdpc:minSdkVersion="S" />
+        <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
+            android:key="enterprise_slice_1_allow_fallback_to_default"
+            android:title="@string/allow_fallback_to_default"
+            testdpc:admin="profileOwner"
+            testdpc:minSdkVersion="S" />
+        <com.afwsamples.testdpc.common.preference.DpcEditTextPreference
+            android:key="enterprise_slice_1_included_apps"
+            android:title="@string/included_apps"
+            testdpc:admin="profileOwner"
+            testdpc:minSdkVersion="S"/>
+        <com.afwsamples.testdpc.common.preference.DpcEditTextPreference
+            android:key="enterprise_slice_1_excluded_apps"
+            android:title="@string/excluded_apps"
+            testdpc:admin="profileOwner"
+            testdpc:minSdkVersion="S"/>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/enterprise_slice_2">
+        <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
+            android:key="enterprise_slice_2_enable"
+            android:title="@string/slice_enable"
+            testdpc:admin="profileOwner"
+            testdpc:minSdkVersion="S" />
+        <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
+            android:key="enterprise_slice_2_allow_fallback_to_default"
+            android:title="@string/allow_fallback_to_default"
+            testdpc:admin="profileOwner"
+            testdpc:minSdkVersion="S" />
+        <com.afwsamples.testdpc.common.preference.DpcEditTextPreference
+            android:key="enterprise_slice_2_included_apps"
+            android:title="@string/included_apps"
+            testdpc:admin="profileOwner"
+            testdpc:minSdkVersion="S"/>
+        <com.afwsamples.testdpc.common.preference.DpcEditTextPreference
+            android:key="enterprise_slice_2_excluded_apps"
+            android:title="@string/excluded_apps"
+            testdpc:admin="profileOwner"
+            testdpc:minSdkVersion="S"/>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/enterprise_slice_3">
+        <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
+            android:key="enterprise_slice_3_enable"
+            android:title="@string/slice_enable"
+            testdpc:admin="profileOwner"
+            testdpc:minSdkVersion="S" />
+        <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
+            android:key="enterprise_slice_3_allow_fallback_to_default"
+            android:title="@string/allow_fallback_to_default"
+            testdpc:admin="profileOwner"
+            testdpc:minSdkVersion="S" />
+        <com.afwsamples.testdpc.common.preference.DpcEditTextPreference
+            android:key="enterprise_slice_3_included_apps"
+            android:title="@string/included_apps"
+            testdpc:admin="profileOwner"
+            testdpc:minSdkVersion="S"/>
+        <com.afwsamples.testdpc.common.preference.DpcEditTextPreference
+            android:key="enterprise_slice_3_excluded_apps"
+            android:title="@string/excluded_apps"
+            testdpc:admin="profileOwner"
+            testdpc:minSdkVersion="S"/>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/enterprise_slice_4">
+        <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
+            android:key="enterprise_slice_4_enable"
+            android:title="@string/slice_enable"
+            testdpc:admin="profileOwner"
+            testdpc:minSdkVersion="S" />
+        <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
+            android:key="enterprise_slice_4_allow_fallback_to_default"
+            android:title="@string/allow_fallback_to_default"
+            testdpc:admin="profileOwner"
+            testdpc:minSdkVersion="S" />
+        <com.afwsamples.testdpc.common.preference.DpcEditTextPreference
+            android:key="enterprise_slice_4_included_apps"
+            android:title="@string/included_apps"
+            testdpc:admin="profileOwner"
+            testdpc:minSdkVersion="S"/>
+        <com.afwsamples.testdpc.common.preference.DpcEditTextPreference
+            android:key="enterprise_slice_4_excluded_apps"
+            android:title="@string/excluded_apps"
+            testdpc:admin="profileOwner"
+            testdpc:minSdkVersion="S"/>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/enterprise_slice_5">
+        <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
+            android:key="enterprise_slice_5_enable"
+            android:title="@string/slice_enable"
+            testdpc:admin="profileOwner"
+            testdpc:minSdkVersion="S" />
+        <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
+            android:key="enterprise_slice_5_allow_fallback_to_default"
+            android:title="@string/allow_fallback_to_default"
+            testdpc:admin="profileOwner"
+            testdpc:minSdkVersion="S" />
+        <com.afwsamples.testdpc.common.preference.DpcEditTextPreference
+            android:key="enterprise_slice_5_included_apps"
+            android:title="@string/included_apps"
+            testdpc:admin="profileOwner"
+            testdpc:minSdkVersion="S"/>
+        <com.afwsamples.testdpc.common.preference.DpcEditTextPreference
+            android:key="enterprise_slice_5_excluded_apps"
+            android:title="@string/excluded_apps"
+            testdpc:admin="profileOwner"
+            testdpc:minSdkVersion="S"/>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/submit_title">
+          <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="enterprise_slice_submit"
+            android:title="@string/submit"
+            testdpc:admin="profileOwner"
+            testdpc:minSdkVersion="S"/>
+    </PreferenceCategory>
+</PreferenceScreen>
