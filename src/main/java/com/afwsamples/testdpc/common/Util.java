@@ -354,4 +354,20 @@ public class Util {
   private static String constNameWithoutPrefix(String prefix, Field field) {
     return field.getName().substring(prefix.length());
   }
+
+  public static void onSuccessShowToast(Context mContext, String template, Object... args) {
+    Toast.makeText(
+            mContext,
+            String.format(template, args),
+            Toast.LENGTH_LONG)
+        .show();
+  }
+
+  public static void onErrorShowToast(Context mContext, Exception e, String template, Object... args) {
+    Toast.makeText(
+            mContext,
+            e.getMessage() + "\n" + String.format(template, args),
+            Toast.LENGTH_LONG)
+        .show();
+  }
 }

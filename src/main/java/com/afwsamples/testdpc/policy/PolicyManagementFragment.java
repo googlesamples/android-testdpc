@@ -3720,7 +3720,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
   @TargetApi(VERSION_CODES.P)
   private List<String> getMeteredDataRestrictedPkgs() {
-    return mDevicePolicyManager.getMeteredDataDisabledPackages(mAdminComponentName);
+    return mDevicePolicyManagerGateway.getMeteredDataDisabledPackages();
   }
 
   /**

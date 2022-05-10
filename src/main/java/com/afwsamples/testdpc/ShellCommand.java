@@ -1380,16 +1380,15 @@ final class ShellCommand {
     mDevicePolicyManagerGateway.setMeteredDataDisabledPackages(
         disabledPackages,
         (v) ->
-            onSuccess(
-                "Restricted following packages from using metered data: %s", disabledPackages),
+            onSuccess("Successfully restricted %s (except for %s)", disabledPackages, v),
         (e) ->
-            onError(e, "Error restricting following packages from using metered data: %s", disabledPackages));
+            onError(e, "Error restricting following packages: %s", disabledPackages));
   }
 
   private void getMeteredDataDisabledPackages() {
     List<String> disabledPackages = mDevicePolicyManagerGateway.getMeteredDataDisabledPackages();
     Log.d(TAG, "getMeteredDataDisabledPackages(): " + disabledPackages);
-    printCollection("disabled-packages", disabledPackages);
+    printCollection("disabled-package", disabledPackages);
   }
 
   private void warnAboutAsyncCall() {
