@@ -27,6 +27,7 @@ import android.widget.Toast;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.ToggleComponentsArrayAdapter;
+import com.afwsamples.testdpc.common.Util;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -96,16 +97,11 @@ public class MeteredDataRestrictionInfoAdapter extends ToggleComponentsArrayAdap
 
   @TargetApi(VERSION_CODES.P)
   private void setMeteredDataRestrictedPkgs(List<String> pkgNames) {
-    final List<String> excludedPkgs =
-        mDevicePolicyManager.setMeteredDataDisabledPackages(
-            DeviceAdminReceiver.getComponentName(mContext), pkgNames);
-
-    if (!excludedPkgs.isEmpty()) {
-      Toast.makeText(
-              mContext,
-              mContext.getString(R.string.metered_data_restriction_failed_pkgs, excludedPkgs),
-              Toast.LENGTH_LONG)
-          .show();
-    }
+    mDevicePolicyManagerGateway.setMeteredDataDisabledPackages(pkgNames,
+      (v) -> {
+        String succeeded = v.isEmpty() ? "" : " (except " + v + ")";
+        Util.onSuccessShowToast(mContext, "setMeteredDataRestrictedPkgs(%s) succeeded%s", pkgNames, succeeded);
+      },
+      (e) -> Util.onErrorShowToast(mContext, e, "setMeteredDataRestrictedPkgs(%s) failed", pkgNames));
   }
 }

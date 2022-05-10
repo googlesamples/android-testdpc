@@ -1263,12 +1263,11 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
   @Override
   public void setMeteredDataDisabledPackages(
       List<String> packageNames, Consumer<List<String>> onSuccess, Consumer<Exception> onError) {
-    Log.d(TAG, "setMeteredDataDisabledPackages(packageNames): " + packageNames);
+    Log.d(TAG, "setMeteredDataDisabledPackages(" + packageNames + ")");
 
     try {
-      mDevicePolicyManager.setMeteredDataDisabledPackages(mAdminComponentName, packageNames);
-      Log.d(TAG, "set successfully");
-      onSuccess.accept(packageNames);
+      List<String> disabledPackages = mDevicePolicyManager.setMeteredDataDisabledPackages(mAdminComponentName, packageNames);
+      onSuccess.accept(disabledPackages);
     } catch (Exception e) {
       onError.accept(e);
     }
