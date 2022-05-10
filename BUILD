@@ -8,6 +8,7 @@ aar_import(
     name = "setupdesign",
     aar = "lib/setupdesign.aar",
     deps = [
+        ":setupdesign_strings",
         ":setupcompat",
         "@maven//:com_google_android_material_material",
     ],
@@ -16,6 +17,11 @@ aar_import(
 aar_import(
     name = "setupcompat",
     aar = "lib/setupcompat.aar",
+)
+
+aar_import(
+    name = "setupdesign_strings",
+    aar = "lib/strings.aar",
 )
 
 android_library(

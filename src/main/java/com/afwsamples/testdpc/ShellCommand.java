@@ -21,7 +21,6 @@ import static com.afwsamples.testdpc.util.flags.Flags.optional;
 import static com.afwsamples.testdpc.util.flags.Flags.ordinalParam;
 import static com.afwsamples.testdpc.util.flags.Flags.repeated;
 
-import android.annotation.TargetApi;
 import android.app.admin.ConnectEvent;
 import android.app.admin.DnsEvent;
 import android.app.admin.NetworkEvent;
@@ -31,7 +30,6 @@ import android.content.Context;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -44,15 +42,12 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.afwsamples.testdpc.common.Util;
-import com.afwsamples.testdpc.policy.SecurityLogsFragment;
 import com.afwsamples.testdpc.util.flags.Flags;
 import java.io.File;
 import java.io.PrintWriter;
 import java.net.InetAddress;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -1457,27 +1452,16 @@ final class ShellCommand {
     mWriter.printf("%d (%s)\n", time, formattedDate);
   }
 
-  @TargetApi(VERSION_CODES.N)
-  @SuppressWarnings("SimpleDateFormat")
   private void printSecurityLogs(List<SecurityEvent> events) {
     if (events == null || events.isEmpty()) {
       mWriter.println("N/A");
       return;
     }
     mWriter.printf("%d events:\n", events.size());
-    SimpleDateFormat formatter = new SimpleDateFormat("MM-dd HH:mm:ss.SSS");
     for (int i = 0; i < events.size(); i++) {
       SecurityEvent event = events.get(i);
-      StringBuilder sb = new StringBuilder();
-      if (Util.SDK_INT >= VERSION_CODES.P) {
-        sb.append(event.getId() + ": ");
-      }
-      sb.append(SecurityLogsFragment.getStringEventTagFromId(event.getTag()));
-      sb.append(" (")
-          .append(formatter.format(new Date(TimeUnit.NANOSECONDS.toMillis(event.getTimeNanos()))))
-          .append("): ");
-      SecurityLogsFragment.printData(sb, event.getData());
-      mWriter.printf("%s\n", sb.toString());
+      // TODO: print more stuff
+      mWriter.printf("\t%d: id=%d tag=%d\n", i, event.getId(), event.getTag());
     }
   }
 

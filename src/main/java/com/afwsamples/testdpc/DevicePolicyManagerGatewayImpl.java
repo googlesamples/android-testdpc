@@ -16,8 +16,6 @@
 
 package com.afwsamples.testdpc;
 
-import static com.afwsamples.testdpc.common.Util.isAtLeastT;
-
 import android.app.admin.DevicePolicyManager;
 import android.app.admin.NetworkEvent;
 import android.app.admin.SecurityLog.SecurityEvent;
@@ -638,11 +636,7 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
   public boolean isPreferentialNetworkServiceEnabled() {
     Util.requireAndroidS();
 
-    if (isAtLeastT()) {
-      return mDevicePolicyManager.isPreferentialNetworkServiceEnabled();
-    }
-
-    return false;
+    return mDevicePolicyManager.isPreferentialNetworkServiceEnabled();
   }
 
   @Override

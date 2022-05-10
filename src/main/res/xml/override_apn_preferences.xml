@@ -21,17 +21,17 @@
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="insert_override_apn"
             android:title="@string/insert_override_apn"
-            testdpc:admin="deviceOwner"
+            testdpc:admin="deviceOwner|profileOwner"
             testdpc:minSdkVersion="P" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="remove_override_apn"
             android:title="@string/remove_override_apn"
-            testdpc:admin="deviceOwner"
+            testdpc:admin="deviceOwner|profileOwner"
             testdpc:minSdkVersion="P" />
         <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
             android:key="enable_override_apn"
             android:title="@string/enable_override_apn"
-            testdpc:admin="deviceOwner"
+            testdpc:admin="deviceOwner|profileOwner"
             testdpc:minSdkVersion="P" />
     </PreferenceCategory>
 </PreferenceScreen>
