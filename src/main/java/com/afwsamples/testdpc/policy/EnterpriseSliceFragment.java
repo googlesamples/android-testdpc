@@ -238,34 +238,51 @@ public class EnterpriseSliceFragment extends BaseSearchablePolicyPreferenceFragm
 
     switch (key) {
       case ENTERPRISE_SLICE_SUBMIT:
+        Log.d(TAG, "ENTERPRISE_SLICE_SUBMIT: ");
         List<PreferentialNetworkServiceConfig> preferentialNetworkServiceConfigs =
             new ArrayList<>();
         try {
           preferentialNetworkServiceConfigs.add(mPreferentialNetworkServiceConfigBuilder1.build());
           if (mPreferentialNetworkServiceConfigBuilder2.build().getNetworkId() ==
-                  PreferentialNetworkServiceConfig.PREFERENTIAL_NETWORK_ID_2) {
+                  PreferentialNetworkServiceConfig.PREFERENTIAL_NETWORK_ID_2 &&
+                  mPreferentialNetworkServiceConfigBuilder2.build().isEnabled()) {
             preferentialNetworkServiceConfigs.add(
                 mPreferentialNetworkServiceConfigBuilder2.build());
           }
           if (mPreferentialNetworkServiceConfigBuilder3.build().getNetworkId() ==
-                  PreferentialNetworkServiceConfig.PREFERENTIAL_NETWORK_ID_3) {
+                  PreferentialNetworkServiceConfig.PREFERENTIAL_NETWORK_ID_3 &&
+                  mPreferentialNetworkServiceConfigBuilder3.build().isEnabled()) {
             preferentialNetworkServiceConfigs.add(
                 mPreferentialNetworkServiceConfigBuilder3.build());
           }
           if (mPreferentialNetworkServiceConfigBuilder4.build().getNetworkId() ==
-                  PreferentialNetworkServiceConfig.PREFERENTIAL_NETWORK_ID_4) {
+                  PreferentialNetworkServiceConfig.PREFERENTIAL_NETWORK_ID_4 &&
+                  mPreferentialNetworkServiceConfigBuilder4.build().isEnabled()) {
             preferentialNetworkServiceConfigs.add(
                 mPreferentialNetworkServiceConfigBuilder4.build());
           }
           if (mPreferentialNetworkServiceConfigBuilder5.build().getNetworkId() ==
-                  PreferentialNetworkServiceConfig.PREFERENTIAL_NETWORK_ID_5) {
+                  PreferentialNetworkServiceConfig.PREFERENTIAL_NETWORK_ID_5 &&
+                  mPreferentialNetworkServiceConfigBuilder5.build().isEnabled()) {
             preferentialNetworkServiceConfigs.add(
                 mPreferentialNetworkServiceConfigBuilder5.build());
+          }
+          Log.d(TAG, "configs: " + preferentialNetworkServiceConfigs);
+          for (PreferentialNetworkServiceConfig config : preferentialNetworkServiceConfigs) {
+            Log.d(TAG, "config: " + config);
+            for (int i : config.getIncludedUids()) {
+              Log.d(TAG, "includedUid : " + i);
+            }
+            for (int i : config.getExcludedUids()) {
+              Log.d(TAG, "excludedUid : " + i);
+            }
           }
           mDevicePolicyManager.setPreferentialNetworkServiceConfigs(
               preferentialNetworkServiceConfigs);
           showToast("Sent the configurations");
+
         } catch (Exception e) {
+          Log.d(TAG, "Exception : " + e);
           showToast("Exception: " + e);
         }
         return true;
@@ -327,10 +344,10 @@ public class EnterpriseSliceFragment extends BaseSearchablePolicyPreferenceFragm
 
       case ENTERPRISE_SLICE_2_ENABLE:
         if ((Boolean) newValue) {
-          mPreferentialNetworkServiceConfigBuilder1.setNetworkId(
-              PreferentialNetworkServiceConfig.PREFERENTIAL_NETWORK_ID_1);
+          mPreferentialNetworkServiceConfigBuilder2.setNetworkId(
+              PreferentialNetworkServiceConfig.PREFERENTIAL_NETWORK_ID_2);
         }
-        mPreferentialNetworkServiceConfigBuilder1.setEnabled((Boolean) newValue);
+        mPreferentialNetworkServiceConfigBuilder2.setEnabled((Boolean) newValue);
         break;
 
       case ENTERPRISE_SLICE_2_ALLOW_FALLBACK_TO_DEFAULT_KEY:
@@ -351,16 +368,12 @@ public class EnterpriseSliceFragment extends BaseSearchablePolicyPreferenceFragm
       case ENTERPRISE_SLICE_3_ENABLE:
         if ((Boolean) newValue) {
           mPreferentialNetworkServiceConfigBuilder3.setNetworkId(
-              PreferentialNetworkServiceConfig.PREFERENTIAL_NETWORK_ID_1);
+              PreferentialNetworkServiceConfig.PREFERENTIAL_NETWORK_ID_3);
         }
         mPreferentialNetworkServiceConfigBuilder3.setEnabled((Boolean) newValue);
         break;
 
       case ENTERPRISE_SLICE_3_ALLOW_FALLBACK_TO_DEFAULT_KEY:
-        if ((Boolean) newValue) {
-          mPreferentialNetworkServiceConfigBuilder3.setNetworkId(
-              PreferentialNetworkServiceConfig.PREFERENTIAL_NETWORK_ID_3);
-        }
         mPreferentialNetworkServiceConfigBuilder3.setFallbackToDefaultConnectionAllowed(
             (Boolean) newValue);
         break;
@@ -379,16 +392,12 @@ public class EnterpriseSliceFragment extends BaseSearchablePolicyPreferenceFragm
       case ENTERPRISE_SLICE_4_ENABLE:
         if ((Boolean) newValue) {
           mPreferentialNetworkServiceConfigBuilder4.setNetworkId(
-              PreferentialNetworkServiceConfig.PREFERENTIAL_NETWORK_ID_1);
+              PreferentialNetworkServiceConfig.PREFERENTIAL_NETWORK_ID_4);
         }
         mPreferentialNetworkServiceConfigBuilder4.setEnabled((Boolean) newValue);
         break;
 
       case ENTERPRISE_SLICE_4_ALLOW_FALLBACK_TO_DEFAULT_KEY:
-        if ((Boolean) newValue) {
-          mPreferentialNetworkServiceConfigBuilder4.setNetworkId(
-              PreferentialNetworkServiceConfig.PREFERENTIAL_NETWORK_ID_4);
-        }
         mPreferentialNetworkServiceConfigBuilder4.setFallbackToDefaultConnectionAllowed(
             (Boolean) newValue);
         break;
@@ -406,17 +415,14 @@ public class EnterpriseSliceFragment extends BaseSearchablePolicyPreferenceFragm
       case ENTERPRISE_SLICE_5_ENABLE:
         if ((Boolean) newValue) {
           mPreferentialNetworkServiceConfigBuilder5.setNetworkId(
-              PreferentialNetworkServiceConfig.PREFERENTIAL_NETWORK_ID_1);
+              PreferentialNetworkServiceConfig.PREFERENTIAL_NETWORK_ID_5);
         }
         mPreferentialNetworkServiceConfigBuilder5.setEnabled((Boolean) newValue);
         break;
 
       case ENTERPRISE_SLICE_5_ALLOW_FALLBACK_TO_DEFAULT_KEY:
-        if ((Boolean) newValue) {
-          mPreferentialNetworkServiceConfigBuilder5.setNetworkId(
-              PreferentialNetworkServiceConfig.PREFERENTIAL_NETWORK_ID_5);
-        }
-        mPreferentialNetworkServiceConfigBuilder5.setFallbackToDefaultConnectionAllowed((Boolean) newValue);
+        mPreferentialNetworkServiceConfigBuilder5.setFallbackToDefaultConnectionAllowed(
+            (Boolean) newValue);
         break;
 
       case ENTERPRISE_SLICE_5_INCLUDED_APP_KEY:

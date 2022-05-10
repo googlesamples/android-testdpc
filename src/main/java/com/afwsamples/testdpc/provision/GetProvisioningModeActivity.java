@@ -51,6 +51,7 @@ public class GetProvisioningModeActivity extends Activity {
     if (ProvisioningUtil.isAutoProvisioningDeviceOwnerMode()) {
         Log.i(TAG, "Automatically provisioning device onwer");
         onDoButtonClick(null);
+        finish();
     }
 
     setContentView(R.layout.activity_get_provisioning_mode);

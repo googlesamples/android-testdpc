@@ -1,6 +1,0 @@
-bazel-android-testdpc
-bazel-bin
-bazel-out
-bazel-testlogs
-**/*.iml
-.idea
