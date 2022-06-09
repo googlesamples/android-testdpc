@@ -744,6 +744,11 @@ public interface DevicePolicyManagerGateway {
   @NonNull List<String> getMeteredDataDisabledPackages();
 
   /**
+   * See {@link android.app.admin.DevicePolicyManager#getSecondaryUsers(ComponentName)};
+   */
+  @NonNull List<UserHandle> getSecondaryUsers();
+
+  /**
    * Used on error callbacks to indicate a {@link android.app.admin.DevicePolicyManager} method call
    * failed.
    */
