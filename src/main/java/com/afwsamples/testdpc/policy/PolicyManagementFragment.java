@@ -2421,7 +2421,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     showChooseUserPrompt(
         R.string.stop_user,
         userHandle -> {
-          mDevicePolicyManagerGateway.startUserInBackground(
+          mDevicePolicyManagerGateway.stopUser(
               userHandle,
               (v) -> onSuccessShowToast("stopUser", R.string.user_stopped),
               (e) -> onErrorShowToast("stopUser", e, R.string.failed_to_stop_user));
