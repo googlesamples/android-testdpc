@@ -1282,6 +1282,13 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
   }
 
   @Override
+  public List<UserHandle> getSecondaryUsers() {
+    List<UserHandle> secondaryUsers = mDevicePolicyManager.getSecondaryUsers(mAdminComponentName);
+    Log.d(TAG, "getSecondaryUsers(): " + secondaryUsers);
+    return secondaryUsers;
+  }
+
+  @Override
   public String toString() {
     return "DevicePolicyManagerGatewayImpl[" + mAdminComponentName + "]";
   }

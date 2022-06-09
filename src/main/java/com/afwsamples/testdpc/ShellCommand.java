@@ -593,6 +593,9 @@ final class ShellCommand {
       flags.addCommand(
           command("get-metered-data-disabled-packages", this::getMeteredDataDisabledPackages)
               .setDescription("List the packages restricted from using metered data."));
+      flags.addCommand(
+          command("get-secondary-users", this::getSecondaryUsers)
+              .setDescription("List all UserHandles of secondary users on the device."));
     }
 
     try {
@@ -1389,6 +1392,15 @@ final class ShellCommand {
     List<String> disabledPackages = mDevicePolicyManagerGateway.getMeteredDataDisabledPackages();
     Log.d(TAG, "getMeteredDataDisabledPackages(): " + disabledPackages);
     printCollection("disabled-package", disabledPackages);
+  }
+
+  public void getSecondaryUsers() {
+    List<UserHandle> secondaryUsers = mDevicePolicyManagerGateway.getSecondaryUsers();
+    List<String> secondaryUsersStrings = secondaryUsers.stream()
+      .map((u) -> toString(u))
+      .collect(Collectors.toList());
+    Log.d(TAG, "getSecondaryUsers(): " + secondaryUsersStrings);
+    printCollection("secondary-user", secondaryUsersStrings);
   }
 
   private void warnAboutAsyncCall() {
