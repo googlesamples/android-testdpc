@@ -9,4 +9,6 @@ yes | $ANDROID_HOME/tools/bin/sdkmanager "platforms;android-33" "build-tools;30.
 cd "${KOKORO_ARTIFACTS_DIR}/github/android-testdpc"
 ./build.sh
 
-echo ${KOKORO_ARTIFACTS_DIR}
+ls ${KOKORO_ARTIFACTS_DIR}
+mkdir ${KOKORO_ARTIFACTS_DIR}/artifacts
+mv bazel-bin/* ${KOKORO_ARTIFACTS_DIR}/artifacts
