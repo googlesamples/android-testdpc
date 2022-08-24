@@ -35,7 +35,6 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Process;
 import android.os.UserHandle;
-import android.security.AttestedKeyPair;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
 import android.util.Log;
@@ -48,12 +47,11 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -78,8 +76,14 @@ final class ShellCommand {
     mWriter = writer;
     mArgs = args;
     mDevicePolicyManagerGateway = new DevicePolicyManagerGatewayImpl(context);
-    Log.d(TAG, "constructor: pid=" + Process.myPid() + ", process name=" + Util.myProcessName()
-        + ", args=" + Arrays.toString(args));
+    Log.d(
+        TAG,
+        "constructor: pid="
+            + Process.myPid()
+            + ", process name="
+            + Util.myProcessName()
+            + ", args="
+            + Arrays.toString(args));
   }
 
   private static String suspendedToString(boolean suspended) {
@@ -110,7 +114,8 @@ final class ShellCommand {
 
           UserHandle userHandle = mDevicePolicyManagerGateway.getUserHandle(serialNumber);
           if (userHandle == null) {
-            return validator.invalid(String.format("User %d does not exist.", serialNumber));
+            return validator.invalid(
+                String.format(Locale.getDefault(), "User %d does not exist.", serialNumber));
           }
 
           return validator.valid(userHandle);
@@ -121,7 +126,8 @@ final class ShellCommand {
           File file = UserIconContentProvider.getFile(mContext, string);
 
           if (!file.isFile()) {
-            return validator.invalid(String.format("Could not open file %s.", string));
+            return validator.invalid(
+                String.format(Locale.getDefault(), "Could not open file %s.", string));
           }
 
           return validator.valid(file);
@@ -256,8 +262,8 @@ final class ShellCommand {
             command("is-network-logging-enabled", this::isNetworkLoggingEnabled)
                 .setDescription("Checks whether network logging is enabled."));
     flags.addCommand(
-            command("get-last-network-log-retrieval-time", this::getLastNetworkLogRetrievalTime)
-                    .setDescription("Prints the last time the device owner retrieved the network log."));
+        command("get-last-network-log-retrieval-time", this::getLastNetworkLogRetrievalTime)
+            .setDescription("Prints the last time the device owner retrieved the network log."));
     flags.addCommand(
             command("retrieve-network-logs", this::retrieveNetworkLogs,
                     ordinalParam(Long.class, "batch-token"))
@@ -272,8 +278,8 @@ final class ShellCommand {
             command("is-security-logging-enabled", this::isSecurityLoggingEnabled)
                 .setDescription("Checks whether security logging is enabled."));
     flags.addCommand(
-            command("get-last-security-log-retrieval-time", this::getLastSecurityLogRetrievalTime)
-                    .setDescription("Prints the last time the device owner retrieved the security log."));
+        command("get-last-security-log-retrieval-time", this::getLastSecurityLogRetrievalTime)
+            .setDescription("Prints the last time the device owner retrieved the security log."));
     flags.addCommand(
             command("retrieve-security-logs", this::retrieveSecurityLogs)
                     .setDescription("Retrieves the security logs."));
@@ -325,7 +331,9 @@ final class ShellCommand {
         command("is-active-password-sufficient", this::isActivePasswordSufficient)
             .setDescription("Checks if user's password is sufficient."));
     flags.addCommand(
-        command("is-active-password-sufficient-for-device-requirement", this::isActivePasswordSufficientForDeviceRequirement)
+        command(
+                "is-active-password-sufficient-for-device-requirement",
+                this::isActivePasswordSufficientForDeviceRequirement)
             .setDescription("Checks if user's password is sufficient for device requirement."));
     flags.addCommand(
         command(
@@ -1352,11 +1360,15 @@ final class ShellCommand {
   }
 
   private void revokeKeyPairFromApp(String alias, String packageName) {
-    mDevicePolicyManagerGateway.revokeKeyPairFromApp(alias, packageName,
-        (v) -> onSuccess("%s certificate with alias %s to app %s", (v ? "Revoked" : "Didn't revoke"),
-            alias, packageName),
-        (e) -> onError(e, "Error revoking certificate with alias %s to app %s", alias,
-            packageName));
+    mDevicePolicyManagerGateway.revokeKeyPairFromApp(
+        alias,
+        packageName,
+        (v) ->
+            onSuccess(
+                "%s certificate with alias %s to app %s",
+                (v ? "Revoked" : "Didn't revoke"), alias, packageName),
+        (e) ->
+            onError(e, "Error revoking certificate with alias %s to app %s", alias, packageName));
   }
 
   private void getDelegatedScopes(String delegatePackage) {

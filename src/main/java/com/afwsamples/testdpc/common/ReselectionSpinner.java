@@ -17,14 +17,14 @@
 package com.afwsamples.testdpc.common;
 
 import android.content.Context;
+import android.support.v7.widget.AppCompatSpinner;
 import android.util.AttributeSet;
-import android.widget.Spinner;
 
 /**
  * A wrapper class of spinner which passes the onItemSelected event even when the same item is
  * selected again.
  */
-public class ReselectionSpinner extends Spinner {
+public class ReselectionSpinner extends AppCompatSpinner {
 
   public ReselectionSpinner(Context context) {
     super(context);
@@ -44,11 +44,6 @@ public class ReselectionSpinner extends Spinner {
 
   public ReselectionSpinner(Context context, AttributeSet attrs, int defStyleAttr, int mode) {
     super(context, attrs, defStyleAttr, mode);
-  }
-
-  public ReselectionSpinner(
-      Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes, int mode) {
-    super(context, attrs, defStyleAttr, defStyleRes, mode);
   }
 
   @Override

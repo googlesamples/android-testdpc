@@ -29,6 +29,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import com.google.common.base.Joiner;
 import java.util.Collections;
+import java.util.Locale;
 import java.util.Set;
 
 /**
@@ -77,9 +78,12 @@ public class CrossProfileAppsAllowlistFragment extends Fragment {
   private void setOnClickListeners() {
     mResetButton.setOnClickListener(view -> resetApps());
     mAddButton.setOnClickListener(
-        view -> addApp(mAppNameEditText.getText().toString().toLowerCase().trim()));
+        view ->
+            addApp(mAppNameEditText.getText().toString().toLowerCase(Locale.getDefault()).trim()));
     mRemoveButton.setOnClickListener(
-        view -> removeApp(mAppNameEditText.getText().toString().toLowerCase().trim()));
+        view ->
+            removeApp(
+                mAppNameEditText.getText().toString().toLowerCase(Locale.getDefault()).trim()));
   }
 
   private void resetApps() {

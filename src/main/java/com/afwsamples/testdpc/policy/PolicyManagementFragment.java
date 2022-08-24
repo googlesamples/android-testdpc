@@ -173,6 +173,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
@@ -1694,7 +1695,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
           locationMode = Secure.LOCATION_MODE_OFF;
         }
         mDevicePolicyManager.setSecureSetting(
-            mAdminComponentName, Secure.LOCATION_MODE, String.format("%d", locationMode));
+            mAdminComponentName,
+            Secure.LOCATION_MODE,
+            String.format(Locale.getDefault(), "%d", locationMode));
         reloadLocationEnabledUi();
         reloadLocationModeUi();
         return true;

@@ -44,6 +44,7 @@ import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import javax.security.auth.x500.X500Principal;
 import org.bouncycastle.operator.OperatorCreationException;
 
@@ -206,12 +207,14 @@ public class GenerateKeyAndCertificateTask extends AsyncTask<Void, Integer, Atte
 
         attestationDetails.append(
             String.format(
+                Locale.getDefault(),
                 "%s: %d\n",
                 mActivity.getText(R.string.attestation_chain_length_description),
                 keyPair.getAttestationRecord().size()));
 
         attestationDetails.append(
             String.format(
+                Locale.getDefault(),
                 "%s\n%s\n",
                 mActivity.getText(R.string.attestation_root_description),
                 ((X509Certificate) root).getSubjectX500Principal().getName()));

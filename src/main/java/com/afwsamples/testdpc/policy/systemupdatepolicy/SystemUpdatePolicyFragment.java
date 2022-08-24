@@ -48,6 +48,7 @@ import java.time.MonthDay;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * This fragment provides functionalities related to managed system update that are available in a
@@ -329,7 +330,7 @@ public class SystemUpdatePolicyFragment extends Fragment
   }
 
   private String formatMinutes(int minutes) {
-    return String.format("%02d:%02d", minutes / 60, minutes % 60);
+    return String.format(Locale.getDefault(), "%02d:%02d", minutes / 60, minutes % 60);
   }
 
   private void updateMaintenanceWindowDisplay() {
@@ -360,8 +361,10 @@ public class SystemUpdatePolicyFragment extends Fragment
             mMaintenanceEnd = policy.getInstallWindowEnd();
             policyDescription =
                 String.format(
+                    Locale.getDefault(),
                     "Windowed: %s-%s",
-                    formatMinutes(mMaintenanceStart), formatMinutes(mMaintenanceEnd));
+                    formatMinutes(mMaintenanceStart),
+                    formatMinutes(mMaintenanceEnd));
             updateMaintenanceWindowDisplay();
 
             mSystemUpdatePolicySelection.check(R.id.system_update_policy_Windowed);
