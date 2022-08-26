@@ -310,6 +310,19 @@ final class ShellCommand {
         command("get-user-control-disabled-packages", this::getUserControlDisabledPackages)
             .setDescription("Get the packages that the user cannot force stop or clear data for."));
     flags.addCommand(
+        command(
+                "set-cross-profile-packages",
+                this::setCrossProfilePackages,
+                repeated(ordinalParam(String.class, "packages")))
+            .setDescription(
+                "Set the allow-listed packages that are allowed to request user consent for"
+                    + " cross-profile communication. Provide an empty list to reset."));
+    flags.addCommand(
+        command("get-cross-profile-packages", this::getCrossProfilePackages)
+            .setDescription(
+                "Get the allow-listed packages that are allowed to request user consent"
+                    + " for cross-profile communication."));
+    flags.addCommand(
         command("remove-active-admin", this::removeActiveAdmin)
             .setDescription("Remove TestDPC as an active admin."));
     flags.addCommand(
@@ -894,6 +907,27 @@ final class ShellCommand {
 
   private void getUserControlDisabledPackages() {
     List<String> pkgs = mDevicePolicyManagerGateway.getUserControlDisabledPackages();
+    pkgs.forEach(mWriter::println);
+  }
+
+  private void setCrossProfilePackages(String[] packages) {
+    Set<String> packagesList = getOrderedSortedSet(packages);
+    Log.i(TAG, "setCrossProfilePackages(" + packagesList + ")");
+
+    mDevicePolicyManagerGateway.setCrossProfilePackages(
+        packagesList,
+        (v) ->
+            onSuccess(
+                "Allow-listed packages for cross-profile communication set to %s", packagesList),
+        (e) ->
+            onError(
+                e,
+                "Error setting allow-listed packages for cross-profile communication to" + " %s",
+                packagesList));
+  }
+
+  private void getCrossProfilePackages() {
+    Set<String> pkgs = mDevicePolicyManagerGateway.getCrossProfilePackages();
     pkgs.forEach(mWriter::println);
   }
 
