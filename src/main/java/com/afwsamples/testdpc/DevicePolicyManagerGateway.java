@@ -348,6 +348,23 @@ public interface DevicePolicyManagerGateway {
   List<String> getUserControlDisabledPackages();
 
   /**
+   * See {@link
+   * android.app.admin.DevicePolicyManager#setCrossProfilePackages(android.content.ComponentName,
+   * Set<String>)}.
+   */
+  void setCrossProfilePackages(
+      @NonNull Set<String> packages,
+      @NonNull Consumer<Void> onSuccess,
+      @NonNull Consumer<Exception> onError);
+
+  /**
+   * See {@link
+   * android.app.admin.DevicePolicyManager#getCrossProfilePackages(android.content.ComponentName)}.
+   */
+  @NonNull
+  Set<String> getCrossProfilePackages();
+
+  /**
    * See {@link android.app.admin.DevicePolicyManager#setPermittedInputMethods(
    * android.content.ComponentName, List)}.
    */

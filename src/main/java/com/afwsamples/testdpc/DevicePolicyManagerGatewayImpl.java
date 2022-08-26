@@ -32,11 +32,10 @@ import android.os.PersistableBundle;
 import android.os.Process;
 import android.os.UserHandle;
 import android.os.UserManager;
-import android.security.keystore.KeyGenParameterSpec;
 import android.security.AttestedKeyPair;
+import android.security.keystore.KeyGenParameterSpec;
 import android.util.Log;
 import androidx.annotation.NonNull;
-
 import com.afwsamples.testdpc.common.ReflectionUtil;
 import com.afwsamples.testdpc.common.Util;
 import com.google.common.base.Joiner;
@@ -572,6 +571,24 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
   @Override
   public List<String> getUserControlDisabledPackages() {
     return mDevicePolicyManager.getUserControlDisabledPackages(mAdminComponentName);
+  }
+
+  @Override
+  public void setCrossProfilePackages(
+      Set<String> packages, Consumer<Void> onSuccess, Consumer<Exception> onError) {
+    Log.d(TAG, "setCrossProfilePackages(" + packages + ")");
+
+    try {
+      mDevicePolicyManager.setCrossProfilePackages(mAdminComponentName, packages);
+      onSuccess.accept(null);
+    } catch (Exception e) {
+      onError.accept(e);
+    }
+  }
+
+  @Override
+  public Set<String> getCrossProfilePackages() {
+    return mDevicePolicyManager.getCrossProfilePackages(mAdminComponentName);
   }
 
   @Override
