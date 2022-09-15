@@ -624,7 +624,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     mMuteAudioSwitchPreference = (SwitchPreference) findPreference(MUTE_AUDIO_KEY);
     mMuteAudioSwitchPreference.setOnPreferenceChangeListener(this);
 
-    if (mIsProfileOwner && Util.SDK_INT >= VERSION_CODES.S) {
+    if ((isManagedProfileOwner() || isDeviceOwner()) && Util.SDK_INT >= VERSION_CODES.S) {
       mPreferentialNetworkServiceSwitchPreference =
           (SwitchPreference) findPreference(SET_GET_PREFERENTIAL_NETWORK_SERVICE_STATUS);
       mPreferentialNetworkServiceSwitchPreference.setOnPreferenceChangeListener(this);
