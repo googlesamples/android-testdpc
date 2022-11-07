@@ -152,7 +152,7 @@ public abstract class IntentOrIntentFilterFragment extends Fragment
     mDevicePolicyManagerGateway = new DevicePolicyManagerGatewayImpl(activity);
 
     View intentOrIntentFilterView =
-        layoutInflater.inflate(R.layout.add_intent_or_intent_filter, null);
+        layoutInflater.inflate(R.layout.add_intent_or_intent_filter, container, false);
 
     // Prepare add actions view
     mActionsSpinner = (Spinner) intentOrIntentFilterView.findViewById(R.id.list_of_actions);

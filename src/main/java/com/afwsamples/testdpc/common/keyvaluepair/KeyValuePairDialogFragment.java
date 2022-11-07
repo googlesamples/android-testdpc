@@ -15,6 +15,7 @@
  */
 package com.afwsamples.testdpc.common.keyvaluepair;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -137,6 +138,7 @@ public class KeyValuePairDialogFragment extends DialogFragment {
     return fragment;
   }
 
+  @SuppressLint("InflateParams")
   @Override
   public Dialog onCreateDialog(Bundle savedInstanceState) {
     LayoutInflater inflater = LayoutInflater.from(getActivity());

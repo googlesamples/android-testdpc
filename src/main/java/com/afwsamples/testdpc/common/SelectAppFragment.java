@@ -60,7 +60,7 @@ public abstract class SelectAppFragment extends Fragment
   @Override
   public View onCreateView(
       LayoutInflater layoutInflater, ViewGroup container, Bundle savedInstanceState) {
-    View view = layoutInflater.inflate(R.layout.select_app, null);
+    View view = layoutInflater.inflate(R.layout.select_app, container, false);
 
     mCurrentSelectedPackage = view.findViewById(R.id.selected_package_current);
     mNewSelectedPackage = view.findViewById(R.id.selected_package_new);
