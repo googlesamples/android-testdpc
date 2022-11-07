@@ -182,7 +182,7 @@ public class SystemUpdatePolicyFragment extends Fragment
   @Override
   public View onCreateView(
       LayoutInflater layoutInflater, ViewGroup container, Bundle savedInstanceState) {
-    View view = layoutInflater.inflate(R.layout.system_update_policy, null);
+    View view = layoutInflater.inflate(R.layout.system_update_policy, container, false);
 
     mCurrentSystemUpdatePolicy = view.findViewById(R.id.system_update_policy_current);
     mSystemUpdatePolicySelection = view.findViewById(R.id.system_update_policy_selection);

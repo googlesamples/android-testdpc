@@ -73,7 +73,7 @@ public class PrivateDnsModeFragment extends Fragment
   @Override
   public View onCreateView(
       LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-    View view = inflater.inflate(R.layout.private_dns_mode, null);
+    View view = inflater.inflate(R.layout.private_dns_mode, container, false);
     mSetButton = view.findViewById(R.id.private_dns_mode_apply);
     mSetButton.setOnClickListener(this);
 

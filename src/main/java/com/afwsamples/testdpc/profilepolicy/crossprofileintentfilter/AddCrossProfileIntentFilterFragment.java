@@ -64,7 +64,7 @@ public class AddCrossProfileIntentFilterFragment extends IntentOrIntentFilterFra
   public View onCreateView(
       LayoutInflater layoutInflater, ViewGroup container, Bundle savedInstanceState) {
     LinearLayout crossProfileIntentFilterContainer =
-        (LinearLayout) layoutInflater.inflate(R.layout.cross_profile_intent, null);
+        (LinearLayout) layoutInflater.inflate(R.layout.cross_profile_intent, container, false);
     View intentView = super.onCreateView(layoutInflater, container, savedInstanceState);
     crossProfileIntentFilterContainer.addView(intentView);
     // Prepare spinner that indicates the cross profile intent direction

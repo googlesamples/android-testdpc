@@ -62,7 +62,7 @@ public class PickTransferComponentFragment extends Fragment {
   public View onCreateView(
       LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     final ViewGroup rootView =
-        (ViewGroup) inflater.inflate(R.layout.transfer_ownership_dialog, null);
+        (ViewGroup) inflater.inflate(R.layout.transfer_ownership_dialog, container, false);
     final ListView listView = rootView.findViewById(R.id.list);
     final EditText componentName = rootView.findViewById(R.id.component_name);
     final EditText result = rootView.findViewById(R.id.result);

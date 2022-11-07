@@ -125,7 +125,7 @@ public class ResetPasswordWithTokenFragment extends Fragment implements View.OnC
   @Override
   public View onCreateView(
       LayoutInflater layoutInflater, ViewGroup container, Bundle savedInstanceState) {
-    View view = layoutInflater.inflate(R.layout.reset_password_token, null);
+    View view = layoutInflater.inflate(R.layout.reset_password_token, container, false);
 
     mEdtToken = (EditText) view.findViewById(R.id.edtToken);
     mEdtUseToken = (EditText) view.findViewById(R.id.edtUseToken);

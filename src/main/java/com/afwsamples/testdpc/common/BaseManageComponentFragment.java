@@ -55,7 +55,7 @@ public abstract class BaseManageComponentFragment<T> extends Fragment
   @Override
   public View onCreateView(
       LayoutInflater layoutInflater, ViewGroup container, Bundle savedInstanceState) {
-    View view = layoutInflater.inflate(R.layout.manage_apps, null);
+    View view = layoutInflater.inflate(R.layout.manage_apps, container, false);
 
     mHeaderView = (TextView) view.findViewById(R.id.header_text);
     mManagedAppsSpinner = (Spinner) view.findViewById(R.id.managed_apps_list);
