@@ -463,17 +463,4 @@ public class Util {
     }
     return eventTag;
   }
-
-  public static void printData(StringBuilder sb, Object data) {
-    if (data instanceof Integer
-        || data instanceof Long
-        || data instanceof Float
-        || data instanceof String) {
-      sb.append(data.toString()).append(" ");
-    } else if (data instanceof Object[]) {
-      for (Object item : (Object[]) data) {
-        printData(sb, item);
-      }
-    }
-  }
 }

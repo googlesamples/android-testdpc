@@ -44,6 +44,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.afwsamples.testdpc.common.Util;
+import com.afwsamples.testdpc.policy.SecurityLogsFragment;
 import com.afwsamples.testdpc.util.flags.Flags;
 import java.io.File;
 import java.io.PrintWriter;
@@ -1474,7 +1475,7 @@ final class ShellCommand {
       sb.append(" (")
           .append(formatter.format(new Date(TimeUnit.NANOSECONDS.toMillis(event.getTimeNanos()))))
           .append("): ");
-      Util.printData(sb, event.getData());
+      SecurityLogsFragment.printData(sb, event.getData());
       mWriter.printf("%s\n", sb.toString());
     }
   }

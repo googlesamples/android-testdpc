@@ -134,11 +134,24 @@ public class SecurityLogsFragment extends ListFragment {
         sb.append(" (")
             .append(formatter.format(new Date(TimeUnit.NANOSECONDS.toMillis(event.getTimeNanos()))))
             .append("): ");
-        Util.printData(sb, event.getData());
+        printData(sb, event.getData());
         mAdapter.add(sb.toString());
       }
       ListView listView = SecurityLogsFragment.this.getListView();
       listView.setSelection(listView.getCount() - 1);
+    }
+  }
+
+  public static void printData(StringBuilder sb, Object data) {
+    if (data instanceof Integer
+        || data instanceof Long
+        || data instanceof Float
+        || data instanceof String) {
+      sb.append(data.toString()).append(" ");
+    } else if (data instanceof Object[]) {
+      for (Object item : (Object[]) data) {
+        printData(sb, item);
+      }
     }
   }
 }
