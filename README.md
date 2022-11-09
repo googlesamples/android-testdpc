@@ -20,7 +20,7 @@ You can find various kinds of provisioning methods [here](https://developers.goo
 #### QR code provisioing (Device Owner N+ only) ####
 1. Factory reset your device and tap the welcome screen in setup wizard 6 times.
 2. The setup wizard prompts the user to connect to the Internet so the setup wizard can download a QR code reader.
-3. Modify (if needed) and scan [this QR code] (http://down-box.appspot.com/qr/nQB0tw7b).
+3. Modify (if needed) and scan [this QR code](http://down-box.appspot.com/qr/nQB0tw7b).
 4. Follow onscreen instructions
 
 #### adb command (Device Owner) ####
