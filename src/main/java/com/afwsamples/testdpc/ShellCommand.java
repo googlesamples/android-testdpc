@@ -1471,7 +1471,7 @@ final class ShellCommand {
       if (Util.SDK_INT >= VERSION_CODES.P) {
         sb.append(event.getId() + ": ");
       }
-      sb.append(Util.getStringEventTagFromId(event.getTag()));
+      sb.append(SecurityLogsFragment.getStringEventTagFromId(event.getTag()));
       sb.append(" (")
           .append(formatter.format(new Date(TimeUnit.NANOSECONDS.toMillis(event.getTimeNanos()))))
           .append("): ");
