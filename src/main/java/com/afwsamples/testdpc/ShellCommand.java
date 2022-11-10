@@ -64,9 +64,7 @@ import java.util.stream.Collectors;
 /**
  * Provides a CLI (command-line interface) to TestDPC through {@code dumpsys}.
  *
- * <p>
- * Usage:
- * {@code adb shell dumpsys activity service --user USER_ID com.afwsamples.testdpc CMD}.
+ * <p>Usage: {@code adb shell dumpsys activity service --user USER_ID com.afwsamples.testdpc CMD}.
  */
 final class ShellCommand {
   private static final String TAG = "TestDPCShellCommand";
@@ -150,10 +148,10 @@ final class ShellCommand {
     flags.addCommand(command("dump", this::dumpState).setDescription("Dump internal state."));
     flags.addCommand(
         command(
-            "create-user",
-            this::createUser,
-            ordinalParam(String.class, "name"),
-            optional(namedParam(int.class, "flags")))
+                "create-user",
+                this::createUser,
+                ordinalParam(String.class, "name"),
+                optional(namedParam(int.class, "flags")))
             .setDescription("Create a user with the optional flags and name."));
     flags.addCommand(
         command("set-user-icon", this::setUserIcon, ordinalParam(File.class, "file"))
@@ -168,64 +166,64 @@ final class ShellCommand {
                     + " /tmp/icon.png`)."));
     flags.addCommand(
         command(
-            "set-start-user-session-message",
-            this::setStartUserSessionMessage,
-            ordinalParam(String.class, "message"))
+                "set-start-user-session-message",
+                this::setStartUserSessionMessage,
+                ordinalParam(String.class, "message"))
             .setDescription("Set the message shown when a user is switched to"));
     flags.addCommand(
         command("get-start-user-session-message", this::getStartUserSessionMessage)
             .setDescription("Get the message shown when a user is switched to"));
     flags.addCommand(
         command(
-            "set-end-user-session-message",
-            this::setEndUserSessionMessage,
-            ordinalParam(String.class, "message"))
+                "set-end-user-session-message",
+                this::setEndUserSessionMessage,
+                ordinalParam(String.class, "message"))
             .setDescription("Set the message shown when a user is switched of"));
     flags.addCommand(
         command("get-end-user-session-message", this::getEndUserSessionMessage)
             .setDescription("Get the message shown when a user is switched of"));
     flags.addCommand(
         command(
-            "remove-user",
-            this::removeUser,
-            ordinalParam(UserHandle.class, "user-serial-number"))
+                "remove-user",
+                this::removeUser,
+                ordinalParam(UserHandle.class, "user-serial-number"))
             .setDescription("Remove the given user."));
     flags.addCommand(
         command(
-            "switch-user",
-            this::switchUser,
-            ordinalParam(UserHandle.class, "user-serial-number"))
+                "switch-user",
+                this::switchUser,
+                ordinalParam(UserHandle.class, "user-serial-number"))
             .setDescription("Switch the given user to foreground."));
     flags.addCommand(
         command(
-            "start-user-in-background",
-            this::startUserInBackground,
-            ordinalParam(UserHandle.class, "user-serial-number"))
+                "start-user-in-background",
+                this::startUserInBackground,
+                ordinalParam(UserHandle.class, "user-serial-number"))
             .setDescription("Switch the given user to foreground."));
     flags.addCommand(
-        command(
-            "is-logout-enabled",
-            this::isLogoutEnabled)
-            .setDescription("Whether logout is enabled."));
+            command(
+                    "is-logout-enabled",
+                    this::isLogoutEnabled)
+                .setDescription("Whether logout is enabled."));
     flags.addCommand(
-        command(
-            "set-logout-enabled",
-            this::setLogoutEnabled,
-            ordinalParam(boolean.class, "enabled"))
-            .setDescription("Set whether logout is enabled."));
+            command(
+                    "set-logout-enabled",
+                    this::setLogoutEnabled,
+                    ordinalParam(boolean.class, "enabled"))
+                .setDescription("Set whether logout is enabled."));
     flags.addCommand(
-        command(
-            "logout-user",
-            this::logoutUser)
-            .setDescription("Logout the current user."));
+            command(
+                    "logout-user",
+                    this::logoutUser)
+                .setDescription("Logout the current user."));
     flags.addCommand(
         command("is-user-affiliated", this::isUserAffiliated)
             .setDescription("Check if the user is affiliated with the device."));
     flags.addCommand(
         command(
-            "set-affiliation-ids",
-            this::setAffiliationIds,
-            repeated(ordinalParam(String.class, "ids")))
+                "set-affiliation-ids",
+                this::setAffiliationIds,
+                repeated(ordinalParam(String.class, "ids")))
             .setDescription("Set the user affiliation ids (or clear them if no ids are passed)."));
     flags.addCommand(
         command("get-affiliation-ids", this::getAffiliationIds)
@@ -235,10 +233,10 @@ final class ShellCommand {
             .setDescription("List the user restrictions."));
     flags.addCommand(
         command(
-            "set-user-restriction",
-            this::setUserRestriction,
-            ordinalParam(String.class, "restriction"),
-            ordinalParam(boolean.class, "enabled"))
+                "set-user-restriction",
+                this::setUserRestriction,
+                ordinalParam(String.class, "restriction"),
+                ordinalParam(boolean.class, "enabled"))
             .setDescription("Set the given user restriction."));
     flags.addCommand(
         command("lock-now", this::lockNow, optional(namedParam(int.class, "flags")))
@@ -248,62 +246,62 @@ final class ShellCommand {
         command("wipe-data", this::wipeData, optional(namedParam(int.class, "flags")))
             .setDescription("Factory reset the device."));
     flags.addCommand(
-        command("request-bugreport", this::requestBugreport)
-            .setDescription("Request a bug report."));
+                command("request-bugreport", this::requestBugreport)
+                        .setDescription("Request a bug report."));
     flags.addCommand(
-        command("get-last-bugreport-request-time", this::getLastBugReportRequestTime)
-            .setDescription("Prints the last time the device owner request a bugreport."));
+            command("get-last-bugreport-request-time", this::getLastBugReportRequestTime)
+                    .setDescription("Prints the last time the device owner request a bugreport."));
     flags.addCommand(
         command(
-            "set-network-logging-enabled",
-            this::setNetworkLoggingEnabled,
-            ordinalParam(boolean.class, "enabled"))
+                "set-network-logging-enabled",
+                this::setNetworkLoggingEnabled,
+                ordinalParam(boolean.class, "enabled"))
             .setDescription("Enable / disable network logging."));
     flags.addCommand(
-        command("is-network-logging-enabled", this::isNetworkLoggingEnabled)
-            .setDescription("Checks whether network logging is enabled."));
+            command("is-network-logging-enabled", this::isNetworkLoggingEnabled)
+                .setDescription("Checks whether network logging is enabled."));
     flags.addCommand(
-        command("get-last-network-log-retrieval-time", this::getLastNetworkLogRetrievalTime)
-            .setDescription("Prints the last time the device owner retrieved the network log."));
+            command("get-last-network-log-retrieval-time", this::getLastNetworkLogRetrievalTime)
+                    .setDescription("Prints the last time the device owner retrieved the network log."));
     flags.addCommand(
-        command("retrieve-network-logs", this::retrieveNetworkLogs,
-            ordinalParam(Long.class, "batch-token"))
-            .setDescription("Retrieves the network logs."));
+            command("retrieve-network-logs", this::retrieveNetworkLogs,
+                    ordinalParam(Long.class, "batch-token"))
+                    .setDescription("Retrieves the network logs."));
     flags.addCommand(
-        command(
-            "set-security-logging-enabled",
-            this::setSecurityLoggingEnabled,
-            ordinalParam(boolean.class, "enabled"))
-            .setDescription("Enable / disable security logging."));
+            command(
+                    "set-security-logging-enabled",
+                    this::setSecurityLoggingEnabled,
+                    ordinalParam(boolean.class, "enabled"))
+                .setDescription("Enable / disable security logging."));
     flags.addCommand(
-        command("is-security-logging-enabled", this::isSecurityLoggingEnabled)
-            .setDescription("Checks whether security logging is enabled."));
+            command("is-security-logging-enabled", this::isSecurityLoggingEnabled)
+                .setDescription("Checks whether security logging is enabled."));
     flags.addCommand(
-        command("get-last-security-log-retrieval-time", this::getLastSecurityLogRetrievalTime)
-            .setDescription("Prints the last time the device owner retrieved the security log."));
+            command("get-last-security-log-retrieval-time", this::getLastSecurityLogRetrievalTime)
+                    .setDescription("Prints the last time the device owner retrieved the security log."));
     flags.addCommand(
-        command("retrieve-security-logs", this::retrieveSecurityLogs)
-            .setDescription("Retrieves the security logs."));
+            command("retrieve-security-logs", this::retrieveSecurityLogs)
+                    .setDescription("Retrieves the security logs."));
     flags.addCommand(
-        command("retrieve-pre-reboot-security-logs", this::retrievePreRebootSecurityLogs)
-            .setDescription("Retrieves the pre-reboot security logs."));
+            command("retrieve-pre-reboot-security-logs", this::retrievePreRebootSecurityLogs)
+                    .setDescription("Retrieves the pre-reboot security logs."));
     flags.addCommand(
         command("clear-organization-name", this::clearOrganizationName)
             .setDescription("Clear the organisation name."));
     flags.addCommand(
         command(
-            "set-organization-name",
-            this::setOrganizationName,
-            ordinalParam(String.class, "name"))
+                "set-organization-name",
+                this::setOrganizationName,
+                ordinalParam(String.class, "name"))
             .setDescription("Set the organisation name."));
     flags.addCommand(
         command("get-organization-name", this::getOrganizationName)
             .setDescription("Get the organization name."));
     flags.addCommand(
         command(
-            "set-user-control-disabled-packages",
-            this::setUserControlDisabledPackages,
-            repeated(ordinalParam(String.class, "packages")))
+                "set-user-control-disabled-packages",
+                this::setUserControlDisabledPackages,
+                repeated(ordinalParam(String.class, "packages")))
             .setDescription(
                 "Set the packages that the user cannot force stop or clear data for. Provide an"
                     + " empty list to reset."));
@@ -321,9 +319,9 @@ final class ShellCommand {
             .setDescription("Clear TestDPC as profile owner."));
     flags.addCommand(
         command(
-            "set-password-quality",
-            this::setPasswordQuality,
-            ordinalParam(int.class, "quality"))
+                "set-password-quality",
+                this::setPasswordQuality,
+                ordinalParam(int.class, "quality"))
             .setDescription("Set the password quality."));
     flags.addCommand(
         command("get-password-quality", this::getPasswordQuality)
@@ -332,14 +330,13 @@ final class ShellCommand {
         command("is-active-password-sufficient", this::isActivePasswordSufficient)
             .setDescription("Checks if user's password is sufficient."));
     flags.addCommand(
-        command("is-active-password-sufficient-for-device-requirement",
-            this::isActivePasswordSufficientForDeviceRequirement)
+        command("is-active-password-sufficient-for-device-requirement", this::isActivePasswordSufficientForDeviceRequirement)
             .setDescription("Checks if user's password is sufficient for device requirement."));
     flags.addCommand(
         command(
-            "set-required-password-complexity",
-            this::setRequiredPasswordComplexity,
-            ordinalParam(int.class, "complexity"))
+                "set-required-password-complexity",
+                this::setRequiredPasswordComplexity,
+                ordinalParam(int.class, "complexity"))
             .setDescription("Set the required password complexity."));
     flags.addCommand(
         command("get-required-password-complexity", this::getRequiredPasswordComplexity)
@@ -349,28 +346,28 @@ final class ShellCommand {
             .setDescription("Transfer ownership to the given admin."));
     flags.addCommand(
         command(
-            "set-suspended-packages",
-            this::setSuspendedPackages,
-            ordinalParam(boolean.class, "suspended"),
-            repeated(ordinalParam(String.class, "packageNames")))
+                "set-suspended-packages",
+                this::setSuspendedPackages,
+                ordinalParam(boolean.class, "suspended"),
+                repeated(ordinalParam(String.class, "packageNames")))
             .setDescription("Suspend / unsuspend the given packages."));
     flags.addCommand(
         command(
-            "is-suspended-packages",
-            this::isSuspendedPackage,
-            repeated(ordinalParam(String.class, "packageNames")))
+                "is-suspended-packages",
+                this::isSuspendedPackage,
+                repeated(ordinalParam(String.class, "packageNames")))
             .setDescription("Check if the given packages are suspended."));
     flags.addCommand(
         command(
-            "set-personal-apps-suspended",
-            this::setPersonalAppsSuspended,
-            ordinalParam(boolean.class, "suspended"))
+                "set-personal-apps-suspended",
+                this::setPersonalAppsSuspended,
+                ordinalParam(boolean.class, "suspended"))
             .setDescription("Suspend / unsuspend personal apps."));
     flags.addCommand(
         command(
-            "enable-system-app",
-            this::enableSystemApp,
-            ordinalParam(String.class, "packageName"))
+                "enable-system-app",
+                this::enableSystemApp,
+                ordinalParam(String.class, "packageName"))
             .setDescription("Enable the given system app."));
     flags.addCommand(
         command("list-disabled-system-apps", this::listDisabledSystemApps)
@@ -380,78 +377,78 @@ final class ShellCommand {
             .setDescription("Get the reasons for suspending personal apps."));
     flags.addCommand(
         command(
-            "set-hidden-package",
-            this::setHiddenPackage,
-            ordinalParam(String.class, "package"),
-            ordinalParam(boolean.class, "hidden"))
+                "set-hidden-package",
+                this::setHiddenPackage,
+                ordinalParam(String.class, "package"),
+                ordinalParam(boolean.class, "hidden"))
             .setDescription("Hide / unhide the given package."));
     flags.addCommand(
         command("is-hidden-package", this::isHiddenPackage, ordinalParam(String.class, "package"))
             .setDescription("Check if the given package is hidden."));
     flags.addCommand(
         command(
-            "set-lock-task-packages",
-            this::setLockTaskPackages,
-            repeated(ordinalParam(String.class, "packages")))
+                "set-lock-task-packages",
+                this::setLockTaskPackages,
+                repeated(ordinalParam(String.class, "packages")))
             .setDescription("Set the packages allowed to have tasks locked."));
     flags.addCommand(
         command("get-lock-task-packages", this::getLockTaskPackages)
             .setDescription("Get the packages allowed to have tasks locked."));
     flags.addCommand(
         command(
-            "is-lock-task-permitted",
-            this::isLockTaskPermitted,
-            repeated(ordinalParam(String.class, "packages")))
+                "is-lock-task-permitted",
+                this::isLockTaskPermitted,
+                repeated(ordinalParam(String.class, "packages")))
             .setDescription("Check if the given packages are allowed to have tasks locked."));
     flags.addCommand(
         command(
-            "set-lock-task-features",
-            this::setLockTaskFeatures,
-            ordinalParam(int.class, "flags"))
+                "set-lock-task-features",
+                this::setLockTaskFeatures,
+                ordinalParam(int.class, "flags"))
             .setDescription("Set the lock task features."));
     flags.addCommand(
         command("get-lock-task-features", this::getLockTaskFeatures)
             .setDescription("Get the lock task features."));
     flags.addCommand(
         command(
-            "set-app-restrictions",
-            this::setAppRestrictions,
-            ordinalParam(String.class, "package"),
-            repeated(ordinalParam(KeyValue.class, "restrictions")))
+                "set-app-restrictions",
+                this::setAppRestrictions,
+                ordinalParam(String.class, "package"),
+                repeated(ordinalParam(KeyValue.class, "restrictions")))
             .setDescription(
                 "Set the application restrictions (provided as key=value strings) for the given app"
                     + " (or clear if no values provided)."));
     flags.addCommand(
         command(
-            "get-app-restrictions",
-            this::getAppRestrictions,
-            repeated(ordinalParam(String.class, "packages")))
+                "get-app-restrictions",
+                this::getAppRestrictions,
+                repeated(ordinalParam(String.class, "packages")))
             .setDescription(
                 "Get the application restrictions for the given apps (or for TestDPC when empty,"
                     + " using UserManager)."));
     flags.addCommand(
         command(
-            "set-permission-grant-state",
-            this::setPermissionGrantState,
-            ordinalParam(String.class, "package"),
-            ordinalParam(String.class, "permission"),
-            ordinalParam(int.class, "state"))
+                "set-permission-grant-state",
+                this::setPermissionGrantState,
+                ordinalParam(String.class, "package"),
+                ordinalParam(String.class, "permission"),
+                ordinalParam(int.class, "state"))
             .setDescription("Set the grant state for the given package and permission."));
     flags.addCommand(
         command(
-            "get-permission-grant-state",
-            this::getPermissionGrantState,
-            ordinalParam(String.class, "package"),
-            ordinalParam(String.class, "permission"))
+                "get-permission-grant-state",
+                this::getPermissionGrantState,
+                ordinalParam(String.class, "package"),
+                ordinalParam(String.class, "permission"))
             .setDescription("Get the grant state for the given package and persmission."));
     flags.addCommand(
         command("can-admin-grant-sensors-permissions", this::canAdminGrantSensorsPermissions)
             .setDescription("Checks whether the admin can grant sensor permissions."));
     flags.addCommand(
         command(
-            "set-location-enabled",
-            this::setLocationEnabled,
-            ordinalParam(boolean.class, "enabled"))
+                "set-location-enabled",
+                this::setLocationEnabled,
+                ordinalParam(boolean.class, "enabled"))
             .setDescription("Set location enabled for the user."));
     flags.addCommand(
         command("is-location-enabled", this::isLocationEnabled)
@@ -461,131 +458,130 @@ final class ShellCommand {
             .setDescription("Clear the device owner lock screen info."));
     flags.addCommand(
         command(
-            "set-device-owner-lockscreen-info",
-            this::setDeviceOwnerLockScreenInfo,
-            ordinalParam(String.class, "info"))
+                "set-device-owner-lockscreen-info",
+                this::setDeviceOwnerLockScreenInfo,
+                ordinalParam(String.class, "info"))
             .setDescription("Set the device owner lock screen info."));
     flags.addCommand(
         command("get-device-owner-lockscreen-info", this::getDeviceOwnerLockScreenInfo)
             .setDescription("Get the device owner lock screen info."));
     flags.addCommand(
         command(
-            "set-keyguard-disabled",
-            this::setKeyguardDisabled,
-            ordinalParam(boolean.class, "disabled"))
+                "set-keyguard-disabled",
+                this::setKeyguardDisabled,
+                ordinalParam(boolean.class, "disabled"))
             .setDescription("Set keyguard disabled."));
     flags.addCommand(
         command(
-            "set-keyguard-disabled-features",
-            this::setKeyguardDisabledFeatures,
-            ordinalParam(int.class, "flags"))
+                "set-keyguard-disabled-features",
+                this::setKeyguardDisabledFeatures,
+                ordinalParam(int.class, "flags"))
             .setDescription("Set the keyguard disabled features."));
     flags.addCommand(
         command("get-keyguard-disabled-features", this::getKeyguardDisabledFeatures)
             .setDescription("Get the keyguard disabled features."));
     flags.addCommand(
         command(
-            "set-camera-disabled",
-            this::setCameraDisabled,
-            ordinalParam(boolean.class, "disabled"))
+                "set-camera-disabled",
+                this::setCameraDisabled,
+                ordinalParam(boolean.class, "disabled"))
             .setDescription("Set camera disabled."));
     flags.addCommand(
         command("get-camera-disabled", this::getCameraDisabled)
             .setDescription("Get camera disabled."));
     flags.addCommand(
-        command(
-            "set-status-bar-disabled",
-            this::setStatusBarDisabled,
-            ordinalParam(boolean.class, "disabled"))
-            .setDescription("Set status bar disabled."));
+            command(
+                    "set-status-bar-disabled",
+                    this::setStatusBarDisabled,
+                    ordinalParam(boolean.class, "disabled"))
+                .setDescription("Set status bar disabled."));
     flags.addCommand(
         command(
-            "set-max-failed-passwords",
-            this::setMaximumFailedPasswordsForWipe,
-            ordinalParam(int.class, "max"))
+                "set-max-failed-passwords",
+                this::setMaximumFailedPasswordsForWipe,
+                ordinalParam(int.class, "max"))
             .setDescription("Set maximum number of failed passwords before user is wiped."));
     flags.addCommand(
         command("get-max-failed-passwords", this::getMaximumFailedPasswordsForWipe)
             .setDescription("Get maximum number of failed passwords before user is wiped."));
     flags.addCommand(
         command("install-existing-package", this::installExistingPackage,
-            ordinalParam(String.class, "package"))
+                ordinalParam(String.class, "package"))
             .setDescription("Installs the existing package for this user."));
     flags.addCommand(
         command("set-uninstall-blocked", this::setUninstallBlocked,
-            ordinalParam(String.class, "package"),
-            ordinalParam(boolean.class, "blocked"))
+                ordinalParam(String.class, "package"),
+                ordinalParam(boolean.class, "blocked"))
             .setDescription("Sets whether the given package can be uninstalled."));
     flags.addCommand(
         command("is-uninstall-blocked", this::isUninstallBlocked,
-            ordinalParam(String.class, "package"))
+                ordinalParam(String.class, "package"))
             .setDescription("Checks whether the given package can be uninstalled."));
     flags.addCommand(
         command("set-secure-setting", this::setSecureSetting,
-            ordinalParam(String.class, "setting"),
-            ordinalParam(String.class, "value"))
+                ordinalParam(String.class, "setting"),
+                ordinalParam(String.class, "value"))
             .setDescription("Sets the given Settings.SECURE setting for this user."));
     flags.addCommand(
         command("set-global-setting", this::setGlobalSetting,
-            ordinalParam(String.class, "setting"),
-            ordinalParam(String.class, "value"))
+                ordinalParam(String.class, "setting"),
+                ordinalParam(String.class, "value"))
             .setDescription("Sets the given Settings.GLOBAL setting for this user."));
     flags.addCommand(
         command("has-key-pair", this::hasKeyPair,
-            ordinalParam(String.class, "alias"))
+                ordinalParam(String.class, "alias"))
             .setDescription("Checks if a certificate key with the given alias is installed."));
     flags.addCommand(
         command("generate-device-attestation-key-pair", this::generateDeviceAttestationKeyPair,
-            ordinalParam(String.class, "alias"),
-            optional(namedParam(int.class, "flags")))
+                ordinalParam(String.class, "alias"),
+                optional(namedParam(int.class, "flags")))
             .setDescription("Generates a device attestation key."));
     flags.addCommand(
         command("remove-key-pair", this::removeKeyPair,
-            ordinalParam(String.class, "alias"))
+                ordinalParam(String.class, "alias"))
             .setDescription("Removes the certificate key with the given alias."));
     flags.addCommand(
         command("grant-key-pair-to-app", this::grantKeyPairToApp,
-            ordinalParam(String.class, "alias"),
-            ordinalParam(String.class, "packageName"))
+                ordinalParam(String.class, "alias"),
+                ordinalParam(String.class, "packageName"))
             .setDescription("Grants a certificate key to an app."));
     flags.addCommand(
         command("get-key-pair-grants", this::getKeyPairGrants,
-            ordinalParam(String.class, "alias"))
+                ordinalParam(String.class, "alias"))
             .setDescription("Lists the apps that were granted the given certificate key."));
     flags.addCommand(
         command("revoke-key-pair-from-app", this::revokeKeyPairFromApp,
-            ordinalParam(String.class, "alias"),
-            ordinalParam(String.class, "packageName"))
+                ordinalParam(String.class, "alias"),
+                ordinalParam(String.class, "packageName"))
             .setDescription("Revokes a certificate key from an app."));
     flags.addCommand(
         command("set-delegated-scopes", this::setDelegatedScopes,
-            ordinalParam(String.class, "packageName"),
-            repeated(ordinalParam(String.class, "scopes")))
+                ordinalParam(String.class, "packageName"),
+                repeated(ordinalParam(String.class, "scopes")))
             .setDescription("Delegates the given scopes to an app."));
     flags.addCommand(
         command("get-delegated-scopes", this::getDelegatedScopes,
-            ordinalParam(String.class, "packageName"))
+                ordinalParam(String.class, "packageName"))
             .setDescription("Gets the scopes delgated to an app."));
     flags.addCommand(
         command("get-delegate-packages", this::getDelegatePackages,
-            ordinalParam(String.class, "scope"))
+                ordinalParam(String.class, "scope"))
             .setDescription("Gets the apps that were delegate a given scope."));
 
-    // Separator for S / pre-S commands - do NOT remove line to avoid cherry-pick
-    // conflicts
+    // Separator for S / pre-S commands - do NOT remove line to avoid cherry-pick conflicts
 
     if (Util.isAtLeastS()) {
       flags.addCommand(
           command(
-              "set-usb-data-signaling-enabled",
-              this::setUsbDataSignalingEnabled,
-              ordinalParam(boolean.class, "enabled"))
+                  "set-usb-data-signaling-enabled",
+                  this::setUsbDataSignalingEnabled,
+                  ordinalParam(boolean.class, "enabled"))
               .setDescription("Enable / disable USB data signaling."));
       flags.addCommand(
           command(
-              "set-permitted-input-methods-parent",
-              this::setPermittedInputMethodsOnParent,
-              repeated(ordinalParam(String.class, "methods")))
+                  "set-permitted-input-methods-parent",
+                  this::setPermittedInputMethodsOnParent,
+                  repeated(ordinalParam(String.class, "methods")))
               .setDescription("Set the permitted input methods in the parent's device admin."));
       flags.addCommand(
           command("list-foreground-users", this::listForegroundUsers)
@@ -595,9 +591,9 @@ final class ShellCommand {
               .setDescription("Checks if the calling user is running in the foreground."));
       flags.addCommand(
           command(
-              "set-metered-data-disabled-packages",
-              this::setMeteredDataDisabledPackages,
-              repeated(ordinalParam(String.class, "disabled-packages")))
+                  "set-metered-data-disabled-packages",
+                  this::setMeteredDataDisabledPackages,
+                  repeated(ordinalParam(String.class, "disabled-packages")))
               .setDescription("Restricts packages from using metered data."));
       flags.addCommand(
           command("get-metered-data-disabled-packages", this::getMeteredDataDisabledPackages)
@@ -607,10 +603,8 @@ final class ShellCommand {
     try {
       flags.run(mArgs);
     } catch (Exception e) {
-      // Must explicitly catch and show generic exceptions (like NumberFormatException
-      // parsing
-      // args), otherwise they'dbe logcat'ed on AndroidRuntime and not surfaced to
-      // caller
+      // Must explicitly catch and show generic exceptions (like NumberFormatException parsing
+      // args), otherwise they'dbe logcat'ed on AndroidRuntime and not surfaced to caller
       onError(e, "error executing %s", Arrays.toString(mArgs));
     }
   }
@@ -710,20 +704,20 @@ final class ShellCommand {
   }
 
   private void isLogoutEnabled() {
-    mWriter.println(mDevicePolicyManagerGateway.isLogoutEnabled());
+      mWriter.println(mDevicePolicyManagerGateway.isLogoutEnabled());
   }
 
   private void setLogoutEnabled(boolean enabled) {
-    mDevicePolicyManagerGateway.setLogoutEnabled(enabled,
-        (v) -> onSuccess("Logout enabled set to %b", enabled),
-        (e) -> onError(e, "Error setting logout enabled to %b", enabled));
+      mDevicePolicyManagerGateway.setLogoutEnabled(enabled,
+          (v) -> onSuccess("Logout enabled set to %b", enabled),
+          (e) -> onError(e, "Error setting logout enabled to %b", enabled));
   }
 
   private void logoutUser() {
-    UserHandle userHandle = Process.myUserHandle();
-    mDevicePolicyManagerGateway.logoutUser(
-        (v) -> onSuccess("User %s logged out", userHandle),
-        (e) -> onError(e, "Error logging out user %s", userHandle));
+      UserHandle userHandle = Process.myUserHandle();
+      mDevicePolicyManagerGateway.logoutUser(
+          (v) -> onSuccess("User %s logged out", userHandle),
+          (e) -> onError(e, "Error logging out user %s", userHandle));
   }
 
   private void getAffiliationIds() {
@@ -793,7 +787,7 @@ final class ShellCommand {
   }
 
   private void getLastBugReportRequestTime() {
-    printTime(mDevicePolicyManagerGateway.getLastBugReportRequestTime());
+      printTime(mDevicePolicyManagerGateway.getLastBugReportRequestTime());
   }
 
   private void setNetworkLoggingEnabled(boolean enabled) {
@@ -820,37 +814,37 @@ final class ShellCommand {
     }
     mWriter.printf("%d events:\n", events.size());
     for (int i = 0; i < events.size(); i++) {
-      NetworkEvent event = events.get(i);
-      if (event instanceof DnsEvent) {
-        DnsEvent de = (DnsEvent) event;
-        String addresses = de.getInetAddresses().stream()
-            .map(InetAddress::toString).collect(Collectors.joining(","));
-        mWriter.printf("\t%d:DnsEvent id=%d pkg=%s hostname=%s addresses=%s\n",
-            i, event.getId(), event.getPackageName(), de.getHostname(), addresses);
-      } else if (event instanceof ConnectEvent) {
-        ConnectEvent ce = (ConnectEvent) event;
-        mWriter.printf("\t%d:ConnectEvent id=%d pkg=%s address=%s port=%d\n",
-            i, ce.getId(), ce.getPackageName(), ce.getInetAddress(), ce.getPort());
-      } else {
-        mWriter.printf("\t%d:Unknown id=%d pkg=%s\n", i, event.getId(), event.getPackageName());
-      }
+        NetworkEvent event = events.get(i);
+        if (event instanceof DnsEvent) {
+          DnsEvent de = (DnsEvent) event;
+          String addresses = de.getInetAddresses().stream()
+              .map(InetAddress::toString).collect(Collectors.joining(","));
+          mWriter.printf("\t%d:DnsEvent id=%d pkg=%s hostname=%s addresses=%s\n",
+              i, event.getId(), event.getPackageName(), de.getHostname(), addresses);
+        } else if (event instanceof ConnectEvent) {
+          ConnectEvent ce = (ConnectEvent) event;
+          mWriter.printf("\t%d:ConnectEvent id=%d pkg=%s address=%s port=%d\n",
+              i, ce.getId(), ce.getPackageName(), ce.getInetAddress(), ce.getPort());
+        } else {
+          mWriter.printf("\t%d:Unknown id=%d pkg=%s\n", i, event.getId(), event.getPackageName());
+        }
     }
   }
 
   private void setSecurityLoggingEnabled(boolean enabled) {
-    Log.i(TAG, "setSecurityLoggingEnabled(" + enabled + ")");
-    mDevicePolicyManagerGateway.setSecurityLoggingEnabled(
-        enabled,
-        (v) -> onSuccess("Security logging enabled set to %b", enabled),
-        (e) -> onError(e, "Error setting security logging enabled to %b", enabled));
+      Log.i(TAG, "setSecurityLoggingEnabled(" + enabled + ")");
+      mDevicePolicyManagerGateway.setSecurityLoggingEnabled(
+          enabled,
+          (v) -> onSuccess("Security logging enabled set to %b", enabled),
+          (e) -> onError(e, "Error setting security logging enabled to %b", enabled));
   }
 
   private void isSecurityLoggingEnabled() {
-    mWriter.println(mDevicePolicyManagerGateway.isSecurityLoggingEnabled());
+      mWriter.println(mDevicePolicyManagerGateway.isSecurityLoggingEnabled());
   }
 
   private void getLastSecurityLogRetrievalTime() {
-    printTime(mDevicePolicyManagerGateway.getLastSecurityLogRetrievalTime());
+      printTime(mDevicePolicyManagerGateway.getLastSecurityLogRetrievalTime());
   }
 
   private void retrieveSecurityLogs() {
@@ -928,7 +922,8 @@ final class ShellCommand {
     List<String> inputMethodsList = Arrays.asList(inputMethod);
     Log.i(TAG, "setPermittedInputMethodsOnParent(" + inputMethodsList + ")");
 
-    DevicePolicyManagerGateway parentDpmGateway = DevicePolicyManagerGatewayImpl.forParentProfile(mContext);
+    DevicePolicyManagerGateway parentDpmGateway =
+        DevicePolicyManagerGatewayImpl.forParentProfile(mContext);
     parentDpmGateway.setPermittedInputMethods(inputMethodsList);
   }
 
@@ -979,12 +974,14 @@ final class ShellCommand {
     Log.i(TAG, "setRequiredPasswordComplexity(" + complexity + "/" + complexityString + ")");
     mDevicePolicyManagerGateway.setRequiredPasswordComplexity(
         complexity,
-        (v) -> onSuccess("Set required password complexity to %s (%d)", complexityString, complexity),
-        (e) -> onError(
-            e,
-            "Error setting required password complexity to %s (%d)",
-            complexityString,
-            complexity));
+        (v) ->
+            onSuccess("Set required password complexity to %s (%d)", complexityString, complexity),
+        (e) ->
+            onError(
+                e,
+                "Error setting required password complexity to %s (%d)",
+                complexityString,
+                complexity));
   }
 
   private void getRequiredPasswordComplexity() {
@@ -1022,8 +1019,9 @@ final class ShellCommand {
     mDevicePolicyManagerGateway.setPackagesSuspended(
         packageNames,
         suspended,
-        (v) -> onSuccess(
-            "Set %s (but not %s) to %s", printableNames, Arrays.toString(v), printableStatus),
+        (v) ->
+            onSuccess(
+                "Set %s (but not %s) to %s", printableNames, Arrays.toString(v), printableStatus),
         (e) -> onError(e, "Error setting %s to %s", printableNames, printableStatus));
   }
 
@@ -1177,7 +1175,8 @@ final class ShellCommand {
         permission,
         grantState,
         (v) -> onSuccess("Set %s state on %s to %s", permission, packageName, grantName),
-        (e) -> onError(e, "Error setting %s state on %s to %s", packageName, permission, grantName));
+        (e) ->
+            onError(e, "Error setting %s state on %s to %s", packageName, permission, grantName));
   }
 
   private void getPermissionGrantState(String packageName, String permission) {
@@ -1302,15 +1301,15 @@ final class ShellCommand {
   }
 
   private void setSecureSetting(String setting, String value) {
-    mDevicePolicyManagerGateway.setSecureSetting(setting, value,
-        (v) -> onSuccess("Set secure setting '%s' to '%s'", setting, value),
-        (e) -> onError(e, "Error setting secure setting '%s' to '%s'", setting, value));
+      mDevicePolicyManagerGateway.setSecureSetting(setting, value,
+          (v) -> onSuccess("Set secure setting '%s' to '%s'", setting, value),
+          (e) -> onError(e, "Error setting secure setting '%s' to '%s'", setting, value));
   }
 
   private void setGlobalSetting(String setting, String value) {
-    mDevicePolicyManagerGateway.setGlobalSetting(setting, value,
-        (v) -> onSuccess("Set global setting '%s' to '%s'", setting, value),
-        (e) -> onError(e, "Error setting global setting '%s' to '%s'", setting, value));
+      mDevicePolicyManagerGateway.setGlobalSetting(setting, value,
+          (v) -> onSuccess("Set global setting '%s' to '%s'", setting, value),
+          (e) -> onError(e, "Error setting global setting '%s' to '%s'", setting, value));
   }
 
   private void hasKeyPair(String alias) {
@@ -1320,7 +1319,7 @@ final class ShellCommand {
   private void generateDeviceAttestationKeyPair(String alias, int flags) {
     // Cannot call dpm.generateKeyPair() on main thread
     warnAboutAsyncCall();
-    post(() -> handleDeviceAttestationKeyPair(alias, flags));
+    post(()->handleDeviceAttestationKeyPair(alias, flags));
   }
 
   private void removeKeyPair(String alias) {
@@ -1369,7 +1368,7 @@ final class ShellCommand {
   }
 
   private void getDelegatePackages(String delegationScope) {
-    List<String> packages = mDevicePolicyManagerGateway.getDelegatePackages(delegationScope);
+    List<String> packages  = mDevicePolicyManagerGateway.getDelegatePackages(delegationScope);
     Log.d(TAG, "getDelegatePackages(" + delegationScope + "): " + packages);
     printCollection("package", packages);
   }
@@ -1385,9 +1384,11 @@ final class ShellCommand {
     List<String> disabledPackages = Arrays.asList(packageNames);
     mDevicePolicyManagerGateway.setMeteredDataDisabledPackages(
         disabledPackages,
-        (v) -> onSuccess(
-            "Restricted following packages from using metered data: %s", disabledPackages),
-        (e) -> onError(e, "Error restricting following packages from using metered data: %s", disabledPackages));
+        (v) ->
+            onSuccess(
+                "Restricted following packages from using metered data: %s", disabledPackages),
+        (e) ->
+            onError(e, "Error restricting following packages from using metered data: %s", disabledPackages));
   }
 
   private void getMeteredDataDisabledPackages() {
@@ -1492,15 +1493,15 @@ final class ShellCommand {
   private static KeyGenParameterSpec buildRsaKeySpecWithKeyAttestation(String alias) {
     return new KeyGenParameterSpec.Builder(alias,
         KeyProperties.PURPOSE_SIGN | KeyProperties.PURPOSE_VERIFY)
-        .setKeySize(2048)
-        .setDigests(KeyProperties.DIGEST_SHA256)
-        .setSignaturePaddings(KeyProperties.SIGNATURE_PADDING_RSA_PSS,
-            KeyProperties.SIGNATURE_PADDING_RSA_PKCS1)
-        .setIsStrongBoxBacked(false)
-        .setAttestationChallenge(new byte[] {
-            'a', 'b', 'c'
-        })
-        .build();
+            .setKeySize(2048)
+            .setDigests(KeyProperties.DIGEST_SHA256)
+            .setSignaturePaddings(KeyProperties.SIGNATURE_PADDING_RSA_PSS,
+                KeyProperties.SIGNATURE_PADDING_RSA_PKCS1)
+            .setIsStrongBoxBacked(false)
+            .setAttestationChallenge(new byte[] {
+                'a', 'b', 'c'
+            })
+            .build();
   }
 
   private static final class KeyValue {
