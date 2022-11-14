@@ -99,6 +99,9 @@ public class UserRestrictionsParentDisplayFragment extends BaseSearchablePolicyP
       DpcPreferenceBase pref = (DpcPreferenceBase) findPreference(restriction.key);
       if (Arrays.stream(UserRestriction.TM_PLUS_RESTRICTIONS).anyMatch(restriction.key::equals)) {
         pref.setMinSdkVersion(VERSION_CODES.TIRAMISU);
+      } else if (Arrays.stream(UserRestriction.UDC_PLUS_RESTRICTIONS)
+          .anyMatch(restriction.key::equals)) {
+        pref.setMinSdkVersion(VERSION_CODES.UPSIDE_DOWN_CAKE);
       } else {
         pref.setMinSdkVersion(VERSION_CODES.R);
       }

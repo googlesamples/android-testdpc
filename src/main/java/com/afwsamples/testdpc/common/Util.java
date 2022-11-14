@@ -56,8 +56,8 @@ public class Util {
   private static final String TAG = "Util";
   private static final int DEFAULT_BUFFER_SIZE = 4096;
 
-  // TODO(b/179160578): change check once T SDK is launched
-  private static final boolean IS_RUNNING_T = VERSION.CODENAME.equals("Tiramisu");
+  // TODO(b/258511062): change check once U SDK is launched
+  private static final boolean IS_RUNNING_U = VERSION.CODENAME.equals("UpsideDownCake");
 
   /**
    * A replacement for {@link VERSION.SDK_INT} that is compatible with pre-release SDKs
@@ -65,7 +65,7 @@ public class Util {
    * <p>This will be set to the version SDK, or {@link VERSION_CODES.CUR_DEVELOPMENT} if the SDK int
    * is not yet assigned.
    */
-  public static final int SDK_INT = IS_RUNNING_T ? VERSION_CODES.CUR_DEVELOPMENT : VERSION.SDK_INT;
+  public static final int SDK_INT = IS_RUNNING_U ? VERSION_CODES.CUR_DEVELOPMENT : VERSION.SDK_INT;
 
   /**
    * Format a friendly datetime for the current locale according to device policy documentation. If
