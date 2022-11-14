@@ -62,11 +62,20 @@ import static android.os.UserManager.DISALLOW_WIFI_DIRECT;
 import static android.os.UserManager.DISALLOW_WIFI_TETHERING;
 import static android.os.UserManager.ENSURE_VERIFY_APPS;
 
+// TODO(b/258509336): uncomment and remove the placeholder static string once
+// an SDK drops in google3 that contains the new user restriction.
+// import static android.os.UserManager.DISALLOW_CELLULAR_2G;
+
 import com.afwsamples.testdpc.R;
 
 public class UserRestriction {
   public String key;
   public int titleResId;
+  public int minSdkVersion;
+
+  // TODO(b/258509336): remove the placeholder static string once
+  // an SDK drops in google3 that contains the new user restriction.
+  static final String DISALLOW_CELLULAR_2G = "no_cellular_2g";
 
   public UserRestriction(String key, int titleResId) {
     this.key = key;
@@ -140,6 +149,7 @@ public class UserRestriction {
         DISALLOW_SHARING_ADMIN_CONFIGURED_WIFI, R.string.disallow_sharing_admin_configured_wifi),
     new UserRestriction(DISALLOW_WIFI_DIRECT, R.string.disallow_wifi_direct),
     new UserRestriction(DISALLOW_ADD_WIFI_CONFIG, R.string.disallow_add_wifi_config),
+    new UserRestriction(DISALLOW_CELLULAR_2G, R.string.disallow_cellular_2g),
   };
 
   /**
@@ -173,6 +183,7 @@ public class UserRestriction {
     new UserRestriction(DISALLOW_WIFI_TETHERING, R.string.disallow_wifi_tethering),
     new UserRestriction(DISALLOW_WIFI_DIRECT, R.string.disallow_wifi_direct),
     new UserRestriction(DISALLOW_ADD_WIFI_CONFIG, R.string.disallow_add_wifi_config),
+    new UserRestriction(DISALLOW_CELLULAR_2G, R.string.disallow_cellular_2g),
   };
 
   /** Setting these user restrictions only have effect on primary users. */
@@ -205,9 +216,14 @@ public class UserRestriction {
 
   /** User restrictions that cannot be set by profile owners. Applied to all users. */
   public static final String[] DEVICE_OWNER_ONLY_RESTRICTIONS = {
-    DISALLOW_USER_SWITCH, DISALLOW_MICROPHONE_TOGGLE, DISALLOW_CAMERA_TOGGLE,
-    DISALLOW_CHANGE_WIFI_STATE, DISALLOW_WIFI_TETHERING, DISALLOW_WIFI_DIRECT,
+    DISALLOW_USER_SWITCH,
+    DISALLOW_MICROPHONE_TOGGLE,
+    DISALLOW_CAMERA_TOGGLE,
+    DISALLOW_CHANGE_WIFI_STATE,
+    DISALLOW_WIFI_TETHERING,
+    DISALLOW_WIFI_DIRECT,
     DISALLOW_ADD_WIFI_CONFIG,
+    DISALLOW_CELLULAR_2G,
   };
 
   /** Setting these user restrictions only have effect on managed profiles. */
@@ -271,5 +287,9 @@ public class UserRestriction {
   public static String[] TM_PLUS_RESTRICTIONS = {
     DISALLOW_CHANGE_WIFI_STATE, DISALLOW_WIFI_TETHERING, DISALLOW_SHARING_ADMIN_CONFIGURED_WIFI,
     DISALLOW_WIFI_DIRECT, DISALLOW_ADD_WIFI_CONFIG,
+  };
+
+  public static String[] UDC_PLUS_RESTRICTIONS = {
+    DISALLOW_CELLULAR_2G,
   };
 }
