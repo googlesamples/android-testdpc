@@ -129,7 +129,7 @@ public class SecurityLogsFragment extends ListFragment {
       for (SecurityEvent event : logs) {
         StringBuilder sb = new StringBuilder();
         if (Util.SDK_INT >= VERSION_CODES.P) {
-          sb.append(getEventId(event) + ": ");
+          sb.append(event.getId() + ": ");
         }
         sb.append(getStringEventTagFromId(event.getTag()));
         sb.append(" (")
@@ -143,12 +143,7 @@ public class SecurityLogsFragment extends ListFragment {
     }
   }
 
-  @TargetApi(VERSION_CODES.P)
-  private long getEventId(SecurityEvent event) {
-    return event.getId();
-  }
-
-  private String getStringEventTagFromId(int eventId) {
+  public static String getStringEventTagFromId(int eventId) {
     final String eventTag;
     switch (eventId) {
       case SecurityLog.TAG_ADB_SHELL_INTERACTIVE:
@@ -256,7 +251,7 @@ public class SecurityLogsFragment extends ListFragment {
     return eventTag;
   }
 
-  private void printData(StringBuilder sb, Object data) {
+  public static void printData(StringBuilder sb, Object data) {
     if (data instanceof Integer
         || data instanceof Long
         || data instanceof Float
