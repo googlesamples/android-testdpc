@@ -31,8 +31,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import com.afwsamples.testdpc.R;
-import com.afwsamples.testdpc.common.Util;
-
 import java.util.ArrayList;
 
 /**
@@ -49,9 +47,8 @@ public class GetProvisioningModeActivity extends Activity {
     super.onCreate(icicle);
 
     if (ProvisioningUtil.isAutoProvisioningDeviceOwnerMode()) {
-        Log.i(TAG, "Automatically provisioning device onwer");
-        onDoButtonClick(null);
-        finish();
+      Log.i(TAG, "Automatically provisioning device owner");
+      onDoButtonClick(null);
     }
 
     setContentView(R.layout.activity_get_provisioning_mode);
