@@ -440,6 +440,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
   private static final String GRANT_KEY_PAIR_TO_APP_KEY = "grant_key_pair_to_app";
   private static final String SET_WIFI_MIN_SECURITY_LEVEL_KEY = "set_wifi_min_security_level";
   private static final String SET_WIFI_SSID_RESTRICTION_KEY = "set_wifi_ssid_restriction";
+  private static final String MTE_POLICY_KEY = "mte_policy";
 
   private static final String BATTERY_PLUGGED_ANY =
       Integer.toString(
@@ -803,6 +804,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     findPreference(GRANT_KEY_PAIR_TO_APP_KEY).setOnPreferenceClickListener(this);
     findPreference(SET_WIFI_MIN_SECURITY_LEVEL_KEY).setOnPreferenceClickListener(this);
     findPreference(SET_WIFI_SSID_RESTRICTION_KEY).setOnPreferenceClickListener(this);
+    findPreference(MTE_POLICY_KEY).setOnPreferenceClickListener(this);
 
     DpcPreference bindDeviceAdminPreference =
         (DpcPreference) findPreference(BIND_DEVICE_ADMIN_POLICIES);
@@ -1415,8 +1417,28 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     } else if (SET_WIFI_SSID_RESTRICTION_KEY.equals(key)) {
       showSetWifiSsidRestrictionDialog();
       return true;
+    } else if (MTE_POLICY_KEY.equals(key)) {
+      showMtePolicyDialog();
+      return true;
     }
     return false;
+  }
+
+  @TargetApi(VERSION_CODES.UPSIDE_DOWN_CAKE)
+  private void showMtePolicyDialog() {
+    if (getActivity() == null || getActivity().isFinishing()) {
+      return;
+    }
+
+    int policy = mDevicePolicyManager.getMtePolicy();
+    new AlertDialog.Builder(getActivity())
+        .setTitle(R.string.mte_policy)
+        .setSingleChoiceItems(
+            R.array.mte_policy_options,
+            /* checkedItem= */ policy,
+            (dialogInterface, i) -> mDevicePolicyManager.setMtePolicy(i))
+        .setNegativeButton(R.string.close, null)
+        .show();
   }
 
   @TargetApi(VERSION_CODES.Q)

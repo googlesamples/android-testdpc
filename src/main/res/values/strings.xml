@@ -1258,4 +1258,13 @@
     <string name="work_policy_info_description">This is the work policy info for TestDPC."
     </string>
 
+    <string name="mte_section">MTE settings</string>
+    <string name="mte_policy">Set MTE policy</string>
+    <string-array name="mte_policy_options">
+      <!-- IMPORTANT: Must match order of items in MtePolicy in DevicePolicyManager. -->
+      <item>Do not force</item>
+      <item>Force on</item>
+      <item>Force off</item>
+    </string-array>
+
 </resources>

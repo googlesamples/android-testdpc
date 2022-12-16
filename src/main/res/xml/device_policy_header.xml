@@ -886,4 +886,13 @@
             android:title="@string/nearby_app_streaming"
             testdpc:minSdkVersion="S" />
     </PreferenceCategory>
+
+  <PreferenceCategory android:title="@string/mte_section">
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="mte_policy"
+            testdpc:admin="deviceOwner|orgOwnedProfileOwner"
+            android:title="@string/mte_policy"
+            testdpc:minSdkVersion="U" />
+    </PreferenceCategory>
+
 </PreferenceScreen>

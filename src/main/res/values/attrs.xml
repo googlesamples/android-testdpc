@@ -33,6 +33,8 @@
             <enum name="S" value="31" />
             <enum name="S_V2" value="32" />
             <enum name="T" value="33" />
+            <!-- Change to U API level once released. -->
+            <enum name="U" value="10000" />
         </attr>
 
         <!-- Constrain a preference to DO or PO admins. -->
