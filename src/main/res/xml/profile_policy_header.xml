@@ -72,4 +72,11 @@
             testdpc:minSdkVersion="L" />
     </PreferenceCategory>
 
+    <PreferenceCategory android:title="@string/work_telephony_title">
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="managed_subscriptions"
+            android:title="@string/managed_subscriptions_title"
+            testdpc:minSdkVersion="U" />
+    </PreferenceCategory>
+
 </PreferenceScreen>

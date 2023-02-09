@@ -22,12 +22,16 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.app.admin.DevicePolicyManager;
+import android.app.admin.ManagedSubscriptionsPolicy;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 import androidx.preference.Preference;
 import androidx.preference.SwitchPreference;
@@ -80,6 +84,8 @@ public class ProfilePolicyManagementFragment extends BaseSearchablePolicyPrefere
 
   private static final String ORGANIZATION_COLOR_ID = "organizationColor";
 
+  private static final String MANAGED_SUBSCRIPTIONS_KEY = "managed_subscriptions";
+
   private DevicePolicyManager mDevicePolicyManager;
   private ComponentName mAdminComponentName;
   private Preference mAddCrossProfileIntentFilterPreference;
@@ -92,6 +98,7 @@ public class ProfilePolicyManagementFragment extends BaseSearchablePolicyPrefere
   private SwitchPreference mDisableCrossProfileContactsSearchSwitchPreference;
   private Preference mSetOrganizationNamePreference;
   private Preference mSetOrganizationColorPreference;
+  private Preference mManagedSubscriptionsPreference;
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -116,6 +123,8 @@ public class ProfilePolicyManagementFragment extends BaseSearchablePolicyPrefere
     mAddCrossProfileAppWidgetsPreference.setOnPreferenceClickListener(this);
     mRemoveCrossProfileAppWidgetsPreference = findPreference(REMOVE_CROSS_PROFILE_APP_WIDGETS_KEY);
     mRemoveCrossProfileAppWidgetsPreference.setOnPreferenceClickListener(this);
+    mManagedSubscriptionsPreference = findPreference(MANAGED_SUBSCRIPTIONS_KEY);
+    mManagedSubscriptionsPreference.setOnPreferenceClickListener(this);
 
     initSwitchPreferences();
     initializeOrganizationInfoPreferences();
@@ -174,6 +183,9 @@ public class ProfilePolicyManagementFragment extends BaseSearchablePolicyPrefere
         }
         ColorPicker.newInstance(colorValue, FRAGMENT_TAG, ORGANIZATION_COLOR_ID)
             .show(getFragmentManager(), "colorPicker");
+        break;
+      case MANAGED_SUBSCRIPTIONS_KEY:
+        showManagedSubscriptionsPolicyDialog();
         break;
     }
     return false;
@@ -385,4 +397,48 @@ public class ProfilePolicyManagementFragment extends BaseSearchablePolicyPrefere
     }
     Toast.makeText(activity, msg, Toast.LENGTH_SHORT).show();
   }
+
+  private void showManagedSubscriptionsPolicyDialog() {
+    if (getActivity() == null || getActivity().isFinishing()) {
+      return;
+    }
+    View policyView =
+        getActivity().getLayoutInflater().inflate(R.layout.managed_subscriptions_policy, null);
+    final RadioGroup permissionGroup =
+        (RadioGroup) policyView.findViewById(R.id.set_managed_subscriptions);
+
+    ManagedSubscriptionsPolicy policy = mDevicePolicyManager.getManagedSubscriptionsPolicy();
+    switch (policy.getPolicyType()) {
+      case ManagedSubscriptionsPolicy.TYPE_ALL_PERSONAL_SUBSCRIPTIONS:
+        ((RadioButton) permissionGroup.findViewById(R.id.personal_subscriptions)).toggle();
+        break;
+      case ManagedSubscriptionsPolicy.TYPE_ALL_MANAGED_SUBSCRIPTIONS:
+        ((RadioButton) permissionGroup.findViewById(R.id.work_subscriptions)).toggle();
+        break;
+    }
+
+    new AlertDialog.Builder(getActivity())
+        .setTitle(getString(R.string.managed_subscriptions_title))
+        .setView(policyView)
+        .setPositiveButton(
+            android.R.string.ok,
+            new DialogInterface.OnClickListener() {
+              @Override
+              public void onClick(DialogInterface dialog, int which) {
+                ManagedSubscriptionsPolicy policy = null;
+                int checked = permissionGroup.getCheckedRadioButtonId();
+                if (checked == R.id.personal_subscriptions) {
+                  policy = new ManagedSubscriptionsPolicy(
+                      ManagedSubscriptionsPolicy.TYPE_ALL_PERSONAL_SUBSCRIPTIONS);
+                } else if (checked == R.id.work_subscriptions) {
+                  policy = new ManagedSubscriptionsPolicy(
+                      ManagedSubscriptionsPolicy.TYPE_ALL_MANAGED_SUBSCRIPTIONS);
+                }
+                mDevicePolicyManager.setManagedSubscriptionsPolicy(policy);
+                dialog.dismiss();
+              }
+            })
+        .show();
+  }
+
 }
