@@ -1267,4 +1267,10 @@
       <item>Force off</item>
     </string-array>
 
+    <!--  Strings for managed subscriptions policy  -->
+    <string name="work_telephony_title">Work Profile Telephony</string>
+    <string name="managed_subscriptions_title">Set managed subscriptions policy</string>
+    <string name="personal_subscriptions_label">All SIMs are for personal</string>
+    <string name="work_subscriptions_label">All SIMs are for work</string>
+
 </resources>
