@@ -107,6 +107,7 @@
     <string name="managed_profile">managed profile</string>
     <string name="requires_device_owner">Requires device owner</string>
     <string name="requires_profile_owner_organization_owned_device">Requires profile owner of an organization owned device</string>
+    <string name="requires_device_owner_or_profile_owner_organization_owned_device">Requires device owner or profile owner of an organization owned device</string>
     <string name="requires_device_owner_or_delegation_network_logging">Requires device owner or delegation-network-logging</string>
     <string name="requires_device_owner_or_delegation_security_logging">Requires device owner or delegation-security-logging</string>
 
@@ -941,6 +942,8 @@
     <string name="keyguard_disable_iris">Disable iris unlock</string>
     <string name="keyguard_disable_fingerprint">Disable fingerprint</string>
     <string name="keyguard_disable_remote_input">Disable text entry in secure keyguard screen</string>
+    <string name="keyguard_disable_shortcuts">Disable shortcuts</string>
+    <string name="cannot_disable_shortcuts_on_work_profile">Can\'t disable shortcuts on work profile. Please switch to personal profile tab.</string>
 
     <!-- Trust agent features -->
     <string name="trust_agent_features">Trust agent features</string>

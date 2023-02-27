@@ -27,6 +27,7 @@ import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.util.ArrayMap;
 import android.widget.Toast;
+import androidx.annotation.StringRes;
 import androidx.preference.EditTextPreference;
 import androidx.preference.Preference;
 import androidx.preference.TwoStatePreference;
@@ -73,6 +74,7 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment
     static final String KEYGUARD_DISABLE_SECURE_CAMERA = "keyguard_disable_secure_camera";
     static final String KEYGUARD_DISABLE_SECURE_NOTIFICATIONS =
         "keyguard_disable_secure_notifications";
+    static final String KEYGUARD_DISABLE_SHORTCTUS = "keyguard_disable_shortcuts";
     static final String KEYGUARD_DISABLE_TRUST_AGENTS = "keyguard_disable_trust_agents";
     static final String KEYGUARD_DISABLE_UNREDACTED_NOTIFICATIONS =
         "keyguard_disable_unredacted_notifications";
@@ -87,6 +89,9 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment
   }
 
   private static final Map<String, Integer> KEYGUARD_FEATURES = new ArrayMap<>();
+  // TODO(b/270155548): Use DevicePolicyManager.KEYGUARD_DISABLE_SHORTCUTS_ALL when Google3 Android
+  // SDK contains this API.
+  private static final int KEYGUARD_DISABLE_SHORTCUTS_ALL = 1 << 9;
 
   static {
     KEYGUARD_FEATURES.put(
@@ -112,6 +117,8 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment
 
     KEYGUARD_FEATURES.put(
         Keys.KEYGUARD_DISABLE_REMOTE_INPUT, DevicePolicyManager.KEYGUARD_DISABLE_REMOTE_INPUT);
+
+    KEYGUARD_FEATURES.put(Keys.KEYGUARD_DISABLE_SHORTCTUS, KEYGUARD_DISABLE_SHORTCUTS_ALL);
   }
 
   @Override
@@ -308,6 +315,11 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment
       return;
     }
 
+    if (Util.SDK_INT >= VERSION_CODES.UPSIDE_DOWN_CAKE
+        && key.equals(Keys.KEYGUARD_DISABLE_SHORTCTUS)) {
+      dpcPref.setCustomConstraint(this::getKeyguardDisableShortcutsPolicyCustomConstraints);
+    }
+
     // Set up initial state and possibly a descriptive summary of said state.
     if (pref instanceof EditTextPreference) {
       String stringValue = (adminSetting != null ? adminSetting.toString() : null);
@@ -323,6 +335,26 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment
     // Start listening for change events.
     pref.setOnPreferenceChangeListener(this);
     pref.setOnPreferenceClickListener(this);
+  }
+
+  @StringRes
+  private int getKeyguardDisableShortcutsPolicyCustomConstraints() {
+    // KEYGUARD_DISABLE_SHORTCUTS_ALL is only allowed if the admin is a device owner or COPE.
+    // For COPE case, the policy can only set from the personal profile tab.
+    boolean isCope =
+        isProfileOwner()
+            && getContext()
+                .getSystemService(DevicePolicyManager.class)
+                .isOrganizationOwnedDeviceWithManagedProfile();
+    boolean isParentProfileInstance = isParentProfileInstance();
+
+    if (isDeviceOwner() || (isCope && isParentProfileInstance)) {
+      return NO_CUSTOM_CONSTRAINT;
+    } else if (isCope && !isParentProfileInstance) {
+      return R.string.cannot_disable_shortcuts_on_work_profile;
+    } else {
+      return R.string.requires_device_owner_or_profile_owner_organization_owned_device;
+    }
   }
 
   private void disableIncompatibleManagementOptionsInCurrentProfile() {
