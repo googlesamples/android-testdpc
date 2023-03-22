@@ -16,6 +16,7 @@
 -->
 
 <device-admin>
+    <headless-system-user device-owner-mode="affiliated" />
     <support-transfer-ownership/>
     <uses-policies>
         <limit-password/>
