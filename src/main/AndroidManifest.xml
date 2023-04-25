@@ -18,7 +18,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
           package="com.afwsamples.testdpc"
-          tools:ignore="MissingClass">
+          tools:ignore="MissingClass"
+           android:versionCode="0"
+           android:versionName="dev">
     <uses-sdk android:minSdkVersion="21"/>
 
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
