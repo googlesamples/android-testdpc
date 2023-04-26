@@ -46,7 +46,6 @@
     <!-- TODO(b/201271137): Add non-testOnly build config. -->
     <!-- NOTE: android:testOnly will be stripped by build.gradle (stripTestOnlyForBuild()) -->
     <application
-            android:testOnly="true"
             android:allowBackup="true"
             android:icon="@drawable/ic_launcher"
             android:banner="@drawable/ic_launcher"
