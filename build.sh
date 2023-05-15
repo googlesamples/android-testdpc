@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Fail on any error.
-set -e
+bazel clean --expunge
+bazel build --java_runtime_version=remotejdk_11 //:testdpc
 
-bazel build --noincremental_dexing testdpc
+## apk file created in path  bazel-bin
