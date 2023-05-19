@@ -89,9 +89,6 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment
   }
 
   private static final Map<String, Integer> KEYGUARD_FEATURES = new ArrayMap<>();
-  // TODO(b/270155548): Use DevicePolicyManager.KEYGUARD_DISABLE_SHORTCUTS_ALL when Google3 Android
-  // SDK contains this API.
-  private static final int KEYGUARD_DISABLE_SHORTCUTS_ALL = 1 << 9;
 
   static {
     KEYGUARD_FEATURES.put(
@@ -118,7 +115,8 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment
     KEYGUARD_FEATURES.put(
         Keys.KEYGUARD_DISABLE_REMOTE_INPUT, DevicePolicyManager.KEYGUARD_DISABLE_REMOTE_INPUT);
 
-    KEYGUARD_FEATURES.put(Keys.KEYGUARD_DISABLE_SHORTCTUS, KEYGUARD_DISABLE_SHORTCUTS_ALL);
+    KEYGUARD_FEATURES.put(
+        Keys.KEYGUARD_DISABLE_SHORTCTUS, DevicePolicyManager.KEYGUARD_DISABLE_SHORTCUTS_ALL);
   }
 
   @Override
