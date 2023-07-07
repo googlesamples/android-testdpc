@@ -84,13 +84,13 @@ public class SystemUpdatePolicyFragment extends Fragment
       StringBuffer stringBuffer = new StringBuffer();
       formatter
           .format(
-              new Date(0, mStart.getMonthValue(), mStart.getDayOfMonth()),
+              new Date(0, mStart.getMonthValue() - 1, mStart.getDayOfMonth()),
               stringBuffer,
               new FieldPosition(0))
           .append(" - ");
       return formatter
           .format(
-              new Date(0, mEnd.getMonthValue(), mEnd.getDayOfMonth()),
+              new Date(0, mEnd.getMonthValue() - 1, mEnd.getDayOfMonth()),
               stringBuffer,
               new FieldPosition(0))
           .toString();
