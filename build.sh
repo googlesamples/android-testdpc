@@ -3,4 +3,9 @@
 # Fail on any error.
 set -e
 
-bazel build --noincremental_dexing testdpc
+if [[ $1 = "clean" ]]; then
+  bazel clean --expunge
+fi
+#bazel build --noincremental_dexing testdpc
+bazel build testdpc
+bazel mobile-install //:testdpc --verbose_failures

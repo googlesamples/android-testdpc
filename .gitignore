@@ -1,0 +1,4 @@
+bazel-bin
+bazel-out
+bazel-testlogs
+bazel-zipline-fork-of-android-testdpc
