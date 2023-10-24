@@ -48,6 +48,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import static com.afwsamples.testdpc.common.Util.isAtLeastT;
 
 public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManagerGateway {
 
@@ -651,7 +652,9 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
 
   @Override
   public boolean isPreferentialNetworkServiceEnabled() {
-    Util.requireAndroidS();
+    if (!isAtLeastT()) {
+      return false;
+    }
 
     return mDevicePolicyManager.isPreferentialNetworkServiceEnabled();
   }
