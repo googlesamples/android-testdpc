@@ -8,7 +8,7 @@ See the [documentation](https://developer.android.com/work/index.html) to learn 
 Getting Started
 ---------------
 
-This sample uses the Bazel build system. To build this project, use the "bazel build --noincremental_dexing" command.
+This sample uses the Bazel build system. To build this project, use the "bazel build testdpc" command.
 
 This app can also be found [on the Play store](https://play.google.com/store/apps/details?id=com.afwsamples.testdpc).
 
