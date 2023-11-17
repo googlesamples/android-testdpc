@@ -23,6 +23,7 @@ import static com.afwsamples.testdpc.util.flags.Flags.repeated;
 
 import android.annotation.TargetApi;
 import android.app.admin.ConnectEvent;
+import android.app.admin.DevicePolicyManager;
 import android.app.admin.DnsEvent;
 import android.app.admin.NetworkEvent;
 import android.app.admin.SecurityLog.SecurityEvent;
@@ -44,6 +45,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.policy.SecurityLogsFragment;
+import com.afwsamples.testdpc.policy.resetpassword.ResetPasswordWithTokenFragment;
 import com.afwsamples.testdpc.util.flags.Flags;
 import java.io.File;
 import java.io.PrintWriter;
@@ -589,6 +591,12 @@ final class ShellCommand {
         command("get-delegate-packages", this::getDelegatePackages,
                 ordinalParam(String.class, "scope"))
             .setDescription("Gets the apps that were delegate a given scope."));
+    flags.addCommand(
+        command("set-password", this::setPassword, ordinalParam(String.class, "newPassword"))
+            .setDescription("Resets password to a given one. Requires an active token"));
+    flags.addCommand(
+        command("clear-password", this::clearPassword)
+            .setDescription("Resets password to an empty one. Requires an active token"));
 
     // Separator for S / pre-S commands - do NOT remove line to avoid cherry-pick conflicts
 
@@ -1423,6 +1431,50 @@ final class ShellCommand {
     printCollection("package", packages);
   }
 
+  private void setPassword(String newPassword) {
+    resetPasswordWithToken(newPassword);
+  }
+
+  private void clearPassword() {
+    resetPasswordWithToken("");
+  }
+
+  private byte[] getActiveResetPasswordToken() {
+    byte[] token = ResetPasswordWithTokenFragment.loadPasswordResetTokenFromPreference(mContext);
+    if (token == null) {
+      return null;
+    }
+    if (!dpm().isResetPasswordTokenActive(DeviceAdminReceiver.getComponentName(mContext))) {
+      Log.i(TAG, "Token exists but is not activated.");
+      mWriter.printf("Token exists but is not activated.\n");
+      return null;
+    }
+    return token;
+  }
+
+  private void resetPasswordWithToken(String newPassword) {
+    byte[] token = getActiveResetPasswordToken();
+
+    if (token == null) {
+      Log.e(TAG, "Cannot reset password without token");
+      mWriter.printf("Cannot reset password without token\n");
+      return;
+    }
+
+    boolean result =
+        dpm()
+            .resetPasswordWithToken(
+                DeviceAdminReceiver.getComponentName(mContext), newPassword, token, 0);
+
+    if (!result) {
+      Log.e(TAG, "Error resetting password");
+      mWriter.printf("Error resetting password\n");
+      return;
+    } else {
+      mWriter.printf("Password reset to %s\n", newPassword);
+    }
+  }
+
   private void setDelegatedScopes(String delegatePackage, String[] scopesArray) {
     List<String> scopes = Arrays.asList(scopesArray);
     mDevicePolicyManagerGateway.setDelegatedScopes(delegatePackage, scopes,
@@ -1578,5 +1630,9 @@ final class ShellCommand {
     public String value() {
       return value;
     }
+  }
+
+  private DevicePolicyManager dpm() {
+    return mDevicePolicyManagerGateway.getDevicePolicyManager();
   }
 }
