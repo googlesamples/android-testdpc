@@ -19,8 +19,8 @@
     xmlns:tools="http://schemas.android.com/tools"
           package="com.afwsamples.testdpc"
           tools:ignore="MissingClass"
-           android:versionCode="9000"
-           android:versionName="9.0">
+           android:versionCode="9001"
+           android:versionName="9.0.1">
     <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="33"/>
 
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
@@ -41,7 +41,6 @@
     <uses-permission android:name="com.google.android.setupwizard.SETUP_COMPAT_SERVICE" />
 
     <uses-feature android:name="android.hardware.wifi" android:required="false" />
-    <uses-feature android:name="android.software.leanback" android:required="false" />
     <uses-feature android:name="android.hardware.touchscreen" android:required="false"/>
  
     <!-- TODO(b/201271137): Add non-testOnly build config. -->
@@ -61,10 +60,6 @@
         <intent-filter>
             <action android:name="android.intent.action.MAIN"/>
             <category android:name="android.intent.category.LAUNCHER"/>
-        </intent-filter>
-        <intent-filter>
-          <action android:name="android.intent.action.MAIN"/>
-          <category android:name="android.intent.category.LEANBACK_LAUNCHER"/>
         </intent-filter>
         <intent-filter>
             <action android:name="android.app.action.CHECK_POLICY_COMPLIANCE"/>
