@@ -98,6 +98,8 @@ public class UserRestriction {
     new UserRestriction(DISALLOW_CONFIG_TETHERING, R.string.disallow_config_tethering),
     new UserRestriction(DISALLOW_CONFIG_VPN, R.string.disallow_config_vpn),
     new UserRestriction(DISALLOW_CONFIG_WIFI, R.string.disallow_config_wifi),
+    new UserRestriction(DISALLOW_CONTENT_CAPTURE, R.string.disallow_content_capture),
+    new UserRestriction(DISALLOW_CONTENT_SUGGESTIONS, R.string.disallow_content_suggestions),
     new UserRestriction(DISALLOW_CREATE_WINDOWS, R.string.disallow_create_windows),
     new UserRestriction(DISALLOW_SYSTEM_ERROR_DIALOGS, R.string.disallow_system_error_dialogs),
     new UserRestriction(
