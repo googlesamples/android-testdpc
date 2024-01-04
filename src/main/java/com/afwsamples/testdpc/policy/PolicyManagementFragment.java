@@ -756,13 +756,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     findPreference(SHOW_WIFI_MAC_ADDRESS_KEY).setOnPreferenceClickListener(this);
     mInstallNonMarketAppsPreference =
         (DpcSwitchPreference) findPreference(INSTALL_NONMARKET_APPS_KEY);
-    mInstallNonMarketAppsPreference.setCustomConstraint(
-        () ->
-            (mUserManager.hasUserRestriction(DISALLOW_INSTALL_UNKNOWN_SOURCES)
-                    || mUserManager.hasUserRestriction(
-                        UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES_GLOBALLY))
-                ? R.string.user_restricted
-                : NO_CUSTOM_CONSTRAINT);
+    mInstallNonMarketAppsPreference.setCustomConstraint(this::validateInstallNonMarketApps);
     mInstallNonMarketAppsPreference.setOnPreferenceChangeListener(this);
     findPreference(SET_USER_RESTRICTIONS_KEY).setOnPreferenceClickListener(this);
     mUserRestrictionsParentPreference =
@@ -4693,6 +4687,18 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
   private int validateDeviceOwnerOrDelegationNetworkLoggingBeforeS() {
     if (Util.SDK_INT < VERSION_CODES.S && (isDeviceOwner() || hasNetworkLoggingDelegation())) {
       return R.string.requires_device_owner_or_delegation_network_logging;
+    }
+    return NO_CUSTOM_CONSTRAINT;
+  }
+
+  private int validateInstallNonMarketApps() {
+    if (Util.SDK_INT >= VERSION_CODES.O
+        && getActivity().getApplicationInfo().targetSdkVersion >= VERSION_CODES.O) {
+      return R.string.deprecated_since_oreo;
+    }
+    if (mUserManager.hasUserRestriction(UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES_GLOBALLY)
+        || mUserManager.hasUserRestriction(DISALLOW_INSTALL_UNKNOWN_SOURCES)) {
+      return R.string.user_restricted;
     }
     return NO_CUSTOM_CONSTRAINT;
   }
