@@ -41,7 +41,8 @@
     </style>
 
     <style name="containerText">
-        <item name="android:textColor">@color/text_black</item>
+        <item name="android:colorPrimary">@color/primary</item>
+        <item name="android:colorPrimaryDark">@color/primary_dark</item>
         <item name="android:textSize">@dimen/content_text_size</item>
         <item name="android:lineSpacingMultiplier">1.2</item>
     </style>
