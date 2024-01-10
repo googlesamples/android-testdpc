@@ -40,6 +40,8 @@ import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1SequenceParser;
 import org.bouncycastle.asn1.ASN1TaggedObject;
+import org.bouncycastle.asn1.ASN1Util;
+import org.bouncycastle.asn1.BERTags;
 
 public class AuthorizationList {
   // Algorithm values.
@@ -212,110 +214,169 @@ public class AuthorizationList {
     ASN1TaggedObject entry = parseAsn1TaggedObject(parser);
     for (; entry != null; entry = parseAsn1TaggedObject(parser)) {
       int tag = entry.getTagNo();
-      ASN1Primitive value = entry.getObject();
-      Log.i("Attestation", "Parsing tag: [" + tag + "], value: [" + value + "]");
+      Log.i(
+          "Attestation",
+          "Parsing tag: [" + tag + "], value: [" + entry.getBaseUniversal(true, tag) + "]");
       switch (tag) {
         default:
           throw new CertificateParsingException("Unknown tag " + tag + " found");
 
         case KM_TAG_PURPOSE & KEYMASTER_TAG_TYPE_MASK:
-          purposes = Asn1Utils.getIntegersFromAsn1Set(value);
+          purposes =
+              Asn1Utils.getIntegersFromAsn1Set(
+                  ASN1Util.getContextBaseUniversal(entry, tag, true, BERTags.SET));
           break;
         case KM_TAG_ALGORITHM & KEYMASTER_TAG_TYPE_MASK:
-          algorithm = Asn1Utils.getIntegerFromAsn1(value);
+          algorithm =
+              Asn1Utils.getIntegerFromAsn1(
+                  ASN1Util.getContextBaseUniversal(entry, tag, true, BERTags.INTEGER));
           break;
         case KM_TAG_KEY_SIZE & KEYMASTER_TAG_TYPE_MASK:
-          keySize = Asn1Utils.getIntegerFromAsn1(value);
+          keySize =
+              Asn1Utils.getIntegerFromAsn1(
+                  ASN1Util.getContextBaseUniversal(entry, tag, true, BERTags.INTEGER));
           Log.i("Attestation", "Found KEY SIZE, value: " + keySize);
           break;
         case KM_TAG_DIGEST & KEYMASTER_TAG_TYPE_MASK:
-          digests = Asn1Utils.getIntegersFromAsn1Set(value);
+          digests =
+              Asn1Utils.getIntegersFromAsn1Set(
+                  ASN1Util.getContextBaseUniversal(entry, tag, true, BERTags.SET));
           break;
         case KM_TAG_PADDING & KEYMASTER_TAG_TYPE_MASK:
-          paddingModes = Asn1Utils.getIntegersFromAsn1Set(value);
+          paddingModes =
+              Asn1Utils.getIntegersFromAsn1Set(
+                  ASN1Util.getContextBaseUniversal(entry, tag, true, BERTags.SET));
           break;
         case KM_TAG_RSA_PUBLIC_EXPONENT & KEYMASTER_TAG_TYPE_MASK:
-          rsaPublicExponent = Asn1Utils.getLongFromAsn1(value);
+          rsaPublicExponent =
+              Asn1Utils.getLongFromAsn1(
+                  ASN1Util.getContextBaseUniversal(entry, tag, true, BERTags.INTEGER));
           break;
         case KM_TAG_NO_AUTH_REQUIRED & KEYMASTER_TAG_TYPE_MASK:
           noAuthRequired = true;
           break;
         case KM_TAG_CREATION_DATETIME & KEYMASTER_TAG_TYPE_MASK:
-          creationDateTime = Asn1Utils.getDateFromAsn1(value);
+          creationDateTime =
+              Asn1Utils.getDateFromAsn1(
+                  ASN1Util.getContextBaseUniversal(entry, tag, true, BERTags.INTEGER));
           break;
         case KM_TAG_ORIGIN & KEYMASTER_TAG_TYPE_MASK:
-          origin = Asn1Utils.getIntegerFromAsn1(value);
+          origin =
+              Asn1Utils.getIntegerFromAsn1(
+                  ASN1Util.getContextBaseUniversal(entry, tag, true, BERTags.INTEGER));
           break;
         case KM_TAG_OS_VERSION & KEYMASTER_TAG_TYPE_MASK:
-          osVersion = Asn1Utils.getIntegerFromAsn1(value);
+          osVersion =
+              Asn1Utils.getIntegerFromAsn1(
+                  ASN1Util.getContextBaseUniversal(entry, tag, true, BERTags.INTEGER));
           break;
         case KM_TAG_OS_PATCHLEVEL & KEYMASTER_TAG_TYPE_MASK:
-          osPatchLevel = Asn1Utils.getIntegerFromAsn1(value);
+          osPatchLevel =
+              Asn1Utils.getIntegerFromAsn1(
+                  ASN1Util.getContextBaseUniversal(entry, tag, true, BERTags.INTEGER));
           break;
         case KM_TAG_VENDOR_PATCHLEVEL & KEYMASTER_TAG_TYPE_MASK:
-          vendorPatchLevel = Asn1Utils.getIntegerFromAsn1(value);
+          vendorPatchLevel =
+              Asn1Utils.getIntegerFromAsn1(
+                  ASN1Util.getContextBaseUniversal(entry, tag, true, BERTags.INTEGER));
           break;
         case KM_TAG_BOOT_PATCHLEVEL & KEYMASTER_TAG_TYPE_MASK:
-          bootPatchLevel = Asn1Utils.getIntegerFromAsn1(value);
+          bootPatchLevel =
+              Asn1Utils.getIntegerFromAsn1(
+                  ASN1Util.getContextBaseUniversal(entry, tag, true, BERTags.INTEGER));
           break;
         case KM_TAG_ACTIVE_DATETIME & KEYMASTER_TAG_TYPE_MASK:
-          activeDateTime = Asn1Utils.getDateFromAsn1(value);
+          activeDateTime =
+              Asn1Utils.getDateFromAsn1(
+                  ASN1Util.getContextBaseUniversal(entry, tag, true, BERTags.INTEGER));
           break;
         case KM_TAG_ORIGINATION_EXPIRE_DATETIME & KEYMASTER_TAG_TYPE_MASK:
-          originationExpireDateTime = Asn1Utils.getDateFromAsn1(value);
+          originationExpireDateTime =
+              Asn1Utils.getDateFromAsn1(
+                  ASN1Util.getContextBaseUniversal(entry, tag, true, BERTags.INTEGER));
           break;
         case KM_TAG_USAGE_EXPIRE_DATETIME & KEYMASTER_TAG_TYPE_MASK:
-          usageExpireDateTime = Asn1Utils.getDateFromAsn1(value);
+          usageExpireDateTime =
+              Asn1Utils.getDateFromAsn1(
+                  ASN1Util.getContextBaseUniversal(entry, tag, true, BERTags.INTEGER));
           break;
         case KM_TAG_APPLICATION_ID & KEYMASTER_TAG_TYPE_MASK:
-          applicationId = Asn1Utils.getByteArrayFromAsn1(value);
+          applicationId =
+              Asn1Utils.getByteArrayFromAsn1(
+                  ASN1Util.getContextBaseUniversal(entry, tag, true, BERTags.OCTET_STRING));
           break;
         case KM_TAG_ROLLBACK_RESISTANT & KEYMASTER_TAG_TYPE_MASK:
           rollbackResistant = true;
           break;
         case KM_TAG_AUTH_TIMEOUT & KEYMASTER_TAG_TYPE_MASK:
-          authTimeout = Asn1Utils.getIntegerFromAsn1(value);
+          authTimeout =
+              Asn1Utils.getIntegerFromAsn1(
+                  ASN1Util.getContextBaseUniversal(entry, tag, true, BERTags.INTEGER));
           break;
         case KM_TAG_ALLOW_WHILE_ON_BODY & KEYMASTER_TAG_TYPE_MASK:
           allowWhileOnBody = true;
           break;
         case KM_TAG_EC_CURVE & KEYMASTER_TAG_TYPE_MASK:
-          ecCurve = Asn1Utils.getIntegerFromAsn1(value);
+          ecCurve =
+              Asn1Utils.getIntegerFromAsn1(
+                  ASN1Util.getContextBaseUniversal(entry, tag, true, BERTags.INTEGER));
           break;
         case KM_TAG_USER_AUTH_TYPE & KEYMASTER_TAG_TYPE_MASK:
-          userAuthType = Asn1Utils.getIntegerFromAsn1(value);
+          userAuthType =
+              Asn1Utils.getIntegerFromAsn1(
+                  ASN1Util.getContextBaseUniversal(entry, tag, true, BERTags.INTEGER));
           break;
         case KM_TAG_ROOT_OF_TRUST & KEYMASTER_TAG_TYPE_MASK:
-          rootOfTrust = new RootOfTrust(value);
+          rootOfTrust =
+              new RootOfTrust(ASN1Util.getContextBaseUniversal(entry, tag, true, BERTags.SEQUENCE));
           break;
         case KM_TAG_ATTESTATION_APPLICATION_ID & KEYMASTER_TAG_TYPE_MASK:
           attestationApplicationId =
               new AttestationApplicationId(
-                  Asn1Utils.getAsn1EncodableFromBytes(Asn1Utils.getByteArrayFromAsn1(value)));
+                  Asn1Utils.getAsn1EncodableFromBytes(
+                      Asn1Utils.getByteArrayFromAsn1(
+                          ASN1Util.getContextBaseUniversal(
+                              entry, tag, true, BERTags.OCTET_STRING))));
           break;
         case KM_TAG_ATTESTATION_ID_BRAND & KEYMASTER_TAG_TYPE_MASK:
-          brand = getStringFromAsn1Value(value);
+          brand =
+              getStringFromAsn1Value(
+                  ASN1Util.getContextBaseUniversal(entry, tag, true, BERTags.OCTET_STRING));
           break;
         case KM_TAG_ATTESTATION_ID_DEVICE & KEYMASTER_TAG_TYPE_MASK:
-          device = getStringFromAsn1Value(value);
+          device =
+              getStringFromAsn1Value(
+                  ASN1Util.getContextBaseUniversal(entry, tag, true, BERTags.OCTET_STRING));
           break;
         case KM_TAG_ATTESTATION_ID_PRODUCT & KEYMASTER_TAG_TYPE_MASK:
-          product = getStringFromAsn1Value(value);
+          product =
+              getStringFromAsn1Value(
+                  ASN1Util.getContextBaseUniversal(entry, tag, true, BERTags.OCTET_STRING));
           break;
         case KM_TAG_ATTESTATION_ID_SERIAL & KEYMASTER_TAG_TYPE_MASK:
-          serialNumber = getStringFromAsn1Value(value);
+          serialNumber =
+              getStringFromAsn1Value(
+                  ASN1Util.getContextBaseUniversal(entry, tag, true, BERTags.OCTET_STRING));
           break;
         case KM_TAG_ATTESTATION_ID_IMEI & KEYMASTER_TAG_TYPE_MASK:
-          imei = getStringFromAsn1Value(value);
+          imei =
+              getStringFromAsn1Value(
+                  ASN1Util.getContextBaseUniversal(entry, tag, true, BERTags.OCTET_STRING));
           break;
         case KM_TAG_ATTESTATION_ID_MEID & KEYMASTER_TAG_TYPE_MASK:
-          meid = getStringFromAsn1Value(value);
+          meid =
+              getStringFromAsn1Value(
+                  ASN1Util.getContextBaseUniversal(entry, tag, true, BERTags.OCTET_STRING));
           break;
         case KM_TAG_ATTESTATION_ID_MANUFACTURER & KEYMASTER_TAG_TYPE_MASK:
-          manufacturer = getStringFromAsn1Value(value);
+          manufacturer =
+              getStringFromAsn1Value(
+                  ASN1Util.getContextBaseUniversal(entry, tag, true, BERTags.OCTET_STRING));
           break;
         case KM_TAG_ATTESTATION_ID_MODEL & KEYMASTER_TAG_TYPE_MASK:
-          model = getStringFromAsn1Value(value);
+          model =
+              getStringFromAsn1Value(
+                  ASN1Util.getContextBaseUniversal(entry, tag, true, BERTags.OCTET_STRING));
           break;
         case KM_TAG_ALL_APPLICATIONS & KEYMASTER_TAG_TYPE_MASK:
           allApplications = true;
