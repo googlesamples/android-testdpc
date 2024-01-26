@@ -19,8 +19,8 @@
     xmlns:tools="http://schemas.android.com/tools"
           package="com.afwsamples.testdpc"
           tools:ignore="MissingClass"
-           android:versionCode="9002"
-           android:versionName="9.0.2">
+           android:versionCode="9003"
+           android:versionName="9.0.3">
     <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="33"/>
 
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
@@ -39,6 +39,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"/>
     <uses-permission android:name="com.google.android.setupwizard.SETUP_COMPAT_SERVICE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
     <uses-feature android:name="android.hardware.wifi" android:required="false" />
     <uses-feature android:name="android.hardware.touchscreen" android:required="false"/>
@@ -177,6 +178,7 @@
             <intent-filter>
                 <action android:name="android.app.action.CHOOSE_PRIVATE_KEY_ALIAS"/>
                 <action android:name="android.app.action.NETWORK_LOGS_AVAILABLE"/>
+                <action android:name="android.app.action.SECURITY_LOGS_AVAILABLE"/>
             </intent-filter>
         </receiver>
 

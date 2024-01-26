@@ -16,13 +16,19 @@
 
 package com.afwsamples.testdpc;
 
+import android.Manifest;
 import android.R.id;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Build;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import com.afwsamples.testdpc.common.DumpableActivity;
 import com.afwsamples.testdpc.common.OnBackPressedHandler;
 import com.afwsamples.testdpc.policy.PolicyManagementFragment;
@@ -89,6 +95,8 @@ public class PolicyManagementActivity extends DumpableActivity
     if (lockModeCommand != null) {
       setLockTaskMode(lockModeCommand);
     }
+
+    askNotificationPermission();
   }
 
   @Override
@@ -175,6 +183,21 @@ public class PolicyManagementActivity extends DumpableActivity
         break;
       default:
         Log.e(TAG, "invalid lock-task action: " + action);
+    }
+  }
+
+  private void askNotificationPermission() {
+    // This is only necessary for API level >= 33 (TIRAMISU)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+      if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+          == PackageManager.PERMISSION_GRANTED) {
+        Log.d(TAG, "Notification permission granted");
+      } else {
+        Log.e(TAG, "Notification permission missing");
+        // Directly ask for the permission
+        ActivityCompat.requestPermissions(
+            this, new String[] {Manifest.permission.POST_NOTIFICATIONS}, 101);
+      }
     }
   }
 }
