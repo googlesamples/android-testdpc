@@ -1277,4 +1277,13 @@
     <string name="personal_subscriptions_label">All SIMs are for personal</string>
     <string name="work_subscriptions_label">All SIMs are for work</string>
 
+    <!--  Strings for credential manager policy. -->
+    <string name="credential_manager_title">Credential Manager</string>
+    <string name="credential_manager_set_allowlist">Set Credential Provider Allowlist</string>
+    <string name="credential_manager_set_allowlist_and_system">Set Credential Provider Allowlist and System</string>
+    <string name="credential_manager_set_blocklist">Set Credential Provider Blocklist</string>
+    <string name="credential_manager_clear_policy">Clear policy</string>
+    <string name="credential_manager_policy_applied_toast">Policy has been applied</string>
+    <string name="credential_manager_policy_title">Enter package name of Credential Provider</string>
+
 </resources>

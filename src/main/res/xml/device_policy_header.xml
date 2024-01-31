@@ -895,4 +895,23 @@
             testdpc:minSdkVersion="U" />
     </PreferenceCategory>
 
+    <PreferenceCategory android:title="@string/credential_manager_title">
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="credential_manager_set_allowlist"
+            android:title="@string/credential_manager_set_allowlist"
+            testdpc:minSdkVersion="U" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="credential_manager_set_allowlist_and_system"
+            android:title="@string/credential_manager_set_allowlist_and_system"
+            testdpc:minSdkVersion="U" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="credential_manager_set_blocklist"
+            android:title="@string/credential_manager_set_blocklist"
+            testdpc:minSdkVersion="U" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="credential_manager_clear_policy"
+            android:title="@string/credential_manager_clear_policy"
+            testdpc:minSdkVersion="U" />
+    </PreferenceCategory>
+
 </PreferenceScreen>

@@ -35,6 +35,7 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.admin.DevicePolicyManager;
 import android.app.admin.DevicePolicyManager.InstallSystemUpdateCallback;
+import android.app.admin.PackagePolicy;
 import android.app.admin.SystemUpdateInfo;
 import android.app.admin.WifiSsidPolicy;
 import android.content.ComponentName;
@@ -441,6 +442,14 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
   private static final String SET_WIFI_MIN_SECURITY_LEVEL_KEY = "set_wifi_min_security_level";
   private static final String SET_WIFI_SSID_RESTRICTION_KEY = "set_wifi_ssid_restriction";
   private static final String MTE_POLICY_KEY = "mte_policy";
+  private static final String CREDENTIAL_MANAGER_SET_ALLOWLIST_KEY =
+      "credential_manager_set_allowlist";
+  private static final String CREDENTIAL_MANAGER_SET_ALLOWLIST_AND_SYSTEM_KEY =
+      "credential_manager_set_allowlist_and_system";
+  private static final String CREDENTIAL_MANAGER_SET_BLOCKLIST_KEY =
+      "credential_manager_set_blocklist";
+  private static final String CREDENTIAL_MANAGER_CLEAR_POLICY_KEY =
+      "credential_manager_clear_policy";
 
   private static final String BATTERY_PLUGGED_ANY =
       Integer.toString(
@@ -799,6 +808,12 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     findPreference(SET_WIFI_MIN_SECURITY_LEVEL_KEY).setOnPreferenceClickListener(this);
     findPreference(SET_WIFI_SSID_RESTRICTION_KEY).setOnPreferenceClickListener(this);
     findPreference(MTE_POLICY_KEY).setOnPreferenceClickListener(this);
+
+    findPreference(CREDENTIAL_MANAGER_SET_ALLOWLIST_KEY).setOnPreferenceClickListener(this);
+    findPreference(CREDENTIAL_MANAGER_SET_ALLOWLIST_AND_SYSTEM_KEY)
+        .setOnPreferenceClickListener(this);
+    findPreference(CREDENTIAL_MANAGER_SET_BLOCKLIST_KEY).setOnPreferenceClickListener(this);
+    findPreference(CREDENTIAL_MANAGER_CLEAR_POLICY_KEY).setOnPreferenceClickListener(this);
 
     DpcPreference bindDeviceAdminPreference =
         (DpcPreference) findPreference(BIND_DEVICE_ADMIN_POLICIES);
@@ -1413,6 +1428,18 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
       return true;
     } else if (MTE_POLICY_KEY.equals(key)) {
       showMtePolicyDialog();
+      return true;
+    } else if (CREDENTIAL_MANAGER_SET_ALLOWLIST_KEY.equals(key)) {
+      showCredentialManagerPolicyDialog(PackagePolicy.PACKAGE_POLICY_ALLOWLIST);
+      return true;
+    } else if (CREDENTIAL_MANAGER_SET_ALLOWLIST_AND_SYSTEM_KEY.equals(key)) {
+      showCredentialManagerPolicyDialog(PackagePolicy.PACKAGE_POLICY_ALLOWLIST_AND_SYSTEM);
+      return true;
+    } else if (CREDENTIAL_MANAGER_SET_BLOCKLIST_KEY.equals(key)) {
+      showCredentialManagerPolicyDialog(PackagePolicy.PACKAGE_POLICY_BLOCKLIST);
+      return true;
+    } else if (CREDENTIAL_MANAGER_CLEAR_POLICY_KEY.equals(key)) {
+      resetCredentialManagerPolicy();
       return true;
     }
     return false;
@@ -2894,6 +2921,50 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
       final boolean isAudioMuted = mDevicePolicyManager.isMasterVolumeMuted(mAdminComponentName);
       mMuteAudioSwitchPreference.setChecked(isAudioMuted);
     }
+  }
+
+  @TargetApi(VERSION_CODES.UPSIDE_DOWN_CAKE)
+  private void resetCredentialManagerPolicy() {
+    mDevicePolicyManager.setCredentialManagerPolicy(null);
+    showToast(R.string.credential_manager_policy_applied_toast);
+  }
+
+  @TargetApi(VERSION_CODES.UPSIDE_DOWN_CAKE)
+  private void showCredentialManagerPolicyDialog(int policyType) {
+    LinearLayout inputContainer =
+        (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.simple_edittext, null);
+    final EditText editText = (EditText) inputContainer.findViewById(R.id.input);
+
+    new AlertDialog.Builder(getActivity())
+        .setTitle(getString(R.string.credential_manager_policy_title))
+        .setView(inputContainer)
+        .setPositiveButton(
+            android.R.string.ok,
+            new DialogInterface.OnClickListener() {
+              @Override
+              public void onClick(DialogInterface dialog, int which) {
+                Set<String> packageNames = new HashSet<>();
+                String packageName = editText.getText().toString();
+                if (!TextUtils.isEmpty(packageName)) {
+                  packageNames.add(packageName);
+                }
+
+                mDevicePolicyManager.setCredentialManagerPolicy(
+                    new PackagePolicy(policyType, packageNames));
+
+                showToast(R.string.credential_manager_policy_applied_toast);
+                dialog.dismiss();
+              }
+            })
+        .setNegativeButton(
+            android.R.string.cancel,
+            new DialogInterface.OnClickListener() {
+              @Override
+              public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+              }
+            })
+        .show();
   }
 
   /** Shows a prompt to ask for package name which is used to enable a system app. */
