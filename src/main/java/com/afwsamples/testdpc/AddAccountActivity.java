@@ -41,9 +41,11 @@ import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 import androidx.lifecycle.ProcessLifecycleOwner;
+import com.afwsamples.testdpc.common.ThemeUtil;
 import com.afwsamples.testdpc.common.Util;
 import com.google.android.setupcompat.template.FooterBarMixin;
 import com.google.android.setupcompat.template.FooterButton;
+import com.google.android.setupcompat.util.WizardManagerHelper;
 import com.google.android.setupdesign.GlifLayout;
 import java.io.IOException;
 
@@ -74,6 +76,9 @@ public class AddAccountActivity extends Activity {
     mUserManager = (UserManager) getSystemService(Context.USER_SERVICE);
     mDevicePolicyManager = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
     mAdminComponentName = DeviceAdminReceiver.getComponentName(this);
+
+    // get default theme string from suw intent extra and set the Theme.
+    ThemeUtil.setTheme(this, getIntent().getStringExtra(WizardManagerHelper.EXTRA_THEME));
 
     setContentView(R.layout.activity_add_account);
     GlifLayout layout = findViewById(R.id.setup_wizard_layout);

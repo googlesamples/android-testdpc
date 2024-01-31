@@ -29,10 +29,12 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.afwsamples.testdpc.common.LaunchIntentUtil;
+import com.afwsamples.testdpc.common.ThemeUtil;
 import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.provision.ProvisioningUtil;
 import com.google.android.setupcompat.template.FooterBarMixin;
 import com.google.android.setupcompat.template.FooterButton;
+import com.google.android.setupcompat.util.WizardManagerHelper;
 import com.google.android.setupdesign.GlifLayout;
 
 public class FinalizeActivity extends Activity {
@@ -56,6 +58,9 @@ public class FinalizeActivity extends Activity {
         onNavigateNext(null);
         return;
     }
+
+    // get default theme string from suw intent extra and set the Theme.
+    ThemeUtil.setTheme(this, getIntent().getStringExtra(WizardManagerHelper.EXTRA_THEME));
 
     setContentView(R.layout.finalize_activity);
     mSetupWizardLayout = findViewById(R.id.setup_wizard_layout);

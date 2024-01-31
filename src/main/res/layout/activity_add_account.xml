@@ -20,7 +20,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:icon="@drawable/ic_enterprise_blue"
-    android:theme="@style/SudDynamicColorThemeGlifV3.DayNight"
     app:sucHeaderText="@string/add_account">
 
     <LinearLayout
