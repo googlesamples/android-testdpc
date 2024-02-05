@@ -75,6 +75,7 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment
     static final String KEYGUARD_DISABLE_SECURE_NOTIFICATIONS =
         "keyguard_disable_secure_notifications";
     static final String KEYGUARD_DISABLE_SHORTCTUS = "keyguard_disable_shortcuts";
+    static final String KEYGUARD_DISABLE_WIDGETS_ALL = "keyguard_disable_widgets_all";
     static final String KEYGUARD_DISABLE_TRUST_AGENTS = "keyguard_disable_trust_agents";
     static final String KEYGUARD_DISABLE_UNREDACTED_NOTIFICATIONS =
         "keyguard_disable_unredacted_notifications";
@@ -117,6 +118,9 @@ public final class LockScreenPolicyFragment extends ProfileOrParentFragment
 
     KEYGUARD_FEATURES.put(
         Keys.KEYGUARD_DISABLE_SHORTCTUS, DevicePolicyManager.KEYGUARD_DISABLE_SHORTCUTS_ALL);
+
+    KEYGUARD_FEATURES.put(
+        Keys.KEYGUARD_DISABLE_WIDGETS_ALL, DevicePolicyManager.KEYGUARD_DISABLE_WIDGETS_ALL);
   }
 
   @Override

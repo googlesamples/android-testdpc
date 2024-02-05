@@ -944,6 +944,7 @@
     <string name="keyguard_disable_fingerprint">Disable fingerprint</string>
     <string name="keyguard_disable_remote_input">Disable text entry in secure keyguard screen</string>
     <string name="keyguard_disable_shortcuts">Disable shortcuts</string>
+    <string name="keyguard_disable_widgets_all">Disable widgets</string>
     <string name="cannot_disable_shortcuts_on_work_profile">Can\'t disable shortcuts on work profile. Please switch to personal profile tab.</string>
 
     <!-- Trust agent features -->

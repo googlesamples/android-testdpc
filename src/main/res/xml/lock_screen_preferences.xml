@@ -104,6 +104,10 @@
             android:key="keyguard_disable_shortcuts"
             android:title="@string/keyguard_disable_shortcuts"
             testdpc:minSdkVersion="U" />
+         <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
+            android:key="keyguard_disable_widgets_all"
+            android:title="@string/keyguard_disable_widgets_all"
+            testdpc:minSdkVersion="L" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/trust_agent_features">
