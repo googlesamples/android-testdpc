@@ -36,11 +36,13 @@ android_library(
     name = "androidx_deps",
     exports = [
         "@maven//:androidx_annotation_annotation",
+        "@maven//:androidx_appcompat_appcompat",
         "@maven//:androidx_core_core",
         "@maven//:androidx_enterprise_enterprise_feedback",
         "@maven//:androidx_legacy_legacy_support_v13",
         "@maven//:androidx_lifecycle_lifecycle_common",
         "@maven//:androidx_lifecycle_lifecycle_process",
+        "@maven//:androidx_lifecycle_lifecycle_runtime",
         "@maven//:androidx_localbroadcastmanager_localbroadcastmanager",
         "@maven//:androidx_preference_preference",
         "@maven//:androidx_recyclerview_recyclerview",

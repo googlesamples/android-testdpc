@@ -28,13 +28,16 @@ load("@rules_jvm_external//:defs.bzl", "maven_install")
 maven_install(
     artifacts = [
         "androidx.annotation:annotation:1.3.0",
+        "androidx.appcompat:appcompat:1.6.1",
+        "androidx.appcompat:appcompat-resources:1.6.1",
         "androidx.constraintlayout:constraintlayout:2.1.3",
         "androidx.core:core:1.6.0",
         "androidx.enterprise:enterprise-feedback:1.1.0",
         "androidx.legacy:legacy-support-core-ui:1.0.0",
         "androidx.legacy:legacy-support-v13:1.0.0",
-        "androidx.lifecycle:lifecycle-common:2.4.1",
-        "androidx.lifecycle:lifecycle-process:2.4.1",
+        "androidx.lifecycle:lifecycle-common:2.5.1",
+        "androidx.lifecycle:lifecycle-process:2.5.1",
+        "androidx.lifecycle:lifecycle-runtime:2.5.1",
         "androidx.localbroadcastmanager:localbroadcastmanager:1.1.0",
         "androidx.preference:preference:1.1.0",
         "androidx.recyclerview:recyclerview:1.2.0",
