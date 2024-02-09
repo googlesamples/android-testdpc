@@ -23,11 +23,8 @@ You can find various kinds of provisioning methods [here](https://developers.goo
 3. Modify (if needed) and scan [this QR code] (http://down-box.appspot.com/qr/nQB0tw7b).
 4. Follow onscreen instructions
 
-#### ADB command (Device Owner) ####
-
-```shell
+#### adb command (Device Owner) ####
 adb shell dpm set-device-owner com.afwsamples.testdpc/.DeviceAdminReceiver
-```
 
 #### Work profile ####
 The easiest way is to launch the "Set Up TestDPC" app in launcher and follow the onscreen instructions.

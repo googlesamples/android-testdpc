@@ -18,6 +18,7 @@ package com.afwsamples.testdpc.common.preference;
 
 import android.app.admin.DevicePolicyManager;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
 import android.os.Build.VERSION_CODES;
 import android.text.TextUtils;
@@ -96,6 +97,7 @@ public class DpcPreferenceHelper {
   private @AdminKind int mAdminConstraint;
   private @UserKind int mUserConstraint;
   private String mDelegationConstraint;
+  private String mPermissionConstraint;
 
   public DpcPreferenceHelper(Context context, Preference preference, AttributeSet attrs) {
     mContext = context;
@@ -117,6 +119,7 @@ public class DpcPreferenceHelper {
     // noinspection ResourceType
     mUserConstraint = a.getInt(R.styleable.DpcPreference_user, USER_DEFAULT);
     mDelegationConstraint = a.getString(R.styleable.DpcPreference_delegation);
+    mPermissionConstraint = a.getString(R.styleable.DpcPreference_permission);
     a.recycle();
   }
 
@@ -294,7 +297,7 @@ public class DpcPreferenceHelper {
   }
 
   private boolean isSufficientlyPrivileged(@AdminKind int admin, List<String> delegations) {
-    return isEnabledForAdmin(admin) || hasDelegation(delegations);
+    return isEnabledForAdmin(admin) || hasDelegation(delegations) || hasPermission();
   }
 
   private boolean isEnabledForAdmin(@AdminKind int admin) {
@@ -303,6 +306,11 @@ public class DpcPreferenceHelper {
 
   private boolean hasDelegation(List<String> delegations) {
     return delegations.contains(mDelegationConstraint);
+  }
+
+  private boolean hasPermission() {
+    return mPermissionConstraint != null
+        && mContext.checkSelfPermission(mPermissionConstraint) == PackageManager.PERMISSION_GRANTED;
   }
 
   private boolean isEnabledForUser(@UserKind int user) {

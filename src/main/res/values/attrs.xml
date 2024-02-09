@@ -53,6 +53,9 @@
         <!-- Constrain a preference to a delegated scope. -->
         <attr name="delegation" format="string" />
 
+        <!-- Constrain a preference to a permission. -->
+        <attr name="permission" format="string" />
+
         <!-- Constrain a preference to certain users. -->
         <attr name="user">
             <flag name="primaryUser" value="0x1" />

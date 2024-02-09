@@ -122,6 +122,7 @@
     <string name="this_is_a_profile_owner">This app is a profile owner.</string>
     <string name="this_is_an_org_owned_profile_owner">This app is a profile owner of an organization-owned device.</string>
     <string name="this_is_a_delegated_app">This app has delegated permissions.</string>
+    <string name="this_is_a_role_holder">This app is the Device Management Role Holder.</string>
     <string name="this_is_not_an_admin">This app is not an admin.</string>
 
     <!-- Strings for provisioning disclaimers-->
@@ -1249,6 +1250,7 @@
     <string name="set_organization_id">Set Organization Identifier</string>
     <string name="organization_id_empty">Organization Identifier must not be empty.</string>
     <string name="enrollment_specific_id">Enrollment-specific ID</string>
+    <string name="enrollment_specific_id_empty">Not Available</string>
 
     <!-- Messsage used in a toast to inform that operations that could be unsafe to execute might be safe now (or vice versa) -->
     <string name="safety_operations_change_message">Operations that affect <xliff:g id="reason">%1$s</xliff:g> are now <xliff:g id="state">%2$s</xliff:g></string>
