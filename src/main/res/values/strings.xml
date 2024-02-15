@@ -528,6 +528,7 @@
     <string name="disallow_content_capture">Disallow content capture</string>
     <string name="disallow_content_suggestions">Disallow content suggestions</string>
     <string name="disallow_cellular_2g">Disallow Cellular 2G</string>
+    <string name="disallow_config_default_apps">Disallow config default apps</string>
     <string name="user_restriction_error_msg">Operation not allowed</string>
 
     <!-- Strings for select app -->

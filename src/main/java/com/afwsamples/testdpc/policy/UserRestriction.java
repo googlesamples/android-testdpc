@@ -61,6 +61,7 @@ import static android.os.UserManager.DISALLOW_USER_SWITCH;
 import static android.os.UserManager.DISALLOW_WIFI_DIRECT;
 import static android.os.UserManager.DISALLOW_WIFI_TETHERING;
 import static android.os.UserManager.ENSURE_VERIFY_APPS;
+import static android.os.UserManager.DISALLOW_CONFIG_DEFAULT_APPS;
 
 // TODO(b/258509336): uncomment and remove the placeholder static string once
 // an SDK drops in google3 that contains the new user restriction.
@@ -152,6 +153,7 @@ public class UserRestriction {
     new UserRestriction(DISALLOW_WIFI_DIRECT, R.string.disallow_wifi_direct),
     new UserRestriction(DISALLOW_ADD_WIFI_CONFIG, R.string.disallow_add_wifi_config),
     new UserRestriction(DISALLOW_CELLULAR_2G, R.string.disallow_cellular_2g),
+    new UserRestriction(DISALLOW_CONFIG_DEFAULT_APPS, R.string.disallow_config_default_apps),
   };
 
   /**
@@ -186,6 +188,7 @@ public class UserRestriction {
     new UserRestriction(DISALLOW_WIFI_DIRECT, R.string.disallow_wifi_direct),
     new UserRestriction(DISALLOW_ADD_WIFI_CONFIG, R.string.disallow_add_wifi_config),
     new UserRestriction(DISALLOW_CELLULAR_2G, R.string.disallow_cellular_2g),
+    new UserRestriction(DISALLOW_CONFIG_DEFAULT_APPS, R.string.disallow_config_default_apps),
   };
 
   /** Setting these user restrictions only have effect on primary users. */
@@ -292,6 +295,6 @@ public class UserRestriction {
   };
 
   public static String[] UDC_PLUS_RESTRICTIONS = {
-    DISALLOW_CELLULAR_2G,
+    DISALLOW_CELLULAR_2G, DISALLOW_CONFIG_DEFAULT_APPS,
   };
 }
