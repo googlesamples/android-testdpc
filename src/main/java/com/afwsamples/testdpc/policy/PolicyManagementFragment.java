@@ -4238,12 +4238,14 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
   @TargetApi(VERSION_CODES.N)
   private void reboot() {
-    if (mTelephonyManager.getCallState() != TelephonyManager.CALL_STATE_IDLE) {
-      showToast(R.string.reboot_error_msg);
-      return;
-    }
     mDevicePolicyManagerGateway.reboot(
-        (v) -> onSuccessLog("reboot"), (e) -> onErrorLog("reboot", e));
+        (v) -> onSuccessLog("reboot"),
+        (e) -> {
+          onErrorLog("reboot", e);
+          if (e instanceof IllegalStateException) {
+            showToast(R.string.reboot_error_msg);
+          }
+        });
   }
 
   private void showSetupManagement() {
