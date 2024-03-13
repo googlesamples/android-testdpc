@@ -38,7 +38,6 @@ import android.app.admin.DevicePolicyManager.InstallSystemUpdateCallback;
 import android.app.admin.PackagePolicy;
 import android.app.admin.SystemUpdateInfo;
 import android.app.admin.WifiSsidPolicy;
-import android.app.role.RoleManager;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -464,11 +463,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
   private static final SparseIntArray PASSWORD_COMPLEXITY = new SparseIntArray(4);
 
-  // Copied over from RoleManager.ROLE_DEVICE_POLICY_MANAGEMENT, which can't be referenced directly
-  // since it's a @SystemAPI.
-  private static final String ROLE_DEVICE_POLICY_MANAGEMENT =
-      "android.app.role.DEVICE_POLICY_MANAGEMENT";
-
   static {
     if (Util.SDK_INT >= VERSION_CODES.Q) {
       final int[] complexityIds =
@@ -566,11 +560,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
   @Override
   public void onCreate(Bundle savedInstanceState) {
     Context context = getActivity();
-    if (isDelegatedApp() || isCredentialManagerApp() || isDeviceManagementRoleHolder()) {
-      mAdminComponentName = null;
-    } else {
-      mAdminComponentName = DeviceAdminReceiver.getComponentName(context);
-    }
+    mAdminComponentName = DeviceAdminReceiver.getComponentName(context);
     mDevicePolicyManager = context.getSystemService(DevicePolicyManager.class);
     mUserManager = context.getSystemService(UserManager.class);
     mPackageManager = context.getPackageManager();
@@ -984,33 +974,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             .setAdminConstraint(DpcPreferenceHelper.ADMIN_DEVICE_OWNER);
       }
     }
-  }
-
-  private boolean isDelegatedApp() {
-    if (Util.SDK_INT < VERSION_CODES.O) {
-      return false;
-    }
-
-    DevicePolicyManager dpm = getActivity().getSystemService(DevicePolicyManager.class);
-    return !dpm.getDelegatedScopes(null, getActivity().getPackageName()).isEmpty();
-  }
-
-  private boolean isCredentialManagerApp() {
-    // TODO: replace with more precise API
-    if (Util.SDK_INT < VERSION_CODES.S) {
-      return false;
-    }
-    DevicePolicyManager dpm = getActivity().getSystemService(DevicePolicyManager.class);
-    final String packageName = getActivity().getPackageName();
-    return !dpm.isDeviceOwnerApp(packageName) && !dpm.isProfileOwnerApp(packageName);
-  }
-
-  private boolean isDeviceManagementRoleHolder() {
-    if (Util.SDK_INT < VERSION_CODES.S) {
-      return false;
-    }
-    RoleManager rm = getActivity().getSystemService(RoleManager.class);
-    return rm.isRoleHeld(ROLE_DEVICE_POLICY_MANAGEMENT);
   }
 
   @Override
@@ -2580,26 +2543,36 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
   }
 
   private void loadAppStatus() {
-    final @StringRes int appStatusStringId;
+    final @StringRes List<Integer> appStatus = new ArrayList<>();
     boolean isOrgOwned =
         Util.SDK_INT >= VERSION_CODES.R
             && mDevicePolicyManagerGateway.isOrganizationOwnedDeviceWithManagedProfile();
     if (mDevicePolicyManager.isProfileOwnerApp(mPackageName)) {
       if (isOrgOwned) {
-        appStatusStringId = R.string.this_is_an_org_owned_profile_owner;
+        appStatus.add(R.string.this_is_an_org_owned_profile_owner);
       } else {
-        appStatusStringId = R.string.this_is_a_profile_owner;
+        appStatus.add(R.string.this_is_a_profile_owner);
       }
     } else if (mDevicePolicyManager.isDeviceOwnerApp(mPackageName)) {
-      appStatusStringId = R.string.this_is_a_device_owner;
-    } else if (isDelegatedApp()) {
-      appStatusStringId = R.string.this_is_a_delegated_app;
-    } else if (isDeviceManagementRoleHolder()) {
-      appStatusStringId = R.string.this_is_a_role_holder;
-    } else {
-      appStatusStringId = R.string.this_is_not_an_admin;
+      appStatus.add(R.string.this_is_a_device_owner);
+    } else if (Util.isDelegatedApp(getActivity())) {
+      appStatus.add(R.string.this_is_a_delegated_app);
     }
-    findPreference(APP_STATUS_KEY).setSummary(appStatusStringId);
+    if (Util.isDeviceManagementRoleHolder(getActivity())) {
+      appStatus.add(R.string.this_is_a_role_holder);
+    }
+
+    if (appStatus.isEmpty()) {
+      findPreference(APP_STATUS_KEY).setSummary(R.string.this_is_not_an_admin);
+    } else if (appStatus.size() == 1) {
+      findPreference(APP_STATUS_KEY).setSummary(appStatus.get(0));
+    } else {
+      findPreference(APP_STATUS_KEY)
+          .setSummary(
+              String.join(
+                  "\n", appStatus.stream().map(this::getString).collect(Collectors.toList())));
+    }
+
   }
 
   @TargetApi(VERSION_CODES.M)

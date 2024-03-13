@@ -28,7 +28,7 @@ public class ProvisioningUtil {
   public static void enableProfile(Context context) {
     DevicePolicyManager manager =
         (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
-    ComponentName componentName = DeviceAdminReceiver.getComponentName(context);
+    ComponentName componentName = DeviceAdminReceiver.getReceiverComponentName(context);
     // This is the name for the newly created managed profile.
     manager.setProfileName(componentName, context.getString(R.string.profile_name));
     // We enable the profile here.

@@ -39,7 +39,8 @@ public class UserRestrictionsParentDisplayFragment extends BaseSearchablePolicyP
     setPreferenceScreen(preferenceScreen);
 
     final Context preferenceContext = getPreferenceManager().getContext();
-    for (UserRestriction restriction : UserRestriction.PROFILE_OWNER_ORG_DEVICE_RESTRICTIONS) {
+    for (String restrictionKey : UserRestriction.PROFILE_OWNER_ORG_DEVICE_RESTRICTIONS) {
+      UserRestriction restriction = UserRestriction.getRestriction(restrictionKey);
       DpcSwitchPreference preference = new DpcSwitchPreference(preferenceContext);
       preference.setTitle(restriction.titleResId);
       preference.setKey(restriction.key);
@@ -82,8 +83,8 @@ public class UserRestrictionsParentDisplayFragment extends BaseSearchablePolicyP
 
   @RequiresApi(api = VERSION_CODES.R)
   private void updateAllUserRestrictions() {
-    for (UserRestriction restriction : UserRestriction.PROFILE_OWNER_ORG_DEVICE_RESTRICTIONS) {
-      updateUserRestriction(restriction.key);
+    for (String restrictionKey : UserRestriction.PROFILE_OWNER_ORG_DEVICE_RESTRICTIONS) {
+      updateUserRestriction(restrictionKey);
     }
   }
 
@@ -95,12 +96,12 @@ public class UserRestrictionsParentDisplayFragment extends BaseSearchablePolicyP
   }
 
   private void constrainPreferences() {
-    for (UserRestriction restriction : UserRestriction.PROFILE_OWNER_ORG_DEVICE_RESTRICTIONS) {
-      DpcPreferenceBase pref = (DpcPreferenceBase) findPreference(restriction.key);
-      if (Arrays.stream(UserRestriction.TM_PLUS_RESTRICTIONS).anyMatch(restriction.key::equals)) {
+    for (String restrictionKey : UserRestriction.PROFILE_OWNER_ORG_DEVICE_RESTRICTIONS) {
+      DpcPreferenceBase pref = (DpcPreferenceBase) findPreference(restrictionKey);
+      if (Arrays.stream(UserRestriction.TM_PLUS_RESTRICTIONS).anyMatch(restrictionKey::equals)) {
         pref.setMinSdkVersion(VERSION_CODES.TIRAMISU);
       } else if (Arrays.stream(UserRestriction.UDC_PLUS_RESTRICTIONS)
-          .anyMatch(restriction.key::equals)) {
+          .anyMatch(restrictionKey::equals)) {
         pref.setMinSdkVersion(VERSION_CODES.UPSIDE_DOWN_CAKE);
       } else {
         pref.setMinSdkVersion(VERSION_CODES.R);

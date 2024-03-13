@@ -174,6 +174,15 @@ public class DpcPreferenceHelper {
     setUserConstraint(USER_DEFAULT);
   }
 
+  void setPermissionConstraint(String permissionConstraints) {
+    mPermissionConstraint = permissionConstraints;
+    disableIfConstraintsNotMet();
+  }
+
+  void clearPermissionConstraint() {
+    setPermissionConstraint(null);
+  }
+
   /**
    * Clear the admin and user constraints for this preference.
    *
@@ -289,7 +298,7 @@ public class DpcPreferenceHelper {
       return USER_PRIMARY_USER;
     }
 
-    if (Util.isManagedProfileOwner(mContext)) {
+    if (Util.isManagedProfile(mContext)) {
       return USER_MANAGED_PROFILE;
     }
 

@@ -232,7 +232,7 @@ public class SetupManagementFragment extends Fragment
     if (Util.SDK_INT >= VERSION_CODES.M) {
       intent.putExtra(
           EXTRA_PROVISIONING_DEVICE_ADMIN_COMPONENT_NAME,
-          DeviceAdminReceiver.getComponentName(getActivity()));
+          DeviceAdminReceiver.getReceiverComponentName(getActivity()));
     } else {
       intent.putExtra(EXTRA_PROVISIONING_DEVICE_ADMIN_PACKAGE_NAME, getActivity().getPackageName());
     }

@@ -30,6 +30,10 @@ public interface DpcPreferenceBase {
 
   void clearUserConstraint();
 
+  void setPermissionConstraint(String permissionConstraints);
+
+  void clearPermissionConstraint();
+
   void clearNonCustomConstraints();
 
   void setCustomConstraint(@Nullable CustomConstraint customConstraint);

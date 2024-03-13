@@ -20,6 +20,7 @@ import android.annotation.TargetApi;
 import android.app.Service;
 import android.app.UiModeManager;
 import android.app.admin.DevicePolicyManager;
+import android.app.role.RoleManager;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.Context;
@@ -66,6 +67,11 @@ public class Util {
    * is not yet assigned.
    */
   public static final int SDK_INT = IS_RUNNING_U ? VERSION_CODES.CUR_DEVELOPMENT : VERSION.SDK_INT;
+
+  // Copied over from RoleManager.ROLE_DEVICE_POLICY_MANAGEMENT, which can't be referenced directly
+  // since it's a @SystemAPI.
+  private static final String ROLE_DEVICE_POLICY_MANAGEMENT =
+      "android.app.role.DEVICE_POLICY_MANAGEMENT";
 
   /**
    * Format a friendly datetime for the current locale according to device policy documentation. If
@@ -122,7 +128,7 @@ public class Util {
 
     if (Util.SDK_INT >= VERSION_CODES.N) {
       try {
-        return dpm.isManagedProfile(DeviceAdminReceiver.getComponentName(context));
+        return dpm.isManagedProfile(DeviceAdminReceiver.getReceiverComponentName(context));
       } catch (SecurityException ex) {
         // This is thrown if we are neither profile owner nor device owner.
         return false;
@@ -133,6 +139,16 @@ public class Util {
     // may support being a profile owner in other contexts (e.g. a secondary user) which will
     // require further checks.
     return isProfileOwner(context);
+  }
+
+  public static boolean isManagedProfile(Context context) {
+    if (Util.SDK_INT >= VERSION_CODES.R) {
+      UserManager userManager = (UserManager) context.getSystemService(Context.USER_SERVICE);
+      return userManager.isManagedProfile();
+    }
+    // There is no equivalent API before Android R, so fall back to previous behaviour that only
+    // works correctly if we are the PO of a managed profile
+    return isManagedProfileOwner(context);
   }
 
   @TargetApi(VERSION_CODES.M)
@@ -157,6 +173,25 @@ public class Util {
   public static boolean isProfileOwner(Context context) {
     final DevicePolicyManager dpm = getDevicePolicyManager(context);
     return dpm.isProfileOwnerApp(context.getPackageName());
+  }
+
+  @TargetApi(VERSION_CODES.O)
+  public static boolean isDelegatedApp(Context context) {
+    if (Util.SDK_INT < VERSION_CODES.O) {
+      return false;
+    }
+
+    DevicePolicyManager dpm = context.getSystemService(DevicePolicyManager.class);
+    return !dpm.getDelegatedScopes(null, context.getPackageName()).isEmpty();
+  }
+
+  @TargetApi(VERSION_CODES.S)
+  public static boolean isDeviceManagementRoleHolder(Context context) {
+    if (Util.SDK_INT < VERSION_CODES.S) {
+      return false;
+    }
+    RoleManager rm = context.getSystemService(RoleManager.class);
+    return rm.isRoleHeld(ROLE_DEVICE_POLICY_MANAGEMENT);
   }
 
   @TargetApi(VERSION_CODES.O)

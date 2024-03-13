@@ -95,6 +95,16 @@ public class DpcEditTextPreference extends EditTextPreference implements DpcPref
   }
 
   @Override
+  public void setPermissionConstraint(String permissionConstraints) {
+    mHelper.setPermissionConstraint(permissionConstraints);
+  }
+
+  @Override
+  public void clearPermissionConstraint() {
+    mHelper.clearPermissionConstraint();
+  }
+
+  @Override
   public void clearNonCustomConstraints() {
     mHelper.clearNonCustomConstraints();
   }

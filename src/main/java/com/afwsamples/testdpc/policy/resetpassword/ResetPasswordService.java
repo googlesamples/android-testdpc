@@ -17,6 +17,7 @@
 package com.afwsamples.testdpc.policy.resetpassword;
 
 import static android.content.Intent.ACTION_USER_UNLOCKED;
+import static android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED;
 
 import android.annotation.TargetApi;
 import android.app.Notification;
@@ -29,6 +30,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Build.VERSION_CODES;
 import android.os.IBinder;
 import android.os.UserManager;
@@ -121,7 +123,12 @@ public class ResetPasswordService extends Service {
             .setSmallIcon(R.drawable.ic_launcher)
             .setChannelId(NOTIFICATION_CHANNEL)
             .build();
-    startForeground(NOTIFICATION_FOREGROUND, notification);
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+      startForeground(NOTIFICATION_FOREGROUND, notification);
+    } else {
+      startForeground(
+          NOTIFICATION_FOREGROUND, notification, FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED);
+    }
   }
 
   @Nullable

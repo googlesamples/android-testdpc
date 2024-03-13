@@ -21,7 +21,7 @@
           tools:ignore="MissingClass"
            android:versionCode="9005"
            android:versionName="9.0.5">
-    <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="33"/>
+    <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="34"/>
 
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
@@ -40,12 +40,35 @@
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"/>
     <uses-permission android:name="com.google.android.setupwizard.SETUP_COMPAT_SERVICE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SYSTEM_EXEMPTED"/>
     <uses-permission android:name="android.permission.MANAGE_DEVICE_POLICY_CERTIFICATES"/>
     <uses-permission android:name="android.permission.MANAGE_DEVICE_POLICY_SYSTEM_UPDATE_INFO"/>
+    <uses-permission android:name="android.permission.MANAGE_DEVICE_POLICY_ACCOUNT_MANAGEMENT"/>
+    <uses-permission android:name="android.permission.MANAGE_DEVICE_POLICY_APPS_CONTROL"/>
+    <uses-permission android:name="android.permission.MANAGE_DEVICE_POLICY_DISPLAY"/>
+    <uses-permission android:name="android.permission.MANAGE_DEVICE_POLICY_INSTALL_UNKNOWN_SOURCES"/>
+    <uses-permission android:name="android.permission.MANAGE_DEVICE_POLICY_AUTOFILL"/>
+    <uses-permission android:name="android.permission.MANAGE_DEVICE_POLICY_LOCALE"/>
+    <uses-permission android:name="android.permission.MANAGE_DEVICE_POLICY_LOCATION"/>
+    <uses-permission android:name="android.permission.MANAGE_DEVICE_POLICY_LOCK_CREDENTIALS"/>
+    <uses-permission android:name="android.permission.MANAGE_DEVICE_POLICY_MOBILE_NETWORK"/>
+    <uses-permission android:name="android.permission.MANAGE_DEVICE_POLICY_MODIFY_USERS"/>
+    <uses-permission android:name="android.permission.MANAGE_DEVICE_POLICY_PACKAGE_STATE"/>
+    <uses-permission android:name="android.permission.MANAGE_DEVICE_POLICY_RESTRICT_PRIVATE_DNS"/>
+    <uses-permission android:name="android.permission.MANAGE_DEVICE_POLICY_CAMERA_TOGGLE"/>
+    <uses-permission android:name="android.permission.MANAGE_DEVICE_POLICY_SAFE_BOOT"/>
+    <uses-permission android:name="android.permission.MANAGE_DEVICE_POLICY_QUERY_SYSTEM_UPDATES"/>
+    <uses-permission android:name="android.permission.MANAGE_DEVICE_POLICY_SMS"/>
+    <uses-permission android:name="android.permission.MANAGE_DEVICE_POLICY_TIME"/>
+    <uses-permission android:name="android.permission.MANAGE_DEVICE_POLICY_VPN"/>
+    <uses-permission android:name="android.permission.MANAGE_DEVICE_POLICY_WALLPAPER"/>
+    <uses-permission android:name="android.permission.MANAGE_DEVICE_POLICY_WIFI"/>
+    <uses-permission android:name="android.permission.MANAGE_DEVICE_POLICY_CAMERA_TOGGLE"/>
+    <uses-permission android:name="android.permission.UPDATE_DEVICE_MANAGEMENT_RESOURCES"/>
 
     <uses-feature android:name="android.hardware.wifi" android:required="false" />
     <uses-feature android:name="android.hardware.touchscreen" android:required="false"/>
- 
+
     <!-- TODO(b/201271137): Add non-testOnly build config. -->
     <!-- NOTE: android:testOnly will be stripped by build.gradle (stripTestOnlyForBuild()) -->
     <application
@@ -212,6 +235,7 @@
         <service android:name=".policy.resetpassword.ResetPasswordService"
                 android:enabled="@bool/is_o_or_later"
                 android:exported="false"
+                android:foregroundServiceType="systemExempted"
                 android:directBootAware="true" >
         </service>
 

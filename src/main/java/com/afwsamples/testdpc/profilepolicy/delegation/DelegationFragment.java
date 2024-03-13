@@ -35,6 +35,7 @@ import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.ManageAppFragment;
 import com.afwsamples.testdpc.common.ReflectionUtil;
 import com.afwsamples.testdpc.common.ReflectionUtil.ReflectionIsTemporaryException;
+import com.afwsamples.testdpc.common.Util;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -66,13 +67,12 @@ public class DelegationFragment extends ManageAppFragment {
       ComponentName mAdminName = DeviceAdminReceiver.getComponentName(getActivity());
       final boolean isDeviceOwner = mDpm.isDeviceOwnerApp(mPackageName);
       final boolean isProfileOwner = mDpm.isProfileOwnerApp(mPackageName);
-      final boolean isManagedProfile = mDpm.isManagedProfile(mAdminName);
+      final boolean isManagedProfileOwner = Util.isManagedProfileOwner(getActivity());
       mIsDeviceOrProfileOwner = isDeviceOwner || isProfileOwner;
 
       // Show DO or managed PO only delegations if we are DO or managed PO.
       mDelegations =
-          DelegationScope.defaultDelegationScopes(
-              isDeviceOwner || (isManagedProfile && isProfileOwner));
+          DelegationScope.defaultDelegationScopes(isDeviceOwner || isManagedProfileOwner);
     }
 
     getActivity().getActionBar().setTitle(R.string.generic_delegation);

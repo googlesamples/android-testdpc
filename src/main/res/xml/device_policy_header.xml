@@ -460,6 +460,7 @@
             android:key="set_required_password_complexity_on_parent"
             android:title="@string/set_required_password_complexity_on_parent"
             testdpc:admin="profileOwner"
+            testdpc:user="managedProfile"
             testdpc:minSdkVersion="S"/>
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="set_profile_parent_new_password"
@@ -616,7 +617,7 @@
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="system_update_pending"
             android:title="@string/system_update_pending"
-            testdpc:permission="android.permission.MANAGE_DEVICE_POLICY_SYSTEM_UPDATE_INFO"
+            testdpc:permission="android.permission.MANAGE_DEVICE_POLICY_QUERY_SYSTEM_UPDATES"
             testdpc:minSdkVersion="O" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="managed_system_updates"
@@ -699,9 +700,12 @@
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/user_restrictions_management_title">
+        <!-- Make the main preference always enabled, individual user restriction will have
+             its own constraints  -->
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="set_user_restrictions"
             android:title="@string/user_restrictions_preference_title"
+            testdpc:admin="any"
             testdpc:minSdkVersion="L" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="set_user_restrictions_parent"

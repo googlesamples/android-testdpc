@@ -23,6 +23,7 @@ import android.content.Context;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.UserManager;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 import androidx.preference.Preference;
@@ -124,6 +125,18 @@ public class UserRestrictionsDisplayFragment extends BaseSearchablePolicyPrefere
   }
 
   private void constrainPreferences() {
+    for (UserRestriction restriction : UserRestriction.ALL_USER_RESTRICTIONS) {
+      DpcPreferenceBase pref = (DpcPreferenceBase) findPreference(restriction.key);
+
+      if (UserRestriction.isDeviceOwnerOnlyRestriction(restriction)) {
+        pref.setAdminConstraint(DpcPreferenceHelper.ADMIN_DEVICE_OWNER);
+      } else {
+        pref.setAdminConstraint(DpcPreferenceHelper.ADMIN_DEFAULT);
+      }
+      if (!TextUtils.isEmpty(restriction.permission)) {
+        pref.setPermissionConstraint(restriction.permission);
+      }
+    }
     for (String restriction : UserRestriction.MNC_PLUS_RESTRICTIONS) {
       DpcPreferenceBase pref = (DpcPreferenceBase) findPreference(restriction);
       pref.setMinSdkVersion(VERSION_CODES.M);
@@ -159,10 +172,6 @@ public class UserRestrictionsDisplayFragment extends BaseSearchablePolicyPrefere
     for (String restriction : UserRestriction.PRIMARY_USER_ONLY_RESTRICTIONS) {
       DpcPreferenceBase pref = (DpcPreferenceBase) findPreference(restriction);
       pref.setUserConstraint(DpcPreferenceHelper.USER_PRIMARY_USER);
-    }
-    for (String restriction : UserRestriction.DEVICE_OWNER_ONLY_RESTRICTIONS) {
-      DpcPreferenceBase pref = (DpcPreferenceBase) findPreference(restriction);
-      pref.setAdminConstraint(DpcPreferenceHelper.ADMIN_DEVICE_OWNER);
     }
     for (String restriction : UserRestriction.MANAGED_PROFILE_ONLY_RESTRICTIONS) {
       DpcPreferenceBase pref = (DpcPreferenceBase) findPreference(restriction);
