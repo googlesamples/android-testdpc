@@ -23,14 +23,65 @@ You can find various kinds of provisioning methods [here](https://developers.goo
 3. Modify (if needed) and scan [this QR code] (http://down-box.appspot.com/qr/nQB0tw7b).
 4. Follow onscreen instructions
 
-#### ADB command (Device Owner) ####
+#### ADB command ####
 
-```shell
-adb shell dpm set-device-owner com.afwsamples.testdpc/.DeviceAdminReceiver
-```
+**Device Owner**
 
-#### Work profile ####
-The easiest way is to launch the "Set Up TestDPC" app in launcher and follow the onscreen instructions.
+*   Run the `adb` command:
+
+    ```console
+    adb shell dpm set-device-owner com.afwsamples.testdpc/.DeviceAdminReceiver
+    ```
+
+**Profile Owner**
+
+*   Create a managed profile by launching the “Set up TestDPC” app (if this app
+    seems broken and you are in dark mode, switch to light mode)
+*   Skip adding an account at the end of the flow
+
+**COPE Profile Owner**
+
+*   Create a managed profile by launching the “Set up TestDPC” app (if this app
+    seems broken and you are in dark mode, switch to light mode)
+*   Skip adding an account at the end of the flow
+*   Run the `adb` command:
+
+    ```console
+    adb shell dpm mark-profile-owner-on-organization-owned-device --user 10 com.afwsamples.testdpc/.DeviceAdminReceiver`
+    ```
+
+## TestDPC as DM role holder
+
+TestDPC v9.0.5+ can be setup as Device Management Role Holder.
+
+*   Running the following `adb` commands:
+
+    ```console
+    adb shell cmd role set-bypassing-role-qualification true
+    adb shell cmd role add-role-holder android.app.role.DEVICE_POLICY_MANAGEMENT com.afwsamples.testdpc
+    ```
+
+    Note: unlike DO/PO, this change is not persisted so TestDPC needs to be
+    marked as role holder again if the device reboots.
+
+Android Studio import
+---------------------
+
+To import this repository in Android Studio, you need to use the 
+[Bazel for IntelliJ](https://plugins.jetbrains.com/plugin/8609-bazel-for-intellij)
+Plugin.
+
+When importing the project you have to select the folder containing the Bazel's
+`BUILD` file. When prompted to select a "project view", you can choose the
+option "Copy external" and choose the `scripts/ij.bazelproject` available in
+this repository.
+
+Once Bazel has complete the import operation and the first sync of the
+project, you can create a "Run Configuration".
+Select "Bazel Command" as Configuration type and add `//:testdpc` as 
+"target expression".
+
+You can now run the project from inside Android Studio.
 
 Support
 -------

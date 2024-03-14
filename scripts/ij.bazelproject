@@ -1,0 +1,17 @@
+directories:
+  .
+
+# Automatically includes all relevant targets under the 'directories' above
+derive_targets_from_directories: false
+
+targets:
+  testdpc
+
+additional_languages:
+  # kotlin
+
+test_sources:
+  # Sources that are categorized as test code by the IDE
+  src/tests/*
+
+android_sdk_platform: android-34
