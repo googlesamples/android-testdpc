@@ -73,6 +73,7 @@ import static android.os.UserManager.DISALLOW_SHARE_LOCATION;
 import static android.os.UserManager.DISALLOW_SHARING_ADMIN_CONFIGURED_WIFI;
 import static android.os.UserManager.DISALLOW_SMS;
 import static android.os.UserManager.DISALLOW_SYSTEM_ERROR_DIALOGS;
+import static android.os.UserManager.DISALLOW_ULTRA_WIDEBAND_RADIO;
 import static android.os.UserManager.DISALLOW_UNIFIED_PASSWORD;
 import static android.os.UserManager.DISALLOW_UNINSTALL_APPS;
 import static android.os.UserManager.DISALLOW_UNMUTE_MICROPHONE;
@@ -215,6 +216,7 @@ public class UserRestriction {
     new UserRestriction(DISALLOW_CONFIG_DEFAULT_APPS, R.string.disallow_config_default_apps),
     new UserRestriction(
         DISALLOW_CONFIG_LOCALE, R.string.disallow_config_locale, MANAGE_DEVICE_POLICY_LOCALE),
+    new UserRestriction(DISALLOW_ULTRA_WIDEBAND_RADIO, R.string.disallow_ultra_wideband_radio),
   };
 
   /**
@@ -250,6 +252,7 @@ public class UserRestriction {
     DISALLOW_ADD_WIFI_CONFIG,
     DISALLOW_CELLULAR_2G,
     DISALLOW_CONFIG_DEFAULT_APPS,
+    DISALLOW_ULTRA_WIDEBAND_RADIO,
   };
 
   /** Setting these user restrictions only have effect on primary users. */
@@ -278,6 +281,7 @@ public class UserRestriction {
     DISALLOW_USB_FILE_TRANSFER,
     DISALLOW_AIRPLANE_MODE,
     DISALLOW_CONFIG_PRIVATE_DNS,
+    DISALLOW_ULTRA_WIDEBAND_RADIO,
   };
 
   /** User restrictions that cannot be set by profile owners. Applied to all users. */
@@ -357,7 +361,7 @@ public class UserRestriction {
   };
 
   public static String[] UDC_PLUS_RESTRICTIONS = {
-    DISALLOW_CELLULAR_2G, DISALLOW_CONFIG_DEFAULT_APPS,
+    DISALLOW_CELLULAR_2G, DISALLOW_CONFIG_DEFAULT_APPS, DISALLOW_ULTRA_WIDEBAND_RADIO,
   };
 
   public static UserRestriction getRestriction(String restrictionKey) {

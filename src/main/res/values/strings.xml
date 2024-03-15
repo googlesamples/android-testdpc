@@ -530,6 +530,7 @@
     <string name="disallow_cellular_2g">Disallow Cellular 2G</string>
     <string name="disallow_config_default_apps">Disallow config default apps</string>
     <string name="disallow_config_locale">Disallow config locale</string>
+    <string name="disallow_ultra_wideband_radio">Disallow ultra wideband radio</string>
     <string name="user_restriction_error_msg">Operation not allowed</string>
 
     <!-- Strings for select app -->
