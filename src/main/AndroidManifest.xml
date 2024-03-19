@@ -69,8 +69,6 @@
     <uses-feature android:name="android.hardware.wifi" android:required="false" />
     <uses-feature android:name="android.hardware.touchscreen" android:required="false"/>
 
-    <!-- TODO(b/201271137): Add non-testOnly build config. -->
-    <!-- NOTE: android:testOnly will be stripped by build.gradle (stripTestOnlyForBuild()) -->
     <application
             android:allowBackup="true"
             android:icon="@drawable/ic_launcher"

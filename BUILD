@@ -2,6 +2,8 @@ exports_files(["LICENSE"])
 
 MANIFEST = "src/main/AndroidManifest.xml"
 
+MANIFEST_DEBUG = "src/main/AndroidManifestDebug.xml"
+
 PACKAGE = "com.afwsamples.testdpc"
 
 aar_import(
@@ -79,6 +81,19 @@ android_binary(
         "--force-jumbo",
     ],
     manifest = MANIFEST,
+    multidex = "native",
+    deps = [
+        ":testdpc_lib",
+    ],
+)
+
+android_binary(
+    name = "testdpc_debug",
+    custom_package = PACKAGE,
+    dexopts = [
+        "--force-jumbo",
+    ],
+    manifest = MANIFEST_DEBUG,
     multidex = "native",
     deps = [
         ":testdpc_lib",
