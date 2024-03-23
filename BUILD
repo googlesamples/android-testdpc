@@ -70,7 +70,13 @@ android_library(
 android_library(
     name = "test_deps",
     exports = [
-
+        "@maven//:org_robolectric_robolectric",
+        "@robolectric//bazel:android-all",
+        "@maven//:org_robolectric_annotations",
+        "@maven//:org_robolectric_shadows_framework",
+        "@maven//:com_google_truth_truth",
+        "@maven//:androidx_test_core",
+        "@maven//:com_google_testparameterinjector_test_parameter_injector"
     ],
 )
 
@@ -138,6 +144,7 @@ android_local_test(
         ":testdpc_lib",
         ":test_deps"
     ],
+    custom_package = "com.afwsamples.testdpc.common"
 )
 
 android_local_test(
@@ -149,6 +156,7 @@ android_local_test(
         ":androidx_deps",
         ":test_deps"
     ],
+    custom_package = "com.afwsamples.testdpc.feedback"
 )
 
 android_local_test(
@@ -159,6 +167,7 @@ android_local_test(
         ":testdpc_lib",
         ":test_deps"
     ],
+    custom_package = "com.afwsamples.testdpc.policy.wifimanagement"
 )
 
 android_local_test(
@@ -169,6 +178,7 @@ android_local_test(
         ":testdpc_lib",
         ":test_deps"
     ],
+    custom_package = "com.afwsamples.testdpc.provision"
 )
 
 java_test(
