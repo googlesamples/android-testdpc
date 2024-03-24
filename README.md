@@ -68,7 +68,7 @@ Android Studio import
 ---------------------
 
 To import this repository in Android Studio, you need to use the 
-[Bazel for IntelliJ](https://plugins.jetbrains.com/plugin/8609-bazel-for-intellij)
+[Bazel for Android Studio](https://plugins.jetbrains.com/plugin/9185-bazel-for-android-studio)
 Plugin.
 
 When importing the project you have to select the folder containing the Bazel's
