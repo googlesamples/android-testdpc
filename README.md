@@ -17,7 +17,7 @@ Provisioning
 
 You can find various kinds of provisioning methods [here](https://developers.google.com/android/work/prov-devices#Key_provisioning_differences_across_android_releases). Let's take a few of them as an example.
 
-#### QR code provisioing (Device Owner N+ only) ####
+#### QR code provisioning (Device Owner N+ only) ####
 1. Factory reset your device and tap the welcome screen in setup wizard 6 times.
 2. The setup wizard prompts the user to connect to the Internet so the setup wizard can download a QR code reader.
 3. Modify (if needed) and scan [this QR code] (http://down-box.appspot.com/qr/nQB0tw7b).
@@ -78,10 +78,19 @@ this repository.
 
 Once Bazel has complete the import operation and the first sync of the
 project, you can create a "Run Configuration".
-Select "Bazel Command" as Configuration type and add `//:testdpc` as 
+Select "Bazel Command" as Configuration type and add `//:testdpc` as
 "target expression".
 
 You can now run the project from inside Android Studio.
+
+
+Building with Bazel
+-------------------
+
+The repository includes a `build.sh` script to build the application. The required
+[setupdesign library](https://android.googlesource.com/platform/external/setupdesign/+/refs/heads/main)
+is now imported and patched dynamically using the command line utility `ed`. This needs to be
+available on the path to successfully build the project.
 
 Support
 -------
