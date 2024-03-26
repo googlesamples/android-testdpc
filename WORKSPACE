@@ -1,18 +1,33 @@
+workspace(name = "testdpc")
+
 android_sdk_repository(
     name = "androidsdk",
     api_level = 34,
 )
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("@bazel_tools//tools/build_defs/repo:jvm.bzl", "jvm_maven_import_external")
 
-RULES_JVM_EXTERNAL_TAG = "4.2"
-RULES_JVM_EXTERNAL_SHA = "cd1a77b7b02e8e008439ca76fd34f5b07aecb8c752961f9640dea15e9e5ba1ca"
+http_archive(
+    name = "robolectric",
+    sha256 = "1ea1cfe67848decf959316e80dd69af2bbaa359ae2195efe1366cbdf3e968356",
+    strip_prefix = "robolectric-bazel-4.11.1",
+    urls = ["https://github.com/robolectric/robolectric-bazel/releases/download/4.11.1/robolectric-bazel-4.11.1.tar.gz"],
+)
+
+load("@robolectric//bazel:robolectric.bzl", "robolectric_repositories")
+
+robolectric_repositories()
+
+RULES_JVM_EXTERNAL_TAG = "4.5"
+
+RULES_JVM_EXTERNAL_SHA = "b17d7388feb9bfa7f2fa09031b32707df529f26c91ab9e5d909eb1676badd9a6"
 
 http_archive(
     name = "rules_jvm_external",
-    strip_prefix = "rules_jvm_external-%s" % RULES_JVM_EXTERNAL_TAG,
-    sha256 = RULES_JVM_EXTERNAL_SHA,
-    url = "https://github.com/bazelbuild/rules_jvm_external/archive/%s.zip" % RULES_JVM_EXTERNAL_TAG,
+    sha256 = "d31e369b854322ca5098ea12c69d7175ded971435e55c18dd9dd5f29cc5249ac",
+    strip_prefix = "rules_jvm_external-5.3",
+    url = "https://github.com/bazelbuild/rules_jvm_external/releases/download/5.3/rules_jvm_external-5.3.tar.gz",
 )
 
 load("@rules_jvm_external//:repositories.bzl", "rules_jvm_external_deps")
@@ -24,12 +39,15 @@ load("@rules_jvm_external//:setup.bzl", "rules_jvm_external_setup")
 rules_jvm_external_setup()
 
 load("@rules_jvm_external//:defs.bzl", "maven_install")
+load("@rules_jvm_external//:specs.bzl", "maven")
 
 maven_install(
+    name = "maven",
     artifacts = [
-        "androidx.annotation:annotation:1.3.0",
+        "androidx.annotation:annotation:1.5.0",
         "androidx.appcompat:appcompat:1.6.1",
         "androidx.appcompat:appcompat-resources:1.6.1",
+        "androidx.collection:collection:1.2.0",
         "androidx.constraintlayout:constraintlayout:2.1.3",
         "androidx.core:core:1.6.0",
         "androidx.enterprise:enterprise-feedback:1.1.0",
@@ -41,14 +59,47 @@ maven_install(
         "androidx.localbroadcastmanager:localbroadcastmanager:1.1.0",
         "androidx.preference:preference:1.1.0",
         "androidx.recyclerview:recyclerview:1.2.0",
-        "androidx.collection:collection:1.2.0",
-        "com.google.android.material:material:1.5.0",
+        "androidx.test:core:1.5.0",
+        "androidx.test:monitor:1.6.0",
+        "androidx.test:runner:1.5.0",
+        "androidx.window:window:1.2.0",
+        "com.google.android.material:material:1.6.1",
         "com.google.guava:guava:31.1-android",
+        "com.google.testparameterinjector:test-parameter-injector:1.15",
+        "com.google.truth:truth:1.1.3",
+        "com.google.errorprone:error_prone_annotations:2.26.1",
+        "junit:junit:4.13.2",
+        "javax.inject:javax.inject:1",
+        "org.hamcrest:java-hamcrest:2.0.0.0",
+        "org.robolectric:robolectric:4.9.2",
+        "org.robolectric:robolectric-annotations:3.3.2",
+        "org.robolectric:shadows-core:3.3.2",
         "org.bouncycastle:bcpkix-jdk15on:1.70",
-        "org.bouncycastle:bcprov-jdk15on:1.70"
+        "org.bouncycastle:bcprov-jdk15on:1.70",
     ],
     repositories = [
         "https://maven.google.com",
         "https://repo1.maven.org/maven2",
     ],
+    # for androidx.annotation 1.5.0. 1.6.0+ uses gradle module metadata
+    # which rules_jvm_external cannot resolve yet, see
+    # https://github.com/bazelbuild/rules_jvm_external/issues/909
+    version_conflict_policy = "pinned",
+)
+
+http_archive(
+    name = "setupdesign",
+    build_file = "@//:setupdesign.BUILD",
+    url = "https://android.googlesource.com/platform/external/setupdesign/+archive/4634dac90e3c09a78c2fcdfcb16ab9cb16265527.tar.gz",
+)
+
+http_archive(
+    name = "setupcompat",
+    build_file = "@//:setupcompat.BUILD",
+    # Patch source code to avoid "cannot infer type arguments for Creator<T>" in 2 files
+    patch_cmds = [
+        "ed -s main/java/com/google/android/setupcompat/logging/ScreenKey.java <<<$',s/Creator<>/Creator<ScreenKey>/g\nw'",
+        "ed -s main/java/com/google/android/setupcompat/logging/SetupMetric.java <<<$',s/Creator<>/Creator<SetupMetric>/g\nw'",
+    ],
+    url = "https://android.googlesource.com/platform/external/setupcompat/+archive/2ce41c8f4de550b5186233cec0a722dd0ffd9a84.tar.gz",
 )
