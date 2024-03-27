@@ -21,8 +21,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:icon="@drawable/ic_enterprise_blue"
-    app:sucHeaderText="@string/finish_setup"
-    app:sucUsePartnerResource="true">
+    app:sucHeaderText="@string/finish_setup">
 
     <LinearLayout
         style="@style/SudContentFrame"
