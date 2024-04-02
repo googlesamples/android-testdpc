@@ -61,14 +61,17 @@
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="set_screen_brightness"
             android:title="@string/set_screen_brightness"
+            testdpc:admin="deviceOwner|orgOwnedProfileOwner"
             testdpc:minSdkVersion="P" />
         <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
             android:key="auto_brightness"
             android:title="@string/auto_brightness"
+            testdpc:admin="deviceOwner|orgOwnedProfileOwner"
             testdpc:minSdkVersion="P" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="set_screen_off_timeout"
             android:title="@string/set_screen_off_timeout"
+            testdpc:admin="deviceOwner|orgOwnedProfileOwner"
             testdpc:minSdkVersion="P" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="set_profile_name"

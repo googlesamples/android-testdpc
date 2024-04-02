@@ -98,11 +98,15 @@ public class UserRestrictionsParentDisplayFragment extends BaseSearchablePolicyP
   private void constrainPreferences() {
     for (String restrictionKey : UserRestriction.PROFILE_OWNER_ORG_DEVICE_RESTRICTIONS) {
       DpcPreferenceBase pref = (DpcPreferenceBase) findPreference(restrictionKey);
-      if (Arrays.stream(UserRestriction.TM_PLUS_RESTRICTIONS).anyMatch(restrictionKey::equals)) {
-        pref.setMinSdkVersion(VERSION_CODES.TIRAMISU);
+      if (Arrays.stream(UserRestriction.VIC_PLUS_PARENT_RESTRICTIONS)
+          .anyMatch(restrictionKey::equals)) {
+        pref.setMinSdkVersion(VERSION_CODES.VANILLA_ICE_CREAM);
       } else if (Arrays.stream(UserRestriction.UDC_PLUS_RESTRICTIONS)
           .anyMatch(restrictionKey::equals)) {
         pref.setMinSdkVersion(VERSION_CODES.UPSIDE_DOWN_CAKE);
+      } else if (Arrays.stream(UserRestriction.TM_PLUS_RESTRICTIONS)
+          .anyMatch(restrictionKey::equals)) {
+        pref.setMinSdkVersion(VERSION_CODES.TIRAMISU);
       } else {
         pref.setMinSdkVersion(VERSION_CODES.R);
       }

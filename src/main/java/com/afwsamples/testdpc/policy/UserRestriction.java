@@ -253,6 +253,8 @@ public class UserRestriction {
     DISALLOW_CELLULAR_2G,
     DISALLOW_CONFIG_DEFAULT_APPS,
     DISALLOW_ULTRA_WIDEBAND_RADIO,
+    DISALLOW_CONFIG_BRIGHTNESS,
+    DISALLOW_CONFIG_SCREEN_TIMEOUT,
   };
 
   /** Setting these user restrictions only have effect on primary users. */
@@ -362,6 +364,10 @@ public class UserRestriction {
 
   public static String[] UDC_PLUS_RESTRICTIONS = {
     DISALLOW_CELLULAR_2G, DISALLOW_CONFIG_DEFAULT_APPS, DISALLOW_ULTRA_WIDEBAND_RADIO,
+  };
+
+  public static String[] VIC_PLUS_PARENT_RESTRICTIONS = {
+    DISALLOW_CONFIG_BRIGHTNESS, DISALLOW_CONFIG_SCREEN_TIMEOUT,
   };
 
   public static UserRestriction getRestriction(String restrictionKey) {
