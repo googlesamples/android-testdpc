@@ -230,6 +230,16 @@
             </intent-filter>
         </receiver>
 
+        <receiver android:name=".PolicyChangeMonitor"
+            android:exported="true"
+            android:enabled="@bool/is_u_or_later"
+                android:permission="android.permission.BIND_DEVICE_ADMIN">
+            <intent-filter>
+                <action android:name="android.app.admin.action.DEVICE_POLICY_CHANGED"/>
+                <action android:name="android.app.admin.action.DEVICE_POLICY_SET_RESULT"/>
+            </intent-filter>
+        </receiver>
+
         <service android:name=".policy.resetpassword.ResetPasswordService"
                 android:enabled="@bool/is_o_or_later"
                 android:exported="false"
