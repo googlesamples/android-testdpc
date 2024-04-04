@@ -57,8 +57,7 @@ public class Util {
   private static final String TAG = "Util";
   private static final int DEFAULT_BUFFER_SIZE = 4096;
 
-  // TODO(b/258511062): change check once U SDK is launched
-  private static final boolean IS_RUNNING_U = VERSION.CODENAME.equals("UpsideDownCake");
+  private static final boolean IS_RUNNING_V = VERSION.CODENAME.equals("VanillaIceCream");
 
   /**
    * A replacement for {@link VERSION.SDK_INT} that is compatible with pre-release SDKs
@@ -66,7 +65,7 @@ public class Util {
    * <p>This will be set to the version SDK, or {@link VERSION_CODES.CUR_DEVELOPMENT} if the SDK int
    * is not yet assigned.
    */
-  public static final int SDK_INT = IS_RUNNING_U ? VERSION_CODES.CUR_DEVELOPMENT : VERSION.SDK_INT;
+  public static final int SDK_INT = IS_RUNNING_V ? VERSION_CODES.CUR_DEVELOPMENT : VERSION.SDK_INT;
 
   // Copied over from RoleManager.ROLE_DEVICE_POLICY_MANAGEMENT, which can't be referenced directly
   // since it's a @SystemAPI.
