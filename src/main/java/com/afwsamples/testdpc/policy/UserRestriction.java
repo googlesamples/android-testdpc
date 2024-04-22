@@ -25,6 +25,7 @@ import static android.os.UserManager.DISALLOW_ADJUST_VOLUME;
 import static android.os.UserManager.DISALLOW_AIRPLANE_MODE;
 import static android.os.UserManager.DISALLOW_AMBIENT_DISPLAY;
 import static android.os.UserManager.DISALLOW_APPS_CONTROL;
+import static android.os.UserManager.DISALLOW_ASSIST_CONTENT;
 import static android.os.UserManager.DISALLOW_AUTOFILL;
 import static android.os.UserManager.DISALLOW_BLUETOOTH;
 import static android.os.UserManager.DISALLOW_BLUETOOTH_SHARING;
@@ -217,6 +218,7 @@ public class UserRestriction {
     new UserRestriction(
         DISALLOW_CONFIG_LOCALE, R.string.disallow_config_locale, MANAGE_DEVICE_POLICY_LOCALE),
     new UserRestriction(DISALLOW_ULTRA_WIDEBAND_RADIO, R.string.disallow_ultra_wideband_radio),
+    new UserRestriction(DISALLOW_ASSIST_CONTENT, R.string.disallow_assist_content),
   };
 
   /**
@@ -358,8 +360,11 @@ public class UserRestriction {
   };
 
   public static String[] TM_PLUS_RESTRICTIONS = {
-    DISALLOW_CHANGE_WIFI_STATE, DISALLOW_WIFI_TETHERING, DISALLOW_SHARING_ADMIN_CONFIGURED_WIFI,
-    DISALLOW_WIFI_DIRECT, DISALLOW_ADD_WIFI_CONFIG,
+    DISALLOW_CHANGE_WIFI_STATE,
+    DISALLOW_WIFI_TETHERING,
+    DISALLOW_SHARING_ADMIN_CONFIGURED_WIFI,
+    DISALLOW_WIFI_DIRECT,
+    DISALLOW_ADD_WIFI_CONFIG,
   };
 
   public static String[] UDC_PLUS_RESTRICTIONS = {
@@ -367,7 +372,7 @@ public class UserRestriction {
   };
 
   public static String[] VIC_PLUS_PARENT_RESTRICTIONS = {
-    DISALLOW_CONFIG_BRIGHTNESS, DISALLOW_CONFIG_SCREEN_TIMEOUT,
+    DISALLOW_CONFIG_BRIGHTNESS, DISALLOW_CONFIG_SCREEN_TIMEOUT, DISALLOW_ASSIST_CONTENT
   };
 
   public static UserRestriction getRestriction(String restrictionKey) {
