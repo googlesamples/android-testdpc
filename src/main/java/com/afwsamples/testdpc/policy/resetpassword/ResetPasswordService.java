@@ -37,6 +37,7 @@ import android.os.UserManager;
 import android.util.Log;
 import androidx.annotation.Nullable;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
+import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.R;
 
 @TargetApi(VERSION_CODES.O)
@@ -58,9 +59,11 @@ public class ResetPasswordService extends Service {
     @Override
     public void onReceive(Context context, Intent intent) {
       Log.d(TAG, "onReceive: " + intent.toString());
-      Intent serviceIntent = new Intent(context, ResetPasswordService.class);
-      serviceIntent.setAction(intent.getAction());
-      context.startForegroundService(serviceIntent);
+      if (Util.isDeviceOwner(context) || Util.isProfileOwner(context)) {
+        Intent serviceIntent = new Intent(context, ResetPasswordService.class);
+        serviceIntent.setAction(intent.getAction());
+        context.startForegroundService(serviceIntent);
+      }
     }
   }
 
@@ -100,7 +103,11 @@ public class ResetPasswordService extends Service {
     IntentFilter filter = new IntentFilter();
     filter.addAction(ACTION_USER_UNLOCKED);
     filter.addAction(ACTION_RESET_PASSWORD);
-    registerReceiver(receiver, filter);
+    if (Util.SDK_INT >= VERSION_CODES.TIRAMISU) {
+      registerReceiver(receiver, filter, Context.RECEIVER_EXPORTED);
+    } else {
+      registerReceiver(receiver, filter);
+    }
 
     showNotification();
     return START_REDELIVER_INTENT;
