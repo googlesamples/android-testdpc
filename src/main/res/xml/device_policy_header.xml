@@ -83,12 +83,17 @@
             testdpc:minSdkVersion="S" />
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="@string/override_apn_title">
+    <PreferenceCategory android:title="@string/telephony_title">
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="manage_override_apn"
             android:title="@string/manage_override_apn"
             testdpc:admin="deviceOwner"
             testdpc:minSdkVersion="P" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="manage_esim"
+            android:title="@string/manage_esim"
+            testdpc:admin="deviceOwner|orgOwnedProfileOwner|profileOwner"
+            testdpc:minSdkVersion="V" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/cross_profile_calendar">

@@ -450,6 +450,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
       "credential_manager_set_blocklist";
   private static final String CREDENTIAL_MANAGER_CLEAR_POLICY_KEY =
       "credential_manager_clear_policy";
+  private static final String MANAGE_ESIM_KEY = "manage_esim";
 
   private static final String BATTERY_PLUGGED_ANY =
       Integer.toString(
@@ -826,6 +827,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         .setOnPreferenceClickListener(this);
     findPreference(CREDENTIAL_MANAGER_SET_BLOCKLIST_KEY).setOnPreferenceClickListener(this);
     findPreference(CREDENTIAL_MANAGER_CLEAR_POLICY_KEY).setOnPreferenceClickListener(this);
+    findPreference(MANAGE_ESIM_KEY).setOnPreferenceClickListener(this);
 
     DpcPreference bindDeviceAdminPreference =
         (DpcPreference) findPreference(BIND_DEVICE_ADMIN_POLICIES);
@@ -1433,6 +1435,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
       return true;
     } else if (CREDENTIAL_MANAGER_CLEAR_POLICY_KEY.equals(key)) {
       resetCredentialManagerPolicy();
+      return true;
+    } else if (MANAGE_ESIM_KEY.equals(key)) {
+      showFragment(new EsimControlFragment());
       return true;
     }
     return false;

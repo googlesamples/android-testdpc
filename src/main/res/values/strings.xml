@@ -230,6 +230,9 @@
     <string name="disable_cross_profile_caller_id">Disable cross-profile caller ID</string>
     <string name="disable_cross_profile_contacts_search">Disable cross-profile contacts search</string>
 
+    <!-- Strings for telephony -->
+    <string name="telephony_title">Telephony</string>
+
     <!-- Strings for APN -->
     <string name="override_apn_title">Override APN management</string>
     <string name="manage_override_apn">Manage override APNs</string>
@@ -255,6 +258,16 @@
     <string name="apn_network_bitmask">Network type bitmask</string>
     <string name="apn_mvno_type">MVNO type</string>
     <string name="apn_numeric_hint">Numeric=MCC+MNC</string>
+
+    <!-- Strings for eSIM controls-->
+    <string name="esim_management">eSIM Management</string>
+    <string name="manage_esim"> Manage eSIM</string>
+    <string name="download_esim">Download eSIM</string>
+    <string name="esim_activation_code">Enter activation code</string>
+    <string name="delete_esim_dialog_title">Enter subId of the eSIM to delete</string>
+    <string name="get_managed_esim_dialog_title">List of managed eSIMs subId</string>
+    <string name="delete_esim">Delete eSIM</string>
+    <string name="get_managed_esim">Get managed eSIM</string>
 
     <string name="apn_entry_name_cannot_be_empty">Entry name cannot be empty</string>
     <string name="apn_name_cannot_be_empty">APN name cannot be empty</string>
