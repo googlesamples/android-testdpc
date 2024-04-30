@@ -72,6 +72,7 @@ import static android.os.UserManager.DISALLOW_SET_WALLPAPER;
 import static android.os.UserManager.DISALLOW_SHARE_INTO_MANAGED_PROFILE;
 import static android.os.UserManager.DISALLOW_SHARE_LOCATION;
 import static android.os.UserManager.DISALLOW_SHARING_ADMIN_CONFIGURED_WIFI;
+import static android.os.UserManager.DISALLOW_SIM_GLOBALLY;
 import static android.os.UserManager.DISALLOW_SMS;
 import static android.os.UserManager.DISALLOW_SYSTEM_ERROR_DIALOGS;
 import static android.os.UserManager.DISALLOW_ULTRA_WIDEBAND_RADIO;
@@ -219,6 +220,7 @@ public class UserRestriction {
         DISALLOW_CONFIG_LOCALE, R.string.disallow_config_locale, MANAGE_DEVICE_POLICY_LOCALE),
     new UserRestriction(DISALLOW_ULTRA_WIDEBAND_RADIO, R.string.disallow_ultra_wideband_radio),
     new UserRestriction(DISALLOW_ASSIST_CONTENT, R.string.disallow_assist_content),
+    new UserRestriction(DISALLOW_SIM_GLOBALLY, R.string.disallow_sim_globally),
   };
 
   /**
@@ -370,6 +372,8 @@ public class UserRestriction {
   public static String[] UDC_PLUS_RESTRICTIONS = {
     DISALLOW_CELLULAR_2G, DISALLOW_CONFIG_DEFAULT_APPS, DISALLOW_ULTRA_WIDEBAND_RADIO,
   };
+
+  public static String[] VIC_PLUS_RESTRICTIONS = {DISALLOW_SIM_GLOBALLY};
 
   public static String[] VIC_PLUS_PARENT_RESTRICTIONS = {
     DISALLOW_CONFIG_BRIGHTNESS, DISALLOW_CONFIG_SCREEN_TIMEOUT, DISALLOW_ASSIST_CONTENT
