@@ -21,7 +21,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:icon="@drawable/ic_enterprise_blue"
-    app:sucHeaderText="@string/set_up_management_header">
+    app:sucHeaderText="@string/set_up_management_header"
+    app:sucUsePartnerResource="true">
 
     <LinearLayout
         style="@style/SudContentFrame"
