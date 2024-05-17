@@ -248,6 +248,13 @@ final class ShellCommand {
                 ordinalParam(boolean.class, "enabled"))
             .setDescription("Set the given user restriction."));
     flags.addCommand(
+        command(
+                "set-user-restriction-on-parent",
+                this::setUserRestrictionOnParent,
+                ordinalParam(String.class, "restriction"),
+                ordinalParam(boolean.class, "enabled"))
+            .setDescription("Set the given user restriction on the parent user."));
+    flags.addCommand(
         command("lock-now", this::lockNow, optional(namedParam(int.class, "flags")))
             .setDescription("Lock the device (now! :-)."));
     flags.addCommand(command("reboot", this::reboot).setDescription("Reboot the device."));
@@ -787,6 +794,19 @@ final class ShellCommand {
         enabled,
         (v) -> onSuccess("User restriction '%s' set to %b", userRestriction, enabled),
         (e) -> onError(e, "Error setting user restriction '%s' to %b", userRestriction, enabled));
+  }
+
+  private void setUserRestrictionOnParent(String userRestriction, boolean enabled) {
+    Log.i(TAG, "setUserRestrictionOnParent(" + userRestriction + ", " + enabled + ")");
+    DevicePolicyManagerGateway parentDpmGateway =
+        DevicePolicyManagerGatewayImpl.forParentProfile(mContext);
+    parentDpmGateway.setUserRestriction(
+        userRestriction,
+        enabled,
+        (v) -> onSuccess("User restriction '%s' set to %b", userRestriction, enabled),
+        (e) ->
+            onError(
+                e, "Error setting parent user restriction '%s' to %b", userRestriction, enabled));
   }
 
   private void lockNow(Integer flags) {

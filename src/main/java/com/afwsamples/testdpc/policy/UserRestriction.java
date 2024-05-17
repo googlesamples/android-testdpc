@@ -10,6 +10,7 @@ import static android.Manifest.permission.MANAGE_DEVICE_POLICY_LOCATION;
 import static android.Manifest.permission.MANAGE_DEVICE_POLICY_LOCK_CREDENTIALS;
 import static android.Manifest.permission.MANAGE_DEVICE_POLICY_MOBILE_NETWORK;
 import static android.Manifest.permission.MANAGE_DEVICE_POLICY_MODIFY_USERS;
+import static android.Manifest.permission.MANAGE_DEVICE_POLICY_PROFILES;
 import static android.Manifest.permission.MANAGE_DEVICE_POLICY_RESTRICT_PRIVATE_DNS;
 import static android.Manifest.permission.MANAGE_DEVICE_POLICY_SAFE_BOOT;
 import static android.Manifest.permission.MANAGE_DEVICE_POLICY_SMS;
@@ -19,6 +20,7 @@ import static android.Manifest.permission.MANAGE_DEVICE_POLICY_WALLPAPER;
 import static android.Manifest.permission.MANAGE_DEVICE_POLICY_WIFI;
 import static android.os.UserManager.ALLOW_PARENT_PROFILE_APP_LINKING;
 import static android.os.UserManager.DISALLOW_ADD_MANAGED_PROFILE;
+import static android.os.UserManager.DISALLOW_ADD_PRIVATE_PROFILE;
 import static android.os.UserManager.DISALLOW_ADD_USER;
 import static android.os.UserManager.DISALLOW_ADD_WIFI_CONFIG;
 import static android.os.UserManager.DISALLOW_ADJUST_VOLUME;
@@ -221,6 +223,10 @@ public class UserRestriction {
     new UserRestriction(DISALLOW_ULTRA_WIDEBAND_RADIO, R.string.disallow_ultra_wideband_radio),
     new UserRestriction(DISALLOW_ASSIST_CONTENT, R.string.disallow_assist_content),
     new UserRestriction(DISALLOW_SIM_GLOBALLY, R.string.disallow_sim_globally),
+    new UserRestriction(
+        DISALLOW_ADD_PRIVATE_PROFILE,
+        R.string.disallow_add_private_profile,
+        MANAGE_DEVICE_POLICY_PROFILES),
   };
 
   /**
@@ -259,6 +265,7 @@ public class UserRestriction {
     DISALLOW_ULTRA_WIDEBAND_RADIO,
     DISALLOW_CONFIG_BRIGHTNESS,
     DISALLOW_CONFIG_SCREEN_TIMEOUT,
+    DISALLOW_ADD_PRIVATE_PROFILE,
   };
 
   /** Setting these user restrictions only have effect on primary users. */
@@ -318,7 +325,8 @@ public class UserRestriction {
     DISALLOW_AIRPLANE_MODE,
     DISALLOW_CONFIG_SCREEN_TIMEOUT,
     DISALLOW_CONFIG_BRIGHTNESS,
-    DISALLOW_AMBIENT_DISPLAY
+    DISALLOW_AMBIENT_DISPLAY,
+    DISALLOW_ADD_PRIVATE_PROFILE,
   };
 
   /** These user restrictions are added in MNC. */
@@ -376,7 +384,10 @@ public class UserRestriction {
   public static String[] VIC_PLUS_RESTRICTIONS = {DISALLOW_SIM_GLOBALLY};
 
   public static String[] VIC_PLUS_PARENT_RESTRICTIONS = {
-    DISALLOW_CONFIG_BRIGHTNESS, DISALLOW_CONFIG_SCREEN_TIMEOUT, DISALLOW_ASSIST_CONTENT
+    DISALLOW_CONFIG_BRIGHTNESS,
+    DISALLOW_CONFIG_SCREEN_TIMEOUT,
+    DISALLOW_ASSIST_CONTENT,
+    DISALLOW_ADD_PRIVATE_PROFILE
   };
 
   public static UserRestriction getRestriction(String restrictionKey) {
