@@ -154,7 +154,17 @@ public class Util {
   public static boolean isPrimaryUser(Context context) {
     if (Util.SDK_INT >= VERSION_CODES.M) {
       UserManager userManager = (UserManager) context.getSystemService(Context.USER_SERVICE);
-      return userManager.isSystemUser();
+
+      // Starting from Android V, on headless devices TestDPC is provisioned using the single_user
+      // DO mode and is set as the DO on the main user. UserManager.isMainUser is not a public API,
+      // so we'll have to depend on the fact that the DO is installed on the main user for the
+      // check.
+      if (Util.SDK_INT >= VERSION_CODES.VANILLA_ICE_CREAM
+          && userManager.isHeadlessSystemUserMode()) {
+        return isDeviceOwner(context);
+      } else {
+        return userManager.isSystemUser();
+      }
     } else {
       // Assume only DO can be primary user. This is not perfect but the cases in which it is
       // wrong are uncommon and require adb to set up.
