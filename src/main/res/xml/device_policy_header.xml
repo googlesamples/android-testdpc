@@ -831,10 +831,6 @@
             testdpc:admin="deviceOwner|orgOwnedProfileOwner"
             testdpc:minSdkVersion="S" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
-            android:key="wipe_data"
-            android:title="@string/wipe_data"
-            testdpc:minSdkVersion="L" />
-        <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="remove_device_owner"
             android:title="@string/remove_device_owner"
             testdpc:admin="deviceOwner"
@@ -849,11 +845,6 @@
             android:title="@string/set_factory_reset_protection_policy"
             testdpc:admin="deviceOwner|orgOwnedProfileOwner"
             testdpc:minSdkVersion="R" />
-        <com.afwsamples.testdpc.common.preference.DpcPreference
-            android:key="factory_reset_org_owned_device"
-            android:title="@string/factory_reset_org_owned"
-            testdpc:admin="orgOwnedProfileOwner"
-            testdpc:minSdkVersion="R" />
         <com.afwsamples.testdpc.common.preference.DpcSwitchPreference
             android:key="suspend_personal_apps"
             android:title="@string/suspend_personal_apps"
@@ -867,6 +858,19 @@
             android:title="@string/profile_max_time_off"
             testdpc:admin="orgOwnedProfileOwner"
             testdpc:minSdkVersion="R" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/data_wipe_section">
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="remove_managed_profile"
+            android:title="@string/remove_managed_profile"
+            testdpc:user="managedProfile"
+            testdpc:minSdkVersion="L" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="factory_reset_device"
+            android:title="@string/factory_reset_device"
+            testdpc:admin="deviceOwner|orgOwnedProfileOwner"
+            testdpc:minSdkVersion="L" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/transfer_ownership">

@@ -246,6 +246,10 @@ public interface DevicePolicyManagerGateway {
   /** See {@link android.app.admin.DevicePolicyManager#wipeData(int)}. */
   void wipeData(int flags, @NonNull Consumer<Void> onSuccess, @NonNull Consumer<Exception> onError);
 
+  /** See {@link android.app.admin.DevicePolicyManager#wipeDevice(int)}. */
+  void wipeDevice(
+      int flags, @NonNull Consumer<Void> onSuccess, @NonNull Consumer<Exception> onError);
+
   /**
    * See {@link
    * android.app.admin.DevicePolicyManager#requestBugreport(android.content.ComponentName)}.

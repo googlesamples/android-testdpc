@@ -65,13 +65,6 @@
             testdpc:minSdkVersion="N" />
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="@string/profile_management_title">
-        <com.afwsamples.testdpc.common.preference.DpcPreference
-            android:key="remove_profile"
-            android:title="@string/remove_managed_profile"
-            testdpc:minSdkVersion="L" />
-    </PreferenceCategory>
-
     <PreferenceCategory android:title="@string/work_telephony_title">
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="managed_subscriptions"

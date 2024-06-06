@@ -16,6 +16,7 @@
 
 package com.afwsamples.testdpc;
 
+import android.annotation.TargetApi;
 import android.app.admin.DevicePolicyManager;
 import android.app.admin.NetworkEvent;
 import android.app.admin.SecurityLog.SecurityEvent;
@@ -27,6 +28,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Bitmap;
 import android.location.LocationManager;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.os.Process;
@@ -430,6 +432,19 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
 
     try {
       mDevicePolicyManager.wipeData(flags);
+      onSuccess.accept(null);
+    } catch (Exception e) {
+      onError.accept(e);
+    }
+  }
+
+  @Override
+  @TargetApi(VERSION_CODES.UPSIDE_DOWN_CAKE)
+  public void wipeDevice(int flags, Consumer<Void> onSuccess, Consumer<Exception> onError) {
+    Log.d(TAG, "wipeDevice(" + flags + ")");
+
+    try {
+      mDevicePolicyManager.wipeDevice(flags);
       onSuccess.accept(null);
     } catch (Exception e) {
       onError.accept(e);

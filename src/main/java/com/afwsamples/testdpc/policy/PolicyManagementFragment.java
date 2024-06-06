@@ -390,7 +390,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
   private static final String UNSUSPEND_APPS_KEY = "unsuspend_apps";
   private static final String CLEAR_APP_DATA_KEY = "clear_app_data";
   private static final String KEEP_UNINSTALLED_PACKAGES = "keep_uninstalled_packages";
-  private static final String WIPE_DATA_KEY = "wipe_data";
+  private static final String REMOVE_MANAGED_PROFILE_KEY = "remove_managed_profile";
+  private static final String FACTORY_RESET_DEVICE_KEY = "factory_reset_device";
   private static final String CREATE_WIFI_CONFIGURATION_KEY = "create_wifi_configuration";
   private static final String CREATE_EAP_TLS_WIFI_CONFIGURATION_KEY =
       "create_eap_tls_wifi_configuration";
@@ -425,7 +426,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
   private static final String MANAGE_OVERRIDE_APN_KEY = "manage_override_apn";
   private static final String MANAGED_SYSTEM_UPDATES_KEY = "managed_system_updates";
   private static final String SET_PRIVATE_DNS_MODE_KEY = "set_private_dns_mode";
-  private static final String FACTORY_RESET_ORG_OWNED_DEVICE = "factory_reset_org_owned_device";
   private static final String SET_FACTORY_RESET_PROTECTION_POLICY_KEY =
       "set_factory_reset_protection_policy";
   private static final String SET_LOCATION_ENABLED_KEY = "set_location_enabled";
@@ -682,7 +682,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     mStayOnWhilePluggedInSwitchPreference =
         (SwitchPreference) findPreference(STAY_ON_WHILE_PLUGGED_IN);
     mStayOnWhilePluggedInSwitchPreference.setOnPreferenceChangeListener(this);
-    findPreference(WIPE_DATA_KEY).setOnPreferenceClickListener(this);
+    findPreference(REMOVE_MANAGED_PROFILE_KEY).setOnPreferenceClickListener(this);
+    findPreference(FACTORY_RESET_DEVICE_KEY).setOnPreferenceClickListener(this);
     findPreference(REMOVE_DEVICE_OWNER_KEY).setOnPreferenceClickListener(this);
     mEnableBackupServicePreference = (DpcSwitchPreference) findPreference(ENABLE_BACKUP_SERVICE);
     mEnableBackupServicePreference.setOnPreferenceChangeListener(this);
@@ -810,7 +811,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     findPreference(CROSS_PROFILE_CALENDAR_KEY).setOnPreferenceClickListener(this);
     findPreference(ENTERPRISE_SLICE_KEY).setOnPreferenceClickListener(this);
-    findPreference(FACTORY_RESET_ORG_OWNED_DEVICE).setOnPreferenceClickListener(this);
     findPreference(SET_FACTORY_RESET_PROTECTION_POLICY_KEY).setOnPreferenceClickListener(this);
     findPreference(SET_ORGANIZATION_ID_KEY).setOnPreferenceClickListener(this);
 
@@ -1060,8 +1060,11 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         // no lock task present, ignore
       }
       return true;
-    } else if (WIPE_DATA_KEY.equals(key)) {
-      showWipeDataPrompt();
+    } else if (REMOVE_MANAGED_PROFILE_KEY.equals(key)) {
+      showWipeDataPrompt(/* wipeDevice */ false);
+      return true;
+    } else if (FACTORY_RESET_DEVICE_KEY.equals(key)) {
+      showWipeDataPrompt(/* wipeDevice */ true);
       return true;
     } else if (REMOVE_DEVICE_OWNER_KEY.equals(key)) {
       showRemoveDeviceOwnerPrompt();
@@ -1402,9 +1405,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
       return true;
     } else if (SET_PROFILE_NAME_KEY.equals(key)) {
       showSetProfileNameDialog();
-      return true;
-    } else if (FACTORY_RESET_ORG_OWNED_DEVICE.equals(key)) {
-      factoryResetOrgOwnedDevice();
       return true;
     } else if (SET_FACTORY_RESET_PROTECTION_POLICY_KEY.equals(key)) {
       showFragment(new FactoryResetProtectionPolicyFragment());
@@ -2067,10 +2067,10 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
   }
 
   /**
-   * Shows a prompt to ask for confirmation on wiping the data and also provide an option to set if
-   * external storage and factory reset protection data also needs to wiped.
+   * Shows a prompt to ask for confirmation on wiping the profile / device and also provide an
+   * option to set if external storage and factory reset protection data also needs to wiped.
    */
-  private void showWipeDataPrompt() {
+  private void showWipeDataPrompt(boolean wipeDevice) {
     final LayoutInflater inflater = getActivity().getLayoutInflater();
     final View dialogView = inflater.inflate(R.layout.wipe_data_dialog_prompt, null);
     final CheckBox externalStorageCheckBox =
@@ -2079,7 +2079,10 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         (CheckBox) dialogView.findViewById(R.id.reset_protection_checkbox);
 
     new AlertDialog.Builder(getActivity())
-        .setTitle(R.string.wipe_data_title)
+        .setTitle(
+            wipeDevice
+                ? R.string.factory_reset_device_title
+                : R.string.remove_managed_profile_title)
         .setView(dialogView)
         .setPositiveButton(
             android.R.string.ok,
@@ -2095,8 +2098,28 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                     (resetProtectionCheckBox.isChecked()
                         ? DevicePolicyManager.WIPE_RESET_PROTECTION_DATA
                         : 0);
-                mDevicePolicyManagerGateway.wipeData(
-                    flags, (v) -> onSuccessLog("wipeData"), (e) -> onErrorLog("wipeData", e));
+                if (wipeDevice) {
+                  if (Util.SDK_INT >= VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                    // Since U, factory reset needs to use wipeDevice()
+                    mDevicePolicyManagerGateway.wipeDevice(
+                        flags, (v) -> onSuccessLog("wipeData"), (e) -> onErrorLog("wipeData", e));
+                  } else if (mIsOrganizationOwnedProfileOwner) {
+                    // Before U, factory reset by COPE goes via the parent DPM instance
+                    DevicePolicyManagerGatewayImpl.forParentProfile(getActivity())
+                        .wipeData(
+                            /* flags= */ 0,
+                            (v) -> onSuccessLog("wipeData"),
+                            (e) -> onErrorLog("wipeData", e));
+                  } else {
+                    // Before U, factory reset by DO goes via the regular DPM instance
+                    mDevicePolicyManagerGateway.wipeData(
+                        flags, (v) -> onSuccessLog("wipeData"), (e) -> onErrorLog("wipeData", e));
+                  }
+                } else {
+                  // Wipe user
+                  mDevicePolicyManagerGateway.wipeData(
+                      flags, (v) -> onSuccessLog("wipeData"), (e) -> onErrorLog("wipeData", e));
+                }
               }
             })
         .setNegativeButton(android.R.string.cancel, null)
@@ -4714,13 +4737,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
       }
     }
     return NO_CUSTOM_CONSTRAINT;
-  }
-
-  @TargetApi(30)
-  private void factoryResetOrgOwnedDevice() {
-    DevicePolicyManagerGatewayImpl.forParentProfile(getActivity())
-        .wipeData(
-            /* flags= */ 0, (v) -> onSuccessLog("wipeData"), (e) -> onErrorLog("wipeData", e));
   }
 
   private boolean isOrganizationOwnedDevice() {

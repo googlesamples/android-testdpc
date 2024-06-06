@@ -135,19 +135,11 @@
     <string name="set_auto_time_required">Set auto (network) time required</string>
     <string name="set_auto_time">Set auto (network) time</string>
     <string name="set_auto_time_zone">Set auto (network) time zone</string>
-    <string name="wipe_data">Wipe data</string>
-    <string name="wipe_data_title">Wipe data?</string>
-    <string name="wipe_data_confirmation">Are you sure you want to wipe the data?</string>
-    <string name="wipe_data_include">Also wipe:</string>
-    <string name="external_storage">External storage</string>
-    <string name="reset_protection_data">Factory reset protection</string>
     <string name="remove_device_owner">Remove this device owner</string>
     <string name="remove_device_owner_title">Remove device owner?</string>
     <string name="remove_device_owner_confirmation">Policies and restrictions will continue to be
         active and may require a factory reset to clear.</string>
     <string name="device_owner_removed">This app is no longer a device owner.</string>
-    <!-- Corporate-owned work profile falls under device owner management, for convenience. -->
-    <string name="factory_reset_org_owned">Factory reset Org-Owned Work Profile device</string>
     <string name="set_factory_reset_protection_policy">Set factory reset protection policy</string>
     <string name="factory_reset_protection_policy">Factory reset protection policy</string>
     <string name="factory_reset_protection_policy_accounts">Accounts</string>
@@ -158,6 +150,18 @@
     </string-array>
     <string name="cleared_factory_reset_protection_policy">Cleared factory reset protection policy</string>
     <string name="saved_factory_reset_protection_policy">Saved factory reset protection policy</string>
+
+    <!-- Strings for data wipe section-->
+    <string name="data_wipe_section">Data wipe</string>
+    <string name="remove_managed_profile">Remove work profile</string>
+    <string name="remove_managed_profile_title">Remove work profile?</string>
+    <string name="wipe_data_confirmation">Are you sure you want to wipe the data?</string>
+    <string name="wipe_data_include">Also wipe:</string>
+    <string name="external_storage">External storage</string>
+    <string name="reset_protection_data">Factory reset protection</string>
+    <string name="factory_reset_device">Factory reset device</string>
+    <string name="factory_reset_device_title">Factory reset device?</string>
+
 
     <!-- Strings for device reboot -->
     <string name="reboot">Reboot device</string>
@@ -203,8 +207,6 @@
 
     <!-- Stings for work profile management -->
     <string name="profile_management_title">Work profile management</string>
-    <string name="remove_managed_profile">Remove work profile</string>
-    <string name="removing_managed_profile">Removing work profile</string>
     <string name="lock_parent_key">Lock parent</string>
     <string name="evict_ce_key">Evict CE key</string>
 

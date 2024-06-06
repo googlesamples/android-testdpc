@@ -52,10 +52,9 @@ import java.util.List;
  * DevicePolicyManager#clearCrossProfileIntentFilters(android.content.ComponentName)} 3) {@link
  * DevicePolicyManager#setCrossProfileCallerIdDisabled(android.content.ComponentName, boolean)} 4)
  * {@link DevicePolicyManager#getCrossProfileCallerIdDisabled(android.content.ComponentName)} 5)
- * {@link DevicePolicyManager#wipeData(int)} 6) {@link
- * DevicePolicyManager#addCrossProfileWidgetProvider(android.content.ComponentName, String)} 7)
- * {@link DevicePolicyManager#removeCrossProfileWidgetProvider(android.content.ComponentName,
- * String)} 8) {@link DevicePolicyManager#setBluetoothContactSharingDisabled(ComponentName,
+ * {@link DevicePolicyManager#addCrossProfileWidgetProvider(android.content.ComponentName, String)}
+ * 6) {@link DevicePolicyManager#removeCrossProfileWidgetProvider(android.content.ComponentName,
+ * String)} 7) {@link DevicePolicyManager#setBluetoothContactSharingDisabled(ComponentName,
  * boolean)}
  */
 public class ProfilePolicyManagementFragment extends BaseSearchablePolicyPreferenceFragment
@@ -78,7 +77,6 @@ public class ProfilePolicyManagementFragment extends BaseSearchablePolicyPrefere
       "disable_cross_profile_contacts_search";
   private static final String REMOVE_CROSS_PROFILE_APP_WIDGETS_KEY =
       "remove_cross_profile_app_widgets";
-  private static final String REMOVE_PROFILE_KEY = "remove_profile";
   private static final String SET_ORGANIZATION_COLOR_KEY = "set_organization_color";
   private static final String SET_PROFILE_ORGANIZATION_NAME_KEY = "set_profile_organization_name";
 
@@ -90,7 +88,6 @@ public class ProfilePolicyManagementFragment extends BaseSearchablePolicyPrefere
   private ComponentName mAdminComponentName;
   private Preference mAddCrossProfileIntentFilterPreference;
   private Preference mClearCrossProfileIntentFiltersPreference;
-  private Preference mRemoveManagedProfilePreference;
   private Preference mAddCrossProfileAppWidgetsPreference;
   private Preference mRemoveCrossProfileAppWidgetsPreference;
   private SwitchPreference mDisableBluetoothContactSharingSwitchPreference;
@@ -117,8 +114,6 @@ public class ProfilePolicyManagementFragment extends BaseSearchablePolicyPrefere
     mClearCrossProfileIntentFiltersPreference =
         findPreference(CLEAR_CROSS_PROFILE_INTENT_FILTERS_PREFERENCE_KEY);
     mClearCrossProfileIntentFiltersPreference.setOnPreferenceClickListener(this);
-    mRemoveManagedProfilePreference = findPreference(REMOVE_PROFILE_KEY);
-    mRemoveManagedProfilePreference.setOnPreferenceClickListener(this);
     mAddCrossProfileAppWidgetsPreference = findPreference(ADD_CROSS_PROFILE_APP_WIDGETS_KEY);
     mAddCrossProfileAppWidgetsPreference.setOnPreferenceClickListener(this);
     mRemoveCrossProfileAppWidgetsPreference = findPreference(REMOVE_CROSS_PROFILE_APP_WIDGETS_KEY);
@@ -157,14 +152,6 @@ public class ProfilePolicyManagementFragment extends BaseSearchablePolicyPrefere
         mDevicePolicyManager.clearCrossProfileIntentFilters(mAdminComponentName);
         showToast(R.string.cross_profile_intent_filters_cleared);
         return true;
-      case REMOVE_PROFILE_KEY:
-        mRemoveManagedProfilePreference.setEnabled(false);
-        mDevicePolicyManager.wipeData(0);
-        showToast(R.string.removing_managed_profile);
-        // Finish the activity because all other functions will not work after the managed
-        // profile is removed.
-        getActivity().finish();
-        break;
       case ADD_CROSS_PROFILE_APP_WIDGETS_KEY:
         showDisabledAppWidgetList();
         return true;
