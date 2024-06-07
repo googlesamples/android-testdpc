@@ -168,7 +168,7 @@ public class WifiEapTlsCreateDialogFragment extends DialogFragment {
   }
 
   private boolean extractInputDataAndSave() {
-    String ssid = mSsidEditText.getText().toString();
+    String ssid = getQuotedString(mSsidEditText.getText().toString());
     if (TextUtils.isEmpty(ssid)) {
       mSsidEditText.setError(getString(R.string.error_missing_ssid));
       return false;
@@ -194,6 +194,10 @@ public class WifiEapTlsCreateDialogFragment extends DialogFragment {
       showToast(R.string.wifi_config_fail);
     }
     return false;
+  }
+
+  private String getQuotedString(String string) {
+    return "\"" + string + "\"";
   }
 
   private WifiEnterpriseConfig extractEnterpriseConfig() {
