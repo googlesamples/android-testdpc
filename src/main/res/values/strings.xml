@@ -361,12 +361,15 @@
     <string name="create_eap_tls_wifi_configuration">Create EAP-TLS WI-FI configuration</string>
     <string name="wifi_identity">Identity (if any)</string>
     <string name="wifi_client_cert_password">Client certificate password (if any)</string>
+    <string name="wifi_domain">Domain suffix match</string>
+    <string name="wifi_alt_subject_match">Alt subject match</string>
     <string name="import_ca_certificate">Import CA certificate</string>
     <string name="import_user_certificate">Import user certificate</string>
     <string name="select_user_certificate">Select user certificate</string>
     <string name="selected_certificate">Selected certificate: <xliff:g example="server certificate" id="certificate_alias">%1$s</xliff:g></string>
     <string name="selected_keychain_certificate">Selected KeyChain alias: <xliff:g example="somealias" id="certificate_alias">%1$s</xliff:g></string>
     <string name="selected_certificate_none">No certificate selected</string>
+    <string name="error_domain_and_alt_subject_match_both_unset">Either domain or alt subject match must be set</string>
     <string name="error_missing_ssid">Missing SSID</string>
     <string name="error_missing_ca_cert">Missing CA cert</string>
     <string name="error_missing_client_cert">Missing client cert or invalid cert password</string>

@@ -123,5 +123,39 @@
                     android:layout_height="wrap_content"
                 tools:ignore="TextFields" />
         </LinearLayout>
+
+        <LinearLayout
+                style="@style/networking_item"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+            <TextView
+                    style="@style/networking_item_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/wifi_domain"/>
+            <EditText
+                    android:id="@+id/wifi_domain"
+                    style="@style/networking_item_edit_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                tools:ignore="TextFields" />
+        </LinearLayout>
+
+        <LinearLayout
+                style="@style/networking_item"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+            <TextView
+                    style="@style/networking_item_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/wifi_alt_subject_match"/>
+            <EditText
+                    android:id="@+id/wifi_alt_subject_match"
+                    style="@style/networking_item_edit_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                tools:ignore="TextFields" />
+        </LinearLayout>
     </LinearLayout>
 </ScrollView>
