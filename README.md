@@ -17,11 +17,23 @@ Provisioning
 
 You can find various kinds of provisioning methods [here](https://developers.google.com/android/work/prov-devices#Key_provisioning_differences_across_android_releases). Let's take a few of them as an example.
 
+#### AFW# code provisioning (Device Owner M+)
+1. Factory reset your device and tap the welcome screen in setup wizard 6 times.
+2. When prompted to sign in, enter **afw#testdpc**
+3. Follow onscreen instructions
+
 #### QR code provisioning (Device Owner N+ only) ####
 1. Factory reset your device and tap the welcome screen in setup wizard 6 times.
-2. The setup wizard prompts the user to connect to the Internet so the setup wizard can download a QR code reader.
-3. Modify (if needed) and scan [this QR code] (http://down-box.appspot.com/qr/nQB0tw7b).
-4. Follow onscreen instructions
+2. On Android O or older, the setup wizard prompts the user to connect to the Internet so the setup wizard can download a QR code reader.
+3. Generate a QR code with the content:
+   ```
+    {
+    	"android.app.extra.PROVISIONING_DEVICE_ADMIN_COMPONENT_NAME": "com.afwsamples.testdpc/com.afwsamples.testdpc.DeviceAdminReceiver",
+    	"android.app.extra.PROVISIONING_DEVICE_ADMIN_SIGNATURE_CHECKSUM": "gJD2YwtOiWJHkSMkkIfLRlj-quNqG1fb6v100QmzM9w=",
+    	"android.app.extra.PROVISIONING_DEVICE_ADMIN_PACKAGE_DOWNLOAD_LOCATION": "https://testdpc-latest-apk.appspot.com"
+    }
+   ```
+6. Scan the QR code and follow onscreen instructions
 
 #### ADB command ####
 
