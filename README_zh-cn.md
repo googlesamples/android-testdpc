@@ -21,7 +21,7 @@ Test DPC 是一款帮助企业移动管理、独立软件厂商和原始设备�
 #### QR 码配置（仅限 Device Owner Android 7.0+） ####
 1. 重置设备并在设置向导中点击欢迎屏幕 6 次。
 2. 安装向导会提示用户连接互联网，以便安装向导下载 QR 码阅读器。
-3. 修改（如需要）并扫描 [此二维码] (http://down-box.appspot.com/qr/nQB0tw7b)。
+3. 修改（如需要）并扫描 [此二维码](http://down-box.appspot.com/qr/nQB0tw7b)。
 4. 按照屏幕上的说明继续操作。
 
 #### ADB 命令 ####
