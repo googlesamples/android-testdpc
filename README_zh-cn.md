@@ -21,7 +21,7 @@ Test DPC 是一款帮助企业移动管理、独立软件厂商和原始设备�
 #### QR 码配置（仅限 Device Owner Android 7.0+） ####
 1. 重置设备并在设置向导中点击欢迎屏幕 6 次。
 2. 安装向导会提示用户连接互联网，以便安装向导下载 QR 码阅读器。
-3. 修改（如需要）并扫描 [此二维码](http://down-box.appspot.com/qr/nQB0tw7b)。
+3. 修改（如需要）并扫描 [此二维码](http://down-box.appspot.com/qr/nQB0tw7b "您所在的国家和地区可能无法访问此链接。")。
 4. 按照屏幕上的说明继续操作。
 
 #### ADB 命令 ####
@@ -70,8 +70,7 @@ TestDPC v9.0.5+ 可设置为设备管理角色持有者。
 要在 Android Studio 中导入该版本库，需要使用 [Bazel for Android Studio](https://plugins.jetbrains.com/plugin/9185-bazel-for-android-studio)
 插件。
 
-导入项目时，您必须选择包含 Bazel 的
-BUILD` 文件的文件夹。当提示选择 "项目视图 "时，可以选择
+导入项目时，您必须选择包含 Bazel 的 `BUILD` 文件的文件夹。当提示选择 "项目视图 "时，可以选择
 选项 "复制外部"，并选择该资源库中的 `scripts/ij.bazelproject`。
 
 一旦 Bazel 完成导入操作和项目的首次同步，您就可以创建 "运行配置"。
