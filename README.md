@@ -95,13 +95,20 @@ Select "Bazel Command" as Configuration type and add `//:testdpc` as
 
 You can now run the project from inside Android Studio.
 
-
 ## Building with Bazel
 
 The repository includes a `build.sh` script to build the application. The required
 [setupdesign library](https://android.googlesource.com/platform/external/setupdesign/+/refs/heads/main)
 is now imported and patched dynamically using the command line utility `ed`. This needs to be
 available on the path to successfully build the project.
+
+### `ANDROID_HOME` environment setup
+
+Bazel requires that you set the `ANDROID_HOME` environment variable to the path of your Android SDK.
+As an example, you can add to your `.bashrc` on linux:
+```
+export ANDROID_HOME=<Path to the Android SDK>
+```
 
 ## Support
 
