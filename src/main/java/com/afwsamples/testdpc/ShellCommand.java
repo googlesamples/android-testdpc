@@ -65,7 +65,7 @@ import java.util.stream.Collectors;
 /**
  * Provides a CLI (command-line interface) to TestDPC through {@code dumpsys}.
  *
- * <p>Usage: {@code adb shell dumpsys activity service --user USER_ID com.afwsamples.testdpc CMD}.
+ * <p>Usage: {@code adb shell dumpsys activity --user USER_ID service com.afwsamples.testdpc CMD}.
  */
 final class ShellCommand {
   private static final String TAG = "TestDPCShellCommand";
