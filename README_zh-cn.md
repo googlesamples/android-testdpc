@@ -19,10 +19,20 @@ Test DPC 是一款帮助企业移动管理、独立软件厂商和原始设备�
 您可以在 [此处（位于google.cn）](https://developers.google.cn/android/work/prov-devices#Key_provisioning_differences_across_android_releases) 找到各种配置方法。让我们以其中几种为例。
 
 #### QR 码配置（仅限 Device Owner Android 7.0+） ####
-1. 重置设备并在设置向导中点击欢迎屏幕 6 次。
-2. 安装向导会提示用户连接互联网，以便安装向导下载 QR 码阅读器。
-3. 修改（如需要）并扫描 [此二维码](http://down-box.appspot.com/qr/nQB0tw7b "您所在的国家和地区可能无法访问此链接。")。
-4. 按照屏幕上的说明继续操作。
+1. 将设备恢复出厂设置，然后在设置向导中点击欢迎屏幕 6 次。
+2. 在 Android O 或更早版本上，设置向导会提示用户连接到 Internet，以便设置向导可以下载二维码阅读器。
+   Android P 和更新的设备已经提供了 QR 码阅读器。
+3. 生成一个二维码，内容如下：
+   ```
+    {
+    	“android.app.extra.PROVISIONING_DEVICE_ADMIN_COMPONENT_NAME”： “com.afwsamples.testdpc/com.afwsamples.testdpc.DeviceAdminReceiver”，
+    	“android.app.extra.PROVISIONING_DEVICE_ADMIN_SIGNATURE_CHECKSUM”： “gJD2YwtOiWJHkSMkkIfLRlj-quNqG1fb6v100QmzM9w=”，
+    	“android.app.extra.PROVISIONING_DEVICE_ADMIN_PACKAGE_DOWNLOAD_LOCATION”： “https://testdpc-latest-apk.appspot.com”
+    }
+   ```
+   或使用此预制二维码： 
+   ![testdpc_provisioning](https://github.com/googlesamples/android-testdpc/assets/188886/a54b809f-cf58-433b-8cbe-f14cf3f00612)
+4. 扫描二维码并按照屏幕上的说明进行操作。
 
 #### ADB 命令 ####
 
@@ -36,14 +46,12 @@ Test DPC 是一款帮助企业移动管理、独立软件厂商和原始设备�
 
 **Profile Owner（配置文件所有者）**
 
-*   启动 "Set up TestDPC "应用程序，创建管理配置文件（如果该应用程序
-    似乎不正常，而且您处于深色模式，请切换到浅色模式模式）。
+*   启动 "Set up TestDPC "应用程序，创建管理配置文件（如果该应用程序似乎不正常，而且您处于深色模式，请切换到浅色模式）。
 *   跳过末尾的添加账户操作。
 
 **COPE Profile Owner （公司所有的配置文件所有者）**
 
-*   启动 "Set up TestDPC "应用程序，创建管理配置文件（如果该应用程序
-    似乎不正常，而且您处于深色模式，请切换到浅色模式模式）。
+*   启动 "Set up TestDPC "应用程序，创建管理配置文件（如果该应用程序似乎不正常，而且您处于深色模式，请切换到浅色模式）。
 *   跳过末尾的添加账户操作。
 *   执行此`ADB`命令:
 
@@ -76,7 +84,6 @@ TestDPC v9.0.5+ 可设置为设备管理角色持有者。
 一旦 Bazel 完成导入操作和项目的首次同步，您就可以创建 "运行配置"。
 项目后，即可创建 "运行配置"。
 选择 "Bazel 命令 "作为配置类型，并添加 `//:testdpc` 作为 "目标表达式"。
-"目标表达式"。
 
 现在，您可以在 Android Studio 中运行该项目。
 
@@ -86,6 +93,15 @@ TestDPC v9.0.5+ 可设置为设备管理角色持有者。
 
 仓库包含一个用于构建应用程序的 `build.sh` 脚本。 所需的
 [setupdesign 库](https://android.googlesource.com/platform/external/setupdesign/+/refs/heads/main "您所在的国家和地区可能无法访问此链接。")现在可使用命令行实用程序 `ed`动态导入和修补。这需要被添加到path才能成功构建项目。
+
+'ANDROID_HOME' 环境设置
+-------------------
+
+Bazel 要求您将“ANDROID_HOME”环境变量设置为 Android SDK 的路径。
+例如，您可以在 linux 上的“.bashrc”中添加：
+```
+export ANDROID_HOME=<Android SDK 的路径>
+```
 
 支持
 -------
