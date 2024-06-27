@@ -34,8 +34,7 @@
             <enum name="S_V2" value="32" />
             <enum name="T" value="33" />
             <enum name="U" value="34" />
-            <!-- Change to V API level once released. -->
-            <enum name="V" value="10000" />
+            <enum name="V" value="35" />
         </attr>
 
         <!-- Constrain a preference to DO or PO admins. -->
