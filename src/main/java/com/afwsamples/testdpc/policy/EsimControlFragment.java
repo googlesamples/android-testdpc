@@ -91,18 +91,36 @@ public class EsimControlFragment extends BaseSearchablePolicyPreferenceFragment
               intent.getIntExtra(EuiccManager.EXTRA_EMBEDDED_SUBSCRIPTION_DETAILED_CODE, -1);
           int errorCode =
               intent.getIntExtra(EuiccManager.EXTRA_EMBEDDED_SUBSCRIPTION_ERROR_CODE, -1);
+          int resultCode = getResultCode();
 
           Log.v(
               TAG,
               "Download result: resultCode: "
-                  + getResultText(getResultCode())
+                  + getResultText(resultCode)
                   + " detailedCode: "
-                  + getResultCode()
+                  + resultCode
                   + " detailedCode: "
                   + detailedCode
                   + " errorCode: "
                   + errorCode);
-          showToast("Download result: " + getResultText(getResultCode()), Toast.LENGTH_LONG);
+          showToast("Download result: " + getResultText(resultCode), Toast.LENGTH_LONG);
+          if (resultCode == EuiccManager.EMBEDDED_SUBSCRIPTION_RESULT_RESOLVABLE_ERROR) {
+            try {
+              mEuiccManager.startResolutionActivity(
+                  getActivity(),
+                  resultCode,
+                  intent,
+                  PendingIntent.getBroadcast(
+                      getActivity(),
+                      0,
+                      new Intent(ACTION_DOWNLOAD_ESIM),
+                      PendingIntent.FLAG_MUTABLE
+                          | PendingIntent.FLAG_ALLOW_UNSAFE_IMPLICIT_INTENT));
+            } catch (Exception e) {
+              Log.e(TAG, "Failed to start resolution activity", e);
+            }
+            return;
+          }
           getActivity().unregisterReceiver(mDownloadESIMReceiver);
         }
       };
