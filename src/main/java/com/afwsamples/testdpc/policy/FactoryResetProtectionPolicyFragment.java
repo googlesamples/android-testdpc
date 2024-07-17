@@ -43,11 +43,20 @@ import com.afwsamples.testdpc.R;
 import java.util.ArrayList;
 import java.util.List;
 
+@RequiresApi(api = VERSION_CODES.R)
 public class FactoryResetProtectionPolicyFragment extends Fragment
     implements AdapterView.OnItemSelectedListener, View.OnClickListener {
 
   private static final int DISABLED = 0;
   private static final int ENABLED = 1;
+
+  /**
+   * The number of digits in a Google account ID, which includes {@link
+   * #GOOGLE_ACCOUNT_ID_PREFIX_LENGTH}
+   */
+  private static final int GOOGLE_ACCOUNT_ID_LENGTH = 21;
+
+  private static final int GOOGLE_ACCOUNT_ID_PREFIX_LENGTH = 1;
 
   private DevicePolicyManager mDevicePolicyManager;
   private ComponentName mAdminComponentName;
@@ -58,7 +67,6 @@ public class FactoryResetProtectionPolicyFragment extends Fragment
   private FrpAccountsAdapter mAccountsAdapter;
   private Spinner mFrpEnabledSpinner;
 
-  @RequiresApi(api = VERSION_CODES.R)
   @Override
   public void onCreate(Bundle savedInstanceState) {
     mDevicePolicyManager =
@@ -68,7 +76,6 @@ public class FactoryResetProtectionPolicyFragment extends Fragment
     getActivity().getActionBar().setTitle(R.string.factory_reset_protection_policy);
   }
 
-  @RequiresApi(api = VERSION_CODES.R)
   @Override
   public View onCreateView(
       LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
@@ -168,6 +175,7 @@ public class FactoryResetProtectionPolicyFragment extends Fragment
     final AlertDialog dialog =
         new AlertDialog.Builder(getActivity())
             .setTitle(R.string.add_account)
+            .setMessage(R.string.factory_reset_protection_policy_account_id_msg)
             .setView(view)
             .setPositiveButton(android.R.string.ok, null)
             .setNegativeButton(android.R.string.cancel, null)
@@ -179,7 +187,7 @@ public class FactoryResetProtectionPolicyFragment extends Fragment
                 .setOnClickListener(
                     okButtonView -> {
                       String item = input.getText().toString();
-                      if (TextUtils.isEmpty(item)) {
+                      if (!isValidAccountId(item)) {
                         showToast(R.string.fail_to_add_account);
                         return;
                       }
@@ -210,5 +218,27 @@ public class FactoryResetProtectionPolicyFragment extends Fragment
 
   private void showToast(@StringRes int stringResId) {
     Toast.makeText(getActivity(), stringResId, Toast.LENGTH_LONG).show();
+  }
+
+  /**
+   * Returns whether the given string is a valid Google account ID, which are numeric strings
+   * that are exactly {@value #GOOGLE_ACCOUNT_ID_LENGTH} digits in length.
+   */
+  private boolean isValidAccountId(String accountId) {
+    if (TextUtils.isEmpty(accountId)) {
+      return false;
+    }
+
+    if (accountId.length() != GOOGLE_ACCOUNT_ID_LENGTH) {
+      return false;
+    }
+
+    try {
+      // Strip the prefix and verify that the rest of the ID can be parsed as a long
+      Long.parseUnsignedLong(accountId.substring(GOOGLE_ACCOUNT_ID_PREFIX_LENGTH));
+      return true;
+    } catch (NumberFormatException ex) {
+      return false;
+    }
   }
 }

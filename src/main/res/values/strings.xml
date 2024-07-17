@@ -142,7 +142,8 @@
     <string name="device_owner_removed">This app is no longer a device owner.</string>
     <string name="set_factory_reset_protection_policy">Set factory reset protection policy</string>
     <string name="factory_reset_protection_policy">Factory reset protection policy</string>
-    <string name="factory_reset_protection_policy_accounts">Accounts</string>
+    <string name="factory_reset_protection_policy_accounts">Account IDs</string>
+    <string name="factory_reset_protection_policy_account_id_msg">Account IDs are exactly 21 decimal digits</string>
     <string name="factory_reset_protection_policy_enabled">Enabled</string>
     <string-array name="factory_reset_protection_policy_enabled_choices">
         <item>Disabled</item>

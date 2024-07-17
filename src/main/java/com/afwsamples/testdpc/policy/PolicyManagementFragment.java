@@ -1407,8 +1407,11 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
       showSetProfileNameDialog();
       return true;
     } else if (SET_FACTORY_RESET_PROTECTION_POLICY_KEY.equals(key)) {
-      showFragment(new FactoryResetProtectionPolicyFragment());
-      return true;
+      if (Util.SDK_INT >= VERSION_CODES.R) {
+        showFragment(new FactoryResetProtectionPolicyFragment());
+        return true;
+      }
+      return false;
     } else if (SET_ORGANIZATION_ID_KEY.equals(key)) {
       showSetOrganizationIdDialog();
       return true;
