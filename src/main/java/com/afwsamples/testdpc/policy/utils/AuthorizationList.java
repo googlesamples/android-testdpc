@@ -216,7 +216,7 @@ public class AuthorizationList {
       int tag = entry.getTagNo();
       Log.i(
           "Attestation",
-          "Parsing tag: [" + tag + "], value: [" + entry.getBaseUniversal(true, tag) + "]");
+          "Parsing tag: [" + tag + "], value: [" + entry.getExplicitBaseObject() + "]");
       switch (tag) {
         default:
           throw new CertificateParsingException("Unknown tag " + tag + " found");
