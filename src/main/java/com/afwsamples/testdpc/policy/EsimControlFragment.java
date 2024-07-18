@@ -48,7 +48,7 @@ import java.util.Set;
 public class EsimControlFragment extends BaseSearchablePolicyPreferenceFragment
     implements Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
   private static final String TAG = EsimControlFragment.class.getSimpleName();
-  private static final String DOWNLOADE_ESIM = "download_esim";
+  private static final String DOWNLOAD_ESIM = "download_esim";
   private static final String DELETE_ESIM = "delete_esim";
   private static final String GET_MANAGED_ESIM = "get_managed_esim";
   private static final String ACTION_DOWNLOAD_ESIM = "com.afwsamples.testdpc.esim_download";
@@ -150,7 +150,7 @@ public class EsimControlFragment extends BaseSearchablePolicyPreferenceFragment
   public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
     addPreferencesFromResource(R.xml.esim_control_preferences);
 
-    mDownloadEsimPreference = (DpcPreference) findPreference(DOWNLOADE_ESIM);
+    mDownloadEsimPreference = (DpcPreference) findPreference(DOWNLOAD_ESIM);
     mDownloadEsimPreference.setOnPreferenceClickListener(this);
 
     mDeleteEsimPreference = (DpcPreference) findPreference(DELETE_ESIM);
@@ -175,7 +175,7 @@ public class EsimControlFragment extends BaseSearchablePolicyPreferenceFragment
     String key = preference.getKey();
 
     switch (key) {
-      case DOWNLOADE_ESIM:
+      case DOWNLOAD_ESIM:
         showDownloadEsimUi();
         return true;
       case DELETE_ESIM:
@@ -299,7 +299,7 @@ public class EsimControlFragment extends BaseSearchablePolicyPreferenceFragment
         PendingIntent.getBroadcast(
             getActivity(),
             0,
-            new Intent(),
+            new Intent(ACTION_DELETE_ESIM),
             PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
     mEuiccManager.deleteSubscription(subId, pi);
 
