@@ -29,7 +29,6 @@ import android.content.pm.PermissionInfo;
 import android.os.Build.VERSION_CODES;
 import androidx.test.core.app.ApplicationProvider;
 import org.junit.Test;
-import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
@@ -39,8 +38,9 @@ import org.robolectric.shadows.ShadowLog;
 @Config(minSdk = VERSION_CODES.Q)
 public class PermissionsHelperTest {
 
-  private ComponentName TESTDPC_ADMIN = null;
-  private ComponentName NON_TESTDPC_ADMIN = null;
+  private static final ComponentName TESTDPC_ADMIN =
+      new ComponentName("com.afwsamples.testdpc", "TestCls");
+  private static final ComponentName NON_TESTDPC_ADMIN = new ComponentName("TestPkg", "TestCls");
 
   private final Context mContext = ApplicationProvider.getApplicationContext();
   private final DevicePolicyManager mDevicePolicyManager =
@@ -52,12 +52,6 @@ public class PermissionsHelperTest {
   private static final String DANGEROUS_PERMISSION = permission.ACCESS_FINE_LOCATION;
   private static final String NORMAL_PERMISSION = permission.ACCESS_WIFI_STATE;
   private static final String MISSING_INFO_PERMISSION = permission.CHANGE_WIFI_STATE;
-
-  @Before
-  public void initialize() {
-    TESTDPC_ADMIN = new ComponentName("com.afwsamples.testdpc", "TestCls");
-    NON_TESTDPC_ADMIN = new ComponentName("TestPkg", "TestCls");
-  }
 
   @Test
   public void

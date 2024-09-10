@@ -249,11 +249,6 @@ public class SetupManagementFragment extends Fragment
     specifySkipEncryption(intent);
     specifyDefaultDisclaimers(intent);
 
-    // allow offline provisioning
-    if (Util.SDK_INT >= VERSION_CODES.TIRAMISU) {
-      intent.putExtra(DevicePolicyManager.EXTRA_PROVISIONING_ALLOW_OFFLINE, true);
-    }
-
     if (adminExtras.size() > 0) {
       intent.putExtra(EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE, adminExtras);
     }
