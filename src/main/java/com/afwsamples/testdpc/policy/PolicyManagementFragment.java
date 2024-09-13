@@ -892,6 +892,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
   }
 
   @Override
+  @TargetApi(VERSION_CODES.S)
   public void dump(String prefix, PrintWriter pw, String[] args) {
     // TODO(b/173541467): needs to compile against @SystemAPI SDK to get it
     // pw.printf("%smUserId: %s\n", prefix, getActivity().getUserId());
@@ -907,9 +908,11 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     pw.printf(
         "%sisRunningOnAutomotiveDevice(): %s\n",
         prefix, Util.isRunningOnAutomotiveDevice(getActivity()));
-    // TODO(b/173541467): need to expose it
-    //        pw.printf("%sisHeadlessSystemUserMode(): %s\n", prefix,
-    //                mUserManager.isHeadlessSystemUserMode());
+    if (Util.SDK_INT >= VERSION_CODES.S) {
+      pw.printf(
+          "%sisHeadlessSystemUserMode(): %s\n",
+          prefix, mUserManager.isHeadlessSystemUserMode());
+    }
   }
 
   private void maybeUpdateProfileMaxTimeOff() {
@@ -4512,22 +4515,10 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 showToast(R.string.organization_id_empty);
                 return;
               }
-              setOrganizationId(organizationId);
+              mDevicePolicyManager.setOrganizationId(organizationId);
             })
         .setNegativeButton(android.R.string.cancel, null)
         .show();
-  }
-
-  private void setOrganizationId(String organizationId) {
-    try {
-      // TODO(b/179160578): Call directly when the S SDK is available.
-      ReflectionUtil.invoke(mDevicePolicyManager, "setOrganizationId", organizationId);
-    } catch (ReflectionIsTemporaryException e) {
-      Log.e(TAG, "Error invoking setOrganizationId", e);
-      showToast("Error setting organization ID");
-    }
-
-    loadEnrollmentSpecificId();
   }
 
   @TargetApi(VERSION_CODES.R)

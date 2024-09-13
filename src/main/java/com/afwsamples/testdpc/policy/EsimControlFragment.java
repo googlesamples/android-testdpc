@@ -189,22 +189,11 @@ public class EsimControlFragment extends BaseSearchablePolicyPreferenceFragment
   }
 
   private void showManagedEsimUi() {
-    Set<Integer> managedSubIds = getSubscriptionIds();
+    Set<Integer> managedSubIds = mDevicePolicyManager.getSubscriptionIds();
     new AlertDialog.Builder(getActivity())
         .setTitle(R.string.get_managed_esim_dialog_title)
         .setItems(managedSubIds.stream().map(String::valueOf).toArray(String[]::new), null)
         .show();
-  }
-
-  private Set<Integer> getSubscriptionIds() {
-    try {
-      // TODO: remove reflection code and call directly once V is released.
-      return ReflectionUtil.invoke(mDevicePolicyManager, "getSubscriptionIds");
-    } catch (ReflectionIsTemporaryException e) {
-      Log.e(TAG, "Error invoking getSubscriptionIds", e);
-      showToast("Error getting managed esim information.", Toast.LENGTH_LONG);
-    }
-    return null;
   }
 
   private void showToast(String msg, int duration) {
