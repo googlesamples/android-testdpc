@@ -275,11 +275,14 @@
                 android:exported="true"
                 android:permission="android.permission.BIND_DEVICE_ADMIN"/>
 
+        <!-- Ignore NewApi lint check because this service is only enabled on API26+. -->
+        <!-- TODO: Address lint failing without removing the check (if possible) -->
         <service
                 android:name=".DeviceAdminService"
                 android:enabled="@bool/is_o_or_later"
                 android:exported="true"
-                android:permission="android.permission.BIND_DEVICE_ADMIN">
+                android:permission="android.permission.BIND_DEVICE_ADMIN"
+                tools:ignore="NewAPI">
             <intent-filter>
                 <action android:name="android.app.action.DEVICE_ADMIN_SERVICE" />
             </intent-filter>
