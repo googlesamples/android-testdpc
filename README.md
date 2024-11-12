@@ -16,9 +16,11 @@ This app can also be found [on the Play store](https://play.google.com/store/app
 You can find various kinds of provisioning methods [here](https://developers.google.com/android/work/prov-devices#Key_provisioning_differences_across_android_releases). Let's take a few of them as an example.
 
 ### AFW# code provisioning (Device Owner M+)
-1. Factory reset your device and tap the welcome screen in setup wizard 6 times.
-2. When prompted to sign in, enter **afw#testdpc**
-3. Follow onscreen instructions
+1. Factory reset your device.
+2. Setup Wi-Fi
+3. When prompted to sign in, enter **afw#testdpc**
+4. Follow onscreen instructions
+  - Choose 'Use for work only' for fully managed setup.
 
 ### QR code provisioning (Device Owner N+ only)
 1. Factory reset your device and tap the welcome screen in setup wizard 6 times.
