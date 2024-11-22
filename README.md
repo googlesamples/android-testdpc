@@ -22,9 +22,9 @@ You can find various kinds of provisioning methods [here](https://developers.goo
 
 ### QR code provisioning (Device Owner N+ only)
 1. Factory reset your device and tap the welcome screen in setup wizard 6 times.
-1. On Android O or older, the setup wizard prompts the user to connect to the Internet so the setup wizard can download a QR code reader.
+   On Android O or older, the setup wizard prompts the user to connect to the Internet so the setup wizard can download a QR code reader.
    Android P and newer devices already have the QR code reader available.
-1. Generate a QR code with the content:
+2. Generate a QR code with the content:
    ```
     {
     	"android.app.extra.PROVISIONING_DEVICE_ADMIN_COMPONENT_NAME": "com.afwsamples.testdpc/com.afwsamples.testdpc.DeviceAdminReceiver",
@@ -34,6 +34,7 @@ You can find various kinds of provisioning methods [here](https://developers.goo
    ```
    or use this pre-made QR code:  
    ![testdpc_provisioning](qrcode.png)
+   > In some cases, it may be difficult to access `appspot.com`. If you still continue to use this QR code, it may cause the device to get stuck at the configuring screen. To resolve this, go to the [Release Page](https://github.com/googlesamples/android-testdpc/releases/latest), right-click on the APK title, and then choose 'Copy URL Link'. Replace the content `https://testdpc-latest-apk.appspot.com` with that link. After that, regenerate the QR code and scan it.
 1. Scan the QR code and follow onscreen instructions
 
 ### ADB command
