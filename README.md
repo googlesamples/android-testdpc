@@ -36,6 +36,15 @@ You can find various kinds of provisioning methods [here](https://developers.goo
    ![testdpc_provisioning](qrcode.png)
 1. Scan the QR code and follow onscreen instructions
 
+#### Note
+
+If using this QR code your device is stuck on the configuring screen, it may due to a problem connecting to the `appspot.com` domain.
+
+In these cases you can use the [latest release](https://github.com/googlesamples/android-testdpc/releases/latest) available on github.
+You can also upload this version on your own server and use that as your download location.
+
+Replace the link used for `PROVISIONING_DEVICE_ADMIN_PACKAGE_DOWNLOAD_LOCATION` with a link to your APK. After that, regenerate the QR code.
+
 ### ADB command
 
 #### Device Owner (DO)
