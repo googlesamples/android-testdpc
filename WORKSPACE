@@ -2,7 +2,7 @@ workspace(name = "testdpc")
 
 android_sdk_repository(
     name = "androidsdk",
-    api_level = 34,
+    api_level = 35,
 )
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
@@ -49,7 +49,7 @@ maven_install(
         "androidx.appcompat:appcompat-resources:1.6.1",
         "androidx.collection:collection:1.2.0",
         "androidx.constraintlayout:constraintlayout:2.1.3",
-        "androidx.core:core:1.6.0",
+        "androidx.core:core:1.9.0",
         "androidx.enterprise:enterprise-feedback:1.1.0",
         "androidx.legacy:legacy-support-core-ui:1.0.0",
         "androidx.legacy:legacy-support-v13:1.0.0",
