@@ -8,17 +8,6 @@ android_sdk_repository(
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:jvm.bzl", "jvm_maven_import_external")
 
-http_archive(
-    name = "robolectric",
-    sha256 = "1ea1cfe67848decf959316e80dd69af2bbaa359ae2195efe1366cbdf3e968356",
-    strip_prefix = "robolectric-bazel-4.11.1",
-    urls = ["https://github.com/robolectric/robolectric-bazel/releases/download/4.11.1/robolectric-bazel-4.11.1.tar.gz"],
-)
-
-load("@robolectric//bazel:robolectric.bzl", "robolectric_repositories")
-
-robolectric_repositories()
-
 RULES_JVM_EXTERNAL_TAG = "4.5"
 
 RULES_JVM_EXTERNAL_SHA = "b17d7388feb9bfa7f2fa09031b32707df529f26c91ab9e5d909eb1676badd9a6"
@@ -40,6 +29,16 @@ rules_jvm_external_setup()
 
 load("@rules_jvm_external//:defs.bzl", "maven_install")
 load("@rules_jvm_external//:specs.bzl", "maven")
+
+http_archive(
+    name = "robolectric",
+    urls = ["https://github.com/robolectric/robolectric-bazel/archive/4.7.3.tar.gz"],
+    strip_prefix = "robolectric-bazel-4.7.3",
+)
+
+load("@robolectric//bazel:robolectric.bzl", "robolectric_repositories")
+
+robolectric_repositories()
 
 maven_install(
     name = "maven",
@@ -66,16 +65,16 @@ maven_install(
         "com.google.android.material:material:1.6.1",
         "com.google.guava:guava:31.1-android",
         "com.google.testparameterinjector:test-parameter-injector:1.15",
-        "com.google.truth:truth:1.1.3",
         "com.google.errorprone:error_prone_annotations:2.26.1",
         "junit:junit:4.13.2",
         "javax.inject:javax.inject:1",
         "org.hamcrest:java-hamcrest:2.0.0.0",
-        "org.robolectric:robolectric:4.9.2",
         "org.robolectric:robolectric-annotations:3.3.2",
         "org.robolectric:shadows-core:3.3.2",
         "org.bouncycastle:bcpkix-jdk15on:1.70",
         "org.bouncycastle:bcprov-jdk15on:1.70",
+        "org.robolectric:robolectric:4.2",
+        "com.google.truth:truth:1.4.2"
     ],
     repositories = [
         "https://maven.google.com",

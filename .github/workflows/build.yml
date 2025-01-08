@@ -1,0 +1,56 @@
+name: Build
+
+on:
+  push:
+    paths-ignore:
+      - "CONTRIB"
+      - "LICENSE"
+      - "PRIVACY"
+      - "README.md"
+  pull_request:
+    branches: [ "master" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Bazel
+        uses: bazel-contrib/setup-bazel@0.8.4
+        with:
+          bazelisk-cache: true
+          disk-cache: ${{ github.workflow }}
+          repository-cache: true
+
+      - name: Build
+        run: |
+          chmod +x build.sh
+          ./build.sh
+
+      - name: Test
+        run: bazel test :all
+
+      - name: Set environments
+        run: |
+          {
+            echo "commit=$(echo ${{ github.sha }} | cut -c-7)"
+            echo "repo=$(echo ${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/})"
+            echo "version=v$(grep -o 'android:versionName="[^"]*"' src/main/AndroidManifest.xml | awk -F'"' '{print $2}')"
+          } >> $GITHUB_ENV
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.repo }}-${{ env.version }}@${{ env.commit }}
+          path: bazel-bin/*.apk
