@@ -14,4 +14,4 @@ test_sources:
   # Sources that are categorized as test code by the IDE
   src/tests/*
 
-android_sdk_platform: android-34
+android_sdk_platform: android-35
