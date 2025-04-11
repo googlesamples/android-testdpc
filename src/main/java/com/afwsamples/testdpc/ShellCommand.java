@@ -616,6 +616,11 @@ final class ShellCommand {
               .setDescription("Enable / disable USB data signaling."));
       flags.addCommand(
           command(
+                  "can-usb-data-signaling-be-disabled",
+                  this::canUsbDataSignalingBeDisabled)
+              .setDescription("Check if USB data signaling can be disabled."));
+      flags.addCommand(
+          command(
                   "set-permitted-input-methods-parent",
                   this::setPermittedInputMethodsOnParent,
                   repeated(ordinalParam(String.class, "methods")))
@@ -1082,6 +1087,11 @@ final class ShellCommand {
         enabled,
         (v) -> onSuccess("USB data signaling set to %b", enabled),
         (e) -> onError(e, "Error setting USB data signaling to %b", enabled));
+  }
+
+  private void canUsbDataSignalingBeDisabled() {
+    boolean result = mDevicePolicyManagerGateway.canUsbDataSignalingBeDisabled();
+    mWriter.printf("canUsbDataSignalingBeDisabled: %b\n", result);
   }
 
   private void setSuspendedPackages(boolean suspended, String[] packageNames) {

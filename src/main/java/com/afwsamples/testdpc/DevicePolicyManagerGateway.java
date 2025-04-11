@@ -458,6 +458,12 @@ public interface DevicePolicyManagerGateway {
 
   /**
    * See {@link
+   * android.app.admin.DevicePolicyManager#canUsbDataSignalingBeDisabled()(ComponentName)}.
+   */
+  boolean canUsbDataSignalingBeDisabled();
+
+  /**
+   * See {@link
    * android.app.admin.DevicePolicyManager#setPreferentialNetworkServiceEnabled(ComponentName,
    * boolean)}.
    */

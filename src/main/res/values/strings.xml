@@ -118,6 +118,7 @@
     <string name="requires_network_logs">Requires network logging to be enabled</string>
     <string name="requires_security_logs">Requires security logging to be enabled</string>
     <string name="not_for_password_quality">Not applicable to current password quality</string>
+    <string name="not_for_this_device">Not applicable to this device</string>
 
     <string name="this_is_a_device_owner">This app is the device owner.</string>
     <string name="this_is_a_profile_owner">This app is a profile owner.</string>

@@ -693,6 +693,11 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     mEnableUsbDataSignalingPreference =
         (DpcSwitchPreference) findPreference(ENABLE_USB_DATA_SIGNALING_KEY);
     mEnableUsbDataSignalingPreference.setOnPreferenceChangeListener(this);
+    if (!canUsbDataSignalingBeDisabled()) {
+      Log.d(TAG, "USB data signaling cannot be disabled");
+      mEnableUsbDataSignalingPreference.setChecked(true);
+      mEnableUsbDataSignalingPreference.setCustomConstraint(() -> R.string.not_for_this_device);
+    }
     findPreference(REQUEST_BUGREPORT_KEY).setOnPreferenceClickListener(this);
     mEnableSecurityLoggingPreference = (SwitchPreference) findPreference(ENABLE_SECURITY_LOGGING);
     mEnableSecurityLoggingPreference.setOnPreferenceChangeListener(this);
@@ -1791,6 +1796,11 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
   @TargetApi(VERSION_CODES.S)
   private void setUsbDataSignalingEnabled(boolean enabled) {
     mDevicePolicyManagerGateway.setUsbDataSignalingEnabled(enabled);
+  }
+
+  @TargetApi(VERSION_CODES.S)
+  private boolean canUsbDataSignalingBeDisabled() {
+    return mDevicePolicyManagerGateway.canUsbDataSignalingBeDisabled();
   }
 
   @TargetApi(VERSION_CODES.M)

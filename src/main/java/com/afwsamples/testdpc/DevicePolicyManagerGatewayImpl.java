@@ -651,6 +651,20 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
   }
 
   @Override
+  public boolean canUsbDataSignalingBeDisabled() {
+    boolean result = false;
+    if (Util.isAtLeastS()) {
+      try {
+        result = mDevicePolicyManager.canUsbDataSignalingBeDisabled();
+      } catch (Exception e) {
+        Log.e(TAG, "Error calling canUsbDataSignalingBeDisabled()", e);
+        result = false;
+      }
+    }
+    return result;
+  }
+
+  @Override
   public void setPreferentialNetworkServiceEnabled(
       boolean enabled, Consumer<Void> onSuccess, Consumer<Exception> onError) {
     Log.d(TAG, "setPreferentialNetworkServiceEnabled(" + enabled + ")");
