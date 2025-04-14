@@ -289,7 +289,7 @@
         </service>
 
         <service android:name=".feedback.AppStatesService"
-                 android:exported="false">
+                 android:exported="true">
           <intent-filter>
             <action android:name="androidx.enterprise.feedback.action.APP_STATES" />
           </intent-filter>
