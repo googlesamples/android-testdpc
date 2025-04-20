@@ -100,6 +100,7 @@
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="cross_profile_calendar"
             android:title="@string/cross_profile_calendar"
+            testdpc:admin="orgOwnedProfileOwner|profileOwner"
             testdpc:minSdkVersion="Q" />
     </PreferenceCategory>
 
