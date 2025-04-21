@@ -323,9 +323,9 @@
         <item>Enabled</item>
     </string-array>
 
-    <!-- Strings for wifi management -->
-    <string name="wifi_management_title">WI-FI management</string>
-    <string name="create_wifi_configuration">Create WI-FI configuration</string>
+    <!-- Strings for Wi-Fi management -->
+    <string name="wifi_management_title">Wi-Fi management</string>
+    <string name="create_wifi_configuration">Create Wi-Fi configuration</string>
     <string name="add_network">Add network</string>
     <string name="wifi_ssid">Network name</string>
     <string name="wifi_ssid_hint">Enter the SSID</string>
@@ -344,22 +344,22 @@
     <string name="wifi_unchanged">(unchanged)</string>
     <string name="wifi_save">Save</string>
     <string name="wifi_cancel">Cancel</string>
-    <string name="wifi_config_success">WI-FI configuration saved.</string>
-    <string name="wifi_config_fail">Failed to save the WI-FI configuration.</string>
-    <string name="enable_wifi_config_lockdown">DO created WI-FI configs are modifiable only by DO</string>
-    <string name="modify_wifi_configuration">Modify WI-FI configuration</string>
-    <string name="modify_owned_wifi_configuration">Modify Owned WI-FI configuration</string>
+    <string name="wifi_config_success">Wi-Fi configuration saved.</string>
+    <string name="wifi_config_fail">Failed to save the Wi-Fi configuration.</string>
+    <string name="enable_wifi_config_lockdown">DO created Wi-Fi configs are modifiable only by DO</string>
+    <string name="modify_wifi_configuration">Modify Wi-Fi configuration</string>
+    <string name="modify_owned_wifi_configuration">Modify Owned Wi-Fi configuration</string>
     <string name="remove_not_owned_wifi_configurations">Remove all networks not owned by DO</string>
     <string name="show_wifi_mac_address">Show Wi-Fi MAC address</string>
     <string name="show_wifi_mac_address_title">Wi-Fi MAC address</string>
     <string name="show_wifi_mac_address_not_available_msg">Wi-Fi MAC is not available</string>
-    <string name="wifi_configs_header">Saved WI-FI configurations</string>
+    <string name="wifi_configs_header">Saved Wi-Fi configurations</string>
     <string name="wifi_update_config_button">Update selected</string>
     <string name="wifi_remove_config_button">Remove selected</string>
     <string name="wifi_remove_all_config_button">Remove All</string>
     <string name="wifi_modification_error_title">Error modifying config</string>
     <string name="wifi_remove_config_error">Unable to remove SSID \'<xliff:g id="wifi_ssid">%1$s</xliff:g>\': netId = <xliff:g id="wifi_network_id">%2$d</xliff:g></string>
-    <string name="create_eap_tls_wifi_configuration">Create EAP-TLS WI-FI configuration</string>
+    <string name="create_eap_tls_wifi_configuration">Create EAP-TLS Wi-Fi configuration</string>
     <string name="wifi_identity">Identity (if any)</string>
     <string name="wifi_client_cert_password">Client certificate password (if any)</string>
     <string name="wifi_domain">Domain suffix match</string>
@@ -377,7 +377,7 @@
     <string name="error_cannot_grant_to_wifi">Failed to allow Wi-Fi auth with client key pair</string>
     <string name="wifi_eap_tls_dialog_message">EAP_TLS with X.509 CA certificate and PKCS12 client certificate</string>
     <string name="wifi_unknown_cert">Unknown cert</string>
-    <string name="set_wifi_min_security_level">Set WI-FI minimum security level</string>
+    <string name="set_wifi_min_security_level">Set Wi-Fi minimum security level</string>
     <string name="security_level_open">Open</string>
     <string name="security_level_personal">Personal</string>
     <string name="security_level_enterprise_eap">Enterprise EAP</string>
@@ -385,7 +385,7 @@
     <string name="type_allowlist">Allowlist</string>
     <string name="type_denylist">Denylist</string>
     <string name="ssid_list_description">Enter comma separated SSIDs - empty list to remove</string>
-    <string name="set_wifi_ssid_restriction">Set WI-FI SSID restriction list</string>
+    <string name="set_wifi_ssid_restriction">Set Wi-Fi SSID restriction list</string>
 
     <!-- Strings for managing apps -->
     <string name="apps_management_title">Apps management</string>
