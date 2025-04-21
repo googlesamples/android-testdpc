@@ -338,6 +338,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
   private static final String RELAUNCH_IN_LOCK_TASK = "relaunch_in_lock_task";
   private static final String REMOVE_ALL_CERTIFICATES_KEY = "remove_all_ca_certificates";
   private static final String REMOVE_DEVICE_OWNER_KEY = "remove_device_owner";
+  private static final String REMOVE_PROFILE_OWNER_KEY = "remove_profile_owner";
   private static final String REMOVE_KEY_CERTIFICATE_KEY = "remove_key_certificate";
   private static final String REMOVE_USER_KEY = "remove_user";
   private static final String SWITCH_USER_KEY = "switch_user";
@@ -685,6 +686,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     findPreference(REMOVE_MANAGED_PROFILE_KEY).setOnPreferenceClickListener(this);
     findPreference(FACTORY_RESET_DEVICE_KEY).setOnPreferenceClickListener(this);
     findPreference(REMOVE_DEVICE_OWNER_KEY).setOnPreferenceClickListener(this);
+    findPreference(REMOVE_PROFILE_OWNER_KEY).setOnPreferenceClickListener(this);
     mEnableBackupServicePreference = (DpcSwitchPreference) findPreference(ENABLE_BACKUP_SERVICE);
     mEnableBackupServicePreference.setOnPreferenceChangeListener(this);
     mEnableBackupServicePreference.setCustomConstraint(this::validateDeviceOwnerBeforeQ);
@@ -1069,6 +1071,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     } else if (REMOVE_DEVICE_OWNER_KEY.equals(key)) {
       showRemoveDeviceOwnerPrompt();
       return true;
+    } else if (REMOVE_PROFILE_OWNER_KEY.equals(key)) {
+       showRemoveProfileOwnerPrompt();
+       return true;
     } else if (REQUEST_BUGREPORT_KEY.equals(key)) {
       requestBugReport();
       return true;
@@ -2145,6 +2150,26 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                       }
                     },
                     (e) -> onErrorLog("clearDeviceOwnerApp", e)))
+        .setNegativeButton(android.R.string.cancel, null)
+        .show();
+  }
+
+  /** Shows a prompt to ask for confirmation on removing profile owner. */
+  private void showRemoveProfileOwnerPrompt() {
+    new AlertDialog.Builder(getActivity())
+        .setTitle(R.string.remove_profile_owner_title)
+        .setMessage(R.string.remove_device_owner_confirmation)
+        .setPositiveButton(
+            android.R.string.ok,
+            (d, i) ->
+                mDevicePolicyManagerGateway.clearProfileOwner(
+                    (v) -> {
+                      if (getActivity() != null && !getActivity().isFinishing()) {
+                        showToast(R.string.profile_owner_removed);
+                        getActivity().finish();
+                      }
+                    },
+                    (e) -> onErrorLog("clearProfileOwner", e)))
         .setNegativeButton(android.R.string.cancel, null)
         .show();
   }
