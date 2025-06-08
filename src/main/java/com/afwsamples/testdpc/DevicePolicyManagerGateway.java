@@ -654,6 +654,13 @@ public interface DevicePolicyManagerGateway {
       boolean disabled, @NonNull Consumer<Void> onSuccess, @NonNull Consumer<Exception> onError);
 
   /**
+   * See {@link android.app.admin.DevicePolicyManager#setScreenCaptureDisabled(ComponentName,
+   * boolean)}.
+   */
+  void setScreenCaptureDisabled(
+      boolean disabled, @NonNull Consumer<Void> onSuccess, @NonNull Consumer<Exception> onError);
+
+  /**
    * See {@link android.app.admin.DevicePolicyManager#setMaximumFailedPasswordsForWipe(ComponentName, int)}.
    */
   void setMaximumFailedPasswordsForWipe(int max, @NonNull Consumer<Void> onSuccess,

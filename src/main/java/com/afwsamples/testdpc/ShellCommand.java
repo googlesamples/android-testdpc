@@ -604,6 +604,12 @@ final class ShellCommand {
     flags.addCommand(
         command("clear-password", this::clearPassword)
             .setDescription("Resets password to an empty one. Requires an active token"));
+    flags.addCommand(
+        command(
+                "set-screencapture-disabled",
+                this::setScreenCaptureDisabled,
+                ordinalParam(boolean.class, "disabled"))
+            .setDescription("Set whether screen capture is disabled."));
 
     // Separator for S / pre-S commands - do NOT remove line to avoid cherry-pick conflicts
 
@@ -1467,6 +1473,13 @@ final class ShellCommand {
 
   private void clearPassword() {
     resetPasswordWithToken("");
+  }
+
+  private void setScreenCaptureDisabled(boolean disabled) {
+    mDevicePolicyManagerGateway.setScreenCaptureDisabled(
+        disabled,
+        (v) -> onSuccess("Screen capture disabled set to %b", disabled),
+        (e) -> onError(e, "Error setting screen capture disabled to %b", disabled));
   }
 
   private byte[] getActiveResetPasswordToken() {

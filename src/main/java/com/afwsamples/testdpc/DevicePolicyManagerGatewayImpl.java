@@ -1121,6 +1121,18 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
   }
 
   @Override
+  public void setScreenCaptureDisabled(
+      boolean disabled, Consumer<Void> onSuccess, Consumer<Exception> onError) {
+    Log.d(TAG, "setScreenCaptureDisabled(" + disabled + ")");
+    try {
+      mDevicePolicyManager.setScreenCaptureDisabled(mAdminComponentName, disabled);
+      onSuccess.accept(null);
+    } catch (Exception e) {
+      onError.accept(e);
+    }
+  }
+
+  @Override
   public void setMaximumFailedPasswordsForWipe(int max, Consumer<Void> onSuccess,
       Consumer<Exception> onError) {
     Log.d(TAG, "setMaximumFailedPasswordsForWipe(" + max + ")");
