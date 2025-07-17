@@ -789,7 +789,9 @@
     <string name="user_management">User management</string>
     <string name="create_and_initialize_user">Create and initialize user</string>
     <string name="create_and_manage_user">Create and manage user</string>
+    <string name="not_supported_on_hsum">Not supported on HSUM mode</string>
     <string name="create_managed_profile">Create managed profile</string>
+    <string name="comp_not_supported_since_r">COMP mode deprecated since Android R</string>
     <string name="skip_setup_wizard">Skip setup wizard</string>
     <string name="make_user_ephemeral">Make user ephemeral</string>
     <string name="start_user_in_background">Start user in background</string>

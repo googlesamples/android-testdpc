@@ -526,6 +526,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
   private DpcPreference mLogoutUserPreference;
   private DpcPreference mManageLockTaskListPreference;
   private DpcPreference mSetLockTaskFeaturesPreference;
+  private DpcPreference mCreateManagedProfilePreference;
+  private DpcPreference mCreateAndManageUserPreference;
   private DpcPreference mUnhideAppsParentPreference;
   private DpcPreference mHideAppsParentPreference;
 
@@ -612,8 +614,12 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     findPreference(START_LOCK_TASK).setOnPreferenceClickListener(this);
     findPreference(RELAUNCH_IN_LOCK_TASK).setOnPreferenceClickListener(this);
     findPreference(STOP_LOCK_TASK).setOnPreferenceClickListener(this);
-    findPreference(CREATE_MANAGED_PROFILE_KEY).setOnPreferenceClickListener(this);
-    findPreference(CREATE_AND_MANAGE_USER_KEY).setOnPreferenceClickListener(this);
+    mCreateManagedProfilePreference = (DpcPreference) findPreference(CREATE_MANAGED_PROFILE_KEY);
+    mCreateManagedProfilePreference.setOnPreferenceClickListener(this);
+    mCreateManagedProfilePreference.setCustomConstraint(this::validateCompModeBeforeR);
+    mCreateAndManageUserPreference = (DpcPreference) findPreference(CREATE_AND_MANAGE_USER_KEY);
+    mCreateAndManageUserPreference.setOnPreferenceClickListener(this);
+    mCreateAndManageUserPreference.setCustomConstraint(this::validateNotHsumMode);
     findPreference(REMOVE_USER_KEY).setOnPreferenceClickListener(this);
     findPreference(SWITCH_USER_KEY).setOnPreferenceClickListener(this);
     findPreference(START_USER_IN_BACKGROUND_KEY).setOnPreferenceClickListener(this);
@@ -4800,6 +4806,20 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     // Android V
     if (mIsOrganizationOwnedProfileOwner && Util.SDK_INT < VERSION_CODES.VANILLA_ICE_CREAM) {
       return R.string.requires_android_v;
+    }
+    return NO_CUSTOM_CONSTRAINT;
+  }
+
+  private int validateCompModeBeforeR() {
+    if (Util.SDK_INT >= VERSION_CODES.R) {
+      return R.string.comp_not_supported_since_r;
+    }
+    return NO_CUSTOM_CONSTRAINT;
+  }
+
+  private int validateNotHsumMode() {
+    if (Util.SDK_INT >= VERSION_CODES.S && mUserManager.isHeadlessSystemUserMode()) {
+      return R.string.not_supported_on_hsum;
     }
     return NO_CUSTOM_CONSTRAINT;
   }
