@@ -83,6 +83,10 @@
         <intent-filter>
             <action android:name="android.intent.action.MAIN"/>
             <category android:name="android.intent.category.LAUNCHER"/>
+            <!-- Categories set it as a launcher activity, so it can be changed by addPersistentPreferredActivity(). -->
+            <category android:name="android.intent.category.HOME" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <category android:name="android.intent.category.LAUNCHER_APP" />
         </intent-filter>
         <intent-filter>
             <action android:name="android.app.action.CHECK_POLICY_COMPLIANCE"/>

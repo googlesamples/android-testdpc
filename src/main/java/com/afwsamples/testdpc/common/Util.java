@@ -344,6 +344,18 @@ public class Util {
     Log.e(tag, String.format(template, args) + " failed", e);
   }
 
+  public static String toString(IntentFilter filter) {
+    StringBuilder sb = new StringBuilder();
+    sb.append("IntentFilter[");
+    for (int i = 0; i < filter.countActions(); i++) {
+      sb.append("a=").append(filter.getAction(i)).append(",");
+    }
+    for (int i = 0; i < filter.countCategories(); i++) {
+      sb.append("c=").append(filter.getCategory(i)).append(",");
+    }
+    return sb.append(']').toString();
+  }
+
   // Copied from DebugUtils
   public static String flagsToString(Class<?> clazz, String prefix, int flags) {
     final StringBuilder res = new StringBuilder();

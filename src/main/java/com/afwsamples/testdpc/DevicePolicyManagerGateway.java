@@ -20,6 +20,7 @@ import android.app.admin.NetworkEvent;
 import android.app.admin.SecurityLog.SecurityEvent;
 import android.content.ComponentName;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Bitmap;
@@ -781,6 +782,17 @@ public interface DevicePolicyManagerGateway {
    * See {@link android.app.admin.DevicePolicyManager#getSecondaryUsers(ComponentName)};
    */
   @NonNull List<UserHandle> getSecondaryUsers();
+
+  /**
+   * See {@link android.app.admin.DevicePolicyManager#addPersistentPreferredActivity(ComponentName, IntentFilter, ComponentName)};
+   */
+  void addPersistentPreferredActivity(ComponentName activityComponentName, IntentFilter filter, @NonNull Consumer<Boolean> onSuccess, @NonNull Consumer<Exception> onError);
+
+  /**
+   * See {@link android.app.admin.DevicePolicyManager#clearPackagePersistentPreferredActivities(ComponentName, String)};
+   */
+  void clearPackagePersistentPreferredActivities(@NonNull String packageName, 
+      @NonNull Consumer<Boolean> onSuccess, @NonNull Consumer<Exception> onError);
 
   /**
    * Used on error callbacks to indicate a {@link android.app.admin.DevicePolicyManager} method call
