@@ -93,7 +93,6 @@ android_library(
     name = "testdpc_lib",
     srcs = glob(["src/main/java/**/*.java"]),
     custom_package = PACKAGE,
-    javacopts = ["-Xep:AndroidJdkLibsChecker:OFF"],
     manifest = MANIFEST,
     resource_files = glob(["src/main/res/**"]),
     deps = [
