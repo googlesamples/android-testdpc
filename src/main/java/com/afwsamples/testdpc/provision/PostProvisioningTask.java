@@ -183,12 +183,16 @@ public class PostProvisioningTask {
 
     List<String> permissions = getRuntimePermissions(mContext.getPackageManager(), packageName);
     for (String permission : permissions) {
-      boolean success =
-          mDevicePolicyManager.setPermissionGrantState(
-              adminComponentName, packageName, permission, PERMISSION_GRANT_STATE_GRANTED);
-      Log.d(TAG, "Auto-granting " + permission + ", success: " + success);
-      if (!success) {
-        Log.e(TAG, "Failed to auto grant permission to self: " + permission);
+      try {
+        boolean success =
+            mDevicePolicyManager.setPermissionGrantState(
+                adminComponentName, packageName, permission, PERMISSION_GRANT_STATE_GRANTED);
+        Log.d(TAG, "Auto-granting " + permission + ", success: " + success);
+        if (!success) {
+          Log.e(TAG, "Failed to auto grant permission to self: " + permission);
+        }
+      } catch (RuntimeException e) {
+        Log.e(TAG, "Exception while trying to grant permission " + permission, e);
       }
     }
   }
