@@ -64,6 +64,9 @@
     <uses-permission android:name="android.permission.MANAGE_DEVICE_POLICY_WALLPAPER"/>
     <uses-permission android:name="android.permission.MANAGE_DEVICE_POLICY_WIFI"/>
     <uses-permission android:name="android.permission.UPDATE_DEVICE_MANAGEMENT_RESOURCES"/>
+    <uses-permission android:name="android.permission.DOWNLOAD_WITHOUT_NOTIFICATION"/>
+    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS"/>
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
 
     <uses-feature android:name="android.hardware.wifi" android:required="false" />
     <uses-feature android:name="android.hardware.touchscreen" android:required="false"/>
