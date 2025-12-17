@@ -2607,8 +2607,11 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
   private void loadAppStatus() {
     final @StringRes List<Integer> appStatus = new ArrayList<>();
+
     if (mDevicePolicyManager.isProfileOwnerApp(mPackageName)) {
-      if (mIsOrganizationOwnedProfileOwner) {
+      if (Util.isFullUser(getContext())) {
+        appStatus.add(R.string.this_is_a_profile_owner_on_full_user);
+      } else if (mIsOrganizationOwnedProfileOwner) {
         appStatus.add(R.string.this_is_an_org_owned_profile_owner);
       } else {
         appStatus.add(R.string.this_is_a_profile_owner);
@@ -2632,7 +2635,6 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
               String.join(
                   "\n", appStatus.stream().map(this::getString).collect(Collectors.toList())));
     }
-
   }
 
   @TargetApi(VERSION_CODES.M)

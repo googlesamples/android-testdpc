@@ -203,6 +203,21 @@ public class Util {
     return rm.isRoleHeld(ROLE_DEVICE_POLICY_MANAGEMENT);
   }
 
+  @TargetApi(VERSION_CODES.TIRAMISU)
+  public static boolean isFullUser(Context context) {
+    // `userManager.isProfile()` requires API level 33.
+    if (SDK_INT < VERSION_CODES.TIRAMISU) {
+      return false;
+    }
+
+    UserManager userManager = context.getSystemService(UserManager.class);
+
+    if (userManager.isProfile()) {
+      return false;
+    }
+    return true;
+  }
+
   @TargetApi(VERSION_CODES.O)
   public static List<UserHandle> getBindDeviceAdminTargetUsers(Context context) {
     if (Util.SDK_INT < VERSION_CODES.O) {

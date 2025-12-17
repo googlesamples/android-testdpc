@@ -121,6 +121,7 @@
     <string name="not_for_this_device">Not applicable to this device</string>
 
     <string name="this_is_a_device_owner">This app is the device owner.</string>
+    <string name="this_is_a_profile_owner_on_full_user">This app is the profile owner on a full user.</string>
     <string name="this_is_a_profile_owner">This app is a profile owner.</string>
     <string name="this_is_an_org_owned_profile_owner">This app is a profile owner of an organization-owned device.</string>
     <string name="this_is_a_delegated_app">This app has delegated permissions.</string>
