@@ -74,7 +74,9 @@ maven_install(
         "org.bouncycastle:bcpkix-jdk15on:1.70",
         "org.bouncycastle:bcprov-jdk15on:1.70",
         "org.robolectric:robolectric:4.2",
-        "com.google.truth:truth:1.4.2"
+        "com.google.truth:truth:1.4.2",
+        "androidx.room:room-runtime:2.5.0",
+        "androidx.room:room-common:2.5.0",
     ],
     repositories = [
         "https://maven.google.com",

@@ -46,6 +46,14 @@ android_library(
 )
 
 android_library(
+    name = "room_deps",
+    exports = [
+        "@maven//:androidx_room_room_runtime",
+        "@maven//:androidx_room_room_common",
+    ],
+)
+
+android_library(
     name = "test_deps",
     exports = [
         "@maven//:org_robolectric_robolectric",
@@ -97,6 +105,7 @@ android_library(
         ":androidx_deps",
         ":bouncycastle_deps",
         ":guava_deps",
+        ":room_deps",
         "@setupdesign//:setupdesign",
         "@setupcompat//:setupcompat",
     ],
