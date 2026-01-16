@@ -1315,4 +1315,30 @@
     <string name="credential_manager_policy_applied_toast">Policy has been applied</string>
     <string name="credential_manager_policy_title">Enter package name of Credential Provider</string>
 
+    <!--  Strings for delay feature  -->
+    <string name="delay_settings_category">Policy Change Delay</string>
+    <string name="delay_settings_title">Delay Settings</string>
+    <string name="delay_settings_summary">Configure waiting period for policy changes</string>
+    <string name="delay_enabled_title">Enable Delay</string>
+    <string name="delay_enabled_summary">When enabled, all policy changes require a waiting period</string>
+    <string name="delay_duration_title">Delay Duration</string>
+    <string name="delay_duration_summary">Number of time units to wait</string>
+    <string name="delay_unit_title">Time Unit</string>
+    <string name="view_pending_changes">View Pending Changes</string>
+    <string name="pending_changes_summary">See and manage queued policy changes</string>
+    <string name="no_pending_changes">No pending changes</string>
+    <string name="applies_in">Applies in %s</string>
+
+    <string-array name="delay_time_units">
+        <item>Seconds</item>
+        <item>Minutes</item>
+        <item>Hours</item>
+    </string-array>
+
+    <string-array name="delay_time_unit_values">
+        <item>SECONDS</item>
+        <item>MINUTES</item>
+        <item>HOURS</item>
+    </string-array>
+
 </resources>

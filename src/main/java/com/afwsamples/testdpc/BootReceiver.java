@@ -25,6 +25,8 @@ import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.comp.BindDeviceAdminServiceHelper;
 import com.afwsamples.testdpc.comp.DeviceOwnerService;
 import com.afwsamples.testdpc.comp.IDeviceOwnerService;
+import com.afwsamples.testdpc.delay.DelayConfig;
+import com.afwsamples.testdpc.delay.DelayService;
 
 public class BootReceiver extends BroadcastReceiver {
 
@@ -32,6 +34,12 @@ public class BootReceiver extends BroadcastReceiver {
   public void onReceive(Context context, Intent intent) {
     final String action = intent.getAction();
     if (Intent.ACTION_BOOT_COMPLETED.equals(action)) {
+      // Start delay service if delay is enabled
+      DelayConfig delayConfig = new DelayConfig(context);
+      if (delayConfig.isEnabled()) {
+        DelayService.start(context);
+      }
+
       if (!Util.isProfileOwner(context)
           || Util.getBindDeviceAdminTargetUsers(context).size() == 0) {
         return;

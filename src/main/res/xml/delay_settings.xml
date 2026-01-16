@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <SwitchPreference
+        android:key="delay_enabled"
+        android:title="Enable Delay"
+        android:summary="When enabled, all policy changes require a waiting period" />
+
+    <EditTextPreference
+        android:key="delay_duration_value"
+        android:title="Delay Duration"
+        android:summary="Number of time units to wait"
+        android:inputType="number"
+        android:defaultValue="1" />
+
+    <ListPreference
+        android:key="delay_duration_unit"
+        android:title="Time Unit"
+        android:entries="@array/delay_time_units"
+        android:entryValues="@array/delay_time_unit_values"
+        android:defaultValue="HOURS" />
+
+    <Preference
+        android:key="pending_changes"
+        android:title="View Pending Changes"
+        android:summary="See and manage queued policy changes" />
+
+</PreferenceScreen>

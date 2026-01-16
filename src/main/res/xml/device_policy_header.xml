@@ -37,6 +37,15 @@
         testdpc:permission="android.permission.MANAGE_DEVICE_POLICY_CERTIFICATES"
         testdpc:minSdkVersion="S" />
 
+    <PreferenceCategory android:title="@string/delay_settings_category">
+        <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="delay_settings"
+            android:title="@string/delay_settings_title"
+            android:summary="@string/delay_settings_summary"
+            testdpc:admin="any"
+            testdpc:minSdkVersion="L" />
+    </PreferenceCategory>
+
     <PreferenceCategory android:title="@string/accessibility_title">
         <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="set_accessibility_services"

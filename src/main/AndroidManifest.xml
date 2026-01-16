@@ -32,6 +32,7 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.REQUEST_PASSWORD_COMPLEXITY"/>
@@ -175,6 +176,12 @@
             </intent-filter>
         </activity>
 
+        <activity
+                android:name=".delay.DelaySettingsActivity"
+                android:exported="false"
+                android:label="@string/delay_settings_title"
+                android:theme="@style/AppTheme" />
+
         <activity android:name="android.app.Activity" android:exported="true" android:permission="android.permission.LAUNCH_DEVICE_MANAGER_SETUP">
             <intent-filter>
                 <action android:name="android.app.action.ROLE_HOLDER_PROVISION_MANAGED_DEVICE_FROM_TRUSTED_SOURCE" />
@@ -291,6 +298,12 @@
             <action android:name="androidx.enterprise.feedback.action.APP_STATES" />
           </intent-filter>
         </service>
+
+        <service
+            android:name=".delay.DelayService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
 
     </application>
 

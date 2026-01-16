@@ -274,6 +274,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
   public static final String OVERRIDE_KEY_SELECTION_KEY = "override_key_selection";
 
+  private static final String DELAY_SETTINGS_KEY = "delay_settings";
   private static final String GENERIC_DELEGATION_KEY = "generic_delegation";
   private static final String APP_RESTRICTIONS_MANAGING_PACKAGE_KEY =
       "app_restrictions_managing_package";
@@ -1019,7 +1020,10 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
   @TargetApi(VERSION_CODES.N)
   public boolean onPreferenceClick(Preference preference) {
     String key = preference.getKey();
-    if (MANAGE_LOCK_TASK_LIST_KEY.equals(key)) {
+    if (DELAY_SETTINGS_KEY.equals(key)) {
+      showDelaySettingsFragment();
+      return true;
+    } else if (MANAGE_LOCK_TASK_LIST_KEY.equals(key)) {
       showManageLockTaskListPrompt(
           R.string.lock_task_title,
           (packages) ->
@@ -4189,6 +4193,11 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         .addToBackStack(PolicyManagementFragment.class.getName())
         .replace(R.id.container, fragment, tag)
         .commit();
+  }
+
+  private void showDelaySettingsFragment() {
+    Intent intent = new Intent(getActivity(), com.afwsamples.testdpc.delay.DelaySettingsActivity.class);
+    startActivity(intent);
   }
 
   @TargetApi(VERSION_CODES.P)

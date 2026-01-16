@@ -31,6 +31,7 @@ import androidx.preference.PreferenceManager;
 import com.afwsamples.testdpc.DevicePolicyManagerGateway;
 import com.afwsamples.testdpc.DevicePolicyManagerGatewayImpl;
 import com.afwsamples.testdpc.R;
+import com.afwsamples.testdpc.delay.DelayedDevicePolicyManagerGateway;
 
 /**
  * This fragment provides functionalities to show the same policy fragment for both the managed user
@@ -151,14 +152,16 @@ public abstract class ProfileOrParentFragment extends BaseSearchablePolicyPrefer
     }
 
     Context context = getActivity();
-    mDevicePolicyGateway = new DevicePolicyManagerGatewayImpl(context);
+    DevicePolicyManagerGateway baseGateway = new DevicePolicyManagerGatewayImpl(context);
+    mDevicePolicyGateway = new DelayedDevicePolicyManagerGateway(baseGateway, context);
 
     // Store whether we are the profile owner for faster lookup.
-    mProfileOwner = mDevicePolicyGateway.isProfileOwnerApp();
-    mDeviceOwner = mDevicePolicyGateway.isDeviceOwnerApp();
+    mProfileOwner = baseGateway.isProfileOwnerApp();
+    mDeviceOwner = baseGateway.isDeviceOwnerApp();
 
     if (mParentInstance) {
-      mDevicePolicyGateway = DevicePolicyManagerGatewayImpl.forParentProfile(context);
+      DevicePolicyManagerGateway parentGateway = DevicePolicyManagerGatewayImpl.forParentProfile(context);
+      mDevicePolicyGateway = new DelayedDevicePolicyManagerGateway(parentGateway, context);
     }
 
     // Put at last to make sure all initializations above are done before subclass's
