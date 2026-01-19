@@ -1,0 +1,39 @@
+load("@rules_jvm_external//:defs.bzl", "artifact")
+
+# Main resource library (placeholder for Android resources)
+java_library(
+    name = "resources",
+    srcs = glob(["res/values/*.xml"]),
+    deps = [
+        # No Android dependencies for now
+    ],
+)
+
+# AIDL files library
+java_library(
+    name = "aidl",
+    srcs = glob(["aidl/**/*.aidl"]),
+)
+
+# Main source library - using minimal Java deps
+java_library(
+    name = "src",
+    srcs = glob(["java/**/*.java"]),
+    deps = [
+        # Guava - the only dependency we need for now
+        "@maven//:com_google_guava_guava",
+    ],
+    javacopts = ["--release=11"],
+)
+
+# Test library
+java_library(
+    name = "test_lib",
+    srcs = glob(["java/com/afwsamples/testdpc/util/flags/BooleanParserTest.java"]),
+    deps = [
+        ":src",
+        "@maven//:junit_junit",
+        "@maven//:org_hamcrest_java_hamcrest",
+    ],
+    javacopts = ["--release=11"],
+)
