@@ -7,7 +7,19 @@ See the [documentation](https://developer.android.com/work/index.html) to learn 
 
 ## Getting Started
 
-This sample uses the Bazel build system. To build this project, use the "bazel build testdpc" command.
+### Building the APK
+
+**For production builds, use Gradle (recommended):**
+```bash
+./gradlew assembleDebug
+```
+
+**For Bazel builds (infrastructure setup in progress):**
+The project has Bazel infrastructure configured, but due to compatibility issues between rules_android and Bazel 7.4.1, full APK building is not yet available. See [BZEL_GRADLE_CONCLUSION.md](BZEL_GRADLE_CONCLUSION.md) for details.
+
+### About the App
+
+Test DPC is an app designed to help EMMs, ISVs, and OEMs to test their applications and platforms in an Android enterprise managed profile (i.e. work profile). It serves as both a sample Device Policy Controller and a testing application to flex the APIs available for Android enterprise.
 
 This app can also be found [on the Play store](https://play.google.com/store/apps/details?id=com.afwsamples.testdpc).
 
