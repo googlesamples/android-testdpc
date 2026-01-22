@@ -61,6 +61,18 @@ android {
 
     // Resource configuration
     // resourceConfigurations += setOf("en", "hdpi", "xhdpi", "xxhdpi", "xxxhdpi")
+
+    sourceSets {
+        getByName("main") {
+            manifest.srcFile("../src/main/AndroidManifest.xml")
+            java.srcDirs("../src/main/java")
+            res.srcDirs("../src/main/res")
+            aidl.srcDirs("../src/main/aidl")
+        }
+        getByName("debug") {
+            manifest.srcFile("../src/main/AndroidManifestDebug.xml")
+        }
+    }
 }
 
 dependencies {
