@@ -2,7 +2,7 @@ $ErrorActionPreference = "Stop"
 $GradleVersion = "8.5"
 $SdkPath = "C:\Users\AhsanHussain\AppData\Local\Android\Sdk"
 $ProjectRoot = Get-Location
-$TempDir = Join-Path $env:TEMP "gradle_bootstrap_v4"
+$TempDir = Join-Path $env:TEMP "gradle_bootstrap_v5"
 
 Write-Host "Checking build environment..."
 
@@ -17,8 +17,9 @@ if (-not (Test-Path $LocalPropFile)) {
 }
 
 # 2. Check/Fix Gradle Wrapper
-if (-not (Test-Path "gradlew.bat")) {
-    Write-Host "Gradle wrapper missing. Bootstrapping in clean environment..."
+# We check for the JAR too now, to force repair if jar is missing
+if (-not (Test-Path "gradle/wrapper/gradle-wrapper.jar")) {
+    Write-Host "Gradle wrapper JAR missing. Bootstrapping in clean environment..."
     
     if (Test-Path $TempDir) { Remove-Item $TempDir -Recurse -Force }
     New-Item -ItemType Directory -Force -Path $TempDir | Out-Null
@@ -35,11 +36,9 @@ if (-not (Test-Path "gradlew.bat")) {
     $GradleBin = Join-Path $TempDir "gradle-$GradleVersion\bin\gradle.bat"
     
     Write-Host "Generating wrapper in temp dir..."
-    # Create a dummy folder to run wrapper in, to avoid project config
     $WrapperGenDir = Join-Path $TempDir "wrapper_gen"
     New-Item -ItemType Directory -Force -Path $WrapperGenDir | Out-Null
     
-    # Create empty settings.gradle (0 bytes, no BOM)
     New-Item -Path (Join-Path $WrapperGenDir "settings.gradle") -ItemType File -Force | Out-Null
     
     Push-Location $WrapperGenDir
@@ -47,16 +46,20 @@ if (-not (Test-Path "gradlew.bat")) {
     Pop-Location
     
     Write-Host "Copying wrapper files to project root..."
-    Copy-Item (Join-Path $WrapperGenDir "gradlew") $ProjectRoot
-    Copy-Item (Join-Path $WrapperGenDir "gradlew.bat") $ProjectRoot
-    Copy-Item (Join-Path $WrapperGenDir "gradle") (Join-Path $ProjectRoot "gradle") -Recurse -Force
+    Copy-Item (Join-Path $WrapperGenDir "gradlew") $ProjectRoot -Force
+    Copy-Item (Join-Path $WrapperGenDir "gradlew.bat") $ProjectRoot -Force
+    
+    # Explicitly copy JAR
+    $WrapperDest = Join-Path $ProjectRoot "gradle\wrapper"
+    $WrapperSource = Join-Path $WrapperGenDir "gradle\wrapper\gradle-wrapper.jar"
+    Copy-Item $WrapperSource $WrapperDest -Force
     
     Write-Host "Cleaning up..."
     try { Remove-Item $TempDir -Recurse -Force -ErrorAction SilentlyContinue } catch {}
     
     Write-Host "Wrapper restored."
 } else {
-    Write-Host "Gradle wrapper already exists."
+    Write-Host "Gradle wrapper JAR already exists."
 }
 
 Write-Host "Bootstrap complete."
