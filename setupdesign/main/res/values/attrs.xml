@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright (C) 2015 The Android Open Source Project
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+<resources>
+
+    <!-- Theme attributes -->
+    <attr name="sudLayoutTheme" format="reference" />
+    <attr name="sudMarginStart" format="dimension|reference" />
+    <attr name="sudMarginEnd" format="dimension|reference" />
+    <attr name="sudEditTextBackgroundColor" format="color" />
+    <attr name="sudButtonHighlightAlpha" format="float" />
+
+    <attr name="sudGlifHeaderTitleStyle" format="reference" />
+    <!-- Subset of values in "gravity" in frameworks/base/core/res/res/values/attrs.xml. Only
+         horizontal values are listed here as the header does not support vertical gravity. -->
+    <attr name="sudGlifHeaderGravity">
+        <!-- Push object to the left of its container, not changing its size. -->
+        <flag name="left" value="0x03" />
+        <!-- Push object to the right of its container, not changing its size. -->
+        <flag name="right" value="0x05" />
+        <!-- Place object in the horizontal center of its container, not changing its size. -->
+        <flag name="center_horizontal" value="0x01" />
+        <!-- Grow the horizontal size of the object if needed so it completely fills its container. -->
+        <flag name="fill_horizontal" value="0x07" />
+        <!-- Push object to the beginning of its container, not changing its size. -->
+        <flag name="start" value="0x00800003" />
+        <!-- Push object to the end of its container, not changing its size. -->
+        <flag name="end" value="0x00800005" />
+    </attr>
+
+    <attr name="sudGlifIconGravity">
+        <!-- Push object to the left of its container, not changing its size. -->
+        <flag name="left" value="0x03" />
+        <!-- Push object to the right of its container, not changing its size. -->
+        <flag name="right" value="0x05" />
+        <!-- Place object in the horizontal center of its container, not changing its size. -->
+        <flag name="center_horizontal" value="0x01" />
+        <!-- Grow the horizontal size of the object if needed so it completely fills its container. -->
+        <flag name="fill_horizontal" value="0x07" />
+        <!-- Push object to the beginning of its container, not changing its size. -->
+        <flag name="start" value="0x00800003" />
+        <!-- Push object to the end of its container, not changing its size. -->
+        <flag name="end" value="0x00800005" />
+    </attr>
+
+    <attr name="sudGlifSubtitleGravity">
+        <!-- Push object to the left of its container, not changing its size. -->
+        <flag name="left" value="0x03" />
+        <!-- Push object to the right of its container, not changing its size. -->
+        <flag name="right" value="0x05" />
+        <!-- Place object in the horizontal center of its container, not changing its size. -->
+        <flag name="center_horizontal" value="0x01" />
+        <!-- Grow the horizontal size of the object if needed so it completely fills its container. -->
+        <flag name="fill_horizontal" value="0x07" />
+        <!-- Push object to the beginning of its container, not changing its size. -->
+        <flag name="start" value="0x00800003" />
+        <!-- Push object to the end of its container, not changing its size. -->
+        <flag name="end" value="0x00800005" />
+    </attr>
+
+    <attr name="sudGlifIconStyle" format="reference" />
+    <attr name="sudGlifIconSize" format="dimension" />
+
+    <attr name="sudGlifDescriptionStyle" format="reference" />
+    <attr name="sudGlifAccountNameStyle" format="reference" />
+    <attr name="sudGlifAccountAvatarStyle" format="reference" />
+    <attr name="sudGlifAccountContainerStyle" format="reference" />
+    <attr name="sudGlifAccountAvatarSize" format="dimension" />
+
+    <attr name="sudButtonAllCaps" format="boolean" />
+    <attr name="sudButtonCornerRadius" format="dimension" />
+    <attr name="sudButtonFontFamily" format="string|reference" />
+    <attr name="sudButtonTertiaryGravity">
+        <!-- Push object to the left of its container, not changing its size. -->
+        <flag name="left" value="0x03" />
+        <!-- Push object to the right of its container, not changing its size. -->
+        <flag name="right" value="0x05" />
+        <!-- Place object in the horizontal center of its container, not changing its size. -->
+        <flag name="center_horizontal" value="0x01" />
+        <!-- Grow the horizontal size of the object if needed so it completely fills its container. -->
+        <flag name="fill_horizontal" value="0x07" />
+        <!-- Push object to the beginning of its container, not changing its size. -->
+        <flag name="start" value="0x00800003" />
+        <!-- Push object to the end of its container, not changing its size. -->
+        <flag name="end" value="0x00800005" />
+    </attr>
+    <attr name="sudCardBackground" format="color|reference" />
+    <attr name="sudDividerCondition">
+        <enum name="either" value="0" />
+        <enum name="both" value="1" />
+    </attr>
+    <attr name="sudFillContentLayoutStyle" format="reference" />
+    <attr name="sudListItemIconColor" format="color" />
+    <attr name="sudNavBarBackgroundColor" format="color" />
+    <attr name="sudNavBarButtonBackground" format="color|reference" />
+    <attr name="sudNavBarTextColor" format="color" />
+    <attr name="sudNavBarTheme" format="reference" />
+    <attr name="sudIconTint" format="color" />
+    <attr name="sudIconGravity">
+        <!-- Values in the enum has to be the same as in android.view.Gravity -->
+        <enum name="top" value="0x30" />
+        <enum name="center_vertical" value="0x10" />
+        <enum name="bottom" value="0x50" />
+    </attr>
+
+    <!-- Values copied from frameworks/base/core/res/res/values/attrs.xml -->
+    <attr name="sudScrollIndicators">
+        <!-- No scroll indicators are displayed. -->
+        <flag name="none" value="0x00" />
+        <!-- Displays top scroll indicator when view can be scrolled up. -->
+        <flag name="top" value="0x01" />
+        <!-- Displays bottom scroll indicator when vew can be scrolled down. -->
+        <flag name="bottom" value="0x02" />
+        <!-- Displays left scroll indicator when vew can be scrolled left. -->
+        <flag name="left" value="0x04" />
+        <!-- Displays right scroll indicator when vew can be scrolled right. -->
+        <flag name="right" value="0x08" />
+        <!-- Displays right scroll indicator when vew can be scrolled in the
+             start direction. -->
+        <flag name="start" value="0x10" />
+        <!-- Displays right scroll indicator when vew can be scrolled in the
+             end direction. -->
+        <flag name="end" value="0x20" />
+    </attr>
+
+    <!-- Custom the scroll bar indicator  -->
+    <attr name="sudScrollBarThumb" format="reference" />
+
+    <!-- Custom view attributes -->
+    <attr name="sudColorPrimary" format="color" />
+    <attr name="sudHeader" format="reference" />
+    <!-- Deprecated. Use sudDividerInsetStart and sudDividerInsetEnd instead -->
+    <attr name="sudDividerInset" format="dimension|reference" />
+    <attr name="sudDividerInsetEnd" format="dimension|reference" />
+    <attr name="sudDividerInsetStart" format="dimension|reference" />
+    <attr name="sudDividerInsetStartNoIcon" format="dimension|reference" />
+    <attr name="sudDividerShown" format="boolean"/>
+    <attr name="sudItemContainerStyle" format="reference"/>
+    <attr name="sudItemIconContainerStyle" format="reference"/>
+    <attr name="sudItemTitleStyle" format="reference"/>
+    <attr name="sudItemSummaryStyle" format="reference"/>
+    <attr name="sudItemDescriptionStyle" format="reference" />
+    <attr name="sudItemDescriptionTitleStyle" format="reference" />
+    <attr name="sudItemDescriptionTitleTextAppearence" format="reference" />
+    <attr name="sudItemVerboseTitleStyle" format="reference" />
+    <attr name="sudItemIconContainerWidth" format="dimension|reference" />
+    <attr name="sudItemPaddingTop" format="dimension|reference" />
+    <attr name="sudItemPaddingBottom" format="dimension|reference" />
+    <attr name="sudItemDividerWidth" format="dimension|reference" />
+    <attr name="sudItemBackgroundPaddingStart" format="dimension|reference" />
+    <attr name="sudItemBackgroundPaddingEnd" format="dimension|reference" />
+    <attr name="sudItemBackgroundColor" format="color|reference" />
+    <attr name="sudItemDescriptionPaddingTop" format="dimension|reference" />
+    <attr name="sudItemDescriptionPaddingBottom" format="dimension|reference" />
+    <attr name="sudItemSummaryPaddingTop" format="dimension|reference" />
+    <attr name="sudItemSummaryPaddingBottom" format="dimension|reference" />
+    <attr name="sudItemBackground" format="color|reference" />
+    <attr name="sudItemBackgroundFirst" format="color|reference" />
+    <attr name="sudItemBackgroundLast" format="color|reference" />
+    <attr name="sudItemBackgroundSingle" format="color|reference" />
+    <attr name="sudItemCornerRadius" format="dimension|reference" />
+    <attr name="sudContentFramePaddingTop" format="dimension|reference" />
+    <attr name="sudContentFramePaddingBottom" format="dimension|reference" />
+    <attr name="sudAccountAvatarMarginEnd" format="dimension|reference" />
+    <attr name="sudAccountAvatarMaxHeight" format="dimension|reference" />
+    <attr name="sudAccountNameTextSize" format="dimension|reference" />
+
+    <!-- EditBox -->
+    <attr name="sudEditBoxStyle" format="reference" />
+    <attr name="sudEditBoxColor" format="reference" />
+    <attr name="boxCornerRadiusTopStart" format="dimension"/>
+    <attr name="boxCornerRadiusTopEnd" format="dimension"/>
+    <attr name="boxCornerRadiusBottomStart" format="dimension"/>
+    <attr name="boxCornerRadiusBottomEnd" format="dimension"/>
+
+    <attr name="sudGlifContentPaddingTop" format="dimension|reference" />
+
+    <attr name="sudHasStableIds" format="boolean|reference" />
+
+    <attr name="selectableItemBackground" format="reference" />
+
+    <declare-styleable name="SudIllustration">
+        <attr name="sudAspectRatio" format="float" />
+    </declare-styleable>
+
+    <declare-styleable name="SudStickyHeaderListView">
+        <attr name="sudHeader" />
+    </declare-styleable>
+
+    <declare-styleable name="SudHeaderRecyclerView">
+        <attr name="sudHeader" />
+    </declare-styleable>
+
+    <declare-styleable name="SudIllustrationVideoView">
+        <attr name="sudVideo" format="reference" />
+        <attr name="sudPauseVideoWhenFinished" format="boolean" />
+    </declare-styleable>
+
+    <declare-styleable name="SudGlifLayout">
+        <attr name="sudBackgroundPatterned" format="boolean" />
+        <attr name="sudBackgroundBaseColor" format="color" />
+        <attr name="sudColorPrimary" />
+        <attr name="sudStickyHeader" format="reference" />
+        <!-- This attribute is false by default. When set to true, the layout will apply partner
+             customizations to Header, Icon and Description. This attribute will be ignored when
+             GlifLayout.shouldApplyPartnerResource() returns false.  -->
+        <attr name="sudUsePartnerHeavyTheme" format="boolean" />
+    </declare-styleable>
+
+    <declare-styleable name="SudIntrinsicSizeFrameLayout">
+        <attr name="android:height" />
+        <attr name="android:width" />
+    </declare-styleable>
+
+    <attr name="sudContentIllustrationMaxWidth" format="dimension" />
+    <attr name="sudContentIllustrationMaxHeight" format="dimension" />
+    <attr name="sudContentIllustrationPaddingTop" format="dimension" />
+    <attr name="sudContentIllustrationPaddingBottom" format="dimension" />
+    <declare-styleable name="SudFillContentLayout">
+        <attr name="android:maxHeight" />
+        <attr name="android:maxWidth" />
+    </declare-styleable>
+
+    <declare-styleable name="SudSetupWizardLayout">
+        <attr name="sudBackground" format="color|reference" />
+        <attr name="sudBackgroundTile" format="color|reference" />
+        <attr name="sudDecorPaddingTop" format="dimension|reference" />
+        <attr name="sudIllustration" format="color|reference" />
+        <attr name="sudIllustrationAspectRatio" format="float|reference" />
+        <attr name="sudIllustrationHorizontalTile" format="color|reference" />
+        <attr name="sudIllustrationImage" format="color|reference" />
+    </declare-styleable>
+
+    <declare-styleable name="SudTemplateLayout">
+        <attr name="android:layout" />
+        <attr name="sudContainer" format="reference" />
+    </declare-styleable>
+
+    <declare-styleable name="SudAbstractItem">
+        <attr name="android:id" />
+    </declare-styleable>
+
+    <declare-styleable name="SudItem">
+        <attr name="android:enabled" />
+        <attr name="android:icon" />
+        <attr name="android:layout" />
+        <attr name="android:summary" />
+        <attr name="android:title" />
+        <attr name="android:visible" />
+        <attr name="android:contentDescription" />
+        <attr name="sudIconTint" />
+        <attr name="sudIconGravity" />
+    </declare-styleable>
+
+    <declare-styleable name="SudDividerItemDecoration">
+        <attr name="android:listDivider" />
+        <attr name="android:dividerHeight" />
+        <attr name="sudDividerCondition" />
+    </declare-styleable>
+
+    <declare-styleable name="SudButtonItem">
+        <attr name="android:buttonStyle" />
+        <attr name="android:enabled" />
+        <attr name="android:text" />
+        <attr name="android:theme" />
+    </declare-styleable>
+
+    <declare-styleable name="SudIconMixin">
+        <attr name="android:icon" />
+        <attr name="sudUpscaleIcon" format="boolean" />
+        <attr name="sudIconTint" />
+    </declare-styleable>
+
+    <declare-styleable name="SudListMixin">
+        <attr name="android:entries" />
+        <attr name="sudDividerInset" />
+        <attr name="sudDividerInsetEnd" />
+        <attr name="sudDividerInsetStart" />
+        <attr name="sudDividerShown" />
+    </declare-styleable>
+
+    <declare-styleable name="SudRecyclerItemAdapter">
+        <attr name="android:colorBackground" />
+        <attr name="android:selectableItemBackground" />
+        <attr name="selectableItemBackground" />
+    </declare-styleable>
+
+    <declare-styleable name="SudRecyclerMixin">
+        <attr name="android:entries" />
+        <attr name="sudDividerInset" />
+        <attr name="sudDividerInsetEnd" />
+        <attr name="sudDividerInsetStart" />
+        <attr name="sudHasStableIds" />
+    </declare-styleable>
+
+    <declare-styleable name="SudSwitchItem">
+        <attr name="android:checked" />
+    </declare-styleable>
+
+    <declare-styleable name="SudExpandableSwitchItem">
+        <attr name="sudCollapsedSummary" format="string" localization="suggested" />
+        <attr name="sudExpandedSummary" format="string" localization="suggested" />
+    </declare-styleable>
+
+    <declare-styleable name="SudDescriptionMixin">
+        <attr name="sudDescriptionText" format="string" localization="suggested" />
+        <attr name="sudDescriptionTextColor" format="reference|color" />
+        <attr name="sudGlifDescriptionMarginTop" format="dimension" />
+        <attr name="sudGlifDescriptionMarginBottom" format="dimension" />
+    </declare-styleable>
+
+    <declare-styleable name="SudProgressBarMixin">
+        <attr name="sudUseBottomProgressBar" format="boolean" />
+    </declare-styleable>
+
+    <declare-styleable name="SudGlifLoadingFramePadding">
+        <attr name="sudLoadingContentFramePaddingTop" format="dimension|reference" />
+        <attr name="sudLoadingContentFramePaddingStart" format="dimension|reference" />
+        <attr name="sudLoadingContentFramePaddingEnd" format="dimension|reference" />
+        <attr name="sudLoadingContentFramePaddingBottom" format="dimension|reference" />
+    </declare-styleable>
+
+    <attr name="sudLoadingHeaderHeight" format="dimension|reference" />
+
+    <!-- Glif Switch Bar style -->
+    <attr name="sudSwitchBarThumbOnColor" format="color|reference" />
+    <attr name="sudSwitchBarThumbOffColor" format="color|reference" />
+    <attr name="sudSwitchBarTrackOnColor" format="color|reference" />
+    <attr name="sudSwitchBarTrackOffColor" format="color|reference" />
+    <attr name="sudSwitchBarTrackOffOutlineColor" format="color|reference" />
+
+    <!-- Footer bar style -->
+    <attr name="sudFooterBackgroundColor" format="color" />
+</resources>

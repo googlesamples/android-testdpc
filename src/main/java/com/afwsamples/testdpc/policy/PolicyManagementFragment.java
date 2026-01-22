@@ -103,6 +103,7 @@ import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.DevicePolicyManagerGateway;
 import com.afwsamples.testdpc.DevicePolicyManagerGateway.FailedOperationException;
 import com.afwsamples.testdpc.DevicePolicyManagerGatewayImpl;
+import com.afwsamples.testdpc.delay.DelayedDevicePolicyManagerGateway;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.SetupManagementActivity;
 import com.afwsamples.testdpc.common.AccountArrayAdapter;
@@ -263,6 +264,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
   public static final String LOG_TAG = "TestDPC";
 
   private static final int INSTALL_KEY_CERTIFICATE_REQUEST_CODE = 7689;
+  private static final int VANILLA_ICE_CREAM = 35;
   private static final int INSTALL_CA_CERTIFICATE_REQUEST_CODE = 7690;
   private static final int CAPTURE_IMAGE_REQUEST_CODE = 7691;
   private static final int CAPTURE_VIDEO_REQUEST_CODE = 7692;
@@ -572,13 +574,14 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             : null;
     mUserManager = context.getSystemService(UserManager.class);
     mPackageManager = context.getPackageManager();
-    mDevicePolicyManagerGateway =
+    DevicePolicyManagerGateway baseGateway =
         new DevicePolicyManagerGatewayImpl(
             mDevicePolicyManager,
             mUserManager,
             mPackageManager,
             context.getSystemService(LocationManager.class),
             mAdminComponentName);
+    mDevicePolicyManagerGateway = new DelayedDevicePolicyManagerGateway(baseGateway, context);
     mIsProfileOwner = mDevicePolicyManagerGateway.isProfileOwnerApp();
     mIsOrganizationOwnedProfileOwner =
         Util.SDK_INT >= VERSION_CODES.R
@@ -750,6 +753,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     findPreference(KEEP_UNINSTALLED_PACKAGES).setOnPreferenceClickListener(this);
     findPreference(MANAGED_CONFIGURATIONS_KEY).setOnPreferenceClickListener(this);
     findPreference(DISABLE_METERED_DATA_KEY).setOnPreferenceClickListener(this);
+    findPreference(DELAY_SETTINGS_KEY).setOnPreferenceClickListener(this);
     findPreference(GENERIC_DELEGATION_KEY).setOnPreferenceClickListener(this);
     findPreference(APP_RESTRICTIONS_MANAGING_PACKAGE_KEY).setOnPreferenceClickListener(this);
     findPreference(REQUEST_MANAGE_CREDENTIALS_KEY).setOnPreferenceClickListener(this);
@@ -1265,7 +1269,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
       showSetGlobalHttpProxyDialog();
       return true;
     } else if (CLEAR_GLOBAL_HTTP_PROXY_KEY.equals(key)) {
-      mDevicePolicyManager.setRecommendedGlobalProxy(mAdminComponentName, null /* proxyInfo */);
+      mDevicePolicyManagerGateway.setRecommendedGlobalProxy(null /* proxyInfo */, v -> {}, e -> {});
       return true;
     } else if (SET_PRIVATE_DNS_MODE_KEY.equals(key)) {
       showFragment(new PrivateDnsModeFragment());
@@ -1383,7 +1387,15 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
       if (Util.SDK_INT >= VERSION_CODES.R) {
         setAutoTimeEnabled(false);
       } else {
-        mDevicePolicyManager.setGlobalSetting(mAdminComponentName, Global.AUTO_TIME, "0");
+        mDevicePolicyManagerGateway.setGlobalSetting(
+            Global.AUTO_TIME,
+            "0",
+            (v) -> {
+              onSuccessLog("setGlobalSetting(AUTO_TIME, 0)");
+              showSetTimeDialog();
+            },
+            (e) -> onErrorLog("setGlobalSetting", e));
+        return true;
       }
       showSetTimeDialog();
       return true;
@@ -1391,7 +1403,15 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
       if (Util.SDK_INT >= VERSION_CODES.R) {
         setAutoTimeZoneEnabled(false);
       } else {
-        mDevicePolicyManager.setGlobalSetting(mAdminComponentName, Global.AUTO_TIME_ZONE, "0");
+        mDevicePolicyManagerGateway.setGlobalSetting(
+            Global.AUTO_TIME_ZONE,
+            "0",
+            (v) -> {
+              onSuccessLog("setGlobalSetting(AUTO_TIME_ZONE, 0)");
+              showSetTimeZoneDialog();
+            },
+            (e) -> onErrorLog("setGlobalSetting", e));
+        return true;
       }
       showSetTimeZoneDialog();
       return true;
@@ -1462,7 +1482,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         .setSingleChoiceItems(
             R.array.mte_policy_options,
             /* checkedItem= */ policy,
-            (dialogInterface, i) -> mDevicePolicyManager.setMtePolicy(i))
+            (dialogInterface, i) -> mDevicePolicyManagerGateway.setMtePolicy(i, v -> {}, e -> {}))
         .setNegativeButton(R.string.close, null)
         .show();
   }
@@ -1483,8 +1503,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
   private void installUpdate() {
     File file = new File(getContext().getFilesDir(), "ota.zip");
     Uri uri = FileProvider.getUriForFile(getActivity(), mPackageName + ".fileprovider", file);
-    mDevicePolicyManager.installSystemUpdate(
-        mAdminComponentName,
+    mDevicePolicyManagerGateway.installSystemUpdate(
         uri,
         new MainThreadExecutor(),
         new InstallSystemUpdateCallback() {
@@ -1492,7 +1511,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
           public void onInstallUpdateError(int errorCode, String errorMessage) {
             showToast("Error code: " + errorCode);
           }
-        });
+        },
+        v -> {},
+        e -> showToast("Failed to install system update: " + e.getMessage()));
   }
 
   @RequiresApi(api = VERSION_CODES.M)
@@ -1649,8 +1670,10 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         reloadScreenCaptureDisableOnParentUi();
         return true;
       case MUTE_AUDIO_KEY:
-        mDevicePolicyManager.setMasterVolumeMuted(mAdminComponentName, (Boolean) newValue);
-        reloadMuteAudioUi();
+        mDevicePolicyManagerGateway.setMasterVolumeMuted(
+            (Boolean) newValue,
+            v -> reloadMuteAudioUi(),
+            e -> {});
         return true;
       case SET_GET_PREFERENTIAL_NETWORK_SERVICE_STATUS:
         mDevicePolicyManagerGateway.setPreferentialNetworkServiceEnabled(
@@ -1662,27 +1685,33 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             (e) -> onErrorLog("setPreferentialNetworkServiceEnabled", e));
         return true;
       case STAY_ON_WHILE_PLUGGED_IN:
-        mDevicePolicyManager.setGlobalSetting(
-            mAdminComponentName,
+        mDevicePolicyManagerGateway.setGlobalSetting(
             Settings.Global.STAY_ON_WHILE_PLUGGED_IN,
-            newValue.equals(true) ? BATTERY_PLUGGED_ANY : DONT_STAY_ON);
-        updateStayOnWhilePluggedInPreference();
+            newValue.equals(true) ? BATTERY_PLUGGED_ANY : DONT_STAY_ON,
+            (v) -> {
+              onSuccessLog("setGlobalSetting(STAY_ON_WHILE_PLUGGED_IN, %s)", newValue);
+              updateStayOnWhilePluggedInPreference();
+            },
+            (e) -> onErrorLog("setGlobalSetting", e));
         return true;
       case WIFI_CONFIG_LOCKDOWN_ENABLE_KEY:
-        mDevicePolicyManager.setConfiguredNetworksLockdownState(
-            mAdminComponentName, newValue.equals(true));
-        reloadLockdownAdminConfiguredNetworksUi();
+        mDevicePolicyManagerGateway.setConfiguredNetworksLockdownState(
+            newValue.equals(true),
+            v -> reloadLockdownAdminConfiguredNetworksUi(),
+            e -> {});
         return true;
       case INSTALL_NONMARKET_APPS_KEY:
-        mDevicePolicyManager.setSecureSetting(
-            mAdminComponentName,
+        mDevicePolicyManagerGateway.setSecureSetting(
             Settings.Secure.INSTALL_NON_MARKET_APPS,
-            newValue.equals(true) ? "1" : "0");
-        updateInstallNonMarketAppsPreference();
+            newValue.equals(true) ? "1" : "0",
+            v -> updateInstallNonMarketAppsPreference(),
+            e -> {});
         return true;
       case SET_AUTO_TIME_REQUIRED_KEY:
-        mDevicePolicyManager.setAutoTimeRequired(mAdminComponentName, newValue.equals(true));
-        reloadSetAutoTimeRequiredUi();
+        mDevicePolicyManagerGateway.setAutoTimeRequired(
+            newValue.equals(true),
+            v -> reloadSetAutoTimeRequiredUi(),
+            e -> {});
         return true;
       case SET_AUTO_TIME_KEY:
         setAutoTimeEnabled(newValue.equals(true));
@@ -1700,8 +1729,13 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         mSetDeviceOrganizationNamePreference.setSummary((String) newValue);
         return true;
       case ENABLE_LOGOUT_KEY:
-        mDevicePolicyManager.setLogoutEnabled(mAdminComponentName, (Boolean) newValue);
-        reloadEnableLogoutUi();
+        mDevicePolicyManagerGateway.setLogoutEnabled(
+            (Boolean) newValue,
+            (v) -> {
+              onSuccessLog("setLogoutEnabled(%b)", newValue);
+              reloadEnableLogoutUi();
+            },
+            (e) -> onErrorLog("setLogoutEnabled", e));
         return true;
       case AUTO_BRIGHTNESS_KEY:
         (mIsOrganizationOwnedProfileOwner ? mParentDevicePolicyManager : mDevicePolicyManager)
@@ -1732,9 +1766,14 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         editor.commit();
         return true;
       case SET_LOCATION_ENABLED_KEY:
-        mDevicePolicyManager.setLocationEnabled(mAdminComponentName, newValue.equals(true));
-        reloadLocationEnabledUi();
-        reloadLocationModeUi();
+        mDevicePolicyManagerGateway.setLocationEnabled(
+            newValue.equals(true),
+            (v) -> {
+              onSuccessLog("setLocationEnabled(%b)", newValue);
+              reloadLocationEnabledUi();
+              reloadLocationModeUi();
+            },
+            (e) -> onErrorLog("setLocationEnabled", e));
         return true;
       case SET_LOCATION_MODE_KEY:
         final int locationMode;
@@ -1743,22 +1782,31 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         } else {
           locationMode = Secure.LOCATION_MODE_OFF;
         }
-        mDevicePolicyManager.setSecureSetting(
-            mAdminComponentName,
+        mDevicePolicyManagerGateway.setSecureSetting(
             Secure.LOCATION_MODE,
-            String.format(Locale.getDefault(), "%d", locationMode));
-        reloadLocationEnabledUi();
-        reloadLocationModeUi();
+            String.format(Locale.getDefault(), "%d", locationMode),
+            (v) -> {
+              onSuccessLog("setSecureSetting(LOCATION_MODE, %d)", locationMode);
+              reloadLocationEnabledUi();
+              reloadLocationModeUi();
+            },
+            (e) -> onErrorLog("setSecureSetting", e));
         return true;
       case SUSPEND_PERSONAL_APPS_KEY:
-        mDevicePolicyManager.setPersonalAppsSuspended(mAdminComponentName, (Boolean) newValue);
-        reloadPersonalAppsSuspendedUi();
+        mDevicePolicyManagerGateway.setPersonalAppsSuspended(
+            (Boolean) newValue,
+            (v) -> {
+              onSuccessLog("setPersonalAppsSuspended(%b)", newValue);
+              reloadPersonalAppsSuspendedUi();
+            },
+            (e) -> onErrorLog("setPersonalAppsSuspended", e));
         return true;
       case PROFILE_MAX_TIME_OFF_KEY:
         final long timeoutSec = Long.parseLong((String) newValue);
-        mDevicePolicyManager.setManagedProfileMaximumTimeOff(
-            mAdminComponentName, TimeUnit.SECONDS.toMillis(timeoutSec));
-        maybeUpdateProfileMaxTimeOff();
+        mDevicePolicyManagerGateway.setManagedProfileMaximumTimeOff(
+            TimeUnit.SECONDS.toMillis(timeoutSec),
+            v -> maybeUpdateProfileMaxTimeOff(),
+            e -> {});
         return true;
     }
     return false;
@@ -1766,27 +1814,33 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
   @TargetApi(VERSION_CODES.M)
   private void setCameraDisabled(boolean disabled) {
-    mDevicePolicyManager.setCameraDisabled(mAdminComponentName, disabled);
+    mDevicePolicyManagerGateway.setCameraDisabled(
+        disabled,
+        (v) -> onSuccessLog("setCameraDisabled(%b)", disabled),
+        (e) -> onErrorLog("setCameraDisabled", e));
   }
 
   @TargetApi(VERSION_CODES.R)
   private void setCameraDisabledOnParent(boolean disabled) {
-    mParentDevicePolicyManager.setCameraDisabled(mAdminComponentName, disabled);
+    mDevicePolicyManagerGateway.setCameraDisabledOnParent(disabled, v -> {}, e -> {});
   }
 
   @TargetApi(VERSION_CODES.N)
   private void setSecurityLoggingEnabled(boolean enabled) {
-    mDevicePolicyManager.setSecurityLoggingEnabled(mAdminComponentName, enabled);
+    mDevicePolicyManagerGateway.setSecurityLoggingEnabled(
+        enabled,
+        (v) -> onSuccessLog("setSecurityLoggingEnabled(%b)", enabled),
+        (e) -> onErrorLog("setSecurityLoggingEnabled", e));
   }
 
   @TargetApi(VERSION_CODES.O)
   private void setBackupServiceEnabled(boolean enabled) {
-    mDevicePolicyManager.setBackupServiceEnabled(mAdminComponentName, enabled);
+    mDevicePolicyManagerGateway.setBackupServiceEnabled(enabled, v -> {}, e -> {});
   }
 
   @TargetApi(VERSION_CODES.R)
   private void setCommonCriteriaModeEnabled(boolean enabled) {
-    mDevicePolicyManager.setCommonCriteriaModeEnabled(mAdminComponentName, enabled);
+    mDevicePolicyManagerGateway.setCommonCriteriaModeEnabled(enabled, v -> {}, e -> {});
   }
 
   @TargetApi(VERSION_CODES.S)
@@ -1799,28 +1853,22 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     mDevicePolicyManagerGateway.setKeyguardDisabled(
         disabled,
         (v) -> onSuccessLog("setKeyGuardDisabled(%b)", disabled),
-        (e) ->
-            showToast(
-                disabled ? R.string.unable_disable_keyguard : R.string.unable_enable_keyguard));
-
-    if (!mDevicePolicyManager.setKeyguardDisabled(mAdminComponentName, disabled)) {
-      // this should not happen
-      if (disabled) {
-        showToast(R.string.unable_disable_keyguard);
-      } else {
-        showToast(R.string.unable_enable_keyguard);
-      }
-    }
+        (e) -> {
+          showToast(
+              disabled ? R.string.unable_disable_keyguard : R.string.unable_enable_keyguard);
+          onErrorLog("setKeyGuardDisabled", e);
+        });
+    // Removed duplicate direct API call - gateway handles it with proper delay
   }
 
   @TargetApi(VERSION_CODES.LOLLIPOP)
   private void setScreenCaptureDisabled(boolean disabled) {
-    mDevicePolicyManager.setScreenCaptureDisabled(mAdminComponentName, disabled);
+    mDevicePolicyManagerGateway.setScreenCaptureDisabled(disabled, v -> {}, e -> {});
   }
 
   @TargetApi(VERSION_CODES.R)
   private void setScreenCaptureDisabledOnParent(boolean disabled) {
-    mParentDevicePolicyManager.setScreenCaptureDisabled(mAdminComponentName, disabled);
+    mDevicePolicyManagerGateway.setScreenCaptureDisabledOnParent(disabled, v -> {}, e -> {});
   }
 
   private boolean isDeviceOwner() {
@@ -1864,35 +1912,15 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
   @TargetApi(VERSION_CODES.M)
   private void setStatusBarDisabled(boolean disable) {
-    if (!mDevicePolicyManager.setStatusBarDisabled(mAdminComponentName, disable)) {
-      if (disable) {
-        showToast("Unable to disable status bar when lock password is set.");
-      }
-    }
-  }
-
-  @TargetApi(VERSION_CODES.P)
-  private boolean installKeyPair(
-      final PrivateKey key, final Certificate cert, final String alias, boolean isUserSelectable) {
-    try {
-      if (Util.SDK_INT >= VERSION_CODES.P) {
-
-        return mDevicePolicyManager.installKeyPair(
-            mAdminComponentName,
-            key,
-            new Certificate[] {cert},
-            alias,
-            isUserSelectable ? DevicePolicyManager.INSTALLKEY_SET_USER_SELECTABLE : 0);
-      } else {
-        if (!isUserSelectable) {
-          throw new IllegalArgumentException("Cannot set key as non-user-selectable prior to P");
-        }
-        return mDevicePolicyManager.installKeyPair(mAdminComponentName, key, cert, alias);
-      }
-    } catch (SecurityException e) {
-      Log.w(TAG, "Not allowed to install keys", e);
-      return false;
-    }
+    mDevicePolicyManagerGateway.setStatusBarDisabled(
+        disable,
+        (v) -> onSuccessLog("setStatusBarDisabled(%b)", disable),
+        (e) -> {
+          if (disable) {
+            showToast("Unable to disable status bar when lock password is set.");
+          }
+          onErrorLog("setStatusBarDisabled", e);
+        });
   }
 
   private void generateKeyPair(final KeyGenerationParameters params) {
@@ -2197,11 +2225,22 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                     | BatteryManager.BATTERY_PLUGGED_USB
                     | BatteryManager.BATTERY_PLUGGED_WIRELESS))
             != 0;
-    mDevicePolicyManager.setGlobalSetting(
-        mAdminComponentName,
-        Settings.Global.STAY_ON_WHILE_PLUGGED_IN,
-        checked ? BATTERY_PLUGGED_ANY : DONT_STAY_ON);
-    mStayOnWhilePluggedInSwitchPreference.setChecked(checked);
+
+    // Only call setGlobalSetting if the value has actually changed
+    if (mStayOnWhilePluggedInSwitchPreference.isChecked() != checked) {
+      final boolean finalChecked = checked;
+      mDevicePolicyManagerGateway.setGlobalSetting(
+          Settings.Global.STAY_ON_WHILE_PLUGGED_IN,
+          checked ? BATTERY_PLUGGED_ANY : DONT_STAY_ON,
+          (v) -> {
+            onSuccessLog("setGlobalSetting(STAY_ON_WHILE_PLUGGED_IN, %s)", finalChecked);
+            mStayOnWhilePluggedInSwitchPreference.setChecked(finalChecked);
+          },
+          (e) -> onErrorLog("setGlobalSetting", e));
+    } else {
+      // Value unchanged, just update the preference display without queuing action
+      mStayOnWhilePluggedInSwitchPreference.setChecked(checked);
+    }
   }
 
   /**
@@ -2261,8 +2300,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 } else if (checked == R.id.deny) {
                   policy = DevicePolicyManager.PERMISSION_POLICY_AUTO_DENY;
                 }
-                mDevicePolicyManager.setPermissionPolicy(mAdminComponentName, policy);
-                dialog.dismiss();
+                mDevicePolicyManagerGateway.setPermissionPolicy(policy, v -> dialog.dismiss(), e -> dialog.dismiss());
               }
             })
         .show();
@@ -2307,10 +2345,13 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
   private void setDisableAccountManagement(String accountType, boolean disabled) {
     if (!TextUtils.isEmpty(accountType)) {
-      mDevicePolicyManager.setAccountManagementDisabled(mAdminComponentName, accountType, disabled);
-      showToast(
-          disabled ? R.string.account_management_disabled : R.string.account_management_enabled,
-          accountType);
+      mDevicePolicyManagerGateway.setAccountManagementDisabled(
+          accountType,
+          disabled,
+          v -> showToast(
+              disabled ? R.string.account_management_disabled : R.string.account_management_enabled,
+              accountType),
+          e -> showToast(R.string.fail_to_set_account_management));
       return;
     }
     showToast(R.string.fail_to_set_account_management);
@@ -2553,8 +2594,14 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
               public void onClick(DialogInterface dialogInterface, int i) {
                 String pkgName = input.getText().toString();
                 if (!TextUtils.isEmpty(pkgName)) {
-                  mDevicePolicyManager.setUninstallBlocked(mAdminComponentName, pkgName, true);
-                  showToast(R.string.uninstallation_blocked, pkgName);
+                  mDevicePolicyManagerGateway.setUninstallBlocked(
+                      pkgName,
+                      true,
+                      (v) -> {
+                        onSuccessLog("setUninstallBlocked(%s, true)", pkgName);
+                        showToast(R.string.uninstallation_blocked, pkgName);
+                      },
+                      (e) -> onErrorLog("setUninstallBlocked", e));
                 } else {
                   showToast(R.string.block_uninstallation_failed_invalid_pkgname);
                 }
@@ -2567,8 +2614,14 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
               public void onClick(DialogInterface dialogInterface, int i) {
                 String pkgName = input.getText().toString();
                 if (!TextUtils.isEmpty(pkgName)) {
-                  mDevicePolicyManager.setUninstallBlocked(mAdminComponentName, pkgName, false);
-                  showToast(R.string.uninstallation_allowed, pkgName);
+                  mDevicePolicyManagerGateway.setUninstallBlocked(
+                      pkgName,
+                      false,
+                      (v) -> {
+                        onSuccessLog("setUninstallBlocked(%s, false)", pkgName);
+                        showToast(R.string.uninstallation_allowed, pkgName);
+                      },
+                      (e) -> onErrorLog("setUninstallBlocked", e));
                 } else {
                   showToast(R.string.block_uninstallation_failed_invalid_pkgname);
                 }
@@ -2953,8 +3006,10 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
   @TargetApi(VERSION_CODES.UPSIDE_DOWN_CAKE)
   private void resetCredentialManagerPolicy() {
-    mDevicePolicyManager.setCredentialManagerPolicy(null);
-    showToast(R.string.credential_manager_policy_applied_toast);
+    mDevicePolicyManagerGateway.setCredentialManagerPolicy(
+        null,
+        v -> showToast(R.string.credential_manager_policy_applied_toast),
+        e -> {});
   }
 
   @TargetApi(VERSION_CODES.UPSIDE_DOWN_CAKE)
@@ -2977,11 +3032,13 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                   packageNames.add(packageName);
                 }
 
-                mDevicePolicyManager.setCredentialManagerPolicy(
-                    new PackagePolicy(policyType, packageNames));
-
-                showToast(R.string.credential_manager_policy_applied_toast);
-                dialog.dismiss();
+                mDevicePolicyManagerGateway.setCredentialManagerPolicy(
+                    new PackagePolicy(policyType, packageNames),
+                    v -> {
+                      showToast(R.string.credential_manager_policy_applied_toast);
+                      dialog.dismiss();
+                    },
+                    e -> dialog.dismiss());
               }
             })
         .setNegativeButton(
@@ -3217,12 +3274,20 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
               public void onClick(DialogInterface dialog, int which) {
                 String alias = input.getText().toString();
                 boolean isUserSelectable = userSelectableCheckbox.isChecked();
-                if (installKeyPair(key, certificate, alias, isUserSelectable) == true) {
-                  showToast(R.string.certificate_added, alias);
-                } else {
-                  showToast(R.string.certificate_add_failed, alias);
-                }
-                dialog.dismiss();
+                int flags = isUserSelectable ? DevicePolicyManager.INSTALLKEY_SET_USER_SELECTABLE : 0;
+                mDevicePolicyManagerGateway.installKeyPair(
+                    key,
+                    new Certificate[] {certificate},
+                    alias,
+                    flags,
+                    success -> {
+                      showToast(R.string.certificate_added, alias);
+                      dialog.dismiss();
+                    },
+                    e -> {
+                      showToast(R.string.certificate_add_failed, alias);
+                      dialog.dismiss();
+                    });
               }
             })
         .setNegativeButton(
@@ -3342,20 +3407,16 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
               return;
             }
 
-            final boolean removed = mDevicePolicyManager.removeKeyPair(mAdminComponentName, alias);
-
-            getActivity()
-                .runOnUiThread(
-                    new Runnable() {
-                      @Override
-                      public void run() {
-                        if (removed) {
-                          showToast(R.string.remove_keypair_successfully);
-                        } else {
-                          showToast(R.string.remove_keypair_fail);
-                        }
-                      }
-                    });
+            mDevicePolicyManagerGateway.removeKeyPair(
+                alias,
+                removed -> getActivity().runOnUiThread(() -> {
+                  if (removed) {
+                    showToast(R.string.remove_keypair_successfully);
+                  } else {
+                    showToast(R.string.remove_keypair_fail);
+                  }
+                }),
+                e -> getActivity().runOnUiThread(() -> showToast(R.string.remove_keypair_fail)));
           }
         }, /* keyTypes[] */
         null, /* issuers[] */
@@ -3470,8 +3531,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 showToast(R.string.port_out_of_range);
                 return;
               }
-              mDevicePolicyManager.setRecommendedGlobalProxy(
-                  mAdminComponentName, ProxyInfo.buildDirectProxy(hostString, port));
+              mDevicePolicyManagerGateway.setRecommendedGlobalProxy(
+                  ProxyInfo.buildDirectProxy(hostString, port), v -> {}, e -> {});
             })
         .setNegativeButton(android.R.string.cancel, null)
         .show();
@@ -3570,14 +3631,16 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             android.R.string.ok,
             (dialog, which) -> {
               final String packageName = editText.getText().toString();
-              boolean success =
-                  mDevicePolicyManager.installExistingPackage(mAdminComponentName, packageName);
-              showToast(
-                  success
-                      ? R.string.install_existing_packages_success_msg
-                      : R.string.package_name_error,
-                  packageName);
-              dialog.dismiss();
+              mDevicePolicyManagerGateway.installExistingPackage(
+                  packageName,
+                  success -> {
+                    showToast(R.string.install_existing_packages_success_msg, packageName);
+                    dialog.dismiss();
+                  },
+                  e -> {
+                    showToast(R.string.package_name_error, packageName);
+                    dialog.dismiss();
+                  });
             })
         .setNegativeButton(android.R.string.cancel, null)
         .show();
@@ -3676,12 +3739,17 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 @Override
                 public void onClick(DialogInterface dialog, int position) {
                   String packageName = showApps.get(position);
-                  if (mDevicePolicyManager.setApplicationHidden(
-                      mAdminComponentName, packageName, !showHiddenApps)) {
-                    showToast(successResId, packageName);
-                  } else {
-                    showToast(getString(failureResId, packageName), Toast.LENGTH_LONG);
-                  }
+                  mDevicePolicyManagerGateway.setApplicationHidden(
+                      packageName,
+                      !showHiddenApps,
+                      (v) -> {
+                        onSuccessLog("setApplicationHidden(%s, %b)", packageName, !showHiddenApps);
+                        showToast(successResId, packageName);
+                      },
+                      (e) -> {
+                        onErrorLog("setApplicationHidden", e);
+                        showToast(getString(failureResId, packageName), Toast.LENGTH_LONG);
+                      });
                 }
               })
           .show();
@@ -3719,17 +3787,21 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
             android.R.string.ok,
             (dialog, which) -> {
               String packageName = input.getText().toString();
-              try {
-                if (mParentDevicePolicyManager.setApplicationHidden(
-                    mAdminComponentName, packageName, !showHiddenApps)) {
-                  showToast(successResId, packageName);
-                } else {
-                  showToast(getString(failureResId, packageName), Toast.LENGTH_LONG);
-                }
-              } catch (IllegalArgumentException e) {
-                showToast(getString(failureSystemResId, packageName), Toast.LENGTH_LONG);
-              }
-              dialog.dismiss();
+              mDevicePolicyManagerGateway.setApplicationHiddenOnParent(
+                  packageName,
+                  !showHiddenApps,
+                  success -> {
+                    showToast(successResId, packageName);
+                    dialog.dismiss();
+                  },
+                  e -> {
+                    if (e instanceof IllegalArgumentException) {
+                      showToast(getString(failureSystemResId, packageName), Toast.LENGTH_LONG);
+                    } else {
+                      showToast(getString(failureResId, packageName), Toast.LENGTH_LONG);
+                    }
+                    dialog.dismiss();
+                  });
             })
         .setNegativeButton(android.R.string.cancel, (dialog, which) -> dialog.dismiss())
         .show();
@@ -3866,14 +3938,15 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
   @TargetApi(VERSION_CODES.P)
   private void clearApplicationUserData(String packageName) {
-    mDevicePolicyManager.clearApplicationUserData(
-        mAdminComponentName,
+    mDevicePolicyManagerGateway.clearApplicationUserData(
         packageName,
         new MainThreadExecutor(),
         (__, succeed) ->
             showToast(
                 succeed ? R.string.clear_app_data_success : R.string.clear_app_data_failure,
-                packageName));
+                packageName),
+        v -> {},
+        e -> showToast(R.string.clear_app_data_failure, packageName));
   }
 
   @TargetApi(VERSION_CODES.N)
@@ -3963,14 +4036,20 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     @Override
     protected void setPermittedComponentsList(List<String> permittedAccessibilityServices) {
-      boolean result =
-          mDevicePolicyManager.setPermittedAccessibilityServices(
-              mAdminComponentName, permittedAccessibilityServices);
-      int successMsgId =
-          (permittedAccessibilityServices == null)
-              ? R.string.all_accessibility_services_enabled
-              : R.string.set_accessibility_services_successful;
-      showToast(result ? successMsgId : R.string.set_accessibility_services_fail);
+      mDevicePolicyManagerGateway.setPermittedAccessibilityServices(
+          permittedAccessibilityServices,
+          (v) -> {
+            int successMsgId =
+                (permittedAccessibilityServices == null)
+                    ? R.string.all_accessibility_services_enabled
+                    : R.string.set_accessibility_services_successful;
+            showToast(successMsgId);
+            onSuccessLog("setPermittedAccessibilityServices");
+          },
+          (e) -> {
+            showToast(R.string.set_accessibility_services_fail);
+            onErrorLog("setPermittedAccessibilityServices", e);
+          });
     }
   }
 
@@ -4009,13 +4088,20 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     @Override
     protected void setPermittedComponentsList(List<String> permittedInputMethods) {
-      boolean result =
-          mDevicePolicyManager.setPermittedInputMethods(mAdminComponentName, permittedInputMethods);
-      int successMsgId =
-          (permittedInputMethods == null)
-              ? R.string.all_input_methods_enabled
-              : R.string.set_input_methods_successful;
-      showToast(result ? successMsgId : R.string.set_input_methods_fail);
+      mDevicePolicyManagerGateway.setPermittedInputMethods(
+          permittedInputMethods,
+          (v) -> {
+            int successMsgId =
+                (permittedInputMethods == null)
+                    ? R.string.all_input_methods_enabled
+                    : R.string.set_input_methods_successful;
+            showToast(successMsgId);
+            onSuccessLog("setPermittedInputMethods");
+          },
+          (e) -> {
+            showToast(R.string.set_input_methods_fail);
+            onErrorLog("setPermittedInputMethods", e);
+          });
     }
   }
 
@@ -4122,14 +4208,20 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
   @TargetApi(VERSION_CODES.O)
   private void setPermittedNotificationListeners(List<String> permittedNotificationListeners) {
-    boolean result =
-        mDevicePolicyManager.setPermittedCrossProfileNotificationListeners(
-            mAdminComponentName, permittedNotificationListeners);
-    int successMsgId =
-        (permittedNotificationListeners == null)
-            ? R.string.all_notification_listeners_enabled
-            : R.string.set_notification_listeners_successful;
-    showToast(result ? successMsgId : R.string.set_notification_listeners_fail);
+    mDevicePolicyManagerGateway.setPermittedCrossProfileNotificationListeners(
+        permittedNotificationListeners,
+        (v) -> {
+          int successMsgId =
+              (permittedNotificationListeners == null)
+                  ? R.string.all_notification_listeners_enabled
+                  : R.string.set_notification_listeners_successful;
+          showToast(successMsgId);
+          onSuccessLog("setPermittedCrossProfileNotificationListeners");
+        },
+        (e) -> {
+          showToast(R.string.set_notification_listeners_fail);
+          onErrorLog("setPermittedCrossProfileNotificationListeners", e);
+        });
   }
 
   /** Gets all CA certificates and displays them in a prompt. */
@@ -4232,8 +4324,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         PackageManager.DONT_KILL_APP);
 
     // set custom launcher as default home activity
-    mDevicePolicyManager.addPersistentPreferredActivity(
-        mAdminComponentName, Util.getHomeIntentFilter(), customLauncher);
+    mDevicePolicyManagerGateway.addPersistentPreferredActivity(
+        Util.getHomeIntentFilter(), customLauncher, v -> {}, e -> {});
     Intent launchIntent = Util.getHomeIntent();
     launchIntent.putExtra(KioskModeActivity.LOCKED_APP_PACKAGE_LIST, lockTaskArray);
 
@@ -4324,7 +4416,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         .setSingleChoiceItems(
             R.array.nearby_streaming_policies,
             /* checkedItem= */ policy,
-            (dialogInterface, i) -> mDevicePolicyManager.setNearbyNotificationStreamingPolicy(i))
+            (dialogInterface, i) -> mDevicePolicyManagerGateway.setNearbyNotificationStreamingPolicy(i, v -> {}, e -> {}))
         .setNegativeButton(R.string.close, null)
         .show();
   }
@@ -4340,7 +4432,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         .setSingleChoiceItems(
             R.array.nearby_streaming_policies,
             /* checkedItem= */ policy,
-            (dialogInterface, i) -> mDevicePolicyManager.setNearbyAppStreamingPolicy(i))
+            (dialogInterface, i) -> mDevicePolicyManagerGateway.setNearbyAppStreamingPolicy(i, v -> {}, e -> {}))
         .setNegativeButton(R.string.close, null)
         .show();
   }
@@ -4425,7 +4517,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 showToast(R.string.invalid_set_time);
                 return;
               }
-              mDevicePolicyManager.setTime(mAdminComponentName, newTime);
+              mDevicePolicyManagerGateway.setTime(newTime, v -> {}, e -> {});
             })
         .setNegativeButton(android.R.string.cancel, null)
         .show();
@@ -4463,7 +4555,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 showToast(R.string.invalid_timezone);
                 return;
               }
-              mDevicePolicyManager.setTimeZone(mAdminComponentName, newTimezone);
+              mDevicePolicyManagerGateway.setTimeZone(newTimezone, v -> {}, e -> {});
             })
         .setNegativeButton(android.R.string.cancel, null)
         .show();
@@ -4492,7 +4584,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 showToast(R.string.no_profile_name);
                 return;
               }
-              mDevicePolicyManager.setProfileName(mAdminComponentName, newProfileName);
+              mDevicePolicyManagerGateway.setProfileName(newProfileName, v -> {}, e -> {});
             })
         .setNegativeButton(android.R.string.cancel, null)
         .show();
@@ -4640,8 +4732,8 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 } else if (checked == R.id.enterprise_192) {
                   level = DevicePolicyManager.WIFI_SECURITY_ENTERPRISE_192;
                 }
-                mDevicePolicyManager.setMinimumRequiredWifiSecurityLevel(level);
-                dialog.dismiss();
+                mDevicePolicyManagerGateway.setMinimumRequiredWifiSecurityLevel(
+                    level, v -> dialog.dismiss(), e -> dialog.dismiss());
               }
             })
         .show();
@@ -4672,8 +4764,10 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
               public void onClick(DialogInterface dialog, int which) {
                 final String ssids = ssidsTextEdit.getText().toString();
                 if (ssids.isEmpty()) {
-                  mDevicePolicyManager.setWifiSsidPolicy(null);
-                  showToast("SSID restriction removed");
+                  mDevicePolicyManagerGateway.setWifiSsidPolicy(
+                      null,
+                      v -> showToast("SSID restriction removed"),
+                      e -> {});
                   return;
                 }
 
@@ -4692,9 +4786,13 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
                 }
 
                 WifiSsidPolicy policy = new WifiSsidPolicy(type, ssidList);
-                mDevicePolicyManager.setWifiSsidPolicy(policy);
-                showToast("SSID restriction set");
-                dialog.dismiss();
+                mDevicePolicyManagerGateway.setWifiSsidPolicy(
+                    policy,
+                    v -> {
+                      showToast("SSID restriction set");
+                      dialog.dismiss();
+                    },
+                    e -> dialog.dismiss());
               }
             })
         .show();
@@ -4806,7 +4904,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
   private int validateBrightnessControlConstraint() {
     // Brightness control is always available to DO, and is enabled for COPE starting from
     // Android V
-    if (mIsOrganizationOwnedProfileOwner && Util.SDK_INT < VERSION_CODES.VANILLA_ICE_CREAM) {
+    if (mIsOrganizationOwnedProfileOwner && Util.SDK_INT < VANILLA_ICE_CREAM) {
       return R.string.requires_android_v;
     }
     return NO_CUSTOM_CONSTRAINT;
@@ -4818,12 +4916,12 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
   @RequiresApi(VERSION_CODES.R)
   private void setAutoTimeEnabled(boolean enabled) {
-    mDevicePolicyManager.setAutoTimeEnabled(mAdminComponentName, enabled);
+    mDevicePolicyManagerGateway.setAutoTimeEnabled(enabled, v -> {}, e -> {});
   }
 
   @RequiresApi(VERSION_CODES.R)
   private void setAutoTimeZoneEnabled(boolean enabled) {
-    mDevicePolicyManager.setAutoTimeZoneEnabled(mAdminComponentName, enabled);
+    mDevicePolicyManagerGateway.setAutoTimeZoneEnabled(enabled, v -> {}, e -> {});
   }
 
   private void onSuccessShowToast(String method, int msgId, Object... args) {

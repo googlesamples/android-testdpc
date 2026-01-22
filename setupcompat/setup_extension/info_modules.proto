@@ -1,0 +1,96 @@
+// Copyright (C) 2022 The Android Open Source Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+// Author: yuchaoyu@google.com (Yu Chao)
+
+syntax = "proto2";
+
+package portal_tips_proto;
+
+option java_package = "com.google.android.setupcompat";
+option java_outer_classname = "InfoModules";
+
+// A list of informational modules to be displayed under the deferred setup
+// items.
+// Next index: 5
+message InfoModuleList {
+  // Contains the title of the entire info module section. This is displayed
+  // before the subtitle and the list of info modules.
+  optional string section_title = 1;
+
+  // Contains the subtitle of the entire info module section. This is displayed
+  // before the list of info modules.
+  optional string section_subtitle = 2;
+
+  // A module represents a single informational item to be displayed in the list
+  // under the deferred setup page.
+  //
+  // Each module contains a unique id, three sections of text labels (title,
+  // description, footer), the Intent URI to launch when being clicked, the raw
+  // icon, and a boolean to determine whether or not the icon should be colored.
+  // Next index: 8
+  message InfoModule {
+
+    // The id to uniquely identify an InfoModule.
+    optional string id = 1;
+
+    // Contains the title of the module. This is displayed as the first section
+    // of the text content.
+    optional string title = 2;
+
+    // Contains the main paragraphs of the module. This is displayed as the
+    // second section of the text content.
+    optional string description = 3;
+
+    // Contains the footer text of the module. This is displayed as the third
+    // and final section of the text content.
+    optional string footer = 4;
+
+    // Contains the Intent string to be launched when the module is clicked.
+    //
+    // This string could be generated from an `Intent` object through the
+    // `toUri()` method.
+    optional string intent_uri = 5;
+
+    // Contains the icon of the module in raw bytes of bitmap format.
+    optional bytes raw_icon = 6;
+
+    // Determines whether the icon should be colored according to the theme.
+    // Generally speaking, this should be set to true for monoline icons (such
+    // as Material Icons) because their colors change according to the theme.
+    // For icons which their colors should be preserved (such as package icons),
+    // this should be set to false.
+    optional bool should_apply_theme_color_on_icon = 7;
+  }
+
+  // Contains a list of informational modules to be displayed.
+  repeated InfoModule info_module_list = 3;
+
+  // A trailing link is a button item appearing below the info module list.
+  // Next index: 3
+  message TrailingLink {
+    // Contains the text that should be displayed on the link button.
+    optional string text = 1;
+
+    // Contains the Intent string to be launched when the link button is
+    // clicked.
+    //
+    // This string could be generated from an `Intent` object through the
+    // `toUri()` method.
+    optional string intent_uri = 2;
+  }
+
+  // Contains a trailing link to be displayed below the info modules.
+  optional TrailingLink trailing_link = 4;
+}

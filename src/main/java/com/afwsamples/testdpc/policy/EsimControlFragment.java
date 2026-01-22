@@ -44,10 +44,11 @@ import com.afwsamples.testdpc.common.preference.DpcPreference;
 import java.util.Set;
 
 /** Fragment to control eSIMs. */
-@TargetApi(VERSION_CODES.VANILLA_ICE_CREAM)
+@TargetApi(35)
 public class EsimControlFragment extends BaseSearchablePolicyPreferenceFragment
     implements Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
   private static final String TAG = EsimControlFragment.class.getSimpleName();
+  private static final int VANILLA_ICE_CREAM = 35;
   private static final String DOWNLOAD_ESIM = "download_esim";
   private static final String DELETE_ESIM = "delete_esim";
   private static final String GET_MANAGED_ESIM = "get_managed_esim";

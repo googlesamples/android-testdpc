@@ -40,6 +40,7 @@ import com.afwsamples.testdpc.common.preference.DpcSwitchPreference;
 public class UserRestrictionsDisplayFragment extends BaseSearchablePolicyPreferenceFragment
     implements Preference.OnPreferenceChangeListener {
   private static final String TAG = "UserRestrictions";
+  private static final int VANILLA_ICE_CREAM = 35;
 
   private DevicePolicyManagerGateway mDevicePolicyManagerGateway;
 
@@ -171,7 +172,7 @@ public class UserRestrictionsDisplayFragment extends BaseSearchablePolicyPrefere
     }
     for (String restriction : UserRestriction.VIC_PLUS_RESTRICTIONS) {
       DpcPreferenceBase pref = (DpcPreferenceBase) findPreference(restriction);
-      pref.setMinSdkVersion(VERSION_CODES.VANILLA_ICE_CREAM);
+      pref.setMinSdkVersion(VANILLA_ICE_CREAM);
     }
     for (String restriction : UserRestriction.PRIMARY_USER_ONLY_RESTRICTIONS) {
       DpcPreferenceBase pref = (DpcPreferenceBase) findPreference(restriction);

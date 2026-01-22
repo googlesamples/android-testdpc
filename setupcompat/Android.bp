@@ -1,0 +1,145 @@
+//
+// Build the setup compat library.
+//
+
+package {
+    default_applicable_licenses: ["external_setupcompat_license"],
+}
+
+// Added automatically by a large-scale-change
+// See: http://go/android-license-faq
+license {
+    name: "external_setupcompat_license",
+    visibility: [":__subpackages__"],
+    license_kinds: [
+        "SPDX-license-identifier-Apache-2.0",
+    ],
+    license_text: [
+        "LICENSE",
+    ],
+}
+
+filegroup {
+    name: "Aidls",
+    srcs: [
+        "main/aidl/com/google/android/setupcompat/ISetupCompatService.aidl",
+    ],
+    path: "main/aidl",
+}
+
+filegroup {
+    name: "AidlsPortal",
+    srcs: [
+        "main/aidl/com/google/android/setupcompat/portal/*.aidl",
+    ],
+    path: "main/aidl",
+}
+
+filegroup {
+    name: "AidlsBts",
+    srcs: [
+        "bts/aidl/com/google/android/setupcompat/bts/*.aidl",
+    ],
+    path: "bts/aidl",
+}
+
+filegroup {
+    name: "Srcs",
+    srcs: [
+        "main/java/com/google/android/setupcompat/*.java",
+        "main/java/com/google/android/setupcompat/internal/*.java",
+        "main/java/com/google/android/setupcompat/logging/*.java",
+        "main/java/com/google/android/setupcompat/logging/*.kt",
+        "main/java/com/google/android/setupcompat/logging/internal/*.java",
+        "main/java/com/google/android/setupcompat/template/*.java",
+        "main/java/com/google/android/setupcompat/util/*.java",
+        "main/java/com/google/android/setupcompat/view/*.java",
+    ],
+    path: "main/java",
+}
+
+filegroup {
+    name: "SrcsPartnerConfig",
+    srcs: [
+        "partnerconfig/java/**/*.java",
+    ],
+    path: "partnerconfig/java",
+}
+
+filegroup {
+    name: "SrcsPortal",
+    srcs: [
+        "main/java/com/google/android/setupcompat/portal/*.java",
+    ],
+    path: "main/java",
+}
+
+filegroup {
+    name: "SrcsBts",
+    srcs: [
+        "bts/java/com/google/android/setupcompat/bts/*.java",
+    ],
+    path: "bts/java",
+}
+
+android_library {
+    name: "setupcompat",
+    manifest: "AndroidManifest.xml",
+    resource_dirs: [
+        "main/res",
+    ],
+    srcs: [
+        ":Aidls",
+        ":AidlsPortal",
+        ":Srcs",
+        ":SrcsPartnerConfig",
+        ":SrcsPortal",
+    ],
+    static_libs: [
+        "androidx.annotation_annotation",
+        "androidx.window_window",
+        "com.google.android.material_material",
+        "error_prone_annotations",
+    ],
+    min_sdk_version: "21",
+    sdk_version: "current",
+    optimize: {
+        proguard_flags_files: ["proguard.flags"],
+    },
+    lint: {
+        baseline_filename: "lint-baseline.xml",
+    },
+    apex_available: [
+        "//apex_available:platform",
+        "com.android.healthfitness",
+    ],
+}
+
+android_library {
+    name: "setupcompat_bts",
+    manifest: "AndroidManifest.xml",
+    resource_dirs: [
+        "main/res",
+    ],
+    srcs: [
+        ":Srcs",
+        ":SrcsBts",
+        ":SrcsPartnerConfig",
+        ":Aidls",
+        ":AidlsBts",
+    ],
+    static_libs: [
+        "androidx.annotation_annotation",
+        "androidx.window_window",
+        "com.google.android.material_material",
+        "error_prone_annotations",
+    ],
+    min_sdk_version: "21",
+    sdk_version: "current",
+    optimize: {
+        proguard_flags_files: ["proguard.flags"],
+    },
+    lint: {
+        baseline_filename: "lint-baseline.xml",
+    },
+}

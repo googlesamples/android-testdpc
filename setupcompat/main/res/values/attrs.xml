@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2018 The Android Open Source Project
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+<resources>
+
+    <!-- Theme attributes -->
+    <attr name="sucLayoutTheme" format="reference" />
+
+    <declare-styleable name="SucTemplateLayout">
+        <attr name="android:layout" />
+        <attr name="sucContainer" format="reference" />
+    </declare-styleable>
+
+    <declare-styleable name="SucPartnerCustomizationLayout">
+        <attr name="sucLayoutFullscreen" format="boolean" />
+        <!-- When set to false, prevents the layout applying partner resource. This attribute is
+             particularly useful when the layout would like to apply their customized attributes.
+             This attribute will be ignored and use partner resource when inside setup wizard flow.
+             The default value is true. -->
+        <attr name="sucUsePartnerResource" format="boolean" />
+        <attr name="sucFullDynamicColor" format="boolean" />
+    </declare-styleable>
+
+    <!-- Status bar attributes; only takes effect on M or above -->
+    <declare-styleable name="SucStatusBarMixin">
+        <!-- The color for the status bar. For this to take effect,
+             "android:windowDrawsSystemBarBackgrounds" should be set to true and
+             "android:windowTranslucentStatus" should be set to false. Also,
+             View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN should be set to true and
+             android:statusBarColor should be transparent. -->
+        <attr name="sucStatusBarBackground" format="color|reference" />
+        <attr name="sucLightStatusBar" format="boolean" />
+    </declare-styleable>
+
+    <!-- System navigation bar attributes; only takes effect on O_MR1 or above -->
+    <declare-styleable name="SucSystemNavBarMixin">
+        <!-- The color for the system navigation bar. For this to take effect,
+             "android:windowDrawsSystemBarBackgrounds" should be set to true and
+             "android:windowTranslucentNavigation" should be set to false. -->
+        <attr name="sucSystemNavBarBackgroundColor" format="color" />
+        <attr name="sucLightSystemNavBar" format="boolean" />
+        <!-- The color for the system navigation bar divider. For this to take effect,
+             "android:windowDrawsSystemBarBackgrounds" should be set to true and
+             "android:windowTranslucentNavigation" should be set to false. -->
+        <attr name="sucSystemNavBarDividerColor" format="color" />
+    </declare-styleable>
+
+    <!-- FooterButton attributes -->
+    <declare-styleable name="SucFooterButton">
+        <attr name="android:text" />
+        <attr name="android:theme" />
+        <!-- Next value: 9 -->
+        <attr name="sucButtonType">
+            <enum name="other" value="0" />
+            <enum name="add_another" value="1" />
+            <enum name="cancel" value="2" />
+            <enum name="clear" value="3" />
+            <enum name="done" value="4" />
+            <enum name="next" value="5" />
+            <enum name="opt_in" value="6" />
+            <enum name="skip" value="7" />
+            <enum name="stop" value="8" />
+        </attr>
+        <attr name="sucFooterButtonPaddingStart" format="dimension" />
+        <attr name="sucFooterButtonPaddingEnd" format="dimension" />
+    </declare-styleable>
+
+    <!-- Button of footer attributes -->
+    <declare-styleable name="SucFooterBarMixin">
+        <attr name="sucFooterBarButtonAllCaps" format="boolean" />
+        <attr name="sucFooterBarButtonAlignEnd" format="boolean" />
+        <attr name="sucFooterBarButtonCornerRadius" format="dimension" />
+        <attr name="sucFooterBarButtonFontFamily" format="string|reference" />
+        <attr name="sucFooterBarButtonMinHeight" format="dimension" />
+        <attr name="sucFooterBarPaddingTop" format="dimension" />
+        <attr name="sucFooterBarPaddingBottom" format="dimension" />
+        <attr name="sucFooterBarPrimaryFooterBackground" format="color" />
+        <attr name="sucFooterBarPrimaryFooterButton" format="reference" />
+        <attr name="sucFooterBarPrimaryFooterButtonEnabledTextColor" format="color" />
+        <attr name="sucFooterBarPrimaryFooterButtonDisabledTextColor" format="color" />
+        <attr name="sucFooterBarSecondaryFooterBackground" format="color" />
+        <attr name="sucFooterBarSecondaryFooterButton" format="reference" />
+        <attr name="sucFooterBarSecondaryFooterButtonEnabledTextColor" format="color" />
+        <attr name="sucFooterBarSecondaryFooterButtonDisabledTextColor" format="color" />
+        <attr name="sucFooterBarButtonHighlightAlpha" format="float" />
+        <attr name="sucFooterBarButtonColorControlHighlight" format="color" />
+        <attr name="sucFooterBarButtonColorControlHighlightRipple" format="color" />
+        <attr name="sucFooterBarPaddingVertical" format="dimension" />
+        <attr name="sucFooterBarPaddingStart" format="dimension" />
+        <attr name="sucFooterBarPaddingEnd" format="dimension" />
+        <attr name="sucFooterBarMinHeight" format="dimension" />
+        <attr name="sucFooterBarButtonMiddleSpacing" format="dimension" />
+        <attr name="sucFooterBarButtonFontWeight" format="integer" />
+        <attr name="sucFooterBarButtonTextSize" format="dimension" />
+        <attr name="sucFooterButtonTextLineSpacingExtra" format="dimension" />
+    </declare-styleable>
+
+    <declare-styleable name="SucHeaderMixin">
+        <attr name="sucHeaderText" format="string" localization="suggested" />
+        <attr name="sucHeaderTextColor" format="reference|color" />
+        <attr name="sucGlifHeaderMarginTop" format="dimension" />
+        <attr name="sucGlifHeaderMarginBottom" format="dimension" />
+        <attr name="sucGlifIconMarginTop" format="dimension" />
+        <attr name="sucHeaderContainerMarginBottom" format="dimension" />
+    </declare-styleable>
+
+    <attr name="sucMaterialOutlinedButtonStyle" format="reference" />
+
+    <attr name="sucMaterialButtonStyle" format="reference" />
+
+</resources>

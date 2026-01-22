@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2021 The Android Open Source Project
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+<resources>
+
+  <color name="sud_system_primary_text">@color/sud_primary_default_text_dark</color>
+  <color name="sud_system_secondary_text">@color/sud_secondary_default_text_dark</color>
+  <color name="sud_system_tertiary_text_inactive">@color/sud_inactive_default_dark</color>
+  <color name="sud_system_error_warning">@color/sud_error_warning_default_dark</color>
+  <color name="sud_system_success_done">@color/success_color_device_default_dark</color>
+  <color name="sud_system_fallback_accent">@color/fallback_color_device_default_dark</color>
+
+  <color name="sud_portal_pending_progress">@color/sud_portal_pending_progress_dark</color>
+
+
+  <color name="sud_uniformity_backdrop_color">#2A2B2E</color>
+  <!-- Default color for the footer button bg (primary80) -->
+  <color name="sud_glif_expressive_footer_button_bg_color">#ffd0bcff</color>
+
+
+  <color name="sud_color_on_surface">@color/sud_neutral90</color>
+  <color name="sud_color_surface_container_highest">@color/sud_neutral22</color>
+
+  <!-- Glif expressive style -->
+  <!-- primary20 -->
+  <color name="sud_glif_expressive_footer_primary_button_enable_text_color">#ff062e6f</color>
+  <!-- neutral_variant80 -->
+  <color name="sud_glif_expressive_footer_primary_button_disable_text_color">#ffcac4d0</color>
+  <!-- secondary90 -->
+  <color name="sud_glif_expressive_footer_secondary_button_enable_text_color">#ffe8def8</color>
+  <!-- neutral_variant80 -->
+  <color name="sud_glif_expressive_footer_secondary_button_disable_text_color">#ffcac4d0</color>
+</resources>

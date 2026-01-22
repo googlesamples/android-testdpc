@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright (C) 2022 The Android Open Source Project
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Animation.SudWindowAnimation" parent="@android:style/Animation.Activity">
+        <item name="android:activityOpenEnterAnimation">@anim/shared_x_axis_activity_open_enter</item>
+        <item name="android:activityOpenExitAnimation">@anim/shared_x_axis_activity_open_exit</item>
+        <item name="android:activityCloseEnterAnimation">@anim/shared_x_axis_activity_close_enter</item>
+        <item name="android:activityCloseExitAnimation">@anim/shared_x_axis_activity_close_exit</item>
+    </style>
+
+    <style name="Animation.SudWindowAnimation.DynamicColor" parent="@android:style/Animation.Activity">
+        <item name="android:activityOpenEnterAnimation">@anim/shared_x_axis_activity_open_enter_dynamic_color</item>
+        <item name="android:activityOpenExitAnimation">@anim/shared_x_axis_activity_open_exit</item>
+        <item name="android:activityCloseEnterAnimation">@anim/shared_x_axis_activity_close_enter_dynamic_color</item>
+        <item name="android:activityCloseExitAnimation">@anim/shared_x_axis_activity_close_exit</item>
+    </style>
+</resources>

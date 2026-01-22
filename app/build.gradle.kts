@@ -17,8 +17,6 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         
-        // Resource configuration
-        resourceConfigurations += setOf("en", "hdpi", "xhdpi", "xxhdpi", "xxxhdpi")
     }
 
     buildTypes {
@@ -52,6 +50,7 @@ android {
 
     buildFeatures {
         buildConfig = true
+        aidl = true
     }
 
     // AIDL configuration
@@ -90,6 +89,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.5.1")
     implementation("androidx.lifecycle:lifecycle-viewmodel:2.5.1")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1")
+    implementation("androidx.lifecycle:lifecycle-process:2.5.1")
 
     // AndroidX Preference
     implementation("androidx.preference:preference:1.2.1")
@@ -97,6 +97,10 @@ dependencies {
 
     // AndroidX RecyclerView
     implementation("androidx.recyclerview:recyclerview:1.2.1")
+
+    // AndroidX Legacy
+    implementation("androidx.legacy:legacy-support-v4:1.0.0")
+    implementation("androidx.legacy:legacy-support-v13:1.0.0")
 
     // AndroidX Window
     implementation("androidx.window:window:1.2.0")
@@ -112,7 +116,10 @@ dependencies {
     implementation("androidx.sqlite:sqlite-framework:2.3.1")
 
     // Material Design
-    implementation("com.google.android.material:material:1.6.1")
+    implementation("com.google.android.material:material:1.11.0")
+
+    // AndroidX Enterprise
+    implementation("androidx.enterprise:enterprise-feedback:1.1.0")
 
     // Constraint Layout
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
@@ -123,6 +130,10 @@ dependencies {
 
     // Google Guava (from Bazel setup)
     implementation("com.google.guava:guava:31.1-android")
+
+    // Bouncy Castle
+    implementation("org.bouncycastle:bcprov-jdk15on:1.70")
+    implementation("org.bouncycastle:bcpkix-jdk15on:1.70")
 
     // Testing
     testImplementation("junit:junit:4.13.2")

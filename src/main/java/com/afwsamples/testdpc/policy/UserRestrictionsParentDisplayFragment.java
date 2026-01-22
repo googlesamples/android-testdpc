@@ -20,6 +20,7 @@ import java.util.Set;
 public class UserRestrictionsParentDisplayFragment extends BaseSearchablePolicyPreferenceFragment
     implements Preference.OnPreferenceChangeListener {
   private static final String TAG = "UserRestrictionsParent";
+  private static final int VANILLA_ICE_CREAM = 35;
 
   private DevicePolicyManagerGateway mDevicePolicyManagerGateway;
 
@@ -100,7 +101,7 @@ public class UserRestrictionsParentDisplayFragment extends BaseSearchablePolicyP
       DpcPreferenceBase pref = (DpcPreferenceBase) findPreference(restrictionKey);
       if (Arrays.stream(UserRestriction.VIC_PLUS_PARENT_RESTRICTIONS)
           .anyMatch(restrictionKey::equals)) {
-        pref.setMinSdkVersion(VERSION_CODES.VANILLA_ICE_CREAM);
+        pref.setMinSdkVersion(VANILLA_ICE_CREAM);
       } else if (Arrays.stream(UserRestriction.UDC_PLUS_RESTRICTIONS)
           .anyMatch(restrictionKey::equals)) {
         pref.setMinSdkVersion(VERSION_CODES.UPSIDE_DOWN_CAKE);

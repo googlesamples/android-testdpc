@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+  <!-- TODO: b/370872815 - Migrate down button values to design lib. -->
+  <!-- Glif expressive down button -->
+  <dimen name="suc_glif_expressive_down_button_width">72dp</dimen>
+  <dimen name="suc_glif_expressive_down_button_height">56dp</dimen>
+  <dimen name="suc_glif_expressive_down_button_radius">28dp</dimen>
+
+</resources>

@@ -1,0 +1,510 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright (C) 2021 The Android Open Source Project
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+<resources xmlns:tools="http://schemas.android.com/tools">
+  <!-- Main theme for dynamic color -->
+  <style name="SudDynamicColorBaseTheme">
+    <item name="colorAccent">@color/sud_dynamic_color_accent_glif_v3_dark</item>
+    <item name="android:colorAccent">?attr/colorAccent</item>
+    <item name="android:textColorLink">@color/sud_system_hyperlink_text</item>
+    <item name="alertDialogTheme">@style/SudDynamicColorAlertDialogThemeCompat</item>
+    <item name="android:alertDialogTheme">@style/SudDynamicColorAlertDialogTheme</item>
+    <item name="android:datePickerDialogTheme">@style/SudDynamicColorDateTimePickerDialogTheme</item>
+    <item name="android:timePickerDialogTheme">@style/SudDynamicColorDateTimePickerDialogTheme</item>
+    <item name="sucFullDynamicColor">false</item>
+    <item name="sudSwitchBarThumbOnColor">@color/sud_dynamic_switch_thumb_on_dark</item>
+    <item name="sudSwitchBarTrackOnColor">@color/sud_dynamic_switch_track_on_dark</item>
+    <item name="sudSwitchBarThumbOffColor">@color/sud_dynamic_switch_thumb_off_dark</item>
+    <item name="sudSwitchBarTrackOffColor">@color/sud_dynamic_switch_track_off_dark</item>
+    <item name="sudSwitchBarTrackOffOutlineColor">@color/sud_dynamic_switch_thumb_off_outline_dark</item>
+    <item name="sudEditBoxColor">@color/sud_dynamic_color_accent_glif_v3_dark</item>
+  </style>
+
+  <style name="SudDynamicColorBaseTheme.Light">
+    <item name="colorAccent">@color/sud_dynamic_color_accent_glif_v3_light</item>
+    <item name="android:colorAccent">?attr/colorAccent</item>
+    <item name="android:textColorLink">@color/sud_system_hyperlink_text</item>
+    <item name="alertDialogTheme">@style/SudDynamicColorAlertDialogThemeCompat.Light</item>
+    <item name="android:alertDialogTheme">@style/SudDynamicColorAlertDialogTheme.Light</item>
+    <item name="android:datePickerDialogTheme">@style/SudDynamicColorDateTimePickerDialogTheme.Light</item>
+    <item name="android:timePickerDialogTheme">@style/SudDynamicColorDateTimePickerDialogTheme.Light</item>
+    <item name="sucFullDynamicColor">false</item>
+    <item name="sudSwitchBarThumbOnColor">@color/sud_dynamic_switch_thumb_on_light</item>
+    <item name="sudSwitchBarTrackOnColor">@color/sud_dynamic_switch_track_on_light</item>
+    <item name="sudSwitchBarThumbOffColor">@color/sud_dynamic_switch_thumb_off_light</item>
+    <item name="sudSwitchBarTrackOffColor">@color/sud_dynamic_switch_track_off_light</item>
+    <item name="sudSwitchBarTrackOffOutlineColor">@color/sud_dynamic_switch_thumb_off_outline_light</item>
+    <item name="sudEditBoxColor">@color/sud_dynamic_color_accent_glif_v3_light</item>
+  </style>
+
+  <style name="SudDynamicColorTheme" parent="SudDynamicColorBaseTheme"/>
+  <style name="SudDynamicColorTheme.Light" parent="SudDynamicColorBaseTheme.Light"/>
+
+  <style name="SudFullDynamicColorTheme" parent="SudDynamicColorTheme">
+    <item name="android:windowBackground">@color/sud_system_background_surface</item>
+    <item name="android:colorForeground">@android:color/system_neutral1_50</item>
+    <item name="android:colorForegroundInverse">@color/sud_system_background_surface</item>
+    <item name="android:colorBackground">@color/sud_system_background_surface</item>
+    <item name="android:colorBackgroundCacheHint">@color/sud_system_background_surface</item>
+    <item name="colorBackgroundFloating">@color/sud_system_background_surface</item>
+    <item name="android:navigationBarColor">@color/sud_system_background_surface</item>
+
+    <item name="android:textColorPrimary">@color/sud_system_primary_text</item>
+    <item name="android:textColorSecondary">@color/sud_system_secondary_text</item>
+    <item name="android:textColorTertiary">@color/sud_system_tertiary_text_inactive</item>
+    <item name="android:textColorPrimaryDisableOnly">@color/sud_system_tertiary_text_inactive</item>
+    <item name="android:textColorPrimaryInverseDisableOnly">@color/sud_system_tertiary_text_inactive</item>
+
+    <item name="colorControlNormal">?android:attr/textColorSecondary</item>
+    <item name="colorControlHighlight">@color/ripple_material_dark</item>
+    <item name="colorButtonNormal">@color/button_material_dark</item>
+    <item name="colorSwitchThumbNormal">@color/switch_thumb_material_dark</item>
+
+    <item name="alertDialogTheme">@style/SudFullDynamicColorAlertDialogThemeCompat</item>
+    <item name="android:alertDialogTheme">@style/SudFullDynamicColorAlertDialogTheme</item>
+
+    <item name="sucFullDynamicColor">true</item>
+
+    <item name="android:windowAnimationStyle">@style/Animation.SudWindowAnimation.DynamicColor</item>
+  </style>
+
+  <style name="SudFullDynamicColorTheme.Light" parent="SudDynamicColorTheme.Light">
+    <item name="android:windowBackground">@color/sud_system_background_surface</item>
+    <item name="android:colorForeground">@android:color/system_neutral1_900</item>
+    <item name="android:colorForegroundInverse">@color/sud_system_background_surface</item>
+    <item name="android:colorBackground">@color/sud_system_background_surface</item>
+    <item name="android:colorBackgroundCacheHint">@color/sud_system_background_surface</item>
+    <item name="colorBackgroundFloating">@color/sud_system_background_surface</item>
+    <item name="android:navigationBarColor">@color/sud_system_background_surface</item>
+
+    <item name="android:textColorPrimary">@color/sud_system_primary_text</item>
+    <item name="android:textColorSecondary">@color/sud_system_secondary_text</item>
+    <item name="android:textColorTertiary">@color/sud_system_tertiary_text_inactive</item>
+    <item name="android:textColorPrimaryDisableOnly">@color/sud_system_tertiary_text_inactive</item>
+
+    <item name="colorControlNormal">?android:attr/textColorSecondary</item>
+    <item name="colorControlHighlight">@color/ripple_material_light</item>
+    <item name="colorButtonNormal">@color/button_material_light</item>
+    <item name="colorSwitchThumbNormal">@color/switch_thumb_material_light</item>
+
+    <item name="alertDialogTheme">@style/SudFullDynamicColorAlertDialogThemeCompat.Light</item>
+    <item name="android:alertDialogTheme">@style/SudFullDynamicColorAlertDialogTheme.Light</item>
+
+    <item name="sucFullDynamicColor">true</item>
+
+    <item name="android:windowAnimationStyle">@style/Animation.SudWindowAnimation.DynamicColor</item>
+  </style>
+
+  <!-- Main theme for dynamic color -->
+  <!-- TODO: cleanup the Glifv3 dependent dynamic color theme -->
+  <style name="SudDynamicColorThemeGlifV3" parent="SudThemeGlifV3">
+    <item name="colorAccent">@color/sud_dynamic_color_accent_glif_v3_dark</item>
+    <item name="android:textColorLink">@color/sud_system_hyperlink_text</item>
+    <item name="alertDialogTheme">@style/SudDynamicColorAlertDialogThemeCompat</item>
+    <item name="android:datePickerDialogTheme">@style/SudDynamicColorDateTimePickerDialogTheme</item>
+    <item name="android:timePickerDialogTheme">@style/SudDynamicColorDateTimePickerDialogTheme</item>
+    <item name="sucFullDynamicColor">false</item>
+    <item name="sudSwitchBarThumbOnColor">@color/sud_dynamic_switch_thumb_on_dark</item>
+    <item name="sudSwitchBarTrackOnColor">@color/sud_dynamic_switch_track_on_dark</item>
+    <item name="sudSwitchBarThumbOffColor">@color/sud_dynamic_switch_thumb_off_dark</item>
+    <item name="sudSwitchBarTrackOffColor">@color/sud_dynamic_switch_track_off_dark</item>
+    <item name="sudSwitchBarTrackOffOutlineColor">@color/sud_dynamic_switch_thumb_off_outline_dark</item>
+    <item name="sudEditBoxColor">@color/sud_dynamic_color_accent_glif_v3_dark</item>
+  </style>
+
+  <style name="SudDynamicColorThemeGlifV3.Light" parent="SudThemeGlifV3.Light">
+    <item name="colorAccent">@color/sud_dynamic_color_accent_glif_v3_light</item>
+    <item name="android:textColorLink">@color/sud_system_hyperlink_text</item>
+    <item name="alertDialogTheme">@style/SudDynamicColorAlertDialogThemeCompat.Light</item>
+    <item name="android:datePickerDialogTheme">@style/SudDynamicColorDateTimePickerDialogTheme.Light</item>
+    <item name="android:timePickerDialogTheme">@style/SudDynamicColorDateTimePickerDialogTheme.Light</item>
+    <item name="sucFullDynamicColor">false</item>
+    <item name="sudSwitchBarThumbOnColor">@color/sud_dynamic_switch_thumb_on_light</item>
+    <item name="sudSwitchBarTrackOnColor">@color/sud_dynamic_switch_track_on_light</item>
+    <item name="sudSwitchBarThumbOffColor">@color/sud_dynamic_switch_thumb_off_light</item>
+    <item name="sudSwitchBarTrackOffColor">@color/sud_dynamic_switch_track_off_light</item>
+    <item name="sudSwitchBarTrackOffOutlineColor">@color/sud_dynamic_switch_thumb_off_outline_light</item>
+    <item name="sudEditBoxColor">@color/sud_dynamic_color_accent_glif_v3_light</item>
+  </style>
+
+  <style name="SudFullDynamicColorThemeGlifV3" parent="SudDynamicColorThemeGlifV3">
+    <item name="android:windowBackground">@color/sud_system_background_surface</item>
+    <item name="android:colorForeground">@android:color/system_neutral1_50</item>
+    <item name="android:colorForegroundInverse">@color/sud_system_background_surface</item>
+    <item name="android:colorBackground">@color/sud_system_background_surface</item>
+    <item name="android:colorBackgroundCacheHint">@color/sud_system_background_surface</item>
+    <item name="colorBackgroundFloating">@color/sud_system_background_surface</item>
+    <item name="android:navigationBarColor">@color/sud_system_background_surface</item>
+
+    <item name="android:textColorPrimary">@color/sud_system_primary_text</item>
+    <item name="android:textColorSecondary">@color/sud_system_secondary_text</item>
+    <item name="android:textColorTertiary">@color/sud_system_tertiary_text_inactive</item>
+    <item name="android:textColorPrimaryDisableOnly">@color/sud_system_tertiary_text_inactive</item>
+    <item name="android:textColorPrimaryInverseDisableOnly">@color/sud_system_tertiary_text_inactive</item>
+
+    <item name="colorControlNormal">?android:attr/textColorSecondary</item>
+    <item name="colorControlHighlight">@color/ripple_material_dark</item>
+    <item name="colorButtonNormal">@color/button_material_dark</item>
+    <item name="colorSwitchThumbNormal">@color/switch_thumb_material_dark</item>
+
+    <item name="alertDialogTheme">@style/SudFullDynamicColorAlertDialogThemeCompat</item>
+
+    <item name="sucFullDynamicColor">true</item>
+  </style>
+
+  <style name="SudFullDynamicColorThemeGlifV3.Light" parent="SudDynamicColorThemeGlifV3.Light">
+    <item name="android:windowBackground">@color/sud_system_background_surface</item>
+    <item name="android:colorForeground">@android:color/system_neutral1_900</item>
+    <item name="android:colorForegroundInverse">@color/sud_system_background_surface</item>
+    <item name="android:colorBackground">@color/sud_system_background_surface</item>
+    <item name="android:colorBackgroundCacheHint">@color/sud_system_background_surface</item>
+    <item name="colorBackgroundFloating">@color/sud_system_background_surface</item>
+    <item name="android:navigationBarColor">@color/sud_system_background_surface</item>
+
+    <item name="android:textColorPrimary">@color/sud_system_primary_text</item>
+    <item name="android:textColorSecondary">@color/sud_system_secondary_text</item>
+    <item name="android:textColorTertiary">@color/sud_system_tertiary_text_inactive</item>
+    <item name="android:textColorPrimaryDisableOnly">@color/sud_system_tertiary_text_inactive</item>
+
+    <item name="colorControlNormal">?android:attr/textColorSecondary</item>
+    <item name="colorControlHighlight">@color/ripple_material_light</item>
+    <item name="colorButtonNormal">@color/button_material_light</item>
+    <item name="colorSwitchThumbNormal">@color/switch_thumb_material_light</item>
+
+    <item name="alertDialogTheme">@style/SudFullDynamicColorAlertDialogThemeCompat.Light</item>
+
+    <item name="sucFullDynamicColor">true</item>
+  </style>
+
+  <!-- Dynamic color theme for alert dialog -->
+  <style name="SudDynamicColorAlertDialogThemeCompat" parent="Theme.AppCompat.Dialog.Alert">
+    <item name="android:textAllCaps">false</item>
+    <item name="android:colorBackground">@color/sud_glif_v3_dialog_background_color_dark</item>
+    <item name="colorAccent">@color/sud_dynamic_color_accent_glif_v3_dark</item>
+    <item name="dialogCornerRadius">@dimen/sud_glif_device_default_dialog_corner_radius</item>
+    <item name="buttonBarButtonStyle">@style/SudAppCompatButtonButtonBarAlertDialog</item>
+    <item name="android:windowTitleStyle">@style/SudMaterialYouWindowTitleStyle</item>
+  </style>
+
+  <style name="SudDynamicColorAlertDialogTheme" parent="android:Theme.DeviceDefault.Dialog.Alert">
+    <item name="android:textAllCaps">false</item>
+    <item name="android:colorBackground">@color/sud_glif_v3_dialog_background_color_dark</item>
+    <item name="colorAccent">@color/sud_dynamic_color_accent_glif_v3_dark</item>
+    <item name="dialogCornerRadius">@dimen/sud_glif_device_default_dialog_corner_radius</item>
+    <item name="buttonBarButtonStyle">@style/SudAppCompatButtonButtonBarAlertDialog</item>
+    <item name="android:windowTitleStyle">@style/SudMaterialYouWindowTitleStyle</item>
+  </style>
+
+  <style name="SudDynamicColorAlertDialogThemeCompat.Light" parent="Theme.AppCompat.Light.Dialog.Alert">
+    <item name="android:textAllCaps">false</item>
+    <item name="android:colorBackground">@color/sud_glif_v3_dialog_background_color_light</item>
+    <item name="colorAccent">@color/sud_dynamic_color_accent_glif_v3_light</item>
+    <item name="dialogCornerRadius">@dimen/sud_glif_device_default_dialog_corner_radius</item>
+    <item name="buttonBarButtonStyle">@style/SudAppCompatButtonButtonBarAlertDialog.Light</item>
+    <item name="android:windowTitleStyle">@style/SudMaterialYouWindowTitleStyle</item>
+  </style>
+
+  <style name="SudDynamicColorAlertDialogTheme.Light" parent="android:Theme.DeviceDefault.Light.Dialog.Alert">
+    <item name="android:textAllCaps">false</item>
+    <item name="android:colorBackground">@color/sud_glif_v3_dialog_background_color_light</item>
+    <item name="colorAccent">@color/sud_dynamic_color_accent_glif_v3_light</item>
+    <item name="dialogCornerRadius">@dimen/sud_glif_device_default_dialog_corner_radius</item>
+    <item name="buttonBarButtonStyle">@style/SudAppCompatButtonButtonBarAlertDialog.Light</item>
+    <item name="android:windowTitleStyle">@style/SudMaterialYouWindowTitleStyle</item>
+  </style>
+
+
+  <style name="SudAppCompatButtonButtonBarAlertDialog" parent="Widget.AppCompat.ButtonBar.AlertDialog">
+    <item name="android:layout_marginStart">@dimen/sud_glif_alert_dialog_footer_bar_padding_start</item>
+    <item name="android:layout_marginLeft">@dimen/sud_glif_alert_dialog_footer_bar_padding_start</item>
+    <item name="android:textAppearance">@style/SudTextAppearanceDeviceDefaultMedium</item>
+    <item name="android:minWidth">@dimen/sud_alert_dialog_button_bar_width</item>
+    <item name="android:minHeight">@dimen/sud_alert_dialog_button_bar_height</item>
+  </style>
+
+  <style name="SudAppCompatButtonButtonBarAlertDialog.Light" parent="SudAppCompatButtonButtonBarAlertDialog">
+    <item name="android:textAppearance">@style/SudTextAppearanceDeviceDefaultMedium.Light</item>
+  </style>
+
+  <style name="SudWindowTitleStyle" parent="RtlOverlay.DialogWindowTitle.AppCompat">
+    <item name="android:textAppearance">@style/SudDeviceDefaultWindowTitleTextAppearance</item>
+  </style>
+
+  <style name="SudDeviceDefaultWindowTitleTextAppearance" parent="android:TextAppearance.DeviceDefault.WindowTitle">
+    <item name="android:textSize">@dimen/sud_alert_dialog_title_text_size</item>
+    <item name="android:textColor">?android:attr/textColorPrimary</item>
+  </style>
+
+  <style name="SudMaterialYouWindowTitleStyle" parent="RtlOverlay.DialogWindowTitle.AppCompat">
+    <item name="android:textAppearance">@style/SudMaterialYouDeviceDefaultWindowTitleTextAppearance</item>
+  </style>
+
+  <style name="SudMaterialYouDeviceDefaultWindowTitleTextAppearance" parent="SudDeviceDefaultWindowTitleTextAppearance">
+    <item name="android:textSize">@dimen/sud_alert_dialog_title_text_size_material_you</item>
+  </style>
+
+  <style name="SudFullDynamicColorAlertDialogThemeCompat" parent="SudDynamicColorAlertDialogThemeCompat">
+    <item name="android:colorBackground">@color/sud_system_neutral1_900</item>
+  </style>
+  <style name="SudFullDynamicColorAlertDialogThemeCompat.Light" parent="SudDynamicColorAlertDialogThemeCompat.Light">
+    <item name="android:colorBackground">@color/sud_system_neutral1_50</item>
+  </style>
+
+  <style name="SudFullDynamicColorAlertDialogTheme" parent="SudDynamicColorAlertDialogTheme">
+    <item name="android:colorBackground">@color/sud_system_neutral1_900</item>
+  </style>
+  <style name="SudFullDynamicColorAlertDialogTheme.Light" parent="SudDynamicColorAlertDialogTheme.Light">
+    <item name="android:colorBackground">@color/sud_system_neutral1_50</item>
+  </style>
+
+
+  <!-- Dynamic color theme for date time dialog -->
+  <style name="SudDynamicColorDateTimePickerDialogTheme" parent="SudDateTimePickerDialogTheme">
+    <item name="colorAccent">@color/sud_dynamic_color_accent_glif_v3_dark</item>
+    <item name="dialogCornerRadius">@dimen/sud_glif_device_default_dialog_corner_radius</item>
+  </style>
+
+  <style name="SudDynamicColorDateTimePickerDialogTheme.Light" parent="SudDateTimePickerDialogTheme.Light">
+    <item name="colorAccent">@color/sud_dynamic_color_accent_glif_v3_light</item>
+    <item name="dialogCornerRadius">@dimen/sud_glif_device_default_dialog_corner_radius</item>
+  </style>
+
+  <style name="SudAlertDialogTheme" parent="android:Theme.DeviceDefault.Dialog.Alert">
+    <item name="android:colorBackground">@color/sud_glif_v3_dialog_background_color_dark</item>
+    <item name="android:buttonBarButtonStyle">@style/SudDeviceDefaultButtonBarButtonStyle</item>
+  </style>
+
+  <style name="SudAlertDialogTheme.Light" parent="android:Theme.DeviceDefault.Light.Dialog.Alert">
+    <item name="android:buttonBarButtonStyle">@style/SudDeviceDefaultButtonBarButtonStyle.Light</item>
+  </style>
+
+  <!-- Can't set style Widget.DeviceDefault.Button.ButtonBar.AlertDialog as parent theme directly,
+       since it is not public. Thus here sets Widget.DeviceDefault.Button.Borderless.Colored and
+       bring the minWidth/minHeight. -->
+  <style name="SudDeviceDefaultButtonBarButtonStyle" parent="android:Widget.DeviceDefault.Button.Borderless.Colored">
+    <item name="android:textAppearance">@style/SudTextAppearanceDeviceDefaultMedium</item>
+    <item name="android:minWidth">@dimen/sud_alert_dialog_button_bar_width</item>
+    <item name="android:minHeight">@dimen/sud_alert_dialog_button_bar_height</item>
+  </style>
+
+  <style name="SudDeviceDefaultButtonBarButtonStyle.Light" parent="SudDeviceDefaultButtonBarButtonStyle">
+    <item name="android:textAppearance">@style/SudTextAppearanceDeviceDefaultMedium.Light</item>
+  </style>
+
+  <style name="SudTextAppearanceDeviceDefaultMedium" parent="android:TextAppearance.DeviceDefault.Medium">
+    <item name="android:textSize">@dimen/sud_alert_dialog_button_bar_button_text_size</item>
+    <item name="android:textColor">@color/sud_dynamic_color_accent_glif_v3_dark</item>
+    <item name="android:textAllCaps">false</item>
+  </style>
+
+  <style name="SudTextAppearanceDeviceDefaultMedium.Light" parent="SudTextAppearanceDeviceDefaultMedium">
+    <item name="android:textColor">@color/sud_dynamic_color_accent_glif_v3_light</item>
+  </style>
+
+  <style name="SudThemeGlif" parent="SudBaseThemeGlif">
+    <item name="sucSystemNavBarBackgroundColor">?android:attr/navigationBarColor</item>
+    <item name="android:windowSplashScreenBackground">?android:attr/colorBackground</item>
+  </style>
+
+  <style name="SudThemeGlif.Light" parent="SudBaseThemeGlif.Light">
+    <item name="sucSystemNavBarBackgroundColor">?android:attr/navigationBarColor</item>
+    <item name="android:windowSplashScreenBackground">?android:attr/colorBackground</item>
+  </style>
+
+  <style name="SudThemeGlifV3" parent="SudBaseThemeGlifV3">
+
+    <!-- Copied from v27 SudThemeGlifV3 -->
+    <item name="android:navigationBarColor">@color/sud_glif_v3_nav_bar_color_dark</item>
+    <item name="android:navigationBarDividerColor" tools:ignore="NewApi">@color/sud_glif_v3_nav_bar_divider_color_dark</item>
+    <item name="android:windowLightNavigationBar" tools:ignore="NewApi">false</item>
+    <item name="sucLightSystemNavBar" tools:ignore="NewApi">?android:attr/windowLightNavigationBar</item>
+    <item name="sucSystemNavBarDividerColor" tools:ignore="NewApi">?android:attr/navigationBarDividerColor</item>
+
+    <!-- Default font family-->
+    <item name="android:textAppearance">@android:style/TextAppearance.DeviceDefault</item>
+    <item name="android:textAppearanceInverse">@android:style/TextAppearance.DeviceDefault.Inverse</item>
+    <item name="android:textAppearanceLarge">@android:style/TextAppearance.DeviceDefault.Large</item>
+    <item name="android:textAppearanceMedium">@android:style/TextAppearance.DeviceDefault.Medium</item>
+    <!-- For textView -->
+    <item name="android:textAppearanceSmall">@android:style/TextAppearance.DeviceDefault.Small</item>
+    <item name="android:textAppearanceLargeInverse">@android:style/TextAppearance.DeviceDefault.Large.Inverse</item>
+    <!-- For editText -->
+    <item name="android:textAppearanceMediumInverse">@android:style/TextAppearance.DeviceDefault.Medium.Inverse</item>
+    <item name="android:textAppearanceSmallInverse">@android:style/TextAppearance.DeviceDefault.Small.Inverse</item>
+    <item name="android:textAppearanceSearchResultTitle">@android:style/TextAppearance.DeviceDefault.SearchResult.Title</item>
+    <item name="android:textAppearanceSearchResultSubtitle">@android:style/TextAppearance.DeviceDefault.SearchResult.Subtitle</item>
+    <item name="android:textAppearanceButton">@android:style/TextAppearance.DeviceDefault.Widget.Button</item>
+    <item name="android:textAppearanceLargePopupMenu">@android:style/TextAppearance.DeviceDefault.Widget.PopupMenu.Large</item>
+    <item name="android:textAppearanceSmallPopupMenu">@android:style/TextAppearance.DeviceDefault.Widget.PopupMenu.Small</item>
+  </style>
+
+  <style name="SudThemeGlifV3.Light" parent="SudBaseThemeGlifV3.Light">
+
+    <!-- Copied from v27 SudThemeGlifV3.Light -->
+    <item name="android:navigationBarColor">@color/sud_glif_v3_nav_bar_color_light</item>
+    <item name="android:navigationBarDividerColor">@color/sud_glif_v3_nav_bar_divider_color_light</item>
+    <item name="android:windowLightNavigationBar">true</item>
+    <item name="sucLightSystemNavBar" tools:ignore="NewApi">?android:attr/windowLightNavigationBar</item>
+    <item name="sucSystemNavBarDividerColor" tools:ignore="NewApi">?android:attr/navigationBarDividerColor</item>
+
+    <!-- Default font family-->
+    <item name="android:textAppearance">@android:style/TextAppearance.DeviceDefault</item>
+    <item name="android:textAppearanceInverse">@android:style/TextAppearance.DeviceDefault.Inverse</item>
+    <item name="android:textAppearanceLarge">@android:style/TextAppearance.DeviceDefault.Large</item>
+    <item name="android:textAppearanceMedium">@android:style/TextAppearance.DeviceDefault.Medium</item>
+    <!-- For textView -->
+    <item name="android:textAppearanceSmall">@android:style/TextAppearance.DeviceDefault.Small</item>
+    <item name="android:textAppearanceLargeInverse">@android:style/TextAppearance.DeviceDefault.Large.Inverse</item>
+    <!-- For editText -->
+    <item name="android:textAppearanceMediumInverse">@android:style/TextAppearance.DeviceDefault.Medium.Inverse</item>
+    <item name="android:textAppearanceSmallInverse">@android:style/TextAppearance.DeviceDefault.Small.Inverse</item>
+    <item name="android:textAppearanceSearchResultTitle">@android:style/TextAppearance.DeviceDefault.SearchResult.Title</item>
+    <item name="android:textAppearanceSearchResultSubtitle">@android:style/TextAppearance.DeviceDefault.SearchResult.Subtitle</item>
+    <item name="android:textAppearanceButton">@android:style/TextAppearance.DeviceDefault.Widget.Button</item>
+    <item name="android:textAppearanceLargePopupMenu">@android:style/TextAppearance.DeviceDefault.Widget.PopupMenu.Large</item>
+    <item name="android:textAppearanceSmallPopupMenu">@android:style/TextAppearance.DeviceDefault.Widget.PopupMenu.Small</item>
+  </style>
+
+    <style name="SudThemeGlifExpressive" parent="SudBaseThemeGlifExpressive">
+        <!-- Copied from v31 SudThemeGlif -->
+        <item name="sucSystemNavBarBackgroundColor">?android:attr/navigationBarColor</item>
+        <item name="android:windowSplashScreenBackground">?android:attr/colorBackground</item>
+
+        <!-- Copied from v31 SudThemeGlifV3 -->
+        <item name="android:navigationBarDividerColor" tools:ignore="NewApi">@color/sud_glif_v3_nav_bar_divider_color_dark</item>
+        <item name="android:windowLightNavigationBar" tools:ignore="NewApi">false</item>
+        <item name="sucLightSystemNavBar" tools:ignore="NewApi">?android:attr/windowLightNavigationBar</item>
+        <item name="sucSystemNavBarDividerColor" tools:ignore="NewApi">?android:attr/navigationBarDividerColor</item>
+        <!-- Default font family-->
+        <item name="android:textAppearance">@android:style/TextAppearance.DeviceDefault</item>
+        <item name="android:textAppearanceInverse">@android:style/TextAppearance.DeviceDefault.Inverse</item>
+        <item name="android:textAppearanceLarge">@android:style/TextAppearance.DeviceDefault.Large</item>
+        <item name="android:textAppearanceMedium">@android:style/TextAppearance.DeviceDefault.Medium</item>
+        <!-- For textView -->
+        <item name="android:textAppearanceSmall">@android:style/TextAppearance.DeviceDefault.Small</item>
+        <item name="android:textAppearanceLargeInverse">@android:style/TextAppearance.DeviceDefault.Large.Inverse</item>
+        <!-- For editText -->
+        <item name="android:textAppearanceMediumInverse">@android:style/TextAppearance.DeviceDefault.Medium.Inverse</item>
+        <item name="android:textAppearanceSmallInverse">@android:style/TextAppearance.DeviceDefault.Small.Inverse</item>
+        <item name="android:textAppearanceSearchResultTitle">@android:style/TextAppearance.DeviceDefault.SearchResult.Title</item>
+        <item name="android:textAppearanceSearchResultSubtitle">@android:style/TextAppearance.DeviceDefault.SearchResult.Subtitle</item>
+        <item name="android:textAppearanceButton">@android:style/TextAppearance.DeviceDefault.Widget.Button</item>
+
+        <!-- Copied from v31 SudDynamicColorBaseTheme -->
+        <item name="android:colorAccent">?attr/colorAccent</item>
+
+        <!-- Copied from v31 SudFullDynamicColorTheme -->
+        <item name="android:windowAnimationStyle">@style/Animation.SudWindowAnimation.DynamicColor</item>
+
+        <!-- Copied from v31 SudDynamicColorThemeGlifV3 -->
+        <item name="android:datePickerDialogTheme">@style/SudDynamicColorDateTimePickerDialogTheme</item>
+        <item name="android:timePickerDialogTheme">@style/SudDynamicColorDateTimePickerDialogTheme</item>
+        <item name="sudSwitchBarThumbOnColor">@color/sud_dynamic_switch_thumb_on_dark</item>
+        <item name="sudSwitchBarTrackOnColor">@color/sud_dynamic_switch_track_on_dark</item>
+        <item name="sudSwitchBarThumbOffColor">@color/sud_dynamic_switch_thumb_off_dark</item>
+        <item name="sudSwitchBarTrackOffColor">@color/sud_dynamic_switch_track_off_dark</item>
+        <item name="sudSwitchBarTrackOffOutlineColor">@color/sud_dynamic_switch_thumb_off_outline_dark</item>
+        <item name="sudEditBoxColor">@color/sud_dynamic_color_accent_glif_v3_dark</item>
+
+        <!-- Copied from v31 SudFullDynamicColorThemeGlifV3 -->
+        <item name="android:colorForeground">@android:color/system_neutral1_50</item>
+        <item name="android:colorForegroundInverse">@color/sud_system_background_surface</item>
+        <item name="android:colorBackgroundCacheHint">@color/sud_system_background_surface</item>
+        <item name="colorBackgroundFloating">@color/sud_system_background_surface</item>
+        <item name="android:navigationBarColor">@color/sud_system_background_surface</item>
+        <item name="colorControlNormal">?android:attr/textColorSecondary</item>
+        <item name="colorControlHighlight">@color/ripple_material_dark</item>
+        <item name="colorButtonNormal">@color/button_material_dark</item>
+        <item name="colorSwitchThumbNormal">@color/switch_thumb_material_dark</item>
+        <item name="android:alertDialogTheme">@style/SudGlifExpressiveDialogTheme</item>
+    </style>
+
+    <style name="SudThemeGlifExpressive.Light" parent="SudBaseThemeGlifExpressive.Light">
+        <!-- Copied from v31 SudThemeGlif.Light -->
+        <item name="sucSystemNavBarBackgroundColor">?android:attr/navigationBarColor</item>
+        <item name="android:windowSplashScreenBackground">?android:attr/colorBackground</item>
+
+        <!-- Copied from v31 SudThemeGlifV3.Light -->
+        <item name="android:navigationBarDividerColor">@color/sud_glif_v3_nav_bar_divider_color_light</item>
+        <item name="android:windowLightNavigationBar">true</item>
+        <item name="sucLightSystemNavBar" tools:ignore="NewApi">?android:attr/windowLightNavigationBar</item>
+        <item name="sucSystemNavBarDividerColor" tools:ignore="NewApi">?android:attr/navigationBarDividerColor</item>
+        <!-- Default font family-->
+        <item name="android:textAppearance">@android:style/TextAppearance.DeviceDefault</item>
+        <item name="android:textAppearanceInverse">@android:style/TextAppearance.DeviceDefault.Inverse</item>
+        <item name="android:textAppearanceLarge">@android:style/TextAppearance.DeviceDefault.Large</item>
+        <item name="android:textAppearanceMedium">@android:style/TextAppearance.DeviceDefault.Medium</item>
+        <!-- For textView -->
+        <item name="android:textAppearanceSmall">@android:style/TextAppearance.DeviceDefault.Small</item>
+        <item name="android:textAppearanceLargeInverse">@android:style/TextAppearance.DeviceDefault.Large.Inverse</item>
+        <!-- For editText -->
+        <item name="android:textAppearanceMediumInverse">@android:style/TextAppearance.DeviceDefault.Medium.Inverse</item>
+        <item name="android:textAppearanceSmallInverse">@android:style/TextAppearance.DeviceDefault.Small.Inverse</item>
+        <item name="android:textAppearanceSearchResultTitle">@android:style/TextAppearance.DeviceDefault.SearchResult.Title</item>
+        <item name="android:textAppearanceSearchResultSubtitle">@android:style/TextAppearance.DeviceDefault.SearchResult.Subtitle</item>
+        <item name="android:textAppearanceButton">@android:style/TextAppearance.DeviceDefault.Widget.Button</item>
+
+        <!-- Copied from v31 SudDynamicColorBaseTheme.Light -->
+        <item name="android:colorAccent">?attr/colorAccent</item>
+
+        <!-- Copied from v31 SudDynamicColorThemeGlifV3.Light -->
+        <item name="android:windowAnimationStyle">@style/Animation.SudWindowAnimation.DynamicColor</item>
+
+        <!-- Copied from v31 SudDynamicColorThemeGlifV3.Light -->
+        <item name="android:datePickerDialogTheme">@style/SudDynamicColorDateTimePickerDialogTheme.Light</item>
+        <item name="android:timePickerDialogTheme">@style/SudDynamicColorDateTimePickerDialogTheme.Light</item>
+        <item name="sudSwitchBarThumbOnColor">@color/sud_dynamic_switch_thumb_on_light</item>
+        <item name="sudSwitchBarTrackOnColor">@color/sud_dynamic_switch_track_on_light</item>
+        <item name="sudSwitchBarThumbOffColor">@color/sud_dynamic_switch_thumb_off_light</item>
+        <item name="sudSwitchBarTrackOffColor">@color/sud_dynamic_switch_track_off_light</item>
+        <item name="sudSwitchBarTrackOffOutlineColor">@color/sud_dynamic_switch_thumb_off_outline_light</item>
+        <item name="sudEditBoxColor">@color/sud_dynamic_color_accent_glif_v3_light</item>
+
+        <!-- Copied from v31 SudFullDynamicColorThemeGlifV3.Light -->
+        <item name="android:colorForeground">@android:color/system_neutral1_900</item>
+        <item name="android:colorForegroundInverse">@color/sud_system_background_surface</item>
+        <item name="android:colorBackgroundCacheHint">@color/sud_system_background_surface</item>
+        <item name="colorBackgroundFloating">@color/sud_system_background_surface</item>
+        <item name="android:navigationBarColor">@color/sud_system_background_surface</item>
+        <item name="colorControlNormal">?android:attr/textColorSecondary</item>
+        <item name="colorControlHighlight">@color/ripple_material_light</item>
+        <item name="colorButtonNormal">@color/button_material_light</item>
+        <item name="colorSwitchThumbNormal">@color/switch_thumb_material_light</item>
+        <item name="android:alertDialogTheme">@style/SudGlifExpressiveDialogTheme</item>
+    </style>
+
+  <style name="SudGlifExpressiveDialogTheme" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+    <item name="alertDialogTheme">@style/SudGlifExpressiveDialogTheme</item>
+    <item name="android:textAllCaps">false</item>
+    <item name="android:fontFamily">@string/sudGlifExpressiveDialogFontFamily</item>
+    <item name="android:background">@color/sud_color_surface_container_high</item>
+    <item name="android:windowTitleStyle">@style/SudGlifExpressiveWindowTitleTextAppearance</item>
+    <item name="dialogCornerRadius">@dimen/sud_glif_device_default_dialog_corner_radius</item>
+    <!-- Body text color -->
+    <item name="android:textColorPrimary">@color/sud_on_surface_variant</item>
+  </style>
+
+  <style name="SudGlifExpressiveWindowTitleTextAppearance" parent="RtlOverlay.DialogWindowTitle.AppCompat">
+    <item name="android:textAppearance">@style/SudGlifExpressiveWindowTitleTextStyle</item>
+  </style>
+
+  <style name="SudGlifExpressiveWindowTitleTextStyle" parent="SudDeviceDefaultWindowTitleTextAppearance">
+    <item name="android:textSize">@dimen/sud_glif_expressive_alert_dialog_title_font_size</item>
+    <item name="android:textColor">@color/sud_color_on_surface</item>
+  </style>
+
+</resources>

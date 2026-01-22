@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2015 The Android Open Source Project
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@color/sud_system_accent*,@color/sud_system_neutral*">
+
+    <!-- General colors -->
+    <color name="sud_color_accent_dark">#ff448aff</color>
+    <color name="sud_color_accent_light">#ff3367d6</color>
+    <color name="sud_color_background_dark">#ff303030</color>
+    <color name="sud_color_background_light">#fffafafa</color>
+    <color name="sud_link_color_dark">#ff448aff</color>
+    <color name="sud_link_color_light">#ff3367d6</color>
+    <color name="sud_list_item_icon_color_dark">#b3ffffff</color>
+    <color name="sud_list_item_icon_color_light">#89000000</color>
+    <color name="sud_progress_bar_color_dark">#ffffcd40</color>
+    <color name="sud_progress_bar_color_light">#fff4b400</color>
+
+    <!-- On versions < 23, we cannot reference other theme values in a color resource. Default to
+         the framework default of 12% black -->
+    <color name="sud_flat_button_highlight">#1f000000</color>
+
+    <!-- Navigation bar colors -->
+    <color name="sud_navbar_bg_dark">#ff21272b</color>
+    <color name="sud_navbar_bg_light">#ffe4e7e9</color>
+
+    <!-- GLIF colors -->
+    <color name="sud_color_accent_glif_dark">#ff4285f4</color>
+    <color name="sud_color_accent_glif_light">#ff4285f4</color>
+    <color name="sud_color_accent_glif_v3_dark">#ff8ab4f8</color>
+    <color name="sud_color_accent_glif_v3_light">#ff1a73e8</color>
+    <color name="sud_glif_background_color_dark">#ff000000</color>
+    <color name="sud_glif_background_color_light">#ffffffff</color>
+    <color name="sud_glif_edit_text_bg_dark_color">#ff202124</color>
+    <color name="sud_glif_edit_text_bg_light_color">#0a000000</color>
+    <color name="sud_glif_v3_dialog_background_color_dark">#ff3c4043</color>
+    <color name="sud_glif_v3_dialog_background_color_light">#fff1f3f4</color>
+    <color name="sud_glif_v3_nav_bar_color_dark">#ff000000</color>
+    <color name="sud_glif_v3_nav_bar_color_light">#ffffffff</color>
+    <color name="sud_glif_v3_nav_bar_divider_color_dark">#00000000</color>
+    <color name="sud_glif_v3_nav_bar_divider_color_light">#1f000000</color>
+    <color name="sud_glif_v3_text_color_dark">#ffffffff</color>
+    <color name="sud_glif_v3_text_color_light">#de000000</color>
+    <color name="sud_glif_window_bg_dark_color">#ff202124</color>
+    <color name="sud_glif_window_bg_light_color">#ffffffff</color>
+
+    <!-- Color for error text  -->
+
+    <color name="sud_color_error_text_dark">#fff28b82</color>
+
+    <color name="sud_color_error_text_light">#ffd93025</color>
+
+
+    <color name="sud_dynamic_color_accent_glif_v3_dark">@color/sud_color_accent_glif_v3_dark</color>
+    <color name="sud_dynamic_color_accent_glif_v3_light">@color/sud_color_accent_glif_v3_light</color>
+
+
+
+    <color name="sud_system_accent1_100">#8DF5E3</color>
+
+    <color name="sud_system_accent1_200">#71D8C7</color>
+
+    <color name="sud_system_accent1_300">#53BCAC</color>
+
+    <color name="sud_system_accent1_600">#006C5F</color>
+
+
+
+    <color name="sud_system_accent2_100">#FFE8DEF8</color>
+
+    <color name="sud_system_accent2_200">#A4CFC7</color>
+
+    <color name="sud_system_accent2_600">#3D665F</color>
+
+
+
+    <color name="sud_system_accent3_100">#ECDBFF</color>
+
+    <color name="sud_system_accent3_200">#CFBFEB</color>
+
+    <color name="sud_system_accent3_600">#64587F</color>
+
+
+
+
+    <color name="sud_system_neutral1_0">#ffffff</color>
+
+    <color name="sud_system_neutral1_10">#f0f0f0</color>
+
+    <color name="sud_system_neutral1_50">#f0f0f0</color>
+
+    <color name="sud_system_neutral1_200">#c6c6c6</color>
+
+    <color name="sud_system_neutral1_300">#ababab</color>
+
+    <color name="sud_system_neutral1_400">#909090</color>
+
+    <color name="sud_system_neutral1_500">#757575</color>
+
+    <color name="sud_system_neutral1_600">#5e5e5e</color>
+
+    <color name="sud_system_neutral1_700">#464646</color>
+
+    <color name="sud_system_neutral1_800">#303030</color>
+
+    <color name="sud_system_neutral1_900">#1b1b1b</color>
+
+    <color name="sud_system_neutral1_1000">#000000</color>
+
+
+
+    <color name="sud_system_neutral2_50">#f0f0f0</color>
+
+    <color name="sud_system_neutral2_100">#e2e2e2</color>
+
+    <color name="sud_system_neutral2_200">#c6c6c6</color>
+
+    <color name="sud_system_neutral2_300">#ababab</color>
+
+    <color name="sud_system_neutral2_400">#909090</color>
+
+    <color name="sud_system_neutral2_500">#757575</color>
+
+    <color name="sud_system_neutral2_700">#464646</color>
+
+
+    <color name="success_color_device_default_dark">#5BB974</color>
+
+    <color name="success_color_device_default_light">#1E8E3E</color>
+
+    <color name="fallback_color_device_default_dark">#669DF6</color>
+
+    <color name="fallback_color_device_default_light">#1A73E8</color>
+
+    <color name="sud_portal_pending_progress_light">#fdc69c</color>
+
+    <color name="sud_portal_pending_progress_dark">#b06000</color>
+
+    <color name="sud_primary_default_text_dark">#FFFFFF</color>
+
+    <color name="sud_primary_default_text_light">#202124</color>
+
+    <color name="sud_secondary_default_text_dark">#9AA0A6</color>
+
+    <color name="sud_secondary_default_text_light">#5F6368</color>
+
+    <color name="sud_inactive_default_dark">#5F6368</color>
+
+    <color name="sud_inactive_default_light">#9AA0A6</color>
+
+    <color name="sud_error_warning_default_dark">#EE675C</color>
+
+    <color name="sud_error_warning_default_light">#D93025</color>
+
+
+    <color name="sud_system_primary_text">@color/sud_primary_default_text_light</color>
+    <color name="sud_system_secondary_text">@color/sud_secondary_default_text_light</color>
+    <color name="sud_system_tertiary_text_inactive">@color/sud_inactive_default_light</color>
+    <color name="sud_system_error_warning">@color/sud_error_warning_default_light</color>
+    <color name="sud_system_success_done">@color/success_color_device_default_light</color>
+    <color name="sud_system_fallback_accent">@color/fallback_color_device_default_light</color>
+
+    <color name="sud_portal_pending_progress">@color/sud_portal_pending_progress_light</color>
+
+
+    <color name="sud_switch_track_off_light">#FF55575E</color>
+    <color name="sud_switch_track_outline_off_light">#FFA5ACB2</color>
+    <color name="sud_switch_thumb_off_light">#FFA5ACB2</color>
+    <color name="sud_switch_track_off_dark">#FF454749</color>
+    <color name="sud_switch_track_outline_off_dark">#FF8F9193</color>
+    <color name="sud_switch_thumb_off_dark">#FF8F9193</color>
+
+
+    <color name="sud_switch_track_on_light">#3B78E7</color>
+
+    <color name="sud_switch_thumb_on_light">#C6DAFC</color>
+
+    <color name="sud_switch_track_on_dark">#824285F4</color>
+
+    <color name="sud_switch_thumb_on_dark">#C6DAFC</color>
+
+
+    <color name="sud_uniformity_backdrop_color">@android:color/white</color>
+
+
+    <color name="sud_autofilled_highlight_bg_color">#4dffeb3b</color>
+
+    <color name="sud_neutral10">#ff1f1f1f</color>
+    <color name="sud_neutral22">#ff343535</color>
+    <color name="sud_neutral90">#ffe3e3e3</color>
+
+
+    <color name="sud_color_on_surface">@color/sud_neutral10</color>
+    <color name="sud_color_surface_container_highest">@color/sud_neutral90</color>
+
+    <!-- Glif expressive style -->
+    <!-- Default color for the footer bg (transparent) -->
+    <color name="sud_glif_expressive_footer_bar_bg_color">#00000000</color>
+    <!-- Default color for the footer button bg (primary40) -->
+    <color name="sud_glif_expressive_footer_button_bg_color">#ff6750a4</color>
+
+    <!-- Default color for the floating back button-->
+    <color name="sud_glif_expressive_back_button_bg_color">@color/sud_color_surface_container_highest</color>
+    <color name="sud_glif_expressive_ic_back_arrow_color">@color/sud_color_on_surface</color>
+    <!-- white -->
+    <color name="sud_glif_expressive_footer_primary_button_enable_text_color">@android:color/white</color>
+    <!-- neutral_variant30 -->
+    <color name="sud_glif_expressive_footer_primary_button_disable_text_color">#ff49454f</color>
+    <!-- secondary10 -->
+    <color name="sud_glif_expressive_footer_secondary_button_enable_text_color">#ff1d192b</color>
+    <!-- neutral_variant30 -->
+    <color name="sud_glif_expressive_footer_secondary_button_disable_text_color">#ff49454f</color>
+</resources>

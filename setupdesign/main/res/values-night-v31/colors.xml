@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2021 The Android Open Source Project
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+<resources>
+  <!-- Accent color -->
+  <color name="sud_dynamic_color_accent_glif_v3">@color/sud_dynamic_color_accent_glif_v3_dark</color>
+
+
+  <color name="sud_system_primary_text">@color/sud_system_neutral1_50</color>
+  <color name="sud_system_secondary_text">@color/sud_system_neutral2_200</color>
+  <color name="sud_system_tertiary_text_inactive">@color/sud_system_neutral2_400</color>
+  <color name="sud_system_error_warning">@color/sud_error_warning_default_dark</color>
+  <color name="sud_system_background_surface">@color/sud_system_neutral1_900</color>
+  <color name="sud_system_accent_icon_text_button">@color/sud_system_accent1_100</color>
+  <color name="sud_system_button_surface">@color/sud_system_accent1_100</color>
+  <color name="sud_system_button_text">@color/sud_system_neutral1_900</color>
+  <color name="sud_system_dividing_line">@color/sud_system_neutral2_300</color>
+  <color name="sud_system_hyperlink_text">@color/sud_system_accent1_300</color>
+  <color name="sud_system_surface">@color/sud_system_neutral1_800</color>
+
+
+  <color name="sud_color_on_surface">@android:color/system_neutral1_100</color>
+  <color name="sud_color_surface_container_highest">@color/m3_ref_palette_dynamic_neutral_variant22</color>
+
+  <!-- Glif expressive colors -->
+  <color name="sud_glif_expressive_footer_bar_bg_color">@color/gm3_dynamic_neutral_variant22</color>
+  <color name="sud_glif_expressive_footer_button_bg_color">@color/sud_system_accent1_200</color>
+  <color name="sud_glif_expressive_footer_primary_button_enable_text_color">@color/sud_system_accent1_800</color>
+  <color name="sud_glif_expressive_footer_primary_button_disable_text_color">@color/sud_system_neutral2_200</color>
+  <color name="sud_glif_expressive_footer_secondary_button_enable_text_color">@color/sud_system_accent2_100</color>
+  <color name="sud_glif_expressive_footer_secondary_button_disable_text_color">@color/sud_system_neutral2_200</color>
+</resources>

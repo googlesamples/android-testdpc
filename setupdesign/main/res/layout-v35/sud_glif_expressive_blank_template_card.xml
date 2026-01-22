@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright (C) 2024 The Android Open Source Project
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+<!-- Please keep filterTouchesWhenObscured=true; it's to prevent tapjacking.
+     See https://developer.android.com/privacy-and-security/risks/tapjacking -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/suc_layout_status"
+    style="@style/SudGlifCardBackground"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:gravity="center_horizontal"
+    android:filterTouchesWhenObscured="true"
+    android:orientation="vertical">
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:visibility="invisible" />
+
+    <com.google.android.setupdesign.view.IntrinsicSizeFrameLayout
+        android:id="@+id/suc_intrinsic_size_layout"
+        style="@style/SudGlifCardContainer"
+        android:layout_width="@dimen/sud_glif_card_width"
+        android:layout_height="wrap_content"
+        android:height="@dimen/sud_glif_card_height">
+
+        <include layout="@layout/sud_glif_expressive_blank_template_content_layout" />
+
+    </com.google.android.setupdesign.view.IntrinsicSizeFrameLayout>
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:visibility="invisible" />
+
+</LinearLayout>

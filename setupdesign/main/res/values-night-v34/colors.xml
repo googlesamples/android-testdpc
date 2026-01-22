@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2024 The Android Open Source Project
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+<resources>
+
+  <color name="sud_color_on_surface">@android:color/system_on_surface_dark</color>
+  <color name="sud_color_surface_container_highest">@android:color/system_surface_container_highest_dark</color>
+
+  <!-- Surface container color dark -->
+  <color name="sud_system_sc_highest_dark">@android:color/system_surface_container_highest_dark</color>
+  <!-- Primary dark -->
+  <color name="sud_color_primary">@android:color/system_primary_dark</color>
+  <!-- System on primary dark -->
+  <color name="sud_system_on_primary">@android:color/system_on_primary_dark</color>
+  <!-- On surface variant dark -->
+  <color name="sud_on_surface_variant">@android:color/system_on_surface_variant_dark</color>
+  <!-- On secondary container -->
+  <color name="sud_on_secondary_container">@android:color/system_on_secondary_container_dark</color>
+  <!-- Surface container high dark -->
+  <color name="sud_color_surface_container_high">@android:color/system_surface_container_high_dark</color>
+
+  <!-- Glif expressive colors -->
+
+  <color name="sud_glif_expressive_footer_bar_bg_color">@color/sud_system_sc_highest_dark</color>
+  <color name="sud_glif_expressive_footer_button_bg_color">@color/sud_color_primary</color>
+  <color name="sud_glif_expressive_footer_primary_button_enable_text_color">@color/sud_system_on_primary</color>
+  <color name="sud_glif_expressive_footer_primary_button_disable_text_color">@color/sud_on_surface_variant</color>
+  <color name="sud_glif_expressive_footer_secondary_button_enable_text_color">@color/sud_on_secondary_container</color>
+  <color name="sud_glif_expressive_footer_secondary_button_disable_text_color">@color/sud_on_surface_variant</color>
+</resources>

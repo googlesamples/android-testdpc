@@ -1,0 +1,80 @@
+//
+// Build the setup design library.
+//
+
+package {
+    default_applicable_licenses: ["external_setupdesign_license"],
+}
+
+// Added automatically by a large-scale-change
+//
+// large-scale-change included anything that looked like it might be a license
+// text as a license_text. e.g. LICENSE, NOTICE, COPYING etc.
+//
+// Please consider removing redundant or irrelevant files from 'license_text:'.
+// See: http://go/android-license-faq
+license {
+    name: "external_setupdesign_license",
+    visibility: [":__subpackages__"],
+    license_kinds: [
+        "SPDX-license-identifier-Apache-2.0",
+    ],
+    license_text: [
+        "LICENSE",
+        "NOTICE",
+    ],
+}
+
+android_library {
+    name: "setupdesign",
+    static_libs: [
+        "androidx.annotation_annotation",
+        "androidx.appcompat_appcompat",
+        "androidx.core_core",
+        "androidx.legacy_legacy-support-core-ui",
+        "androidx.recyclerview_recyclerview",
+        "androidx.window_window",
+        "com.google.android.material_material",
+        "error_prone_annotations",
+        "setupcompat",
+        "setupdesign-strings",
+    ],
+    manifest: "main/AndroidManifest.xml",
+    resource_dirs: [
+        "main/res",
+    ],
+    sdk_version: "current",
+    srcs: [
+        "main/src/**/*.java",
+    ],
+    min_sdk_version: "21",
+    optimize: {
+        proguard_flags_files: ["proguard.flags"],
+    },
+    lint: {
+        baseline_filename: "lint-baseline.xml",
+    },
+    apex_available: [
+        "//apex_available:platform",
+        "com.android.healthfitness",
+    ],
+}
+
+//
+// Strings that will not exposing.
+// If app requires these strings, please copy the string definitions directly.
+//
+
+android_library {
+    name: "setupdesign-strings",
+    manifest: "strings/AndroidManifest.xml",
+    resource_dirs: [
+        "strings/res",
+    ],
+    min_sdk_version: "19",
+    sdk_version: "current",
+    apex_available: [
+        "//apex_available:platform",
+        "com.android.healthfitness",
+    ],
+}

@@ -66,6 +66,7 @@ public class Util {
    * is not yet assigned.
    */
   public static final int SDK_INT = IS_RUNNING_V ? VERSION_CODES.CUR_DEVELOPMENT : VERSION.SDK_INT;
+  private static final int VANILLA_ICE_CREAM = 35;
 
   // Copied over from RoleManager.ROLE_DEVICE_POLICY_MANAGEMENT, which can't be referenced directly
   // since it's a @SystemAPI.
@@ -159,7 +160,7 @@ public class Util {
       // DO mode and is set as the DO on the main user. UserManager.isMainUser is not a public API,
       // so we'll have to depend on the fact that the DO is installed on the main user for the
       // check.
-      if (Util.SDK_INT >= VERSION_CODES.VANILLA_ICE_CREAM
+      if (Util.SDK_INT >= VANILLA_ICE_CREAM
           && userManager.isHeadlessSystemUserMode()) {
         return isDeviceOwner(context);
       } else {

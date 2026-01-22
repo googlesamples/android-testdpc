@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright (C) 2015 The Android Open Source Project
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/sud_layout_header"
+    style="@style/SudGlifHeaderContainer"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:filterTouchesWhenObscured="true"
+    android:orientation="vertical">
+
+    <ProgressBar
+        android:id="@+id/sud_glif_top_progress_bar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="?attr/sudMarginStart"
+        android:layout_marginRight="?attr/sudMarginStart"
+        android:visibility="gone"
+        android:indeterminate="true" />
+
+    <ViewStub
+        android:id="@+id/sud_glif_top_progress_indicator_stub"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="?attr/sudMarginStart"
+        android:layout_marginRight="?attr/sudMarginStart"
+        android:paddingBottom="@dimen/sud_glif_expressive_progress_indicator_padding_bottom"
+        android:inflatedId="@+id/sud_layout_progress_indicator"
+        android:layout="@layout/sud_progress_indicator" />
+
+    <FrameLayout
+        android:id="@+id/sud_layout_icon_container"
+        style="@style/SudGlifIconContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone" >
+        <ImageView
+            android:id="@+id/sud_layout_icon"
+            style="?attr/sudGlifIconStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@null"
+            android:visibility="gone" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/suc_layout_title"
+        style="?attr/sudGlifHeaderTitleStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <include layout="@layout/sud_glif_profile" />
+
+    <ViewStub
+        android:id="@+id/sud_layout_progress_stub"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/sud_glif_progress_bar_margin_vertical"
+        android:layout_marginLeft="?attr/sudMarginStart"
+        android:layout_marginRight="?attr/sudMarginStart"
+        android:layout_marginTop="@dimen/sud_glif_progress_bar_margin_vertical"
+        android:inflatedId="@+id/sud_layout_progress"
+        android:layout="@layout/sud_progress_bar" />
+
+    <com.google.android.setupdesign.view.RichTextView
+        android:id="@+id/sud_layout_subtitle"
+        style="?attr/sudGlifDescriptionStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+
+    <ProgressBar
+        android:id="@+id/sud_glif_progress_bar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="?attr/sudMarginStart"
+        android:layout_marginRight="?attr/sudMarginStart"
+        android:visibility="gone"
+        android:indeterminate="true" />
+
+    <ViewStub
+        android:id="@+id/sud_glif_progress_indicator_stub"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/sud_glif_expressive_progress_indicator_margin_vertical"
+        android:layout_marginLeft="?attr/sudMarginStart"
+        android:layout_marginRight="?attr/sudMarginStart"
+        android:paddingBottom="@dimen/sud_glif_expressive_progress_indicator_padding_bottom"
+        android:inflatedId="@+id/sud_layout_progress_indicator"
+        android:layout="@layout/sud_progress_indicator" />
+
+</LinearLayout>
