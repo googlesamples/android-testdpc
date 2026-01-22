@@ -13,12 +13,12 @@ plugins {
 }
 
 // All projects configuration
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
-    }
-}
+// allprojects {
+//     repositories {
+//         google()
+//         mavenCentral()
+//     }
+// }
 
 // Subprojects configuration
 // subprojects configuration removed to fix Unresolved reference errors
