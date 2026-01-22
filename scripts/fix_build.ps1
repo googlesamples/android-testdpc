@@ -2,7 +2,7 @@ $ErrorActionPreference = "Stop"
 $GradleVersion = "8.5"
 $SdkPath = "C:\Users\AhsanHussain\AppData\Local\Android\Sdk"
 $ProjectRoot = Get-Location
-$TempDir = Join-Path $env:TEMP "gradle_bootstrap_v2"
+$TempDir = Join-Path $env:TEMP "gradle_bootstrap_v3"
 
 Write-Host "Checking build environment..."
 
@@ -39,6 +39,9 @@ if (-not (Test-Path "gradlew.bat")) {
     $WrapperGenDir = Join-Path $TempDir "wrapper_gen"
     New-Item -ItemType Directory -Force -Path $WrapperGenDir | Out-Null
     
+    # Create empty settings.gradle to satisfy Gradle
+    "" | Out-File (Join-Path $WrapperGenDir "settings.gradle") -Encoding utf8
+    
     Push-Location $WrapperGenDir
     & $GradleBin wrapper --gradle-version $GradleVersion
     Pop-Location
@@ -49,7 +52,6 @@ if (-not (Test-Path "gradlew.bat")) {
     Copy-Item (Join-Path $WrapperGenDir "gradle") (Join-Path $ProjectRoot "gradle") -Recurse -Force
     
     Write-Host "Cleaning up..."
-    # Try to cleanup, but ignore errors if daemon locks files
     try { Remove-Item $TempDir -Recurse -Force -ErrorAction SilentlyContinue } catch {}
     
     Write-Host "Wrapper restored."
