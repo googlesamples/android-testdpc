@@ -6,3 +6,4 @@ bazel-testlogs
 .idea
 *.lock
 local.properties
+gradle.properties
