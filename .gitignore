@@ -5,3 +5,4 @@ bazel-testlogs
 **/*.iml
 .idea
 *.lock
+local.properties
