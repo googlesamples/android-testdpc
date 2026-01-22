@@ -118,8 +118,8 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
 
     // Setup Wizard
-    implementation("com.google.android.setupdesign:setupdesign:+")
-    implementation("com.google.android.setupcompat:setupcompat:+")
+    implementation(project(":setupdesign"))
+    implementation(project(":setupcompat"))
 
     // Google Guava (from Bazel setup)
     implementation("com.google.guava:guava:31.1-android")
