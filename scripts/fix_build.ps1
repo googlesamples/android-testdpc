@@ -2,7 +2,7 @@ $ErrorActionPreference = "Stop"
 $GradleVersion = "8.5"
 $SdkPath = "C:\Users\AhsanHussain\AppData\Local\Android\Sdk"
 $ProjectRoot = Get-Location
-$TempDir = Join-Path $env:TEMP "gradle_bootstrap_v5"
+$TempDir = Join-Path $env:TEMP "gradle_bootstrap_v6"
 
 Write-Host "Checking build environment..."
 
@@ -17,7 +17,6 @@ if (-not (Test-Path $LocalPropFile)) {
 }
 
 # 2. Check/Fix Gradle Wrapper
-# We check for the JAR too now, to force repair if jar is missing
 if (-not (Test-Path "gradle/wrapper/gradle-wrapper.jar")) {
     Write-Host "Gradle wrapper JAR missing. Bootstrapping in clean environment..."
     
@@ -45,14 +44,20 @@ if (-not (Test-Path "gradle/wrapper/gradle-wrapper.jar")) {
     & $GradleBin wrapper --gradle-version $GradleVersion
     Pop-Location
     
+    Write-Host "Listing generated files in $WrapperGenDir:"
+    Get-ChildItem -Recurse $WrapperGenDir | ForEach-Object { Write-Host $_.FullName }
+    
     Write-Host "Copying wrapper files to project root..."
     Copy-Item (Join-Path $WrapperGenDir "gradlew") $ProjectRoot -Force
     Copy-Item (Join-Path $WrapperGenDir "gradlew.bat") $ProjectRoot -Force
     
     # Explicitly copy JAR
-    $WrapperDest = Join-Path $ProjectRoot "gradle\wrapper"
-    $WrapperSource = Join-Path $WrapperGenDir "gradle\wrapper\gradle-wrapper.jar"
-    Copy-Item $WrapperSource $WrapperDest -Force
+    $WrapperDestDir = Join-Path $ProjectRoot "gradle\wrapper"
+    $WrapperSourceJar = Join-Path $WrapperGenDir "gradle\wrapper\gradle-wrapper.jar"
+    $WrapperDestJar = Join-Path $WrapperDestDir "gradle-wrapper.jar"
+    
+    Write-Host "Copying JAR from $WrapperSourceJar to $WrapperDestJar"
+    Copy-Item $WrapperSourceJar $WrapperDestJar -Force
     
     Write-Host "Cleaning up..."
     try { Remove-Item $TempDir -Recurse -Force -ErrorAction SilentlyContinue } catch {}
