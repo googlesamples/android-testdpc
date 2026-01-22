@@ -2,7 +2,7 @@ $ErrorActionPreference = "Stop"
 $GradleVersion = "8.5"
 $SdkPath = "C:\Users\AhsanHussain\AppData\Local\Android\Sdk"
 $ProjectRoot = Get-Location
-$TempDir = Join-Path $env:TEMP "gradle_bootstrap_v3"
+$TempDir = Join-Path $env:TEMP "gradle_bootstrap_v4"
 
 Write-Host "Checking build environment..."
 
@@ -39,8 +39,8 @@ if (-not (Test-Path "gradlew.bat")) {
     $WrapperGenDir = Join-Path $TempDir "wrapper_gen"
     New-Item -ItemType Directory -Force -Path $WrapperGenDir | Out-Null
     
-    # Create empty settings.gradle to satisfy Gradle
-    "" | Out-File (Join-Path $WrapperGenDir "settings.gradle") -Encoding utf8
+    # Create empty settings.gradle (0 bytes, no BOM)
+    New-Item -Path (Join-Path $WrapperGenDir "settings.gradle") -ItemType File -Force | Out-Null
     
     Push-Location $WrapperGenDir
     & $GradleBin wrapper --gradle-version $GradleVersion
