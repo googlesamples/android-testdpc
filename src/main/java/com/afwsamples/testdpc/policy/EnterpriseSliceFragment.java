@@ -21,26 +21,25 @@ import android.app.admin.DevicePolicyManager;
 import android.app.admin.PreferentialNetworkServiceConfig;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
-import android.content.pm.PackageManager;
 import android.util.Log;
 import android.widget.Toast;
 import androidx.preference.Preference;
 import com.afwsamples.testdpc.DeviceAdminReceiver;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.BaseSearchablePolicyPreferenceFragment;
-import com.afwsamples.testdpc.common.preference.DpcSwitchPreference;
-import com.afwsamples.testdpc.common.preference.DpcPreference;
 import com.afwsamples.testdpc.common.preference.DpcEditTextPreference;
+import com.afwsamples.testdpc.common.preference.DpcPreference;
+import com.afwsamples.testdpc.common.preference.DpcSwitchPreference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-
 @TargetApi(VERSION_CODES.Q)
 public class EnterpriseSliceFragment extends BaseSearchablePolicyPreferenceFragment
-    implements Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
+    implements Preference.OnPreferenceClickListener {
 
   private static String TAG = "EnterpriseSliceFragment";
   private static final String ENTERPRISE_SLICE_1_ENABLE =
@@ -123,16 +122,6 @@ public class EnterpriseSliceFragment extends BaseSearchablePolicyPreferenceFragm
   private DpcSwitchPreference mEnable5;
 
   private DpcPreference mSubmit;
-  final private PreferentialNetworkServiceConfig.Builder
-      mPreferentialNetworkServiceConfigBuilder1 = new PreferentialNetworkServiceConfig.Builder();
-  final private PreferentialNetworkServiceConfig.Builder
-      mPreferentialNetworkServiceConfigBuilder2 = new PreferentialNetworkServiceConfig.Builder();
-  final private PreferentialNetworkServiceConfig.Builder
-      mPreferentialNetworkServiceConfigBuilder3 = new PreferentialNetworkServiceConfig.Builder();
-  final private PreferentialNetworkServiceConfig.Builder
-      mPreferentialNetworkServiceConfigBuilder4 = new PreferentialNetworkServiceConfig.Builder();
-  final private PreferentialNetworkServiceConfig.Builder
-      mPreferentialNetworkServiceConfigBuilder5 = new PreferentialNetworkServiceConfig.Builder();
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -148,74 +137,34 @@ public class EnterpriseSliceFragment extends BaseSearchablePolicyPreferenceFragm
     addPreferencesFromResource(R.xml.enterprise_slice_preferences);
 
     mIncludedApps1 = (DpcEditTextPreference) findPreference(ENTERPRISE_SLICE_1_INCLUDED_APP_KEY);
-    mIncludedApps1.setOnPreferenceChangeListener(this);
-
     mExcludedApps1 = (DpcEditTextPreference) findPreference(ENTERPRISE_SLICE_1_EXCLUDED_APP_KEY);
-    mExcludedApps1.setOnPreferenceChangeListener(this);
-
     mAllowFallbackToDefault1 =
         (DpcSwitchPreference) findPreference(ENTERPRISE_SLICE_1_ALLOW_FALLBACK_TO_DEFAULT_KEY);
-    mAllowFallbackToDefault1.setOnPreferenceChangeListener(this);
-
-    mEnable1 =
-        (DpcSwitchPreference) findPreference(ENTERPRISE_SLICE_1_ENABLE);
-    mEnable1.setOnPreferenceChangeListener(this);
+    mEnable1 = (DpcSwitchPreference) findPreference(ENTERPRISE_SLICE_1_ENABLE);
 
     mIncludedApps2 = (DpcEditTextPreference) findPreference(ENTERPRISE_SLICE_2_INCLUDED_APP_KEY);
-    mIncludedApps2.setOnPreferenceChangeListener(this);
-
     mExcludedApps2 = (DpcEditTextPreference) findPreference(ENTERPRISE_SLICE_2_EXCLUDED_APP_KEY);
-    mExcludedApps2.setOnPreferenceChangeListener(this);
-
     mAllowFallbackToDefault2 =
         (DpcSwitchPreference) findPreference(ENTERPRISE_SLICE_2_ALLOW_FALLBACK_TO_DEFAULT_KEY);
-    mAllowFallbackToDefault2.setOnPreferenceChangeListener(this);
-
-    mEnable2 =
-        (DpcSwitchPreference) findPreference(ENTERPRISE_SLICE_2_ENABLE);
-    mEnable2.setOnPreferenceChangeListener(this);
+    mEnable2 = (DpcSwitchPreference) findPreference(ENTERPRISE_SLICE_2_ENABLE);
 
     mIncludedApps3 = (DpcEditTextPreference) findPreference(ENTERPRISE_SLICE_3_INCLUDED_APP_KEY);
-    mIncludedApps3.setOnPreferenceChangeListener(this);
-
     mExcludedApps3 = (DpcEditTextPreference) findPreference(ENTERPRISE_SLICE_3_EXCLUDED_APP_KEY);
-    mExcludedApps3.setOnPreferenceChangeListener(this);
-
     mAllowFallbackToDefault3 =
         (DpcSwitchPreference) findPreference(ENTERPRISE_SLICE_3_ALLOW_FALLBACK_TO_DEFAULT_KEY);
-    mAllowFallbackToDefault3.setOnPreferenceChangeListener(this);
-
-    mEnable3 =
-        (DpcSwitchPreference) findPreference(ENTERPRISE_SLICE_3_ENABLE);
-    mEnable3.setOnPreferenceChangeListener(this);
+    mEnable3 = (DpcSwitchPreference) findPreference(ENTERPRISE_SLICE_3_ENABLE);
 
     mIncludedApps4 = (DpcEditTextPreference) findPreference(ENTERPRISE_SLICE_4_INCLUDED_APP_KEY);
-    mIncludedApps4.setOnPreferenceChangeListener(this);
-
     mExcludedApps4 = (DpcEditTextPreference) findPreference(ENTERPRISE_SLICE_4_EXCLUDED_APP_KEY);
-    mExcludedApps4.setOnPreferenceChangeListener(this);
-
     mAllowFallbackToDefault4 =
         (DpcSwitchPreference) findPreference(ENTERPRISE_SLICE_4_ALLOW_FALLBACK_TO_DEFAULT_KEY);
-    mAllowFallbackToDefault4.setOnPreferenceChangeListener(this);
-
-    mEnable4 =
-        (DpcSwitchPreference) findPreference(ENTERPRISE_SLICE_4_ENABLE);
-    mEnable4.setOnPreferenceChangeListener(this);
+    mEnable4 = (DpcSwitchPreference) findPreference(ENTERPRISE_SLICE_4_ENABLE);
 
     mIncludedApps5 = (DpcEditTextPreference) findPreference(ENTERPRISE_SLICE_5_INCLUDED_APP_KEY);
-    mIncludedApps5.setOnPreferenceChangeListener(this);
-
     mExcludedApps5 = (DpcEditTextPreference) findPreference(ENTERPRISE_SLICE_5_EXCLUDED_APP_KEY);
-    mExcludedApps5.setOnPreferenceChangeListener(this);
-
     mAllowFallbackToDefault5 =
         (DpcSwitchPreference) findPreference(ENTERPRISE_SLICE_5_ALLOW_FALLBACK_TO_DEFAULT_KEY);
-    mAllowFallbackToDefault5.setOnPreferenceChangeListener(this);
-
-    mEnable5 =
-        (DpcSwitchPreference) findPreference(ENTERPRISE_SLICE_5_ENABLE);
-    mEnable5.setOnPreferenceChangeListener(this);
+    mEnable5 = (DpcSwitchPreference) findPreference(ENTERPRISE_SLICE_5_ENABLE);
 
     mSubmit = (DpcPreference) findPreference(ENTERPRISE_SLICE_SUBMIT);
     mSubmit.setOnPreferenceClickListener(this);
@@ -242,31 +191,42 @@ public class EnterpriseSliceFragment extends BaseSearchablePolicyPreferenceFragm
         List<PreferentialNetworkServiceConfig> preferentialNetworkServiceConfigs =
             new ArrayList<>();
         try {
-          preferentialNetworkServiceConfigs.add(mPreferentialNetworkServiceConfigBuilder1.build());
-          if (mPreferentialNetworkServiceConfigBuilder2.build().getNetworkId() ==
-                  PreferentialNetworkServiceConfig.PREFERENTIAL_NETWORK_ID_2 &&
-                  mPreferentialNetworkServiceConfigBuilder2.build().isEnabled()) {
-            preferentialNetworkServiceConfigs.add(
-                mPreferentialNetworkServiceConfigBuilder2.build());
-          }
-          if (mPreferentialNetworkServiceConfigBuilder3.build().getNetworkId() ==
-                  PreferentialNetworkServiceConfig.PREFERENTIAL_NETWORK_ID_3 &&
-                  mPreferentialNetworkServiceConfigBuilder3.build().isEnabled()) {
-            preferentialNetworkServiceConfigs.add(
-                mPreferentialNetworkServiceConfigBuilder3.build());
-          }
-          if (mPreferentialNetworkServiceConfigBuilder4.build().getNetworkId() ==
-                  PreferentialNetworkServiceConfig.PREFERENTIAL_NETWORK_ID_4 &&
-                  mPreferentialNetworkServiceConfigBuilder4.build().isEnabled()) {
-            preferentialNetworkServiceConfigs.add(
-                mPreferentialNetworkServiceConfigBuilder4.build());
-          }
-          if (mPreferentialNetworkServiceConfigBuilder5.build().getNetworkId() ==
-                  PreferentialNetworkServiceConfig.PREFERENTIAL_NETWORK_ID_5 &&
-                  mPreferentialNetworkServiceConfigBuilder5.build().isEnabled()) {
-            preferentialNetworkServiceConfigs.add(
-                mPreferentialNetworkServiceConfigBuilder5.build());
-          }
+          addConfig(
+              preferentialNetworkServiceConfigs,
+              mEnable1,
+              mAllowFallbackToDefault1,
+              mIncludedApps1,
+              mExcludedApps1,
+              PreferentialNetworkServiceConfig.PREFERENTIAL_NETWORK_ID_1);
+          addConfig(
+              preferentialNetworkServiceConfigs,
+              mEnable2,
+              mAllowFallbackToDefault2,
+              mIncludedApps2,
+              mExcludedApps2,
+              PreferentialNetworkServiceConfig.PREFERENTIAL_NETWORK_ID_2);
+          addConfig(
+              preferentialNetworkServiceConfigs,
+              mEnable3,
+              mAllowFallbackToDefault3,
+              mIncludedApps3,
+              mExcludedApps3,
+              PreferentialNetworkServiceConfig.PREFERENTIAL_NETWORK_ID_3);
+          addConfig(
+              preferentialNetworkServiceConfigs,
+              mEnable4,
+              mAllowFallbackToDefault4,
+              mIncludedApps4,
+              mExcludedApps4,
+              PreferentialNetworkServiceConfig.PREFERENTIAL_NETWORK_ID_4);
+          addConfig(
+              preferentialNetworkServiceConfigs,
+              mEnable5,
+              mAllowFallbackToDefault5,
+              mIncludedApps5,
+              mExcludedApps5,
+              PreferentialNetworkServiceConfig.PREFERENTIAL_NETWORK_ID_5);
+
           Log.d(TAG, "configs: " + preferentialNetworkServiceConfigs);
           for (PreferentialNetworkServiceConfig config : preferentialNetworkServiceConfigs) {
             Log.d(TAG, "config: " + config);
@@ -301,6 +261,9 @@ public class EnterpriseSliceFragment extends BaseSearchablePolicyPreferenceFragm
   }
 
   int[] getUids(String packages) {
+    if (packages == null) {
+      return new int[0];
+    }
     List<String> packagesList = Arrays.asList(packages.split(",", -1));
     int uids[] = new int[packagesList.size()];
     int index = 0;
@@ -315,126 +278,22 @@ public class EnterpriseSliceFragment extends BaseSearchablePolicyPreferenceFragm
     return uids;
   }
 
-  @Override
-  public boolean onPreferenceChange(Preference preference, Object newValue) {
-    String key = preference.getKey();
-    switch (key) {
-      case ENTERPRISE_SLICE_1_ALLOW_FALLBACK_TO_DEFAULT_KEY:
-        mPreferentialNetworkServiceConfigBuilder1.setFallbackToDefaultConnectionAllowed(
-            (Boolean) newValue);
-        break;
-
-      case ENTERPRISE_SLICE_1_ENABLE:
-        if ((Boolean) newValue) {
-          mPreferentialNetworkServiceConfigBuilder1.setNetworkId(
-              PreferentialNetworkServiceConfig.PREFERENTIAL_NETWORK_ID_1);
-        }
-        mPreferentialNetworkServiceConfigBuilder1.setEnabled((Boolean) newValue);
-        break;
-
-      case ENTERPRISE_SLICE_1_INCLUDED_APP_KEY:
-        mPreferentialNetworkServiceConfigBuilder1.setIncludedUids(
-              getUids((String) newValue));
-        break;
-
-      case ENTERPRISE_SLICE_1_EXCLUDED_APP_KEY:
-        mPreferentialNetworkServiceConfigBuilder1.setExcludedUids(
-              getUids((String) newValue));
-        break;
-
-      case ENTERPRISE_SLICE_2_ENABLE:
-        if ((Boolean) newValue) {
-          mPreferentialNetworkServiceConfigBuilder2.setNetworkId(
-              PreferentialNetworkServiceConfig.PREFERENTIAL_NETWORK_ID_2);
-        }
-        mPreferentialNetworkServiceConfigBuilder2.setEnabled((Boolean) newValue);
-        break;
-
-      case ENTERPRISE_SLICE_2_ALLOW_FALLBACK_TO_DEFAULT_KEY:
-        mPreferentialNetworkServiceConfigBuilder2.setFallbackToDefaultConnectionAllowed(
-            (Boolean) newValue);
-        break;
-
-      case ENTERPRISE_SLICE_2_INCLUDED_APP_KEY:
-        mPreferentialNetworkServiceConfigBuilder2.setIncludedUids(
-              getUids((String) newValue));
-        break;
-
-      case ENTERPRISE_SLICE_2_EXCLUDED_APP_KEY:
-        mPreferentialNetworkServiceConfigBuilder2.setExcludedUids(
-              getUids((String) newValue));
-        break;
-
-      case ENTERPRISE_SLICE_3_ENABLE:
-        if ((Boolean) newValue) {
-          mPreferentialNetworkServiceConfigBuilder3.setNetworkId(
-              PreferentialNetworkServiceConfig.PREFERENTIAL_NETWORK_ID_3);
-        }
-        mPreferentialNetworkServiceConfigBuilder3.setEnabled((Boolean) newValue);
-        break;
-
-      case ENTERPRISE_SLICE_3_ALLOW_FALLBACK_TO_DEFAULT_KEY:
-        mPreferentialNetworkServiceConfigBuilder3.setFallbackToDefaultConnectionAllowed(
-            (Boolean) newValue);
-        break;
-
-      case ENTERPRISE_SLICE_3_INCLUDED_APP_KEY:
-        mPreferentialNetworkServiceConfigBuilder3.setIncludedUids(
-              getUids((String) newValue));
-        break;
-
-      case ENTERPRISE_SLICE_3_EXCLUDED_APP_KEY:
-        mPreferentialNetworkServiceConfigBuilder3.setExcludedUids(
-              getUids((String) newValue));
-        break;
-
-
-      case ENTERPRISE_SLICE_4_ENABLE:
-        if ((Boolean) newValue) {
-          mPreferentialNetworkServiceConfigBuilder4.setNetworkId(
-              PreferentialNetworkServiceConfig.PREFERENTIAL_NETWORK_ID_4);
-        }
-        mPreferentialNetworkServiceConfigBuilder4.setEnabled((Boolean) newValue);
-        break;
-
-      case ENTERPRISE_SLICE_4_ALLOW_FALLBACK_TO_DEFAULT_KEY:
-        mPreferentialNetworkServiceConfigBuilder4.setFallbackToDefaultConnectionAllowed(
-            (Boolean) newValue);
-        break;
-
-      case ENTERPRISE_SLICE_4_INCLUDED_APP_KEY:
-        mPreferentialNetworkServiceConfigBuilder4.setIncludedUids(
-              getUids((String) newValue));
-        break;
-
-      case ENTERPRISE_SLICE_4_EXCLUDED_APP_KEY:
-        mPreferentialNetworkServiceConfigBuilder4.setExcludedUids(
-              getUids((String) newValue));
-        break;
-
-      case ENTERPRISE_SLICE_5_ENABLE:
-        if ((Boolean) newValue) {
-          mPreferentialNetworkServiceConfigBuilder5.setNetworkId(
-              PreferentialNetworkServiceConfig.PREFERENTIAL_NETWORK_ID_5);
-        }
-        mPreferentialNetworkServiceConfigBuilder5.setEnabled((Boolean) newValue);
-        break;
-
-      case ENTERPRISE_SLICE_5_ALLOW_FALLBACK_TO_DEFAULT_KEY:
-        mPreferentialNetworkServiceConfigBuilder5.setFallbackToDefaultConnectionAllowed(
-            (Boolean) newValue);
-        break;
-
-      case ENTERPRISE_SLICE_5_INCLUDED_APP_KEY:
-        mPreferentialNetworkServiceConfigBuilder5.setIncludedUids(
-              getUids((String) newValue));
-        break;
-
-      case ENTERPRISE_SLICE_5_EXCLUDED_APP_KEY:
-        mPreferentialNetworkServiceConfigBuilder5.setExcludedUids(
-              getUids((String) newValue));
-        break;
+  private void addConfig(
+      List<PreferentialNetworkServiceConfig> configs,
+      DpcSwitchPreference enablePref,
+      DpcSwitchPreference fallbackPref,
+      DpcEditTextPreference includedPref,
+      DpcEditTextPreference excludedPref,
+      int networkId) {
+    if (enablePref.isChecked()) {
+      PreferentialNetworkServiceConfig.Builder builder =
+          new PreferentialNetworkServiceConfig.Builder();
+      builder.setEnabled(true);
+      builder.setNetworkId(networkId);
+      builder.setFallbackToDefaultConnectionAllowed(fallbackPref.isChecked());
+      builder.setIncludedUids(getUids(includedPref.getText()));
+      builder.setExcludedUids(getUids(excludedPref.getText()));
+      configs.add(builder.build());
     }
-    return true;
   }
 }
