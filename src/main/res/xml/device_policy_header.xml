@@ -836,6 +836,11 @@
             testdpc:admin="deviceOwner"
             testdpc:minSdkVersion="L" />
         <com.afwsamples.testdpc.common.preference.DpcPreference
+            android:key="remove_profile_owner"
+            android:title="@string/remove_profile_owner"
+            testdpc:admin="profileOwner|orgOwnedProfileOwner"
+            testdpc:minSdkVersion="L" />
+        <com.afwsamples.testdpc.common.preference.DpcPreference
             android:key="reboot"
             android:title="@string/reboot"
             testdpc:admin="deviceOwner"

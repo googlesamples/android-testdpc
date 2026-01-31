@@ -141,6 +141,9 @@
     <string name="remove_device_owner_confirmation">Policies and restrictions will continue to be
         active and may require a factory reset to clear.</string>
     <string name="device_owner_removed">This app is no longer a device owner.</string>
+    <string name="remove_profile_owner">Remove this profile owner</string>
+    <string name="remove_profile_owner_title">Remove profile owner?</string>
+    <string name="profile_owner_removed">This app is no longer a profile owner.</string>
     <string name="set_factory_reset_protection_policy">Set factory reset protection policy</string>
     <string name="factory_reset_protection_policy">Factory reset protection policy</string>
     <string name="factory_reset_protection_policy_accounts">Account IDs</string>
