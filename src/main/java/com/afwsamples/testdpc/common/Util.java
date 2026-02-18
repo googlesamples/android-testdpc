@@ -160,7 +160,7 @@ public class Util {
       // so we'll have to depend on the fact that the DO is installed on the main user for the
       // check.
       if (Util.SDK_INT >= VERSION_CODES.VANILLA_ICE_CREAM
-          && userManager.isHeadlessSystemUserMode()) {
+          && UserManager.isHeadlessSystemUserMode()) {
         return isDeviceOwner(context);
       } else {
         return userManager.isSystemUser();

@@ -133,7 +133,7 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
   public boolean isHeadlessSystemUserMode() {
     Util.requireAndroidS();
 
-    return mUserManager.isHeadlessSystemUserMode();
+    return UserManager.isHeadlessSystemUserMode();
   }
 
   @Override
@@ -1364,7 +1364,13 @@ public final class DevicePolicyManagerGatewayImpl implements DevicePolicyManager
 
   @Override
   public void addPersistentPreferredActivity(ComponentName activityComponentName, IntentFilter filter, Consumer<Boolean> onSuccess, Consumer<Exception> onError) {
-    Log.d(TAG, "addPersistentPreferredActivity(" + activityComponentName + ", " + Util.toString(filter) + ")");
+    Log.d(
+        TAG,
+        "addPersistentPreferredActivity("
+            + activityComponentName
+            + ", "
+            + Util.toString(filter)
+            + ")");
     try {
       mDevicePolicyManager.addPersistentPreferredActivity(mAdminComponentName, filter, activityComponentName);
       onSuccess.accept(null);

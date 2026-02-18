@@ -921,8 +921,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
         prefix, Util.isRunningOnAutomotiveDevice(getActivity()));
     if (Util.SDK_INT >= VERSION_CODES.S) {
       pw.printf(
-          "%sisHeadlessSystemUserMode(): %s\n",
-          prefix, mUserManager.isHeadlessSystemUserMode());
+          "%sisHeadlessSystemUserMode(): %s\n", prefix, UserManager.isHeadlessSystemUserMode());
     }
   }
 
@@ -4820,7 +4819,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
   }
 
   private int validateNotHsumMode() {
-    if (Util.SDK_INT >= VERSION_CODES.S && mUserManager.isHeadlessSystemUserMode()) {
+    if (Util.SDK_INT >= VERSION_CODES.S && UserManager.isHeadlessSystemUserMode()) {
       return R.string.not_supported_on_hsum;
     }
     return NO_CUSTOM_CONSTRAINT;
