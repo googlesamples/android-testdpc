@@ -30,6 +30,7 @@ import android.app.admin.SecurityLog.SecurityEvent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.IntentFilter;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -75,6 +76,7 @@ final class ShellCommand {
   private final PrintWriter mWriter;
   private final String[] mArgs;
   private final DevicePolicyManagerGateway mDevicePolicyManagerGateway;
+  private final boolean mCanTransferOwnership;
 
   @Nullable // dynamically created on post() method
   private Handler mHandler;
@@ -85,6 +87,9 @@ final class ShellCommand {
     mWriter = writer;
     mArgs = args;
     mDevicePolicyManagerGateway = new DevicePolicyManagerGatewayImpl(context);
+    mCanTransferOwnership =
+        (context.getApplicationInfo().flags & ApplicationInfo.FLAG_TEST_ONLY) != 0;
+
     Log.d(
         TAG,
         "constructor: pid="
@@ -1089,6 +1094,12 @@ final class ShellCommand {
   }
 
   private void transferOwnership(String flatTarget) {
+    // block transfer when disabled
+    if (!mCanTransferOwnership) {
+      onError(new UnsupportedOperationException(), "Not supported in this build");
+      return;
+    }
+
     ComponentName target = ComponentName.unflattenFromString(flatTarget);
 
     Log.i(TAG, "transferOwnership(" + target + ")");
@@ -1583,20 +1594,30 @@ final class ShellCommand {
     for (String category : categories) {
       filter.addCategory(category);
     }
-    mDevicePolicyManagerGateway.addPersistentPreferredActivity(activityComponentName, filter,
+    mDevicePolicyManagerGateway.addPersistentPreferredActivity(
+        activityComponentName,
+        filter,
         (v) ->
-            onSuccess("Successfully added persistent preferred activity (%s) for intent filter %s", activityComponentName, Util.toString(filter)),
+            onSuccess(
+                "Successfully added persistent preferred activity (%s) for intent filter %s",
+                activityComponentName, Util.toString(filter)),
         (e) ->
-            onError(e, "Error adding persistent preferred activity (%s) for intent filter %s", activityComponentName, Util.toString(filter)));
+            onError(
+                e,
+                "Error adding persistent preferred activity (%s) for intent filter %s",
+                activityComponentName,
+                Util.toString(filter)));
   }
 
   private void clearPackagePersistentPreferredActivities(String packageName) {
     mDevicePolicyManagerGateway.clearPackagePersistentPreferredActivities(
         packageName,
         (v) ->
-            onSuccess("Successfully cleared package persistent preferred activities for %s", packageName),
+            onSuccess(
+                "Successfully cleared package persistent preferred activities for %s", packageName),
         (e) ->
-            onError(e, "Error clearing package persistent preferred activities for %s", packageName));
+            onError(
+                e, "Error clearing package persistent preferred activities for %s", packageName));
   }
 
   private void post(Runnable r) {

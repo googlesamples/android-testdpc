@@ -128,6 +128,8 @@
     <string name="this_is_a_role_holder">This app is the Device Management Role Holder.</string>
     <string name="this_is_not_an_admin">This app is not an admin.</string>
 
+    <string name="requires_different_build">Not supported in this build</string>
+
     <!-- Strings for provisioning disclaimers-->
     <string name="default_disclaimer_company_name">TestDPC Company</string>
     <string name="default_disclaimer_emm_name">TestDPC EMM</string>

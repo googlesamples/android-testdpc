@@ -561,6 +561,7 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
   private Uri mVideoUri;
   private boolean mIsProfileOwner;
   private boolean mIsOrganizationOwnedProfileOwner;
+  private boolean mCanTransferOwnership;
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -592,6 +593,9 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
 
     mImageUri = getStorageUri("image.jpg");
     mVideoUri = getStorageUri("video.mp4");
+
+    mCanTransferOwnership =
+        (context.getApplicationInfo().flags & ApplicationInfo.FLAG_TEST_ONLY) != 0;
 
     super.onCreate(savedInstanceState);
   }
@@ -781,7 +785,11 @@ public class PolicyManagementFragment extends BaseSearchablePolicyPreferenceFrag
     findPreference(MODIFY_WIFI_CONFIGURATION_KEY).setOnPreferenceClickListener(this);
     findPreference(MODIFY_OWNED_WIFI_CONFIGURATION_KEY).setOnPreferenceClickListener(this);
     findPreference(REMOVE_NOT_OWNED_WIFI_CONFIGURATION_KEY).setOnPreferenceClickListener(this);
-    findPreference(TRANSFER_OWNERSHIP_KEY).setOnPreferenceClickListener(this);
+    final CustomConstraint allowTransferOwnershipChecker =
+        () -> mCanTransferOwnership ? NO_CUSTOM_CONSTRAINT : R.string.requires_different_build;
+    DpcPreference transferOwnershipPreference = findPreference(TRANSFER_OWNERSHIP_KEY);
+    transferOwnershipPreference.addCustomConstraint(allowTransferOwnershipChecker);
+    transferOwnershipPreference.setOnPreferenceClickListener(this);
     findPreference(SHOW_WIFI_MAC_ADDRESS_KEY).setOnPreferenceClickListener(this);
     mInstallNonMarketAppsPreference =
         (DpcSwitchPreference) findPreference(INSTALL_NONMARKET_APPS_KEY);
