@@ -69,7 +69,6 @@ android_binary(
         "--force-jumbo",
     ],
     manifest = MANIFEST,
-    multidex = "native",
     deps = [
         ":testdpc_lib",
     ],
@@ -82,7 +81,6 @@ android_binary(
         "--force-jumbo",
     ],
     manifest = MANIFEST,
-    multidex = "native",
     deps = [
         ":testdpc_lib",
         ":testdpc_lib_debug",
