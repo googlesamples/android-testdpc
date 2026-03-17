@@ -19,8 +19,8 @@
     xmlns:tools="http://schemas.android.com/tools"
           package="com.afwsamples.testdpc"
           tools:ignore="MissingClass"
-           android:versionCode="9014"
-           android:versionName="9.0.14">
+           android:versionCode="9015"
+           android:versionName="9.0.15">
     <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="35"/>
 
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
