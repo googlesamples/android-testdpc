@@ -124,6 +124,7 @@ public class KioskModeActivity extends Activity {
     final KioskAppsArrayAdapter kioskAppsArrayAdapter =
         new KioskAppsArrayAdapter(this, R.id.pkg_name, mKioskPackages);
     ListView listView = new ListView(this);
+    listView.setFitsSystemWindows(true);
     listView.setAdapter(kioskAppsArrayAdapter);
     listView.setOnItemClickListener(
         new AdapterView.OnItemClickListener() {

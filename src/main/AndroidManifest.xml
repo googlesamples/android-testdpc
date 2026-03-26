@@ -19,8 +19,8 @@
     xmlns:tools="http://schemas.android.com/tools"
           package="com.afwsamples.testdpc"
           tools:ignore="MissingClass"
-           android:versionCode="9015"
-           android:versionName="9.0.15">
+           android:versionCode="9016"
+           android:versionName="9.0.16">
     <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="35"/>
 
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
@@ -86,10 +86,6 @@
         <intent-filter>
             <action android:name="android.intent.action.MAIN"/>
             <category android:name="android.intent.category.LAUNCHER"/>
-            <!-- Categories set it as a launcher activity, so it can be changed by addPersistentPreferredActivity(). -->
-            <category android:name="android.intent.category.HOME" />
-            <category android:name="android.intent.category.DEFAULT" />
-            <category android:name="android.intent.category.LAUNCHER_APP" />
         </intent-filter>
         <intent-filter>
             <action android:name="android.app.action.CHECK_POLICY_COMPLIANCE"/>
