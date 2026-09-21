@@ -194,10 +194,34 @@ public class PolicyManagementActivity extends DumpableActivity
         Log.d(TAG, "Notification permission granted");
       } else {
         Log.e(TAG, "Notification permission missing");
-        // Directly ask for the permission
-        ActivityCompat.requestPermissions(
-            this, new String[] {Manifest.permission.POST_NOTIFICATIONS}, 101);
+
+        // Check if we should show an explanation (rationale)
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.POST_NOTIFICATIONS)) {
+          // If the permission was denied, show a Snackbar directing the user to settings
+          showPermissionSnackbar();
+        } else {
+          // Directly ask for the permission
+          ActivityCompat.requestPermissions(
+                  this, new String[]{Manifest.permission.POST_NOTIFICATIONS}, 101);
+        }
       }
     }
+  }
+
+  private void showPermissionSnackbar() {
+    // Create a Snackbar to inform the user and guide them to app settings
+    Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content),
+                    "Notification permission is necessary please enable it in settings.",
+                    Snackbar.LENGTH_LONG)
+            .setAction("Settings", new View.OnClickListener() {
+              @Override
+              public void onClick(View v) {
+                // Open the app settings to allow the user to manually enable permissions
+                Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                intent.setData(Uri.fromParts("package", getPackageName(), null));
+                startActivity(intent);
+              }
+            });
+    snackbar.show();
   }
 }
