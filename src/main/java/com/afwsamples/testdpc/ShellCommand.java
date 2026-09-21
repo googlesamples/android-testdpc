@@ -150,7 +150,7 @@ final class ShellCommand {
         KeyValue.class,
         (string, validator) -> {
           if (string.contains("=")) {
-            String[] parts = string.split("=");
+            String[] parts = string.split("=", 2);
             return validator.valid(
                 new KeyValue(parts.length > 0 ? parts[0] : "", parts.length > 1 ? parts[1] : ""));
           }
