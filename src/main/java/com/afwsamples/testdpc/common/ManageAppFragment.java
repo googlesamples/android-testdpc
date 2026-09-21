@@ -17,6 +17,9 @@
 package com.afwsamples.testdpc.common;
 
 import android.content.pm.ApplicationInfo;
+import android.content.Context;
+import android.content.RestrictionEntry;
+import android.content.RestrictionsManager;
 import android.widget.SpinnerAdapter;
 import com.afwsamples.testdpc.R;
 import java.util.ArrayList;
@@ -60,6 +63,21 @@ public abstract class ManageAppFragment extends BaseManageComponentFragment<Appl
           || ALLOWLISTED_APPS.contains(applicationInfo.packageName)) {
         if (filterApp(applicationInfo)) {
           filteredAppList.add(applicationInfo);
+        }
+      }
+      // Adding system apps with Restrictions and without LaunchIntentForPackage
+      if (!filteredAppList.contains(applicationInfo) &&
+              filterApp(applicationInfo)) {
+        try {
+          List<RestrictionEntry> manifestRestrictions = null;
+          RestrictionsManager mRestrictionsManager =
+                  (RestrictionsManager) getActivity().getSystemService(Context.RESTRICTIONS_SERVICE);
+          manifestRestrictions = mRestrictionsManager.getManifestRestrictions(applicationInfo.packageName);
+          if (manifestRestrictions != null && !manifestRestrictions.isEmpty()) {
+            filteredAppList.add(applicationInfo);
+          }
+        } catch (NullPointerException e) {
+          // This means no default restrictions.
         }
       }
     }
