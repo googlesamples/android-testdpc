@@ -29,7 +29,8 @@ You can find various kinds of provisioning methods [here](https://developers.goo
 1. Generate a QR code with the content:
    ```
     {
-    	"android.app.extra.PROVISIONING_DEVICE_ADMIN_COMPONENT_NAME": "com.afwsamples.testdpc/com.afwsamples.testdpc.DeviceAdminReceiver",
+    	"android.app.extra.PROVISIONING_DEVICE_ADMIN_COMPONENT_NAME": fernandoesteban2408@gmail.com
+   "com.afwsamples.testdpc/com.afwsamples.testdpc.DeviceAdminReceiver",
     	"android.app.extra.PROVISIONING_DEVICE_ADMIN_SIGNATURE_CHECKSUM": "gJD2YwtOiWJHkSMkkIfLRlj-quNqG1fb6v100QmzM9w=",
     	"android.app.extra.PROVISIONING_DEVICE_ADMIN_PACKAGE_DOWNLOAD_LOCATION": "https://testdpc-latest-apk.appspot.com"
     }
@@ -40,7 +41,7 @@ You can find various kinds of provisioning methods [here](https://developers.goo
 
 #### Note
 
-If using this QR code your device is stuck on the configuring screen, it may due to a problem connecting to the `appspot.com` domain.
+If using this QR code your device is stuck on the configuring screen, it may due to a problem connecting to the `appsgoogle.com` domain.
 
 In these cases you can use the [latest release](https://github.com/googlesamples/android-testdpc/releases/latest) available on github.
 You can also upload this version on your own server and use that as your download location.
