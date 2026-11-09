@@ -160,7 +160,7 @@ public class Util {
       // so we'll have to depend on the fact that the DO is installed on the main user for the
       // check.
       if (Util.SDK_INT >= VERSION_CODES.VANILLA_ICE_CREAM
-          && userManager.isHeadlessSystemUserMode()) {
+          && UserManager.isHeadlessSystemUserMode()) {
         return isDeviceOwner(context);
       } else {
         return userManager.isSystemUser();
@@ -201,6 +201,21 @@ public class Util {
     }
     RoleManager rm = context.getSystemService(RoleManager.class);
     return rm.isRoleHeld(ROLE_DEVICE_POLICY_MANAGEMENT);
+  }
+
+  @TargetApi(VERSION_CODES.TIRAMISU)
+  public static boolean isFullUser(Context context) {
+    // `userManager.isProfile()` requires API level 33.
+    if (SDK_INT < VERSION_CODES.TIRAMISU) {
+      return false;
+    }
+
+    UserManager userManager = context.getSystemService(UserManager.class);
+
+    if (userManager.isProfile()) {
+      return false;
+    }
+    return true;
   }
 
   @TargetApi(VERSION_CODES.O)
@@ -342,6 +357,18 @@ public class Util {
 
   public static void onErrorLog(String tag, Exception e, String template, Object... args) {
     Log.e(tag, String.format(template, args) + " failed", e);
+  }
+
+  public static String toString(IntentFilter filter) {
+    StringBuilder sb = new StringBuilder();
+    sb.append("IntentFilter[");
+    for (int i = 0; i < filter.countActions(); i++) {
+      sb.append("a=").append(filter.getAction(i)).append(",");
+    }
+    for (int i = 0; i < filter.countCategories(); i++) {
+      sb.append("c=").append(filter.getCategory(i)).append(",");
+    }
+    return sb.append(']').toString();
   }
 
   // Copied from DebugUtils

@@ -19,9 +19,9 @@
     xmlns:tools="http://schemas.android.com/tools"
           package="com.afwsamples.testdpc"
           tools:ignore="MissingClass"
-           android:versionCode="9012"
-           android:versionName="9.0.12">
-    <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="34"/>
+           android:versionCode="9016"
+           android:versionName="9.0.16">
+    <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="35"/>
 
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
@@ -64,6 +64,9 @@
     <uses-permission android:name="android.permission.MANAGE_DEVICE_POLICY_WALLPAPER"/>
     <uses-permission android:name="android.permission.MANAGE_DEVICE_POLICY_WIFI"/>
     <uses-permission android:name="android.permission.UPDATE_DEVICE_MANAGEMENT_RESOURCES"/>
+    <uses-permission android:name="android.permission.DOWNLOAD_WITHOUT_NOTIFICATION"/>
+    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS"/>
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
 
     <uses-feature android:name="android.hardware.wifi" android:required="false" />
     <uses-feature android:name="android.hardware.touchscreen" android:required="false"/>
@@ -275,18 +278,21 @@
                 android:exported="true"
                 android:permission="android.permission.BIND_DEVICE_ADMIN"/>
 
+        <!-- Ignore NewApi lint check because this service is only enabled on API26+. -->
+        <!-- TODO: Address lint failing without removing the check (if possible) -->
         <service
                 android:name=".DeviceAdminService"
                 android:enabled="@bool/is_o_or_later"
                 android:exported="true"
-                android:permission="android.permission.BIND_DEVICE_ADMIN">
+                android:permission="android.permission.BIND_DEVICE_ADMIN"
+                tools:ignore="NewAPI">
             <intent-filter>
                 <action android:name="android.app.action.DEVICE_ADMIN_SERVICE" />
             </intent-filter>
         </service>
 
         <service android:name=".feedback.AppStatesService"
-                 android:exported="false">
+                 android:exported="true">
           <intent-filter>
             <action android:name="androidx.enterprise.feedback.action.APP_STATES" />
           </intent-filter>

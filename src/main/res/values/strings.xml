@@ -118,13 +118,17 @@
     <string name="requires_network_logs">Requires network logging to be enabled</string>
     <string name="requires_security_logs">Requires security logging to be enabled</string>
     <string name="not_for_password_quality">Not applicable to current password quality</string>
+    <string name="not_for_this_device">Not applicable to this device</string>
 
     <string name="this_is_a_device_owner">This app is the device owner.</string>
+    <string name="this_is_a_profile_owner_on_full_user">This app is the profile owner on a full user.</string>
     <string name="this_is_a_profile_owner">This app is a profile owner.</string>
     <string name="this_is_an_org_owned_profile_owner">This app is a profile owner of an organization-owned device.</string>
     <string name="this_is_a_delegated_app">This app has delegated permissions.</string>
     <string name="this_is_a_role_holder">This app is the Device Management Role Holder.</string>
     <string name="this_is_not_an_admin">This app is not an admin.</string>
+
+    <string name="requires_different_build">Not supported in this build</string>
 
     <!-- Strings for provisioning disclaimers-->
     <string name="default_disclaimer_company_name">TestDPC Company</string>
@@ -788,7 +792,9 @@
     <string name="user_management">User management</string>
     <string name="create_and_initialize_user">Create and initialize user</string>
     <string name="create_and_manage_user">Create and manage user</string>
+    <string name="not_supported_on_hsum">Not supported on HSUM mode</string>
     <string name="create_managed_profile">Create managed profile</string>
+    <string name="comp_not_supported_since_r">COMP mode deprecated since Android R</string>
     <string name="skip_setup_wizard">Skip setup wizard</string>
     <string name="make_user_ephemeral">Make user ephemeral</string>
     <string name="start_user_in_background">Start user in background</string>

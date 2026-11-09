@@ -33,6 +33,7 @@ import com.afwsamples.testdpc.DevicePolicyManagerGateway;
 import com.afwsamples.testdpc.DevicePolicyManagerGatewayImpl;
 import com.afwsamples.testdpc.R;
 import com.afwsamples.testdpc.common.BaseSearchablePolicyPreferenceFragment;
+import com.afwsamples.testdpc.common.Util;
 import com.afwsamples.testdpc.common.preference.DpcPreferenceBase;
 import com.afwsamples.testdpc.common.preference.DpcPreferenceHelper;
 import com.afwsamples.testdpc.common.preference.DpcSwitchPreference;
@@ -144,6 +145,12 @@ public class UserRestrictionsDisplayFragment extends BaseSearchablePolicyPrefere
     for (String restriction : UserRestriction.NYC_PLUS_RESTRICTIONS) {
       DpcPreferenceBase pref = (DpcPreferenceBase) findPreference(restriction);
       pref.setMinSdkVersion(VERSION_CODES.N);
+    }
+    for (String restriction : UserRestriction.PROFILE_OWNER_NYC_PLUS_RESTRICTIONS) {
+      if (Util.isProfileOwner(getPreferenceManager().getContext())) {
+        DpcPreferenceBase pref = (DpcPreferenceBase) findPreference(restriction);
+        pref.setMinSdkVersion(VERSION_CODES.N);
+      }
     }
     for (String restriction : UserRestriction.OC_PLUS_RESTRICTIONS) {
       DpcPreferenceBase pref = (DpcPreferenceBase) findPreference(restriction);

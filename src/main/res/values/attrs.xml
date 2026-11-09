@@ -35,6 +35,8 @@
             <enum name="T" value="33" />
             <enum name="U" value="34" />
             <enum name="V" value="35" />
+            <enum name="B" value="36" />
+            <enum name="C" value="37" />
         </attr>
 
         <!-- Constrain a preference to DO or PO admins. -->

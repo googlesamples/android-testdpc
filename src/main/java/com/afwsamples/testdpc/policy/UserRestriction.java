@@ -272,7 +272,6 @@ public class UserRestriction {
   public static final String[] PRIMARY_USER_ONLY_RESTRICTIONS = {
     DISALLOW_ADD_MANAGED_PROFILE,
     DISALLOW_ADD_USER,
-    DISALLOW_ADJUST_VOLUME,
     DISALLOW_BLUETOOTH,
     DISALLOW_CONFIG_BLUETOOTH,
     DISALLOW_CONFIG_CELL_BROADCASTS,
@@ -334,8 +333,16 @@ public class UserRestriction {
     ALLOW_PARENT_PROFILE_APP_LINKING, DISALLOW_SAFE_BOOT
   };
 
+  /** These user restrictions are added in NYC. */
   public static String[] NYC_PLUS_RESTRICTIONS = {
     DISALLOW_DATA_ROAMING, DISALLOW_SET_USER_ICON, DISALLOW_SET_WALLPAPER
+  };
+
+  /**
+   * These user restrictions should have NYC min version only if app is running on profile owner.
+   */
+  public static String[] PROFILE_OWNER_NYC_PLUS_RESTRICTIONS = {
+    DISALLOW_ADJUST_VOLUME,
   };
 
   public static String[] OC_PLUS_RESTRICTIONS = {

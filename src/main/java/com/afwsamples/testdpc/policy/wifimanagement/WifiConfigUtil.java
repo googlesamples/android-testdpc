@@ -31,7 +31,6 @@ public class WifiConfigUtil {
    *
    * @return whether it was successful.
    */
-  @SuppressWarnings("WifiManagerPotentialLeak") // TODO(b/210723613): proper fix
   public static boolean saveWifiConfiguration(
       Context context, WifiConfiguration wifiConfiguration) {
     WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(

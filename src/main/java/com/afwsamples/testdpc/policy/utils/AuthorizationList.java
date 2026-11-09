@@ -134,6 +134,10 @@ public class AuthorizationList {
   private static final int KM_TAG_VENDOR_PATCHLEVEL = KM_UINT | 718;
   private static final int KM_TAG_BOOT_PATCHLEVEL = KM_UINT | 719;
   private static final int KM_TAG_DEVICE_UNIQUE_ATTESTATION = KM_BOOL | 720;
+  private static final int KM_TAG_IDENTITY_CREDENTIAL_KEY = KM_BOOL | 721;
+  private static final int KM_TAG_STORAGE_KEY = KM_BOOL | 722;
+  private static final int KM_TAG_ATTESTATION_ID_SECOND_IMEI = KM_BYTES | 723;
+  private static final int KM_TAG_MODULE_HASH = KM_BYTES | 724;
 
   // Map for converting padding values to strings
   private static final ImmutableMap<Integer, String> paddingMap =
@@ -202,6 +206,10 @@ public class AuthorizationList {
   private boolean userPresenceRequired;
   private boolean confirmationRequired;
   private boolean individualAttestation;
+  private boolean identityCredentialKey;
+  private boolean storageKey;
+  private String secondImei;
+  private byte[] moduleHash;
 
   @RequiresApi(api = VERSION_CODES.N)
   public AuthorizationList(ASN1Encodable sequence) throws CertificateParsingException {
@@ -389,6 +397,22 @@ public class AuthorizationList {
           break;
         case KM_TAG_DEVICE_UNIQUE_ATTESTATION & KEYMASTER_TAG_TYPE_MASK:
           individualAttestation = true;
+          break;
+        case KM_TAG_IDENTITY_CREDENTIAL_KEY & KEYMASTER_TAG_TYPE_MASK:
+          identityCredentialKey = true;
+          break;
+        case KM_TAG_STORAGE_KEY & KEYMASTER_TAG_TYPE_MASK:
+          storageKey = true;
+          break;
+        case KM_TAG_ATTESTATION_ID_SECOND_IMEI & KEYMASTER_TAG_TYPE_MASK:
+          secondImei =
+              getStringFromAsn1Value(
+                  ASN1Util.getContextBaseUniversal(entry, tag, true, BERTags.OCTET_STRING));
+          break;
+        case KM_TAG_MODULE_HASH & KEYMASTER_TAG_TYPE_MASK:
+          moduleHash =
+              Asn1Utils.getByteArrayFromAsn1(
+                  ASN1Util.getContextBaseUniversal(entry, tag, true, BERTags.OCTET_STRING));
           break;
       }
     }
@@ -634,32 +658,34 @@ public class AuthorizationList {
   public String getSerialNumber() {
     return serialNumber;
   }
-  ;
 
   public String getImei() {
     return imei;
   }
-  ;
 
   public String getMeid() {
     return meid;
   }
-  ;
+
+  public String getSecondImei() {
+    return secondImei;
+  }
+
+  public byte[] getModuleHash() {
+    return moduleHash;
+  }
 
   public String getProduct() {
     return product;
   }
-  ;
 
   public String getManufacturer() {
     return manufacturer;
   }
-  ;
 
   public String getModel() {
     return model;
   }
-  ;
 
   public boolean isUserPresenceRequired() {
     return userPresenceRequired;
@@ -784,6 +810,18 @@ public class AuthorizationList {
 
     if (individualAttestation) {
       s.append("\nIndividual attestation");
+    }
+    if (identityCredentialKey) {
+      s.append("\nIdentity credential key");
+    }
+    if (storageKey) {
+      s.append("\nStorage key");
+    }
+    if (secondImei != null) {
+      s.append("\nSecond IMEI: ").append(secondImei);
+    }
+    if (moduleHash != null) {
+      s.append("\nModule hash: ").append(new java.math.BigInteger(1, moduleHash).toString(16));
     }
 
     if (brand != null) {
