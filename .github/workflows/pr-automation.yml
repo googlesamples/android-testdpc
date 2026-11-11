@@ -1,0 +1,26 @@
+name: PR automation
+
+# Calls the org-wide PR workflows in Trianect/.github; see its README for
+# what each one does and which org variables/secrets they need.
+
+on:
+  pull_request:
+    types: [opened, reopened, ready_for_review, edited, closed]
+  pull_request_target:
+    types: [opened, edited]
+  pull_request_review:
+    types: [submitted]
+  push:
+    branches: [main]
+
+jobs:
+  pr-automation:
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    uses: Trianect/.github/.github/workflows/pr-automation.yml@main
+    with:
+      pr-rebase-open-prs: true # force-pushes rebased PR branches after every push to main
+    secrets:
+      PROJECT_AUTOMATION_TOKEN: ${{ secrets.PROJECT_AUTOMATION_TOKEN }}

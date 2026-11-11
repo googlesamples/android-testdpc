@@ -1,0 +1,4 @@
+# These owners are auto-requested as reviewers on every pull request.
+# GitHub automatically skips requesting review from the PR's own author,
+# even if they are listed below.
+* @Trianect-Wouter @Trianect-Simon
